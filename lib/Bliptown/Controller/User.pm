@@ -1,6 +1,16 @@
 package Bliptown::Controller::User;
 use Mojo::Base 'Mojolicious::Controller';
 
+sub validate_user {
+	my $c = shift;
+	my $validator = Mojolicious::Validator->new;
+	my $v = $validator->validation;
+	$v->required('username')->like(q/[a-zA-Z][a-zA-Z0-9_-]*$/)->size(1,31);
+	$v->required('email')->like(q/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+	$v->required('password')->size(8,256);
+	return 1 unless $v->has_error;
+}
+
 sub user_join {
 	my $c = shift;
 	my $email = $c->param('email') || '';
