@@ -1,7 +1,6 @@
 package Bliptown;
 use Mojo::Base 'Mojolicious';
 use Mojo::SQLite;
-use Text::Markdown;
 
 sub startup {
 	my $app = shift;
@@ -27,11 +26,10 @@ sub startup {
 	my $r = $app->routes;
 
 	$r->post('/join')->to(controller => 'User', action => 'user_join')->name('user_join');
-	$r->get('/join')->to(controller => 'Email', action => 'email_confirmation')->name('email_confirmation');
 	$r->post('/login')->to(controller => 'User', action => 'user_login')->name('user_login');
     $r->get('/logout')->to(controller => 'User', action => 'user_logout')->name('user_logout');
 
-	$r->get('/')->to(controller => 'Page', action => 'render_page')->name('render_page');
+	$r->get('/*catchall')->to(controller => 'Page', action => 'render_page', catchall => '')->name('render_page');
 
 	my $protected = $r->under(
 		sub {
