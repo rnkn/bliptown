@@ -11,12 +11,13 @@ sub generate_email_confirmation {
 From: mayor\@blip.town
 To: $email_address
 Date: $date
+Message-ID: $token\@$hostname
 Subject: Please confirm you email address
 
 Hello,
 
-Thank you for creating an account at Bliptown. Please complete your
-registration by following the link below:
+Thank you for creating an account at Bliptown. Please confirm your
+email address by following the link below:
 
 $protocol://$hostname/confirm?token=$token
 
@@ -33,8 +34,9 @@ EOF
 	return $email_text;
 }
 
-sub email_confirmation {
+sub send_email_confirmation {
 	my $c = shift;
+	my $email_address = 'rnkn@rnkn.xyz'; # <-- FIXME
 	my ($protocol, $hostname);
 	if ($c->app->mode eq 'development') {
 		$protocol = 'http';
@@ -43,7 +45,6 @@ sub email_confirmation {
 		$protocol = 'https';
 		$hostname = 'blip.town';
 	}
-	my $email_address = 'rnkn@rnkn.xyz'; # <-- FIXME
 	my $token = generate_secret;
 	my $email_text = generate_email_confirmation(
 		$email_address, $token, $protocol, $hostname
@@ -68,7 +69,7 @@ sub email_confirmation {
         quit => 1,
 		sub {
 			my ($smtp, $res) = @_;
-			$c->app->log->debug($res->error ? 'Failed to send: ' . $res->error : 'Sent successfully');
+			$c->app->log->debug($res->error ? 'Failed to send email: ' . $res->error : 'Confirmation email sent to $email_address');
         }
 	);
 	$c->stash(
