@@ -4,13 +4,12 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<!-- <title><%= title %></title> -->
-		<title>Bliptown::Test</title>
+		<title><%= $title %></title>
         <link href="/main.css" rel="stylesheet">
 	</head>
 	<body>
-		<input type="radio" id="ui-panel-switch-join" name="ui-panel-switch" hidden>
-		<input type="radio" id="ui-panel-switch-login" name="ui-panel-switch" hidden checked>
+		<input type="radio" id="ui-panel-switch-login" name="ui-panel-switch" hidden>
+		<input type="radio" id="ui-panel-switch-join" name="ui-panel-switch" hidden checked>
 		<div id="ui-panel">
 			% if ($c->session('user_id')) {
 			<div id="user">
@@ -28,11 +27,11 @@
 						</div>
 						<div>
 							<label for="join-username">Username</label>
-							<input type="text" pattern='[a-zA-Z0-9-_]+' id="join-username" name="join-username" required>
+							<input type="text" placeholder="[a-zA-Z][a-zA-Z0-9_-]*" pattern="[a-zA-Z][a-zA-Z0-9_-]*" id="join-username" name="join-username" maxlength="31" required>
 						</div>
 						<div>
 							<label for="join-password">Password</label>
-							<input type="password" id="join-password" name="join-password" required>
+							<input type="password" id="join-password" name="join-password" minlength="8" required>
 						</div>
 						<button type="submit">Join</button>
 					</form>
@@ -69,161 +68,25 @@
 		<div id="viewport">
 			<header>
 				<label id="menu-toggle" class="button" for="menu-toggle">&equiv;</label>
-				<h1>Paul W. Rankin</h1>
+				<h1><a href="/">Bliptown</a></h1>
 				<label id="ui-panel-toggle" class="button" for="ui-panel-toggle">&plus;</label>
 			</header>
 			<nav>
-				<ul>
-					<li>Home
-					<li>Work
-					<li>CV (PDF)
-					<li>Email
+				<ul id="top">
+					<li>About
+					<li>News
+					<li><a href="/pricing">Pricing</a>
+					<li><label id="ui-panel-toggle" class="button" for="ui-panel-toggle">Join/Login</label>
+				</ul>
+				<ul id="bottom">
+					<li>Help
+					<li><a href="http://status.blip.town" target="_blank">Status</a>
 				</ul>
 			</nav>
 			<main>
-
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<p>Nobis saepe incidunt pariatur. Et nulla et voluptatum. Adipisci ipsa ullam quia. Voluptatibus possimus nulla ut excepturi fugit porro voluptatem. Beatae ducimus quibusdam sed sunt.
-
-Est deserunt aut velit autem dignissimos dolorum. Id explicabo sed maxime. Excepturi nemo et omnis error nemo amet quis architecto. Illum explicabo non qui cum id est est. Repellat nobis rerum autem hic ad est. Id vitae labore fugit dolorem aperiam eum.<p>
-
-<p>Aliquam et non saepe. Explicabo incidunt voluptas velit provident esse quia blanditiis perspiciatis. Similique temporibus aut consequatur dolore sint quia aut minima.
-
-<p>Ea reprehenderit minima non facere explicabo recusandae molestiae ex. Omnis veritatis ut quod non sit. Laboriosam enim et et excepturi tempore. In sapiente et perferendis alias ea necessitatibus ut. Illo doloribus alias unde inventore. Id ut iure iure non.
-
-<p>Rerum delectus voluptatem est. Quod deleniti nobis est. Ab fugiat fugit eum laborum quaerat voluptates et. Exercitationem quasi libero numquam enim dicta molestiae aut est. Magnam sit molestias facere eos veniam nesciunt est. Est aut laudantium voluptatem rerum incidunt quod fuga repudiandae.
-
-<%= content %>
+				<div class="<%= $class %>">
+					<%== $content %>
+				</div>
 			</main>
 		</div>
 	</body>
