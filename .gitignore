@@ -1,0 +1,6 @@
+/.env
+/cpanfile.snapshot
+/local
+/*.db
+/*.db-shm
+/*.db-wal
