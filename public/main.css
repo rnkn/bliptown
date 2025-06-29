@@ -1,4 +1,5 @@
 :root {
+		--main-bg-color: rgba(255,255,255,1.0);
 		--ui-panel-height: 3.5rem;
 }
 
@@ -13,15 +14,23 @@ body {
 		font-size: 16px;
 }
 
+p {
+		margin-bottom: 0.6em;
+}
+
 #viewport {
-		background-color: rgba(255,255,255,1.0);
+		background-color: var(--main-bg-color);
 		position: fixed;
 		display: flex;
 		top: 0;
 		width: 100%;
 		height: 100%;
-		box-shadow: 0 0 2em rgba(0,0,0,0.25);
+		box-shadow: 0 0 0.5rem rgba(0,0,0,0.25);
 		transition: transform 0.3s ease;
+}
+
+#ui-panel button {
+		width: 6em;
 }
 
 input#ui-panel-toggle:checked ~ #viewport {
@@ -36,16 +45,29 @@ input#ui-panel-toggle:checked ~ #viewport header label#ui-panel-toggle {
 		transform: rotate(45deg);
 }
 
+#join input#join-username::placeholder {
+		color: rgba(0,0,0,0.25);
+}
+
 header {
 		position: fixed;
 		display: flex;
 		justify-content: space-between;
 		top: 0;
-		width: 100vw;
+		width: 100%;
+		background: transparent;
 }
 
 header h1 {
+		font-size: initial;
+		font-weight: normal;
 		margin: 2em;
+		letter-spacing: 2px;
+}
+
+header h1 a {
+		color: initial;
+		text-decoration: none;
 }
 
 header label.button {
@@ -59,30 +81,24 @@ header label#menu-toggle {
 }
 
 nav {
-		height: 100vh;
-		width: 320px;
+		width: 12em;
 		margin: 4em 2em 0;
+		display: flex;
+		flex-direction: column;
 		overflow-y: auto;
 }
 
-@media only screen and (max-width: 800px) {
-		:root {
-				--ui-panel-height: 8.5rem;
-		}
-		header label#menu-toggle {
-				display: block;
-		}
-		main {
-				margin-top: 4rem;
-		}
-		nav {
-				display: none;
-		}
+nav a {
+		color: initial;
+		text-decoration: none;
 }
 
-main {
-		padding: 2em;
-		overflow: scroll;
+nav label.button {
+		cursor: pointer;
+}
+
+nav ul#bottom {
+		margin: auto 0 2em;
 }
 
 #ui-panel {
@@ -96,16 +112,8 @@ main {
 		transition: transform 0.5s ease;
 }
 
-#ui-panel #join {
+input#ui-panel-switch-login:checked ~ #ui-panel #join {
 		transform: translateX(-100%);
-}
-
-input#ui-panel-switch-join:checked ~ #ui-panel #join {
-		transform: translateX(0);
-}
-
-#ui-panel #login {
-		transform: translateX(0);
 }
 
 input#ui-panel-switch-login:checked ~ #ui-panel #login {
@@ -146,6 +154,32 @@ input#ui-panel-switch-login:checked ~ #ui-panel #login {
 		color: rgba(0,0,0,0.5);
 }
 
-header h1 {
+main {
+		z-index: 100;
+		padding: 2em;
+		overflow: scroll;
+}
+
+main h1 {
 		font-size: initial;
+		margin-bottom: 1em;
+}
+
+main .one-column {
+		max-width: 45em;
+}
+
+@media only screen and (max-width: 800px) {
+		:root {
+				--ui-panel-height: 8.5rem;
+		}
+		header label#menu-toggle {
+				display: block;
+		}
+		main {
+				padding-top: 6rem;
+		}
+		nav {
+				display: none;
+		}
 }
