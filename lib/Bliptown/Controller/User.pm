@@ -22,4 +22,4 @@ sub user_logout {
     $c->session(expires => 1);
 }
 
-return 1
+return 1;
