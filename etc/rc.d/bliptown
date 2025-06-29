@@ -1,0 +1,31 @@
+#!/bin/ksh
+
+daemon="/usr/local/bin/carton exec"
+daemon_flags="hypnotoad script/bliptown"
+daemon_execdir="/var/www/htdocs/blip.town"
+daemon_user="www"
+daemon_timeout=300
+
+. /etc/rc.d/rc.subr
+
+rc_start() {
+        rc_exec "${daemon} -- ${daemon_flags}"
+}
+
+rc_stop() {
+        rc_exec "${daemon} -- ${daemon_flags} --stop"
+}
+
+rc_configtest() {
+        rc_exec "${daemon} -- ${daemon_flags} --test"
+}
+
+rc_reload() {
+        rc_exec "${daemon} -- ${daemon_flags}"
+}
+
+rc_check() {
+        rc_exec "kill -0 $(cat script/hypnotoad.pid)"
+}
+
+rc_cmd $1
