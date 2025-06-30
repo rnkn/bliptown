@@ -12,10 +12,24 @@
 body {
 		font-family: sans-serif;
 		font-size: 16px;
+		color: rgba(0,0,0,0.75);
+		line-height: 1.5;
 }
 
 p {
-		margin-bottom: 0.6em;
+		margin-bottom: 1em;
+}
+
+a {
+		color: initial;
+}
+
+code {
+		font-size: 0.9em;
+}
+
+a:hover {
+		opacity: 0.5;
 }
 
 #viewport {
@@ -37,11 +51,22 @@ input#ui-panel-toggle:checked ~ #viewport {
 		transform: translateY(var(--ui-panel-height));
 }
 
-header label#ui-panel-toggle {
-		transition: transform 0.5s ease;
+label#ui-panel-toggle {
+		z-index: 90;
+		font-size: 2rem;
+		margin: 2rem;
+		line-height: 0.5;
+		position: fixed;
+		top: 0;
+		right: 0;
+		cursor: pointer;
 }
 
-input#ui-panel-toggle:checked ~ #viewport header label#ui-panel-toggle {
+label#ui-panel-toggle:before {
+		content: '+';
+}
+
+input#ui-panel-toggle:checked ~ #viewport label#ui-panel-toggle {
 		transform: rotate(45deg);
 }
 
@@ -50,18 +75,12 @@ input#ui-panel-toggle:checked ~ #viewport header label#ui-panel-toggle {
 }
 
 header {
-		position: fixed;
 		display: flex;
-		justify-content: space-between;
-		top: 0;
-		width: 100%;
-		background: transparent;
 }
 
 header h1 {
 		font-size: initial;
 		font-weight: normal;
-		margin: 2em;
 		letter-spacing: 2px;
 }
 
@@ -70,35 +89,44 @@ header h1 a {
 		text-decoration: none;
 }
 
-header label.button {
+label#menu-toggle {
+		z-index: 100;
+		display: none;
+		position: fixed;
+		top: 0;
+		margin: 2rem;
+		line-height: 0.5;
 		font-size: 2rem;
-		margin: 1.25rem 2rem;
 		cursor: pointer;
 }
 
-header label#menu-toggle {
-		display: none;
+label#menu-toggle:before {
+		content: "=";
 }
 
-nav {
-		width: 12em;
-		margin: 4em 2em 0;
+#sidebar {
+		width: 24rem;
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
+		padding: 2rem;
 }
 
-nav a {
+#sidebar a {
 		color: initial;
 		text-decoration: none;
+}
+
+#sidebar ul {
+		list-style: none;
 }
 
 nav label.button {
 		cursor: pointer;
 }
 
-nav ul#bottom {
-		margin: auto 0 2em;
+footer {
+		margin: auto 0 0;
 }
 
 #ui-panel {
@@ -107,7 +135,6 @@ nav ul#bottom {
 }
 
 #ui-panel #join, #ui-panel #login {
-		display: inline-block;
 		min-width: 100%;
 		transition: transform 0.5s ease;
 }
@@ -155,17 +182,17 @@ input#ui-panel-switch-login:checked ~ #ui-panel #login {
 }
 
 main {
-		z-index: 100;
-		padding: 2em;
+		width: 100%;
 		overflow: scroll;
+		padding: 2rem;
 }
 
-main h1 {
+main h1, main h2, main h3 {
 		font-size: initial;
 		margin-bottom: 1em;
 }
 
-main .one-column {
+#content .one-column {
 		max-width: 45em;
 }
 
@@ -173,13 +200,29 @@ main .one-column {
 		:root {
 				--ui-panel-height: 8.5rem;
 		}
-		header label#menu-toggle {
-				display: block;
+		#sidebar {
+				position: fixed;
+				width: 100%;
+				height: 3rem;
+		}
+		header h1 {
+				margin: auto;
 		}
 		main {
-				padding-top: 6rem;
+				padding-top: 5rem;
 		}
-		nav {
-				display: none;
+		label#menu-toggle {
+				display: block;
+		}
+		input#menu-toggle:checked ~ #sidebar {
+				z-index: 99;
+				height: 100%;
+				background-color: white;
+		}
+		input#menu-toggle:checked ~ label#menu-toggle {
+				transform: rotate(45deg);
+		}
+		input#menu-toggle:checked ~ label#menu-toggle:before {
+				content: '+';
 		}
 }
