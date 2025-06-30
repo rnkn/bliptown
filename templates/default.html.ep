@@ -63,28 +63,24 @@
 			</div>
 			% }
 		</div>
-		<input type="checkbox" id="menu-toggle" hidden>
 		<input type="checkbox" id="ui-panel-toggle" hidden>
 		<div id="viewport">
-			<header>
-				<label id="menu-toggle" class="button" for="menu-toggle">&equiv;</label>
-				<h1><a href="/">Bliptown</a></h1>
-				<label id="ui-panel-toggle" class="button" for="ui-panel-toggle">&plus;</label>
-			</header>
-			<nav>
-				<ul id="top">
-					<li>About
-					<li>News
-					<li><a href="/pricing">Pricing</a>
-					<li><label id="ui-panel-toggle" class="button" for="ui-panel-toggle">Join/Login</label>
-				</ul>
-				<ul id="bottom">
-					<li>Help
-					<li><a href="http://status.blip.town" target="_blank">Status</a>
-				</ul>
-			</nav>
+			<input type="checkbox" id="menu-toggle" hidden>
+			<label id="menu-toggle" class="button" for="menu-toggle"></label>
+			<label id="ui-panel-toggle" class="button" for="ui-panel-toggle"></label>
+			<div id="sidebar">
+				<header>
+					<h1><%== $header %></h1>
+				</header>
+				<nav>
+					<%== $sidebar %>
+				</nav>
+				<footer>
+					<%== $footer %>
+				</footer>
+			</div>
 			<main>
-				<div class="<%= $class %>">
+				<div id="content" class="<%= $layout %>">
 					<%== $content %>
 				</div>
 			</main>
