@@ -16,6 +16,10 @@ sub user_join {
 	my $email = $c->param('email') || '';
 	my $username = $c->param('username') || '';
 	my $password = $c->param('password') || '';
+	# if username already in db -> duplicate_username_error
+	# if email already in db, with email confirm with mismatch username -> duplicate_email_error
+	# if already in db, email unconfirm -> send_email_confirmation
+	# if not in db -> create_user -> loop
 }
 
 sub user_login {

@@ -1,77 +1,76 @@
 package Bliptown::Controller::Page;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(slugify url_unescape);
-use Mojo::Home;
-use YAML::Tiny;
-use Text::Markdown;
 
-sub render_special {
-	my ($user, $special) = @_;
-	my $home = Mojo::Home->new;
-	my $file = $home->child('src', $user, '.' . $special . '.md');
-	my $chars = $file->slurp('utf-8');
-	my $markdown = $chars;
-	$markdown =~ s/\[\[(.*?)\]\]/my $s = slugify($1); "[$1]($s)"/ge;
+my @special_pages = ('header', 'sidebar', 'footer');
 
-	my $md = Text::Markdown->new;
-	my $html = $md->markdown($markdown);
-	return $html;
+sub render_frag {
+	my $page = shift;
+	my $layout = $page->{metadata}{layout} // 'one-column';
+	return "<div class=\"$layout\">\n" . $page->{html} . "</div>\n";
+}
+
+sub yaml_true {
+	my $p = shift;
+	if ($p && $p =~ /^(true|y(es)?|1)$/) {
+		return 1;
+	}
 }
 
 sub render_page {
 	my $c = shift;
-	my @hostname = split('.', $c->req->url->to_abs->host);
-	my $user = @hostname >= 3 ? $hostname[-3] : 'mayor';
+	my $home = $c->get_home;
 	my $path = $c->req->url->to_abs->path;
+	my $user = $c->get_user;
 
 	$path = url_unescape($path);
 	{
-		my @path_elts = split('/', $path);
-		my @slugs = map { slugify($_) } @path_elts;
+		my @elts = split('/', $path);
+		my @slugs = map { slugify $_ } @elts;
 		$path = join('/', @slugs);
 	}
-
 	$path = 'index' if length($path) == 0;
-	my $home = Mojo::Home->new;
-	my $file = $home->child('src', $user, $path . '.md');
-	# my @file_stats = stat $file;
 
-	return $c->reply->not_found unless -e $file && !-x $file;
+	my $file_html = $home->child('src', $user, $path . '.html');
+	my $file_md = $home->child('src', $user, $path . '.md');
 
-	my $chars = $file->slurp('utf-8');
-	my ($yaml, $markdown);
-	if ($chars =~ /^(---.*?---)\s*(.*)$/s) {
-		$yaml = $1;
-		$markdown = $2;
-	} else {
-		$markdown = $chars;
-	}
+	return $c->reply->file($file_html) if -r $file_html;
+	return $c->reply->not_found unless -r $file_md;
 
-	$markdown =~ s/\[\[(.*?)\]\]/my $s = slugify($1); "[$1]($s)"/ge;
+	my $page = $c->page->read_page(
+		{
+			file => $file_md,
+			user => $user,
+			path => $path,
+			home => $home,
+		});
+
+	my $private = $page->{metadata}{private};
 	
-	my ($metadata, $title);
-	my $layout = 'one-column';
-	if ($yaml) {
-		$metadata = YAML::Tiny->read_string($yaml);
-		$title = 'Bliptown::' . $metadata->[0]->{'title'};
-		$layout = $metadata->[0]->{'layout'};
+	return $c->render(
+		text => 'Access denied', status => 403
+	) if yaml_true($private);
+
+	my $title = $page->{metadata}{title} || 'Untitled';
+	my $date = $page->{metadata}{date} || '';
+
+	my %special_html;
+	foreach (@special_pages) {
+		my $file_md = $home->child('src', $user, '.' . $_ . '.md');
+		my $page = $c->page->read_page({ file => $file_md });
+		$special_html{$_} = $page->{html};
 	}
-
-	my $md = Text::Markdown->new;
-	my $html = $md->markdown($markdown);
-
-	my $header = render_special($user, 'header');
-	my $sidebar = render_special($user, 'sidebar');
-	my $footer = render_special($user, 'footer');
+	$special_html{head_add} = $home->child('src', $user, '.head.html')->slurp('utf-8');
 
 	$c->stash(
-		template => 'default',
+		template => 'page',
+		head_add => $special_html{head_add},
 		title => $title,
-		layout => $layout,
-		header => $header,
-		sidebar => $sidebar,
-		footer => $footer,
-		content => $html,
+		date => $date,
+		header => $special_html{header},
+		sidebar => $special_html{sidebar},
+		footer => $special_html{footer},
+		content => $page->{html},
 	);
 	return $c->render;
 }
