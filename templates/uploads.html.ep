@@ -1,0 +1,24 @@
+% layout 'default';
+<main id="uploads">
+	<form id="select-file-upload" method="POST" action="/upload" enctype="multipart/form-data">
+		<input type="file" accept="image/*,application/pdf" id="file-upload" name="file-upload" multiple>
+		<button type="submit">Upload</button>
+	</form>
+	<form id="file-list">
+		% foreach my $file (sort keys %$uploads) {
+		<label class="row" for="file<%= $file %>">
+			<input type="checkbox" id="file<%= $file %>" class="file-row-checkbox" name="file<%= $file %>">
+			<div class="cell filename">
+				<a href="/uploads/<%= $uploads->{$file}{filename} %>"><%= $uploads->{$file}{filename} %></a>
+			</div>
+			<div class="cell detail">
+				<%= $uploads->{$file}{size} %>
+			</div>
+			<div class="cell detail">
+				<%= $uploads->{$file}{mtime} %>
+			</div>
+		</label>
+		% }
+		<button type="submit">Delete</button>
+	</form>
+</main>
