@@ -1,0 +1,30 @@
+% layout 'default';
+<main id="all-pages" class="backstage">
+	<nav>
+		<a href="/" id="exit">View Site</a>
+		<h2><%= $title %></h2>
+	</nav>
+	<form id="page-list">
+		<div class="form-inner">
+			% foreach my $page (sort keys %$pages) {
+			<label class="row" for="page<%= $page %>">
+				<input type="checkbox" id="<%= $page %>" class="row-checkbox" name="<%= $page %>">
+				<div class="cell name">
+					% if ($page =~ /^\./) {
+					<a href="<%= url_for('edit_page', catchall => $page)->query(back_to => $redirect) %>"><%= $page %></a>
+					% } else {
+					<a href="<%= url_for($page) %>"><%= $page %></a>
+					% }
+				</div>
+				<div class="cell">
+					<a href="<%= url_for('edit_page', catchall => $page)->query(back_to => $redirect) %>">Edit</a>
+				</div>
+				<div class="cell">
+					<a href="<%= url_for('delete_page', catchall => $page) %>">Delete</a>
+				</div>
+			</label>
+			% }
+		</div>
+		<button type="submit">Delete</button>
+	</form>
+</main>
