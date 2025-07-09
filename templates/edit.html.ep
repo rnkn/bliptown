@@ -1,7 +1,7 @@
 % layout 'default';
 <main id="edit" class="backstage">
 	<nav>
-		<a href="/" id="exit">View Site</a>
+		<a href="<%= url_for('list_pages') %>" id="exit">All Pages</a>
 		<h2><%= $title %>
 			% if ($filename =~ /^\./) {
 			<%= $filename %>
