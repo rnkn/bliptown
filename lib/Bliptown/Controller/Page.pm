@@ -105,13 +105,6 @@ sub edit_page {
 	my $redirect = $c->param('back_to');
 	my $dir = $c->app->home->child($c->get_src_dir, $c->get_user); # FIXME
 	my $file = get_file($dir, $slug);
-	my $help_url;
-	foreach ($file) {
-		if (/\.html$/) { $help_url = 'https://developer.mozilla.org/docs/Web/HTML' }
-		if (/\.css$/) { $help_url = 'https://developer.mozilla.org/docs/Web/CSS' }
-		if (/\.js$/) { $help_url = 'https://developer.mozilla.org/docs/Web/JavaScript' }
-		if (/\.md$/) { $help_url = 'https://commonmark.org/' }
-	}
 	my $content = $c->source->read_source({ file => $file })->{chars};
 	my @included = ($content =~ /\{\{\s*(.*?)\s*\}\}/g);
 	$c->stash(
@@ -121,7 +114,6 @@ sub edit_page {
 		filename => $file->basename,
 		slug => $slug,
 		editable => 0,
-		help_url => $help_url,
 		redirect => $redirect,
 		content => $content,
 		included => \@included,

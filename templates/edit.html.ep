@@ -9,7 +9,9 @@
 			<a href="/<%= $slug %>"><%= $filename %></a>
 			% }
 		</h2>
-		<a href="<%= $help_url %>" target="_blank" id="format-help">?</a>
+		% if ($filename =~ /\.md$/) {
+		<a href="https://commonmark.org/" target="_blank" id="format-help">?</a>
+		% }
 	</nav>
 	<form method="POST" action="<%= url_for %>" >
 		<div class="form-inner">
