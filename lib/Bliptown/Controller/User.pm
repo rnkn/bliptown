@@ -16,24 +16,33 @@ sub user_join {
 	my $email = $c->param('email') || '';
 	my $username = $c->param('username') || '';
 	my $password = $c->param('password') || '';
-	# if username already in db -> duplicate_username_error
-	# if email already in db, with email confirm with mismatch username -> duplicate_email_error
-	# if already in db, email unconfirm -> send_email_confirmation
-	# if not in db -> create_user -> loop
+	my $redirect_to = $c->param('redirect-to') || '/';
+	$c->user->create_user(
+		{
+			username => $username,
+			email => $email,
+			password => $password,
+		}
+	);
+	return $c->redirect_to($redirect_to);
 }
 
 sub user_login {
 	my $c = shift;
 	my $username = $c->param('username') || '';
 	my $password = $c->param('password') || '';
-	if ($c->users->authenticate_user($username, $password)) {
-		$c->session(expiration => 2592000);
+	my $redirect_to = $c->param('redirect-to') || '/';
+	if ($c->user->authenticate_user({username => $username, password => $password})) {
+		$c->session(expiration => 2592000, username => $username);
+		return $c->redirect_to($redirect_to);
 	}
+	return $c->redirect_to('/nope');
 }
 
 sub user_logout {
     my $c = shift;
     $c->session(expires => 1);
+	return $c->redirect_to('/');
 }
 
 return 1;

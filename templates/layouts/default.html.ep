@@ -1,3 +1,4 @@
+% my $show_join = 1 if $c->get_user eq 'mayor';
 <!DOCTYPE html>
 <html>
 	<head>
@@ -6,67 +7,78 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title><%= $title %></title>
         <link href="/main.css" rel="stylesheet">
-		<%== $head_add %>
+		<link href="/style.css" rel="stylesheet">
+		<%== $head %>
 	</head>
 	<body>
-		<input type="radio" id="ui-panel-switch-login" name="ui-panel-switch" hidden>
-		<input type="radio" id="ui-panel-switch-join" name="ui-panel-switch" hidden checked>
-		<div id="ui-panel">
-			% if ($c->session('user_id')) {
-			<div id="user">
-				<a href="/edit/page">Edit</a>
-				<a href="/delete/page">Delete</a>
-				<a href="<%= url_for('user_logout') %>"class="button">Log Out</a>
+		<input type="radio" id="drawer-switch-login" name="drawer-switch" hidden>
+		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden checked>
+		<div id="drawer">
+			% if ($c->session('username') eq $c->get_user) {
+			<div id="user" class="panel">
+				<ul>
+					<li><a href="<%= url_for('new_page') %>">New</a></li>
+					% if ($editable && $redirect) {
+					<li><a href="<%= url_for('edit_page') %>?back_to=<%= $redirect %>">Edit</a></li>
+					% } elsif ($editable) {
+					<li><a href="<%= url_for('edit_page') %>">Edit</a></li>
+					% }
+					<li><a href="<%= url_for('list_pages') %>">All Pages</a></li>
+					<li><a href="/style">Style</a></li>
+					<li><a href="<%= url_for('list_uploads') %>">Uploads</a></li>
+					<li><a href="<%= url_for('list_settings') %>">Settings</a></li>
+					<li><a href="<%= url_for('user_logout') %>">Log Out</a></li>
+				</ul>
 			</div>
 			% } else {
-			<div id="join">
-				<div class="form-container">
-					<form method="POST" action="<%= url_for('user_join') %>">
-						<div>
-							<label for="join-email">Email</label>
-							<input type="email" id="join-email" name="join-email" required>
-						</div>
-						<div>
-							<label for="join-username">Username</label>
-							<input type="text" placeholder="[a-zA-Z][a-zA-Z0-9_-]*" pattern="[a-zA-Z][a-zA-Z0-9_\-]*" id="join-username" name="join-username" maxlength="31" required>
-						</div>
-						<div>
-							<label for="join-password">Password</label>
-							<input type="password" id="join-password" name="join-password" minlength="8" required>
-						</div>
-						<button type="submit">Join</button>
-					</form>
-					<label id="ui-panel-switch-login" class="switch" for="ui-panel-switch-login">Login</label>
-				</div>
-			</div>
-			<div id="login">
-				<div class="form-container">
-					<label id="ui-panel-switch-join" class="switch" for="ui-panel-switch-join">Join</label>
-					<form action="<%= url_for('user_login') %>" method="POST">
-						<div>
-							<label for="login-username">Username</label>
-							<input type="text" id="login-username" name="login-username" required>
-						</div>
-						<div>
-							<label for="login-password">Password</label>
-							<input type="password" id="login-password" name="login-password" required>
-						</div>
-						<button type="submit">Login</button>
-					</form>
+			% if ($show_join) {
+			<div id="join" class="panel">
+				<form method="POST" action="<%= url_for('user_join') %>">
 					<div>
-						% if ($c->app->mode eq 'development') {
-						<a href="http://blip.local:3000/forgot-password">Forgot Password</a>
-						% } else {
-						<a href="https://blip.town/forgot-password">Forgot Password</a>
-						% }
+						<label for="join-email">Email</label>
+						<input type="email" id="join-email" name="email" required>
 					</div>
-				</div>
+					<div>
+						<label for="join-username">Username</label>
+						<input type="text" placeholder="[a-zA-Z][a-zA-Z0-9_-]*" pattern="[a-zA-Z][a-zA-Z0-9_\-]*" id="join-username" name="username" maxlength="31" required>
+					</div>
+					<div>
+						<label for="join-password">Password</label>
+						<input type="password" id="join-password" name="password" minlength="8" required>
+					</div>
+					<input name="redirect-to" value="<%= url_for %>" hidden>
+					<button type="submit">Join</button>
+				</form>
+				<label id="drawer-switch-login" class="switch" for="drawer-switch-login">Login</label>
+			</div>
+			% }
+			<div id="login" class="panel">
+				<form action="<%= url_for('user_login') %>" method="POST">
+					<div>
+						<label for="login-username">Username</label>
+						<input type="text" id="login-username" name="username" required>
+					</div>
+					<div>
+						<label for="login-password">Password</label>
+						<input type="password" id="login-password" name="password" required>
+					</div>
+					<input name="redirect-to" value="<%= url_for %>" hidden>
+					<button type="submit">Login</button>
+				</form>
+				% if ($show_join) {
+				<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
+				% }
+				% if ($c->app->mode eq 'development') {
+				<a href="http://blip.local:3000/forgot-password">Forgot Password</a>
+				% } else {
+				<a href="https://blip.town/forgot-password">Forgot Password</a>
+				% }
 			</div>
 			% }
 		</div>
-		<input type="checkbox" id="ui-panel-toggle" hidden>
+		<input type="checkbox" id="drawer-toggle" hidden>
 		<div id="viewport">
-			<label id="ui-panel-toggle" class="button" for="ui-panel-toggle"></label>
+			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
 			<%= content %>
 		</div>
 	</body>

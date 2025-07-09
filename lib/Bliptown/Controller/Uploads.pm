@@ -20,10 +20,10 @@ sub format_human_size {
 
 sub list_uploads {
 	my $c = shift;
-	my $upload_paths = $home->child('src', $c->get_user, 'uploads')->list->to_array;
+	my $paths = $home->child($c->get_src_dir, $c->get_user, 'assets')->list->to_array;
 	my %uploads;
 	my $id = 0;
-	foreach (@$upload_paths) {
+	foreach (@$paths) {
 		my @stat = stat($_);
 		$uploads{$id++} = {
 			filename => basename($_),
@@ -32,11 +32,12 @@ sub list_uploads {
 		};
 	}
 	$c->stash(
-		head_add => '',
+		head => '',
 		template => 'uploads',
 		title => 'Uploads',
+		editable => 0,
+		redirect => '',
 		uploads => \%uploads,
-		# content => $html,
 	);
 	return $c->render;
 }

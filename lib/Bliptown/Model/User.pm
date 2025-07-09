@@ -2,6 +2,8 @@ package Bliptown::Model::User;
 use Mojo::Base -base;
 use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 
+has 'sqlite';
+
 sub get_user {
 	my $self = shift;
 	my @hostname = split(/\./, $self->req->url->to_abs->host);
@@ -11,22 +13,23 @@ sub get_user {
 sub create_user {
 	my ($self, $args) = @_;
 	my $password_hash = bcrypt(
-		$args->password, '2b', 12, $ENV{BLIPTOWN_SALT}
+		$args->{password}, '2b', 12, $ENV{BLIPTOWN_SALT}
 	);
 	$self->sqlite->db->insert(
 		'users', {
-			username => $args->username,
-			email => $args->email,
+			email => $args->{email},
+			username => $args->{username},
 			password_hash => $password_hash,
 		});
 }
 
 sub read_user {
     my ($self, $args) = @_;
-    my $data = $self->sqlite->db->select(
+    my $user = $self->sqlite->db->select(
 		'users', undef, {
-			username => $args->username
+			username => $args->{username},
 		})->hash;
+	return $user;
 }
 
 my @allowed_keys = qw(username email password_hash);
@@ -52,10 +55,11 @@ sub delete_user {
 
 sub authenticate_user {
     my ($self, $args) = @_;
-    my $res = $self->read_user({ username => $args->username });
-    my $hash = $res->{password_hash};
+    my $user = $self->read_user({ username => $args->{username} });
+	return unless $user;
+    my $hash = $user->{password_hash};
     if ($hash) {
-        return bcrypt_check($args->password, $hash);
+        return bcrypt_check($args->{password}, $hash);
     }
     return undef;
 }
