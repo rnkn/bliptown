@@ -1,0 +1,31 @@
+% layout 'default';
+<main id="edit" class="backstage">
+	<nav>
+		<a href="/" id="exit">View Site</a>
+		<h2><%= $title %>
+			% if ($filename =~ /^\./) {
+			<%= $filename %>
+			% } else {
+			<a href="/<%= $slug %>"><%= $filename %></a>
+			% }
+		</h2>
+		<a href="<%= $help_url %>" target="_blank" id="format-help">?</a>
+	</nav>
+	<form method="POST" action="<%= url_for %>" >
+		<div class="form-inner">
+			<textarea name="content"><%= $content %></textarea>
+			% if (@$included) {
+			<div id="included">
+				<strong>Included:</strong>
+				% foreach (@$included) {
+				<a href="<%= url_for($_)->query(back_to => $redirect) %>"><%= $_ %></a>
+				% }
+			</div>
+			% }
+		</div>
+		<input name="back_to" value="<%= $redirect %>" hidden>
+		<button type="submit" name="action" value="save-changes">Save Changes</button>
+		<button type="submit" name="action" value="save-exit">Save & Exit</button>
+		<a href="<%= $redirect %>">Cancel</a>
+	</form>
+</main>
