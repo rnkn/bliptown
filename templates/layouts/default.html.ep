@@ -14,7 +14,7 @@
 		<input type="radio" id="drawer-switch-login" name="drawer-switch" hidden>
 		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden checked>
 		<div id="drawer">
-			% if ($c->session('username') eq $c->get_user) {
+			% if ($c->session('username') && $c->session('username') eq $c->get_user) {
 			<div id="user" class="panel">
 				<ul>
 					<li><a href="<%= url_for('new_page') %>">New</a></li>
