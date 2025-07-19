@@ -31,6 +31,7 @@ a {
 
 pre {
 	padding: 1em;
+	overflow-x: auto;
 }
 
 pre, code {
@@ -45,6 +46,15 @@ img {
 blockquote {
 	padding: 0 2em;
 	border-left: 1px solid rgba(0,0,0,0.5);
+}
+
+section {
+	background-color: var(--main-bg-color);
+}
+
+details summary:hover {
+	opacity: 0.5;
+	cursor: pointer;
 }
 
 button {
@@ -132,7 +142,6 @@ footer {
 	flex-shrink: 0;
 }
 
-
 main {
 	width: 100%;
 	overflow: scroll;
@@ -143,7 +152,7 @@ main {
 
 main h1, main h2, main h3 {
 	font-size: initial;
-	margin-bottom: 1em;
+	margin-bottom: 1rem;
 }
 
 main ul {
@@ -155,6 +164,7 @@ main form, main textarea {
 }
 
 #sidebar {
+	z-index: 80;
 	width: 24em;
 	display: flex;
 	flex-direction: column;
@@ -173,6 +183,14 @@ main form, main textarea {
 
 #sidebar ul li label {
 	cursor: pointer;
+}
+
+#sidebar details ul {
+	padding-left: 1em;
+}
+
+#sidebar details summary {
+	list-style: none;
 }
 
 #drawer {
@@ -240,11 +258,44 @@ input#drawer-switch-login:checked ~ #drawer #login {
 #edit textarea {
 	display: block;
 	width: 100%;
-	height: 75vh;
+	height: 70vh;
 }
 
 #edit button {
 	width: 8em;
+}
+
+#edit #edit-name {
+	display: flex;
+}
+
+#edit #edit-name #dot {
+	margin: 0 0.5em;
+}
+
+#edit #edit-name input[type=text] {
+	flex-grow: 1;
+	font-family: monospace;
+}
+
+#edit nav a#format-help {
+	margin-left: 1em;
+}
+
+#edit nav a#format-help:before {
+	content: "(";
+}
+
+#edit nav a#format-help:after {
+	content: ")";
+}
+
+#files #controls {
+	display: flex;
+}
+
+#files #upload {
+	margin-left: auto;
 }
 
 #included {
@@ -270,58 +321,51 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	content: "← ";
 }
 
-#edit nav a#format-help {
-	margin-left: 1em;
-}
-
-#edit nav a#format-help:before {
-	content: "(";
-}
-
-#edit nav a#format-help:after {
-	content: ")";
-}
-
-.backstage .form-inner {
-	margin: 1em 0;
-}
-
-form .row {
+form.table .row {
 	display: flex;
 	cursor: pointer;
 }
 
-form .row:hover {
+form.table .row:hover {
 	background-color: rgba(220,220,220,0.5);
 }
 
-form .cell {
+form.table .cell {
 	margin-left: 1em;
 }
 
-form .cell.name {
+form.table .cell.name {
 	flex-grow: 1;
+}
+
+form.table .cell.button {
+	text-align: center;
+	width: 3em;
+}
+
+.left {
+	margin-right: auto;
+}
+
+.right {
+	margin-left: auto;
+}
+
+.center {
+	margin: auto;
 }
 
 .one-column {
 	max-width: 44em;
 }
 
-.wide, .wide-left, .wide-right {
+.wide {
 	max-width: 100%;
-}
-
-.wide > div {
-	margin: auto;
-}
-
-.wide-right > div {
-	margin-left: auto;
 }
 
 .gallery-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(20em, max-content));
+	grid-template-columns: repeat(auto-fill, minmax(18em, max-content));
 	gap: 1em;
 }
 
@@ -346,6 +390,25 @@ form .cell.name {
 	width: 90%;
 }
 
+.parallax {
+    perspective: 1px;
+	overflow-y: auto;
+	height: calc(100vh - 4rem);
+}
+
+.parallax-bg {
+    transform: translateZ(-1px) scale(2);
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.parallax-fg {
+	transform: translateZ(0);
+}
+
 .error {
 	color: rgba(255,0,0,0.5);
 	font-weight: bold;
@@ -359,7 +422,7 @@ form .cell.name {
 	transform: rotate(45deg);
 }
 
-@media only screen and (max-width: 800px) {
+@media (max-width: 800px) {
 	:root {
 		--ui-panel-height: 8.5rem;
 	}
@@ -375,7 +438,7 @@ form .cell.name {
 		padding-top: 5rem;
 		padding-right: 2rem;
 	}
-	#filelist .cell.detail {
+	#files .cell.stat {
 		display: none;
 	}
 	label#menu-toggle {
