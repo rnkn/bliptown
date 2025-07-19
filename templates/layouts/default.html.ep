@@ -14,18 +14,17 @@
 		<input type="radio" id="drawer-switch-login" name="drawer-switch" hidden>
 		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden checked>
 		<div id="drawer">
-			% if ($c->session('username') && $c->session('username') eq $c->get_user) {
+			% if (session('username') && session('username') eq get_user) {
 			<div id="user" class="panel">
 				<ul>
-					<li><a href="<%= url_for('new_page') %>">New</a></li>
+					<li><a href="<%= url_for('new_page', catchall => '')->query(back_to => $redirect) %>">New</a></li>
 					% if ($editable && $redirect) {
-					<li><a href="<%= url_for('edit_page') %>?back_to=<%= $redirect %>">Edit</a></li>
+					<li><a href="<%= url_for('edit_page')->query(back_to => $redirect) %>">Edit</a></li>
 					% } elsif ($editable) {
 					<li><a href="<%= url_for('edit_page') %>">Edit</a></li>
 					% }
-					<li><a href="<%= url_for('list_pages') %>">All Pages</a></li>
+					<li><a href="<%= url_for('list_files') %>">All Files</a></li>
 					<li><a href="/style">Style</a></li>
-					<li><a href="<%= url_for('list_uploads') %>">Uploads</a></li>
 					<li><a href="<%= url_for('list_settings') %>">Settings</a></li>
 					<li><a href="<%= url_for('user_logout') %>">Log Out</a></li>
 				</ul>
@@ -68,7 +67,7 @@
 				% if ($show_join) {
 				<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
 				% }
-				% if ($c->app->mode eq 'development') {
+				% if (app->mode eq 'development') {
 				<a href="http://blip.local:3000/forgot-password">Forgot Password</a>
 				% } else {
 				<a href="https://blip.town/forgot-password">Forgot Password</a>
