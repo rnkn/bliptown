@@ -4,6 +4,8 @@ use Mojo::Base -base;
 sub create_source {
 	my ($self, $args) = @_;
 	my $file = Mojo::File->new($args->{file});
+	my $path = $file->dirname;
+	$path->make_path;
 	$file->touch;
 }
 
@@ -24,6 +26,12 @@ sub update_source {
 	my $chars = $args->{chars};
 	$self->create_source({ file => $file });
 	$file->spew($chars, 'utf-8');
+}
+
+sub delete_source {
+	my ($self, $args) = @_;
+	my $file = Mojo::File->new($args->{file});
+	$file->remove;
 }
 
 return 1;
