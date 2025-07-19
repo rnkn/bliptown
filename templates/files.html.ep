@@ -1,0 +1,50 @@
+% layout 'default';
+<main id="files" class="backstage">
+	<nav>
+		<a href="/" id="exit">View Site</a>
+		<h2><%= $title %></h2>
+	</nav>
+	<div id="controls">
+		<form id="filter" method="GET" action="<%= url_for('list_files') %>">
+			<input type="text" name="filter" placeholder="regexp" value="<%= param('filter') %>">
+			<button type="submit">Filter</button>
+			% if (param('filter')) {
+			<a href="<%= url_for('list_files') %>">Reset</a>
+			% }
+		</form>
+		<form id="upload" method="POST" action="<%= url_for('upload') %>" enctype="multipart/form-data">
+			<input type="file" accept="image/*,application/pdf" id="file-upload" name="file-upload" multiple>
+			<button type="submit">Upload</button>
+		</form>
+	</div>
+	<form id="file-list" class="table">
+		% foreach (sort keys %$files) {
+		% my $file = %$files{$_};
+		<label class="row" for="<%= $file->{relpath} %>">
+			<input type="checkbox" id="<%= $file->{relpath} %>" class="row-checkbox" name="<%= $file->{relpath} %>">
+			<div class="cell name">
+				% if ($file->{relpath} =~ /^_/) {
+				<a href="<%= url_for('edit_page', catchall => $file->{url}) %>"><%= $file->{relpath} %></a>
+				% } else {
+				<a href="<%= $file->{url} %>"><%= $file->{relpath} %></a>
+				% }
+			</div>
+			<div class="cell stat">
+				<%= $file->{size} %>
+			</div>
+			<div class="cell stat">
+				<%= $file->{mtime} %>
+			</div>
+			<div class="cell button">
+				% if ($file->{relpath} =~ /\.(md|txt|html|css|js)/) {
+				<a href="<%= url_for('edit_page', catchall => $file->{url} )->query(back_to => $redirect) %>">Edit</a>
+				% }
+			</div>
+			<div class="cell button">
+				<a href="<%= url_for('delete_file', catchall => $file->{relpath} )->query(back_to => url_for)%>">Delete</a>
+			</div>
+		</label>
+		% }
+		<button type="submit">Delete</button>
+	</form>
+</main>
