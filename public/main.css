@@ -1,7 +1,7 @@
 :root {
 	--main-bg-color: rgba(255,255,255,1.0);
 	--code-bg-color: rgba(235,235,235,1.0);
-	--ui-panel-height: 3.5rem;
+	--drawer-height: 3.5rem;
 }
 
 * {
@@ -81,7 +81,7 @@ a:hover, label.button:hover {
 }
 
 input#drawer-toggle:checked ~ #viewport {
-	transform: translateY(var(--ui-panel-height));
+	transform: translateY(var(--drawer-height));
 }
 
 label#drawer-toggle {
@@ -222,6 +222,7 @@ input#drawer-switch-login:checked ~ #drawer #login {
 
 #drawer form {
 	display: flex;
+	gap: 1em;
 }
 
 #drawer label.switch {
@@ -240,15 +241,8 @@ input#drawer-switch-login:checked ~ #drawer #login {
 #drawer ul {
 	list-style-type: none;
 	display: flex;
+	gap: 1em;
 	margin-left: auto;
-}
-
-#drawer ul li {
-	margin-left: 1em;
-}
-
-#drawer ul li:first-child {
-	margin-left: 0;
 }
 
 #drawer ul li a {
@@ -265,28 +259,25 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	width: 8em;
 }
 
-#edit #edit-name {
+#edit #filename {
 	display: flex;
+	gap: 0.5em;
 }
 
-#edit #edit-name #dot {
-	margin: 0 0.5em;
-}
-
-#edit #edit-name input[type=text] {
+#edit #filename input[type=text] {
 	flex-grow: 1;
 	font-family: monospace;
 }
 
-#edit nav a#format-help {
+#edit nav a#markdown-help {
 	margin-left: 1em;
 }
 
-#edit nav a#format-help:before {
+#edit nav a#markdown-help:before {
 	content: "(";
 }
 
-#edit nav a#format-help:after {
+#edit nav a#markdown-help:after {
 	content: ")";
 }
 
@@ -298,12 +289,13 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	margin-left: auto;
 }
 
-#included {
+#includes {
 	margin: 1em 0;
 }
 
 .backstage nav {
 	display: flex;
+	gap: 1em;
 	margin-bottom: 1em;
 }
 
@@ -314,7 +306,6 @@ input#drawer-switch-login:checked ~ #drawer #login {
 
 .backstage nav a#exit {
 	font-size: 0.9em;
-	margin-right: 1em;
 }
 
 .backstage nav a#exit:before {
@@ -424,7 +415,7 @@ form.table .cell.button {
 
 @media (max-width: 800px) {
 	:root {
-		--ui-panel-height: 8.5rem;
+		--drawer-height: 8.5rem;
 	}
 	#sidebar {
 		position: fixed;

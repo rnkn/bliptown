@@ -33,15 +33,15 @@
 			% if ($show_join) {
 			<div id="join" class="panel">
 				<form method="POST" action="<%= url_for('user_join') %>">
-					<div>
+					<div class="input">
 						<label for="join-email">Email</label>
 						<input type="email" id="join-email" name="email" required>
 					</div>
-					<div>
+					<div class="input">
 						<label for="join-username">Username</label>
 						<input type="text" placeholder="[a-zA-Z][a-zA-Z0-9_-]*" pattern="[a-zA-Z][a-zA-Z0-9_\-]*" id="join-username" name="username" maxlength="31" required>
 					</div>
-					<div>
+					<div class="input">
 						<label for="join-password">Password</label>
 						<input type="password" id="join-password" name="password" minlength="8" required>
 					</div>
