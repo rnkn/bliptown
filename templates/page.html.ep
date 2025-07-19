@@ -9,7 +9,7 @@
 		<%== $sidebar %>
 		% if ($c->get_user eq 'mayor' && ! $c->session('username')) {
 		<ul>
-			<li><label for="ui-panel-toggle">Join/Login</label>
+			<li><label for="drawer-toggle">Join/Login</label>
 		</ul>
 		% }
 	</nav>

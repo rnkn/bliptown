@@ -76,7 +76,7 @@ sub startup {
 		editable => 0,
 		relfile => '',
 		redirect => '/',
-		included => [],
+		includes => [],
 	);
 
 	my $r = $app->routes;

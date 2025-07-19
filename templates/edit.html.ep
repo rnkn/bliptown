@@ -4,7 +4,7 @@
 		<a href="<%= url_for('list_files') %>" id="exit">All Files</a>
 		% if (current_route eq 'new_page') {
 		<h2><%= $title %></h2>
-		<a href="https://commonmark.org/" target="_blank" id="format-help">?</a>
+		<a href="https://commonmark.org/" target="_blank" id="markdown-help">?</a>
 		% } elsif (current_route eq 'edit_page') {
 		<h2><%= $title %>
 			% if ($relfile =~ /^_/) {
@@ -14,13 +14,13 @@
 			% }
 		</h2>
 		% if ($relfile =~ /\.md$/) {
-		<a href="https://commonmark.org/" target="_blank" id="format-help">?</a>
+		<a href="https://commonmark.org/" target="_blank" id="markdown-help">?</a>
 		% }
 		% }
 	</nav>
 	<form method="POST" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">
 		<div class="form-inner">
-			<div id="edit-name">
+			<div id="filename">
 				<input type="text" name="slug" value="<%= $slug %>" required>
 				<span id="dot">.</span>
 				<select id="ext" name="ext">
@@ -32,10 +32,10 @@
 				</select>
 			</div>
 			<textarea name="content"><%= $content %></textarea>
-			% if (@$included) {
-			<div id="included">
-				<strong>Included:</strong>
-				% foreach (@$included) {
+			% if (@$includes) {
+			<div id="includes">
+				<strong>Includes:</strong>
+				% foreach (@$includes) {
 				% $_ =~ s/^\///;
 				<a href="<%= url_for($_)->query(back_to => $redirect) %>"><%= $_ %></a>
 				% }

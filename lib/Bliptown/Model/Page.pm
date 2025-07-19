@@ -43,7 +43,7 @@ sub read_page {
 		while ($html =~ /\{\{\s*(.*?)\s*\}\}/) {
 			my $slug = $1;
 			my $root = $args->{root};
-			my $transcluded = $args->{transcluded} || [ $file ];
+			my $includes = $args->{includes} || [ $file ];
 			my $file_md;
 			if ($slug =~ /^\//) {
 				$file_md = path($root, "$slug.md")->to_abs;
@@ -53,15 +53,15 @@ sub read_page {
 			my $frag = '';
 			if (!-e $file_md) {
 				$frag = "<span class=\"error\">Error: \"<a href=\"$slug\">$slug</a>\" not found</span>"
-			} elsif (grep { $file_md eq $_ } @$transcluded) {
+			} elsif (grep { $file_md eq $_ } @$includes) {
 				$frag = '<span class="error">Error: infinite recursion</span>';
 			} else {
-				push @$transcluded, $file_md;
+				push @$includes, $file_md;
 				my $page = read_page(
 					$self, {
 						root => $root,
 						file => $file_md,
-						transcluded => $transcluded,
+						includes => $includes,
 					});
 				$frag = $page->{html};
 			}

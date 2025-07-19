@@ -98,12 +98,12 @@ sub edit_page {
 	my $file = $c->get_file($slug) || path($root, "$slug.md");
 	my $ext = $file->extname;
 	my $content = '';
-	my @included;
+	my @includes;
 	if (-e $file) {
 		$content = $c->source->read_source({ file => $file })->{chars};
 		while ($content =~ /\{\{\s*(.*?)\s*\}\}/g) {
-			unless (grep { $_ eq $1 } @included ) {
-				push @included, $1;
+			unless (grep { $_ eq $1 } @includes ) {
+				push @includes, $1;
 			}
 		}
 	}
@@ -115,7 +115,7 @@ sub edit_page {
 		filename => $file->basename,
 		redirect => $redirect,
 		content => $content,
-		included => \@included,
+		includes => \@includes,
 	);
 	return $c->render;
 	
