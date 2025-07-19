@@ -145,10 +145,11 @@ sub save_page {
 
 sub render_raw {
 	my $c = shift;
+	my $root = path($c->get_src_dir, $c->get_user);
 	my $slug = $c->param('catchall');
 	$slug = 'index' if length($slug) == 0;
-	my $dir = path($c->get_src_dir, $c->get_user); # FIXME
 	my $file = $c->get_file($slug);
+	return $c->reply->not_found unless -f $file;
 	my $chars = $file->slurp('utf-8');
 	return $c->render(text => $chars, format => 'txt');
 }
