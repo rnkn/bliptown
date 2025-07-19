@@ -59,8 +59,10 @@ sub startup {
 			my $root = path($c->get_src_dir, $c->get_user);
 			my @filetypes = qw(html css js txt md);
 			foreach (@filetypes) {
-				my $f = path($root, "$slug.$_")->to_abs;
-				return $f if -e $f;
+				my $f = path($root, $slug)->to_abs;
+				return $f if -f $f;
+				$f = path($root, "$slug.$_")->to_abs;
+				return $f if -f $f;
 			}
 		}
 	);
