@@ -1,25 +1,42 @@
 % layout 'default';
 <main id="edit" class="backstage">
 	<nav>
-		<a href="<%= url_for('list_pages') %>" id="exit">All Pages</a>
+		<a href="<%= url_for('list_files') %>" id="exit">All Files</a>
+		% if (current_route eq 'new_page') {
+		<h2><%= $title %></h2>
+		<a href="https://commonmark.org/" target="_blank" id="format-help">?</a>
+		% } elsif (current_route eq 'edit_page') {
 		<h2><%= $title %>
-			% if ($filename =~ /^\./) {
-			<%= $filename %>
+			% if ($relfile =~ /^_/) {
+			<%= $relfile %>
 			% } else {
-			<a href="/<%= $slug %>"><%= $filename %></a>
+			<a href="/<%= $slug %>"><%= $relfile %></a>
 			% }
 		</h2>
-		% if ($filename =~ /\.md$/) {
+		% if ($relfile =~ /\.md$/) {
 		<a href="https://commonmark.org/" target="_blank" id="format-help">?</a>
 		% }
+		% }
 	</nav>
-	<form method="POST" action="<%= url_for %>" >
+	<form method="POST" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">
 		<div class="form-inner">
+			<div id="edit-name">
+				<input type="text" name="slug" value="<%= $slug %>" required>
+				<span id="dot">.</span>
+				<select id="ext" name="ext">
+					<option value="md" <%= 'selected' if $ext eq 'md' %>>md</option>
+					<option value="txt" <%= 'selected' if $ext eq 'txt' %>>txt</option>
+					<option value="html" <%= 'selected' if $ext eq 'html' %>>html</option>
+					<option value="css" <%= 'selected' if $ext eq 'css' %>>css</option>
+					<option value="js" <%= 'selected' if $ext eq 'js' %>>js</option>
+				</select>
+			</div>
 			<textarea name="content"><%= $content %></textarea>
 			% if (@$included) {
 			<div id="included">
 				<strong>Included:</strong>
 				% foreach (@$included) {
+				% $_ =~ s/^\///;
 				<a href="<%= url_for($_)->query(back_to => $redirect) %>"><%= $_ %></a>
 				% }
 			</div>
@@ -28,6 +45,6 @@
 		<input name="back_to" value="<%= $redirect %>" hidden>
 		<button type="submit" name="action" value="save-changes">Save Changes</button>
 		<button type="submit" name="action" value="save-exit">Save & Exit</button>
-		<a href="<%= $redirect %>">Cancel</a>
+		<a href="<%= param('back_to') %>">Cancel</a>
 	</form>
 </main>
