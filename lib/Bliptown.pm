@@ -6,7 +6,7 @@ use lib curfile->dirname->sibling('lib')->to_string;
 
 use Bliptown::Model::User;
 use Bliptown::Model::Page;
-use Bliptown::Model::Source;
+use Bliptown::Model::File;
 
 sub startup {
 	my $app = shift;
@@ -35,8 +35,8 @@ sub startup {
 		});
 
 	$app->helper(
-		source => sub {
-			state $src = Bliptown::Model::Source->new;
+		file => sub {
+			state $src = Bliptown::Model::File->new;
 		});
 
 	$app->helper(

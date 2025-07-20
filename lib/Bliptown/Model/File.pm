@@ -1,7 +1,7 @@
-package Bliptown::Model::Source;
+package Bliptown::Model::File;
 use Mojo::Base -base;
 
-sub create_source {
+sub create_file {
 	my ($self, $args) = @_;
 	my $file = Mojo::File->new($args->{file});
 	my $path = $file->dirname;
@@ -9,7 +9,7 @@ sub create_source {
 	$file->touch;
 }
 
-sub read_source {
+sub read_file {
 	my ($self, $args) = @_;
 	my $file = Mojo::File->new($args->{file});
 	return unless -r $file;
@@ -20,15 +20,15 @@ sub read_source {
 	};
 }
 
-sub update_source {
+sub update_file {
 	my ($self, $args) = @_;
 	my $file = $args->{file};
 	my $chars = $args->{chars};
-	$self->create_source({ file => $file });
+	$self->create_file({ file => $file });
 	$file->spew($chars, 'utf-8');
 }
 
-sub delete_source {
+sub delete_file {
 	my ($self, $args) = @_;
 	my $file = Mojo::File->new($args->{file});
 	$file->remove;

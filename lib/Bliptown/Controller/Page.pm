@@ -90,17 +90,17 @@ sub new_page {
 
 sub edit_page {
 	my $c = shift;
+	my $root = path($c->get_src_dir, $c->get_user);
 	my $slug = $c->param('catchall');
 	$slug = 'index' if length($slug) == 0;
 	$slug =~ s/\.[^.]+?$//;
 	my $redirect = $c->param('back_to');
-	my $root = path($c->get_src_dir, $c->get_user);
 	my $file = $c->get_file($slug) || path($root, "$slug.md");
 	my $ext = $file->extname;
 	my $content = '';
 	my @includes;
 	if (-e $file) {
-		$content = $c->source->read_source({ file => $file })->{chars};
+		$content = $c->file->read_file({ file => $file })->{chars};
 		while ($content =~ /\{\{\s*(.*?)\s*\}\}/g) {
 			unless (grep { $_ eq $1 } @includes ) {
 				push @includes, $1;
@@ -123,14 +123,19 @@ sub edit_page {
 
 sub save_page {
 	my $c = shift;
+	my $root = path($c->get_src_dir, $c->get_user);
 	my $slug = $c->param('slug');
+	{
+		my @elts = split('/', $slug);
+		@elts = map { slugify $_ } @elts;
+		$slug = join('/', @elts);
+	}
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
-	my $root = path($c->get_src_dir, $c->get_user);
 	my $file = path($root, "$slug.$ext");
 	my $chars = $c->param('content');
 	$chars =~ s/\r\n/\n/g;
-	$c->source->update_source(
+	$c->file->update_file(
 		{
 			file => $file,
 			chars => $chars,
