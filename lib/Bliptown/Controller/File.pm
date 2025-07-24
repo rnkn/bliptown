@@ -1,10 +1,8 @@
-package Bliptown::Controller::Files;
+package Bliptown::Controller::File;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::File qw(path);
 use POSIX 'strftime';
 use Mojo::Util qw(dumper);
-
-my $home = Mojo::Home->new;
 
 sub format_human_size {
 	my $size = shift;
@@ -22,12 +20,12 @@ sub format_human_size {
 sub list_files {
 	my $c = shift;
 	my $filter = $c->param('filter');
-	my $root = path($c->get_src_dir, $c->get_user);
+	my $root = path($c->get_src_dir, $c->session('username'));
 	my $f = $root->list_tree;
 
 	my %files;
 	foreach ($f->each) {
-		my @stat = stat($_);
+		my @stats = stat($_);
 		my $relpath = $_;
 		$relpath =~ s/^$root\/?//;
 		my $url = $relpath;
@@ -36,8 +34,8 @@ sub list_files {
 		$files{$_} = {
 			relpath => $relpath,
 			url => $url,
-			size => format_human_size($stat[7]),
-			mtime => strftime('%Y-%m-%d %H:%M', localtime($stat[9])),
+			size => format_human_size($stats[7]),
+			mtime => strftime('%Y-%m-%d %H:%M', localtime($stats[9])),
 		}
 	};
 
@@ -58,14 +56,27 @@ sub list_files {
 	return $c->render;
 }
 
+sub rename_file {
+	my $c = shift;
+	my $root = path($c->get_src_dir, $c->session('username'));
+	my $slug = $c->param('catchall');
+	$slug = 'index' if length($slug) == 0;
+	my $file = $c->get_file($slug);
+	my $new_name = $c->param('new_name');
+	my $chars = $c->file->read_file({ file => $file })->{chars};
+	$c->update_file({ file => $new_name, chars => $chars });
+
+	return $c->redirect_to($c->param('back_to'));
+}
+
 sub delete_file {
 	my $c = shift;
+	my $root = path($c->get_src_dir, $c->session('username'));
 	my $slug = $c->param('catchall');
-	my $redirect = $c->param('back_to');
-	my $root = path($c->get_src_dir, $c->get_user);
+	$slug = 'index' if length($slug) == 0;
 	my $file = $c->get_file($slug);
-	$c->source->delete_source({ file => $file });
-	return $c->redirect_to($redirect);
+	$c->file->delete_file({ file => $file });
+	return $c->redirect_to($c->param('back_to'));
 }
 
 return 1;
