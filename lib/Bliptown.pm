@@ -68,9 +68,9 @@ sub startup {
 			return $src;
 		}
 	);
-
+	
 	$app->helper(
-		get_user => sub {
+		get_domain_user => sub {
 			my $c = shift;
 			my @hostname = split(/\./, $c->req->url->to_abs->host);
 			return @hostname >= 3 ? $hostname[-3] : 'mayor';
@@ -79,11 +79,11 @@ sub startup {
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			my $root = path($c->get_src_dir, $c->get_user);
-			my @filetypes = qw(html css js txt md);
-			foreach (@filetypes) {
-				my $f = path($root, $slug)->to_abs;
-				return $f if -f $f;
+			my $root = path($c->get_src_dir, $c->get_domain_user);
+			my $f = path($root, $slug)->to_abs;
+			return $f if -f $f;
+			my @exts = qw(html css js txt md);
+			foreach (@exts) {
 				$f = path($root, "$slug.$_")->to_abs;
 				return $f if -f $f;
 			}
@@ -91,6 +91,8 @@ sub startup {
 	);
 
 	$app->defaults(
+		home => '/',
+		show_join => 0,
 		head => '',
 		header => '',
 		sidebar => '',
@@ -106,6 +108,13 @@ sub startup {
 
 	my $r = $app->routes;
 
+	$r->post('/join')->to(controller => 'User', action => 'user_join')->name('user_join');
+	$r->post('/login')->to(controller => 'User', action => 'user_login')->name('user_login');
+	$r->get('/logout')->to(controller => 'User', action => 'user_logout')->name('user_logout');
+
+	$r->get('/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
+	$r->post('/totp')->to(controller => 'TOTP', action => 'totp_check')->name('totp_check');
+	
 	$r->get(
 		'/denied' => sub {
 			my $c = shift;
@@ -113,17 +122,14 @@ sub startup {
 		}
 	)->name('access_denied');
 
-	$r->post('/join')->to(controller => 'User', action => 'user_join')->name('user_join');
-	$r->post('/login')->to(controller => 'User', action => 'user_login')->name('user_login');
-	$r->get('/logout')->to(controller => 'User', action => 'user_logout')->name('user_logout');
-
 	my $protected = $r->under(
 		'/' => sub {
 			my $c = shift;
-			if ($c->session('username') && $c->session('username') eq $c->get_user) {
+			if ($c->session('username') && $c->session('username') eq $c->get_domain_user) {
 				return 1;
 			} else {
-				return $c->redirect_to('access_denied');
+				$c->flash(message => 'Login required');
+				return $c->redirect_to('/');
 			}
 		}
 	);
