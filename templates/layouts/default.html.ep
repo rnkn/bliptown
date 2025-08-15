@@ -49,7 +49,9 @@
 					<input name="redirect-to" value="<%= url_for %>" hidden>
 					<button type="submit">Join</button>
 				</form>
-				<label id="drawer-switch-login" class="switch" for="drawer-switch-login">Login</label>
+				<div class="extras">
+					<label id="drawer-switch-login" class="switch" for="drawer-switch-login">Login</label>
+				</div>
 			</div>
 			% }
 			<div id="login" class="panel">
