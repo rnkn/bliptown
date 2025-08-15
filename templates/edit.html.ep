@@ -18,7 +18,7 @@
 		% }
 		% }
 	</nav>
-	<form method="POST" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">
+	<form method="post" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">
 		<div class="form-inner">
 			<div id="filename">
 				<input type="text" name="slug" value="<%= $slug %>" required>
