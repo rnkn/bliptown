@@ -43,6 +43,26 @@ sub startup {
 		});
 
 	$app->helper(
+		get_home => sub {
+			my $c = shift;
+			my $url = Mojo::URL->new;
+			my $username = $c->session('username');
+			if ($username) {
+				$url->host("$username.$domain");
+			} else {
+				$url->host("$domain");
+			}
+			if ($c->app->mode eq 'production') {
+				$url->scheme('https');
+			} else {
+				$url->scheme('http');
+				$url->port(3000);
+			}
+			return $url;
+		}
+	);
+
+	$app->helper(
 		get_src_dir => sub {
 			state $src = $ENV{'BLIPTOWN_SRC'};
 			return $src;
