@@ -64,6 +64,10 @@
 						<label for="login-password">Password</label>
 						<input type="password" id="login-password" name="password" required>
 					</div>
+					<div>
+						<label for="login-totp">2FA</label>
+						<input type="text" id="login-totp" name="totp" required>
+					</div>
 					<input name="redirect-to" value="<%= url_for %>" hidden>
 					<button type="submit">Login</button>
 				</form>
