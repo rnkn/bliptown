@@ -1,6 +1,7 @@
 :root {
 	--main-bg-color: rgba(255,255,255,1.0);
 	--code-bg-color: rgba(235,235,235,1.0);
+	--warning-color: rgba(200,0,0,1.0);
 	--drawer-height: 3.5rem;
 }
 
@@ -53,7 +54,6 @@ section {
 }
 
 details summary:hover {
-	opacity: 0.5;
 	cursor: pointer;
 }
 
@@ -159,7 +159,7 @@ main ul {
 	padding-left: 2em;
 }
 
-main form, main textarea {
+main textarea {
 	margin: 1em 0;
 }
 
@@ -199,9 +199,14 @@ main form, main textarea {
 }
 
 #drawer .panel {
-	min-width: 100%;
 	display: flex;
+	min-width: 100%;
+	height: var(--drawer-height);
 	padding: 1em 2em;
+	flex-direction: column;
+	flex-wrap: wrap;
+	align-content: flex-end;
+	gap: 1em;
 }
 
 #drawer #join,
@@ -214,10 +219,46 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	transform: translateX(-100%);
 }
 
-#drawer a,
-#drawer label {
+#drawer > a, #drawer > label {
 	font-size: 0.9em;
 	color: rgba(0,0,0,0.5);
+}
+
+label#message-close {
+	display: none;
+}
+
+input#message-close:checked ~ label#message-close {
+	display: block;
+}
+
+#message {
+	position: absolute;
+	top: 39%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	padding: 1em 2em;
+	animation: delay-fade-out 1s 2.5s forwards;
+}
+
+#message p {
+	margin: 0;
+}
+
+#message.info {
+	background: rgba(220,220,220,0.5);
+	border: 1px solid black;
+}
+
+#message.warning {
+	color: rgba(100,0,0,1.0);
+	background: rgba(220,0,0,0.5);
+	border: 1px solid red;
+}
+
+@keyframes delay-fade-out {
+	from { opacity: 1; }
+	to { opacity: 0; visibility: hidden; }
 }
 
 #drawer form {
@@ -225,9 +266,16 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	gap: 1em;
 }
 
+#drawer .extras {
+	margin-left: auto;
+}
+
+#drawer .extras #forgot-password {
+	margin-left: 1em;
+}
+
 #drawer label.switch {
 	cursor: pointer;
-	margin-left: auto;
 }
 
 #drawer label#drawer-switch-login::after {
@@ -243,6 +291,10 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	display: flex;
 	gap: 1em;
 	margin-left: auto;
+}
+
+#drawer ul li a#my-site::before {
+	content: "← ";
 }
 
 #drawer ul li a {
@@ -283,10 +335,16 @@ input#drawer-switch-login:checked ~ #drawer #login {
 
 #files #controls {
 	display: flex;
+	flex-wrap: wrap;
 }
 
 #files #upload {
 	margin-left: auto;
+}
+
+#files #list .warning {
+	color: var(--warning-color);
+	font-weight: bold;
 }
 
 #includes {
@@ -312,26 +370,38 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	content: "← ";
 }
 
-form.table .row {
+.row {
 	display: flex;
+	gap: 1em;
 	cursor: pointer;
 }
 
-form.table .row:hover {
-	background-color: rgba(220,220,220,0.5);
-}
-
-form.table .cell {
-	margin-left: 1em;
-}
-
-form.table .cell.name {
+.cell.name {
 	flex-grow: 1;
 }
 
-form.table .cell.button {
+.cell.button {
 	text-align: center;
-	width: 3em;
+	min-width: 3em;
+}
+
+#files #list {
+	margin: 1em 0;
+}
+
+#files details {
+	padding: 2px 4px;
+}
+
+#files details:hover, #files details[open] {
+	background-color: rgba(220,220,220,0.5);
+}
+
+#files details ul {
+	display: flex;
+	gap: 1em;
+	list-style: none;
+	padding: 4px;
 }
 
 .left {
@@ -339,6 +409,8 @@ form.table .cell.button {
 }
 
 .right {
+	display: flex;
+	gap: 1em;
 	margin-left: auto;
 }
 
@@ -400,23 +472,11 @@ form.table .cell.button {
 	transform: translateZ(0);
 }
 
-.error {
-	color: rgba(255,0,0,0.5);
-	font-weight: bold;
-}
-
 .button {
 	cursor: pointer;	
 }
 
-.rotate {
-	transform: rotate(45deg);
-}
-
 @media (max-width: 800px) {
-	:root {
-		--drawer-height: 8.5rem;
-	}
 	#sidebar {
 		position: fixed;
 		width: 100%;
@@ -445,5 +505,11 @@ form.table .cell.button {
 	}				
 	input#menu-toggle:checked ~ label#menu-toggle:before {
 		content: "+";
+	}
+}
+
+@media (max-width: 24rem) {
+	:root {
+		--drawer-height: 6rem;
 	}
 }
