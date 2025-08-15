@@ -1,0 +1,60 @@
+% layout 'default';
+<main id="settings" class="backstage">
+	<nav>
+		<a href="/" id="exit">View Site</a>
+		<h2><%= $title %></h2>
+	</nav>
+	<form action="<%= url_for('settings') %>" method="post">
+		<ul>
+			<li class="row">
+				<label class="cell name" for="username">Username (cannot be changed)</label>
+				<input class="cell" type="text" name="username" value="<%= $username %>" disabled>
+			</li>
+			<li class="row">
+				<label class="cell name" for="email">Email</label>
+				<input class="cell" type="email" id="email" name="email" value="<%= $email %>">
+			</li>
+			<li class="row">
+				<label class="cell name" for="new-password">New password</label>
+				<input class="cell" type="password" id="new-password" name="new-password">
+			</li>
+			<li class="row">
+				<label class="cell name" for="public-key">SSH public key</label>
+				<input class="cell" type="text" id="public-key" name="public-key" placeholder="ssh-ed25519 AAAA...">
+			</li>
+			<li class="row">
+				<label class="cell name" for="custom-domain">Custom domain <a href="" target="_blank" class="help-q">?</a></label>
+				<input class="cell" type="text" id="custom-domain" name="custom-domain" placeholder="example.com">
+			</li>
+			<li class="row">
+				<a href="/totp">Reset 2FA</a>
+			</li>
+			<hr>
+			<li class="row">
+				<label class="cell name" for="site-title">Site title</label>
+				<input class="cell" type="text" id="site-title" name="site-title">
+			</li>
+			<li class="row">
+				<span class="cell name">Sort files</span>
+				<label>
+					<input type="radio" name="sort-files" value="sort-file-alpha" checked>
+					alphabetically
+				</label>
+				<label>
+					<input type="radio" name="sort-files" value="sort-file-recent">
+					modified time
+				</label>
+			</li>
+		</ul>
+		<hr>
+		<details id="delete-account">
+			<summary class="row">Delete account</summary>
+			<div class="row">
+				<label class="cell name" for="delete-account-confirm">To confirm, enter <code>doas rm -rf <%= $username %></code></label>
+				<input class="cell" type="text" id="delete-account-confirm" name="delete-confirm">
+			</div>
+		</details>
+		<hr>
+		<button type="submit">Submit</button>
+	</form>
+</main>
