@@ -36,7 +36,7 @@
 				<form method="POST" action="<%= url_for('user_join') %>">
 					<div class="input">
 						<label for="join-email">Email</label>
-						<input type="email" id="join-email" name="email" required>
+						<input type="email" id="join-email" name="email" maxlength="254" required>
 					</div>
 					<div class="input">
 						<label for="join-username">Username</label>
@@ -44,7 +44,7 @@
 					</div>
 					<div class="input">
 						<label for="join-password">Password</label>
-						<input type="password" id="join-password" name="password" minlength="8" required>
+						<input type="password" id="join-password" name="password" minlength="8" maxlength="256" required>
 					</div>
 					<input name="redirect-to" value="<%= url_for %>" hidden>
 					<button type="submit">Join</button>
