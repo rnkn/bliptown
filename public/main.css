@@ -1,6 +1,7 @@
 :root {
 	--main-bg-color: rgba(255,255,255,1.0);
 	--code-bg-color: rgba(235,235,235,1.0);
+	--row-hover-color: rgba(220,220,220,0.5);
 	--warning-color: rgba(200,0,0,1.0);
 	--drawer-height: 3.5rem;
 }
@@ -63,6 +64,11 @@ button {
 
 iframe {
 	max-width: 100%;
+}
+
+hr {
+	margin: 1em 0;
+	border-width: 0.5px;
 }
 
 a:hover, label.button:hover {
@@ -234,7 +240,7 @@ input#message-close:checked ~ label#message-close {
 
 #message {
 	position: absolute;
-	top: 39%;
+	top: 25%;
 	left: 50%;
 	transform: translateX(-50%) translateY(-50%);
 	padding: 1em 2em;
@@ -246,13 +252,13 @@ input#message-close:checked ~ label#message-close {
 }
 
 #message.info {
-	background: rgba(220,220,220,0.5);
+	background: rgba(220,220,220,0.9);
 	border: 1px solid black;
 }
 
 #message.warning {
 	color: rgba(100,0,0,1.0);
-	background: rgba(220,0,0,0.5);
+	background: rgba(255,200,200,0.9);
 	border: 1px solid red;
 }
 
@@ -321,15 +327,15 @@ input#message-close:checked ~ label#message-close {
 	font-family: monospace;
 }
 
-#edit nav a#markdown-help {
+.help-q {
 	margin-left: 1em;
 }
 
-#edit nav a#markdown-help:before {
+.help-q:before {
 	content: "(";
 }
 
-#edit nav a#markdown-help:after {
+.help-q:after {
 	content: ")";
 }
 
@@ -380,11 +386,6 @@ input#message-close:checked ~ label#message-close {
 	flex-grow: 1;
 }
 
-.cell.button {
-	text-align: center;
-	min-width: 3em;
-}
-
 #files #list {
 	margin: 1em 0;
 }
@@ -394,7 +395,7 @@ input#message-close:checked ~ label#message-close {
 }
 
 #files details:hover, #files details[open] {
-	background-color: rgba(220,220,220,0.5);
+	background-color: var(--row-hover-color);
 }
 
 #files details ul {
@@ -402,6 +403,30 @@ input#message-close:checked ~ label#message-close {
 	gap: 1em;
 	list-style: none;
 	padding: 4px;
+}
+
+#settings form ul {
+	padding: 0;
+}
+
+#settings form ul li {
+	padding: 2px 4px;
+}
+
+#settings form .cell {
+	min-width: 18em;
+}
+
+#settings form ul li:hover, #settings form details:hover {
+	background-color: var(--row-hover-color);
+}
+
+#settings details#delete-account {
+	padding: 2px 4px;
+}
+
+#settings details#delete-account[open] {
+	background-color: rgba(200,0,0,0.2);
 }
 
 .left {
