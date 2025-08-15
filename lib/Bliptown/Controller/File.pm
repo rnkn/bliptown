@@ -41,7 +41,7 @@ sub list_files {
 
 	if ($filter) {
 		foreach (keys %files) {
-			delete $files{$_} if $files{$_}{relpath} !~ /$filter/;
+			delete $files{$_} if $files{$_}{relpath} !~ /$filter/i;
 		}
 	}
 
