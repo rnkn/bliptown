@@ -57,11 +57,13 @@ sub list_files {
 sub rename_file {
 	my $c = shift;
 	my $root = path($c->get_src_dir, $c->session('username'));
-	my $slug = $c->param('catchall');
-	my $old_file = $c->get_file($slug);
-	my $new_file = path($root, $c->param('to'));
+	my $old_slug = $c->param('catchall');
+	my $new_slug = $c->param('to');
+	my $old_file = $c->get_file($old_slug);
+	my $new_file = path($root, $new_slug);
 	$old_file->copy_to($new_file);
 	$old_file->remove;
+	$c->flash(info => "$old_slug renamed to $new_slug");
 	return $c->redirect_to('list_files');
 }
 
@@ -71,6 +73,7 @@ sub delete_file {
 	my $slug = $c->param('catchall');
 	my $file = $c->get_file($slug);
 	$file->remove;
+	$c->flash(info => "$slug deleted");
 	return $c->redirect_to('list_files');
 }
 
