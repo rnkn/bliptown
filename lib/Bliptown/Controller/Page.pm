@@ -65,8 +65,12 @@ sub render_page {
 	my $file_head = path($root, "_head.html");
 	my $head = $file_head->slurp('utf-8') if -e $file_head;
 
+	my $show_join = 1 if $ENV{'BLIPTOWN_JOIN_ENABLED'} == 1
+		&& $c->get_domain_user eq 'mayor';
+
 	$c->stash(
 		template => 'page',
+		home => $c->get_home,
 		head => $head || '',
 		title => $title,
 		date => $date,
@@ -76,6 +80,7 @@ sub render_page {
 		content => $page->{html},
 		editable => 1,
 		redirect => $c->url_for('render_page'),
+		show_join => $show_join,
 	);
 	return $c->render;
 }
