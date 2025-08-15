@@ -1,7 +1,7 @@
 package Bliptown;
 use Mojo::Base 'Mojolicious';
-use Mojo::SQLite;
 use Mojo::File qw(curfile path);
+use Mojo::SQLite;
 use lib curfile->dirname->sibling('lib')->to_string;
 
 use Bliptown::Model::User;
@@ -15,6 +15,9 @@ sub startup {
 		hypnotoad => {
 			proxy  => 1
 		});
+
+	my $domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
+	$app->sessions->cookie_domain($domain);
 
 	$app->helper(
 		sqlite => sub {
