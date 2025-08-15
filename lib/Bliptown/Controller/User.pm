@@ -2,13 +2,22 @@ package Bliptown::Controller::User;
 use Mojo::Base 'Mojolicious::Controller';
 
 sub validate_user {
-	my $c = shift;
-	my $validator = Mojolicious::Validator->new;
-	my $v = $validator->validation;
-	$v->required('username')->like(q/[a-zA-Z][a-zA-Z0-9_-]*$/)->size(1,31);
-	$v->required('email')->like(q/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
-	$v->required('password')->size(8,256);
+	my ($c, $args) = @_;
+	my $v = $c->validation;
+	$v->required($args->{username})->like(q/[a-zA-Z][a-zA-Z0-9_-]*$/)->size(1,31);
+	$v->required($args->{email})->like(q/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)->size(1,254);
+	$v->required($args->{password})->size(8,256);
 	return 1 unless $v->has_error;
+}
+
+sub check_duplicate_user {
+	my ($c, $args) = @_;
+	return $c->user->read_user({ username => $args->{username} });
+}
+
+sub check_duplicate_email {
+	my ($c, $args) = @_;
+	return $c->user->read_user({ email => $args->{email} });
 }
 
 sub user_join {
@@ -17,6 +26,22 @@ sub user_join {
 	my $username = $c->param('username') || '';
 	my $password = $c->param('password') || '';
 	my $redirect_to = $c->param('redirect-to') || '/';
+
+	unless (validate_user($c, { email => $email, username => $username, password => $password })) {
+		$c->flash(warning => 'Invalid credentials');
+		return $c->redirect_to($redirect_to);
+	}
+
+	if (check_duplicate_user($c, { username => $username })) {
+		$c->flash(info => 'Username unavailable');
+		return $c->redirect_to($redirect_to);
+	}
+
+	if (check_duplicate_email($c, { email => $email })) {
+		$c->flash(info => 'Account with email already exists');
+		return $c->redirect_to($redirect_to);
+	}
+
 	$c->user->create_user(
 		{
 			username => $username,
@@ -31,12 +56,14 @@ sub user_login {
 	my $c = shift;
 	my $username = $c->param('username') || '';
 	my $password = $c->param('password') || '';
+	my $totp = $c->param('totp') || '';
 	my $redirect_to = $c->param('redirect-to') || '/';
-	if ($c->user->authenticate_user({username => $username, password => $password})) {
+	if ($c->user->authenticate_user({ username => $username, password => $password, totp => $totp })) {
 		$c->session(expiration => 2592000, username => $username);
-		return $c->redirect_to($redirect_to);
+	} else {
+		$c->flash(warning => 'Incorrect credentials');
 	}
-	return $c->redirect_to('/nope');
+	return $c->redirect_to($redirect_to);
 }
 
 sub user_logout {
