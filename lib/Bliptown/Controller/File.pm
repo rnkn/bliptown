@@ -19,19 +19,20 @@ sub format_human_size {
 
 sub list_files {
 	my $c = shift;
+	my $user = $c->user->read_user({ username => $c->session('username')});
+	my $root = path($c->get_src_dir, $user->{username});
 	my $filter = $c->param('filter');
-	my $root = path($c->get_src_dir, $c->session('username'));
-	my $f = $root->list_tree;
+	my $tree = $root->list_tree;
 
-	my %files;
-	foreach ($f->each) {
+	my @files;
+	foreach ($tree->each) {
 		my @stats = stat($_);
 		my $relpath = $_;
 		$relpath =~ s/^$root\/?//;
 		my $url = $relpath;
 		$url =~ s/\.(md|txt|html|css|js)//;
 
-		$files{$_} = {
+		push @files, {
 			relpath => $relpath,
 			url => $url,
 			size => format_human_size($stats[7]),
@@ -39,17 +40,19 @@ sub list_files {
 		}
 	};
 
-	if ($filter) {
-		foreach (keys %files) {
-			delete $files{$_} if $files{$_}{relpath} !~ /$filter/i;
-		}
+	@files = grep { $_->{relpath} =~ /$filter/i } @files if $filter;
+
+	if ($user->{sort_files} == 1) {
+		@files = sort { $b->{mtime} cmp $a->{mtime} } @files;
+	} else {
+		@files = sort { $a->{relpath} cmp $b->{relpath} } @files;
 	}
 
 	$c->stash(
 		template => 'files',
 		title => 'Files',
 		redirect => $c->url_for,
-		files => \%files,
+		files => \@files,
 	);
 	return $c->render;
 }
