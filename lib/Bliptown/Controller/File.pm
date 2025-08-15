@@ -46,10 +46,8 @@ sub list_files {
 	}
 
 	$c->stash(
-		head => '',
 		template => 'files',
 		title => 'Files',
-		editable => 0,
 		redirect => $c->url_for,
 		files => \%files,
 	);
@@ -60,23 +58,20 @@ sub rename_file {
 	my $c = shift;
 	my $root = path($c->get_src_dir, $c->session('username'));
 	my $slug = $c->param('catchall');
-	$slug = 'index' if length($slug) == 0;
-	my $file = $c->get_file($slug);
-	my $new_name = $c->param('new_name');
-	my $chars = $c->file->read_file({ file => $file })->{chars};
-	$c->update_file({ file => $new_name, chars => $chars });
-
-	return $c->redirect_to($c->param('back_to'));
+	my $old_file = $c->get_file($slug);
+	my $new_file = path($root, $c->param('to'));
+	$old_file->copy_to($new_file);
+	$old_file->remove;
+	return $c->redirect_to('list_files');
 }
 
 sub delete_file {
 	my $c = shift;
 	my $root = path($c->get_src_dir, $c->session('username'));
 	my $slug = $c->param('catchall');
-	$slug = 'index' if length($slug) == 0;
 	my $file = $c->get_file($slug);
-	$c->file->delete_file({ file => $file });
-	return $c->redirect_to($c->param('back_to'));
+	$file->remove;
+	return $c->redirect_to('list_files');
 }
 
 return 1;
