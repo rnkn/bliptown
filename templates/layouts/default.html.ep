@@ -71,14 +71,11 @@
 					<input name="redirect-to" value="<%= url_for %>" hidden>
 					<button type="submit">Login</button>
 				</form>
-				% if ($show_join) {
-				<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
-				% }
-				% if (app->mode eq 'development') {
-				<a href="http://blip.local:3000/forgot-password">Forgot Password</a>
-				% } else {
-				<a href="https://blip.town/forgot-password">Forgot Password</a>
-				% }
+				<div class="extras">
+					% if ($show_join) {
+					<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
+					% }
+				</div>
 			</div>
 			% }
 		</div>
