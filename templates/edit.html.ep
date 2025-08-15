@@ -13,8 +13,8 @@
 			<a href="/<%= $slug %>"><%= $relfile %></a>
 			% }
 		</h2>
-		% if ($relfile =~ /\.md$/) {
-		<a href="https://commonmark.org/" target="_blank" id="markdown-help">?</a>
+		% if ($ext eq 'md') {
+		<a href="https://commonmark.org/" target="_blank" class="help-q">?</a>
 		% }
 		% }
 	</nav>
