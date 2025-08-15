@@ -12,9 +12,13 @@ sub yaml_true {
 
 sub render_page {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->get_user);
+	my $root = path($c->get_src_dir, $c->get_domain_user);
 	my $slug = $c->param('catchall');
 	$slug = 'index' if length($slug) == 0;
+
+	# my $home = Mojo::URL->new;
+	# $c->session('username') . '.' . $c->cookie('domain');
+	# $c->log->debug(dumper $home);
 
 	my $raw = path($root, $slug);
 	return $c->reply->not_found if $raw->extname && !-f $raw;
@@ -90,7 +94,7 @@ sub new_page {
 
 sub edit_page {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->get_user);
+	my $root = path($c->get_src_dir, $c->get_domain_user);
 	my $slug = $c->param('catchall');
 	$slug = 'index' if length($slug) == 0;
 	$slug =~ s/\.[^.]+?$//;
@@ -123,7 +127,7 @@ sub edit_page {
 
 sub save_page {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->get_user);
+	my $root = path($c->get_src_dir, $c->get_domain_user);
 	my $slug = $c->param('slug');
 	{
 		my @elts = split('/', $slug);
@@ -150,7 +154,7 @@ sub save_page {
 
 sub render_raw {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->get_user);
+	my $root = path($c->get_src_dir, $c->get_domain_user);
 	my $slug = $c->param('catchall');
 	$slug = 'index' if length($slug) == 0;
 	my $file = $c->get_file($slug);
