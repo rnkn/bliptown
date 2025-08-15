@@ -142,6 +142,9 @@ sub startup {
 	$protected->get('/rename/*catchall')->to(controller => 'File', action => 'rename_file', catchall => '')->name('rename_file');
 	$protected->get('/delete/*catchall')->to(controller => 'File', action => 'delete_file', catchall => '')->name('delete_file');
 
+	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
+	$protected->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
+
 	$r->get('/raw/*catchall')->to(controller => 'Page', action => 'render_raw', catchall => '')->name('render_raw');
 	$r->get('/*catchall')->to(controller => 'Page', action => 'render_page', catchall => '')->name('render_page');
 }
