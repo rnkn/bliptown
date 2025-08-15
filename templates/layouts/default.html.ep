@@ -1,4 +1,3 @@
-% my $show_join = 1 if $c->get_user eq 'mayor';
 <!DOCTYPE html>
 <html>
 	<head>
