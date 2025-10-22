@@ -13,6 +13,12 @@ sub yaml_true {
 sub render_page {
 	my $c = shift;
 	my $root = path($c->get_src_dir, $c->get_domain_user);
+	if (-d $root) {
+		my @skel = qw(index _header _sidebar _footer);
+		foreach (@skel) {
+			path($root, "$_.md")->touch;
+		}
+	}
 	my $slug = $c->param('catchall');
 	$slug = 'index' if length($slug) == 0;
 
