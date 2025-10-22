@@ -434,8 +434,6 @@ input#message-close:checked ~ label#message-close {
 }
 
 .right {
-	display: flex;
-	gap: 1em;
 	margin-left: auto;
 }
 
