@@ -64,6 +64,7 @@ sub rename_file {
 	my $new_slug = $c->param('to');
 	my $old_file = $c->get_file($old_slug);
 	my $new_file = path($root, $new_slug);
+	$new_file->dirname->make_path;
 	$old_file->copy_to($new_file);
 	$old_file->remove;
 	$c->flash(info => "$old_slug renamed to $new_slug");
