@@ -38,7 +38,14 @@ sub render_page {
 	}
 
 	my $file = $c->get_file($slug);
-	return $c->redirect_to('new_page') unless -f $file;
+	if (!-f $file) {
+		my $u = $c->session('username');
+		if ($u && $u eq $c->get_domain_user) {
+			return $c->redirect_to('new_page');
+		} else {
+			return $c->reply->not_found;
+		}
+	}
 
 	my $page = $c->page->read_page(
 		{
