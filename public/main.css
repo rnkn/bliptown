@@ -240,9 +240,8 @@ input#message-close:checked ~ label#message-close {
 
 #message {
 	position: absolute;
-	top: 25%;
-	left: 50%;
-	transform: translateX(-50%) translateY(-50%);
+	top: 1rem;
+	left: 1rem;
 	padding: 1em 2em;
 	animation: delay-fade-out 1s 2.5s forwards;
 }
