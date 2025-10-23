@@ -14,7 +14,7 @@
 				% }
 			</form>
 			<form id="upload" method="post" action="<%= url_for('upload') %>" enctype="multipart/form-data">
-				<input type="file" accept="image/*,application/pdf" id="file-upload" name="file-upload" multiple>
+				<input type="file" accept="text/*,image/*,application/pdf" id="file-upload" name="file-upload" multiple>
 				<button type="submit">Upload</button>
 			</form>
 		</div>
