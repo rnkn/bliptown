@@ -63,17 +63,17 @@ sub render_page {
 	my $title = $page->{metadata}{title};
 	my $date = $page->{metadata}{date};
 
-	my @special_pages = qw(header sidebar footer);
-	my %special_html;
-	foreach (@special_pages) {
-		my $file_md = path($root, "_$_.md");
+	my @skel = qw(_header _sidebar _footer);
+	my %skel_html;
+	foreach (@skel) {
+		my $f = path($root, "$_.md");
 		my $page = $c->page->read_page(
 			{
-				file => $file_md,
+				file => $f,
 				root => $root,
 			}
-		) if -e $file_md;
-		$special_html{$_} = $page->{html};
+		);
+		$skel_html{$_} = $page->{html};
 	}
 	my $file_head = path($root, "_head.html");
 	my $head = $file_head->slurp('utf-8') if -e $file_head;
@@ -87,9 +87,9 @@ sub render_page {
 		head => $head || '',
 		title => $title,
 		date => $date,
-		header => $special_html{header} || '',
-		sidebar => $special_html{sidebar} || '',
-		footer => $special_html{footer} || '',
+		header => $skel_html{_header} || '',
+		sidebar => $skel_html{_sidebar} || '',
+		footer => $skel_html{_footer} || '',
 		content => $page->{html},
 		editable => 1,
 		redirect => $c->url_for('render_page'),
