@@ -441,7 +441,7 @@ input#message-close:checked ~ label#message-close {
 }
 
 .one-column {
-	max-width: 44em;
+	max-width: 50em;
 }
 
 .wide {
