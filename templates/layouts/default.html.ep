@@ -6,7 +6,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title><%= $title %></title>
 		<link href="/main.css" rel="stylesheet">
-		<link href="/style.css" rel="stylesheet">
+		<link href="/style.css" rel="stylesheet" sandbox>
 		%== $head
 	</head>
 	<body>
