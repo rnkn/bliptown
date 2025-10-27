@@ -60,9 +60,6 @@ sub render_page {
 	# 	text => 'Access denied', status => 403
 	# ) if yaml_true($private);
 
-	my $title = $page->{metadata}{title};
-	my $date = $page->{metadata}{date};
-
 	my @skel = qw(_header _sidebar _footer);
 	my %skel_html;
 	foreach (@skel) {
@@ -75,6 +72,20 @@ sub render_page {
 		);
 		$skel_html{$_} = $page->{html};
 	}
+
+	my $f = path($root, "_title.txt");
+	my $title = "Untitled";
+	if (-f $f) {
+		open(my $fh, '<', $f);
+		$title = <$fh>;
+		close($fh);
+	}
+
+	my $page_title = $page->{metadata}{title};
+	$title = "$title – $page_title" if $page_title;
+
+	my $date = $page->{metadata}{date};
+
 	my $file_head = path($root, "_head.html");
 	my $head = $file_head->slurp('utf-8') if -e $file_head;
 
