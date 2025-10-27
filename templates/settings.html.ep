@@ -32,10 +32,6 @@
 				</li>
 				<hr>
 				<li class="row">
-					<label class="cell name" for="site-title">Site title</label>
-					<input class="cell" type="text" id="site-title" name="site-title">
-				</li>
-				<li class="row">
 					<span class="cell name">Sort files</span>
 					<label>
 						<input type="radio" name="sort-files" value="sort-file-alpha" checked>
