@@ -23,11 +23,7 @@
 			<details name="files">
 				<summary class="row">
 					<span class="cell name">
-						% if ($_->{relpath} =~ /^_/) {
-						<a href="<%= url_for('edit_page', catchall => $_->{url}) %>"><%= $_->{relpath} %></a>
-						% } else {
-						<a href="<%= $_->{url} %>"><%= $_->{relpath} %></a>
-						% }
+						%= $_->{relpath}
 					</span>
 					<span class="cell stat">
 						%= $_->{size}
