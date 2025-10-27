@@ -14,9 +14,9 @@ sub render_page {
 	my $c = shift;
 	my $root = path($c->get_src_dir, $c->get_domain_user);
 	if (-d $root) {
-		my @skel = qw(index _header _sidebar _footer);
+		my @skel = qw(index.md _title.txt _header.md _sidebar.md _footer.md);
 		foreach (@skel) {
-			path($root, "$_.md")->touch;
+			path($root, $_)->touch;
 		}
 	}
 	my $slug = $c->param('catchall');
