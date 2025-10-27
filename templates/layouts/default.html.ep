@@ -82,21 +82,21 @@
 		<input type="checkbox" id="drawer-toggle" hidden>
 		<div id="viewport">
 			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
+			% my $message = begin
+			% my $type = shift;
+			<input type="checkbox" id="message-close" hidden checked>
+			<label id="message-close" class="button" for="message-close">
+				<div id="message" class="<%= $type %>">
+					<p><%= flash("$type") %></p>
+				</div>
+			</label>
+			% end
+			% if (flash('warning')) {
+			%= $message->('warning')
+			% } elsif (flash('info')) {
+			%= $message->('info')
+			% }
 			%= content
 		</div>
-		% my $message = begin
-		% my $type = shift;
-		<input type="checkbox" id="message-close" hidden checked>
-		<label id="message-close" class="button" for="message-close">
-			<div id="message" class="<%= $type %>">
-				<p><%= flash("$type") %></p>
-			</div>
-		</label>
-		% end
-		% if (flash('warning')) {
-		%= $message->('warning')
-		% } elsif (flash('info')) {
-		%= $message->('info')
-		% }
 	</body>
 </html>
