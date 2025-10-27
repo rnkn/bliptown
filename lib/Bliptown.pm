@@ -141,6 +141,7 @@ sub startup {
 	$protected->get('/files')->to(controller => 'File', action => 'list_files')->name('list_files');
 	$protected->get('/rename/*catchall')->to(controller => 'File', action => 'rename_file', catchall => '')->name('rename_file');
 	$protected->get('/delete/*catchall')->to(controller => 'File', action => 'delete_file', catchall => '')->name('delete_file');
+	$protected->post('/upload')->to(controller => 'File', action => 'upload_files')->name('upload_files');
 
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 	$protected->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');

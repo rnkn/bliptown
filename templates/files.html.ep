@@ -13,8 +13,8 @@
 				<a href="<%= url_for('list_files') %>">Reset</a>
 				% }
 			</form>
-			<form id="upload" method="post" action="<%= url_for('upload') %>" enctype="multipart/form-data">
-				<input type="file" accept="text/*,image/*,application/pdf" id="file-upload" name="file-upload" multiple>
+			<form id="upload" method="post" action="<%= url_for('upload_files') %>" enctype="multipart/form-data">
+				<input type="file" accept="text/*,image/*,application/pdf" id="file-uploads" name="file-uploads" multiple>
 				<button type="submit">Upload</button>
 			</form>
 		</div>

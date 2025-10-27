@@ -81,4 +81,26 @@ sub delete_file {
 	return $c->redirect_to('list_files');
 }
 
+sub upload_files {
+	my $c = shift;
+	my $user = $c->user->read_user({ username => $c->session('username')});
+	my $root = path($c->get_src_dir, $user->{username});
+	my @files;
+	foreach (@{$c->req->uploads}) {
+		my $f = $_->filename;
+		if ($_->size > 1024 * 1024 * 50) {
+			$c->flash(warning => "File too large");
+			$c->res->code(413);
+			return $c->redirect_to('list_files');
+		}
+		my $path = path($root, $f);
+		if (-e $path) {
+			$c->flash(warning => "$f already exists!");
+			return $c->redirect_to('list_files');
+		};
+		$_->move_to($path);
+	}
+	return $c->redirect_to('list_files');
+}
+
 return 1;
