@@ -128,7 +128,7 @@ sub startup {
 			if ($c->session('username') && $c->session('username') eq $c->get_domain_user) {
 				return 1;
 			} else {
-				$c->flash(message => 'Login required');
+				$c->flash(info => 'Login required');
 				return $c->redirect_to('/');
 			}
 		}
