@@ -3,6 +3,8 @@
 	--code-bg-color: rgba(235,235,235,1.0);
 	--row-hover-color: rgba(220,220,220,0.5);
 	--warning-color: rgba(200,0,0,1.0);
+	--info-message-color: white;
+	--warning-message-color: rgba(255,200,200,1.0);
 	--drawer-height: 3.5rem;
 }
 
@@ -42,7 +44,7 @@ pre, code {
 }
 
 img {
-	width: 100%;
+	max-width: 100%;
 }
 
 blockquote {
@@ -91,7 +93,7 @@ input#drawer-toggle:checked ~ #viewport {
 }
 
 label#drawer-toggle {
-	z-index: 100;
+	z-index: 99;
 	font-size: 2rem;
 	margin: 2rem;
 	line-height: 0.5;
@@ -131,8 +133,8 @@ label#menu-toggle:before {
 }
 
 header {
-	height: 3rem;
 	flex-shrink: 0;
+	margin-bottom: 1em;
 }
 
 header h1 {
@@ -240,8 +242,9 @@ input#message-close:checked ~ label#message-close {
 
 #message {
 	position: absolute;
+	z-index: 100;
 	top: 1rem;
-	left: 1rem;
+	right: 2rem;
 	padding: 1em 2em;
 	animation: delay-fade-out 1s 2.5s forwards;
 }
@@ -251,19 +254,27 @@ input#message-close:checked ~ label#message-close {
 }
 
 #message.info {
-	background: rgba(220,220,220,0.9);
+	background: var(--info-message-color);
 	border: 1px solid black;
 }
 
 #message.warning {
 	color: rgba(100,0,0,1.0);
-	background: rgba(255,200,200,0.9);
+	background: var(--warning-message-color);
 	border: 1px solid red;
 }
 
 @keyframes delay-fade-out {
 	from { opacity: 1; }
 	to { opacity: 0; visibility: hidden; }
+}
+
+#drawer .button a {
+	text-decoration: none;
+}
+
+#drawer .button a:hover {
+	text-decoration: underline;
 }
 
 #drawer form {
@@ -347,9 +358,16 @@ input#message-close:checked ~ label#message-close {
 	margin-left: auto;
 }
 
+#files #list a {
+	text-decoration: none;
+}
+
+#files #list details ul li {
+	font-size: 0.9em
+}
+
 #files #list .warning {
 	color: var(--warning-color);
-	font-weight: bold;
 }
 
 #includes {
@@ -360,6 +378,7 @@ input#message-close:checked ~ label#message-close {
 	display: flex;
 	gap: 1em;
 	margin-bottom: 1em;
+	align-items: baseline;
 }
 
 .backstage nav * {
@@ -399,7 +418,7 @@ input#message-close:checked ~ label#message-close {
 
 #files details ul {
 	display: flex;
-	gap: 1em;
+	gap: 0.5em 1em;
 	list-style: none;
 	padding: 4px;
 }
@@ -527,6 +546,9 @@ input#message-close:checked ~ label#message-close {
 	}				
 	input#menu-toggle:checked ~ label#menu-toggle:before {
 		content: "+";
+	}
+	#files details ul {
+		flex-direction: column;
 	}
 }
 
