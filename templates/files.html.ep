@@ -39,6 +39,9 @@
 							<button type="submit">Rename</button>
 						</form>
 					</li>
+					% unless ($_->{relpath} =~ /^_/) {
+					<li><a href="<%= $_->{url} %>">View</a></li>
+					% }
 					% if ($_->{relpath} =~ /\.(md|txt|html|css|js)/) {
 					<li><a href="<%= url_for('edit_page', catchall => $_->{url} )->query([back_to => url_for]) %>">Edit</a></li>
 					<li><a href="<%= url_for('render_raw', catchall => $_->{url} ) %>">Raw</a></li>
