@@ -20,12 +20,10 @@
 					<input class="cell" type="password" id="new-password" name="new-password">
 				</li>
 				<li class="row">
-					<label class="cell name" for="public-key">SSH public key</label>
-					<input class="cell" type="text" id="public-key" name="public-key" placeholder="ssh-ed25519 AAAA...">
+					<a href="<%= url_for('edit_page', catchall => '_domains' )->query([ext => 'txt', back_to => url_for])%>">Custom domain</a><a href="https://blip.town/domains" class="help-q">?</a>
 				</li>
 				<li class="row">
-					<label class="cell name" for="custom-domain">Custom domain <a href="" target="_blank" class="help-q">?</a></label>
-					<input class="cell" type="text" id="custom-domain" name="custom-domain" placeholder="example.com">
+					<a href="<%= url_for('edit_page', catchall => '_pubkeys' )->query([ext => 'txt', back_to => url_for])%>">SSH public keys</a>
 				</li>
 				<li class="row">
 					<a href="/totp">Reset 2FA</a>
