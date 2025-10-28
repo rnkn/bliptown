@@ -29,6 +29,7 @@
 				% } else {
 				<div class="button"><a href="<%= $home %>" id="my-site">My Site</a></div>
 				% }
+				<div class="button"><a href="https://blip.town/faq">Help</a></div>
 				<div class="button"><a href="<%= url_for('user_logout') %>">Log Out</a></div>
 			</div>
 			% } else {
