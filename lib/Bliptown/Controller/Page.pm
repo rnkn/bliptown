@@ -129,7 +129,7 @@ sub edit_page {
 	$slug =~ s/\.[^.]+?$//;
 	my $redirect = $c->param('back_to');
 	my $file = $c->get_file($slug) || path($root, "$slug.md");
-	my $ext = $file->extname;
+	my $ext = $c->param('ext') || $file->extname;
 	my $content = '';
 	my @includes;
 	if (-e $file) {
@@ -151,7 +151,6 @@ sub edit_page {
 		includes => \@includes,
 	);
 	return $c->render;
-	
 }
 
 sub save_page {
@@ -165,13 +164,16 @@ sub save_page {
 	}
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
-	my $file = path($root, "$slug.$ext");
+	my $filename = "$slug.$ext";
+	my $trigger = 'pubkeys' if $filename eq '_pubkeys.txt';
+	my $filepath = path($root, $filename);
 	my $chars = $c->param('content');
 	$chars =~ s/\r\n/\n/g;
 	$c->file->update_file(
 		{
-			file => $file,
+			file => $filepath,
 			chars => $chars,
+			trigger => $trigger,
 		});
 	my $redirect;
 	if ($action eq 'save-changes') {
