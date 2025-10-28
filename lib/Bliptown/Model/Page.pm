@@ -1,9 +1,44 @@
 package Bliptown::Model::Page;
 use Mojo::Base -base;
 use Mojo::File qw(path);
-use Mojo::Util qw(slugify url_unescape);
+use FFI::Platypus;
 use YAML::Tiny;
-use Text::Markdown;
+
+use constant {
+	MD_FLAG_COLLAPSEWHITESPACE			=> 1 << 0,	# 0x0001
+	MD_FLAG_PERMISSIVEATXHEADERS		=> 1 << 1,	# 0x0002
+	MD_FLAG_PERMISSIVEURLAUTOLINKS		=> 1 << 2,	# 0x0004
+	MD_FLAG_PERMISSIVEEMAILAUTOLINKS	=> 1 << 3,	# 0x0008
+	MD_FLAG_NOINDENTEDCODEBLOCKS		=> 1 << 4,	# 0x0010
+	MD_FLAG_NOHTMLBLOCKS				=> 1 << 5,	# 0x0020
+	MD_FLAG_NOHTMLSPANS					=> 1 << 6,	# 0x0040
+	MD_FLAG_TABLES						=> 1 << 8,	# 0x0100
+	MD_FLAG_STRIKETHROUGH				=> 1 << 9,	# 0x0200
+	MD_FLAG_PERMISSIVEWWWAUTOLINKS		=> 1 << 10, # 0x0400
+	MD_FLAG_TASKLISTS					=> 1 << 11, # 0x0800
+	MD_FLAG_LATEXMATHSPANS				=> 1 << 12, # 0x1000
+	MD_FLAG_WIKILINKS					=> 1 << 13, # 0x2000
+	MD_FLAG_UNDERLINE					=> 1 << 14, # 0x4000
+	MD_FLAG_HARD_SOFT_BREAKS			=> 1 << 15, # 0x8000
+};
+
+my $md_flags = MD_FLAG_PERMISSIVEURLAUTOLINKS
+	| MD_FLAG_PERMISSIVEEMAILAUTOLINKS
+	| MD_FLAG_TABLES
+	| MD_FLAG_STRIKETHROUGH;
+	
+my $ffi = FFI::Platypus->new(lib => 'lib/libmd4c.so');
+$ffi->type('(string, int, opaque)->void' => 'callback');
+$ffi->attach(
+	md_html => [
+		'string',
+		'uint',
+		'callback',
+		'opaque',
+		'uint',
+		'uint'
+	] => 'int'
+);
 
 sub read_page {
 	my ($self, $args) = @_;
@@ -12,6 +47,12 @@ sub read_page {
 
 	my $metadata;
 	my $html = '';
+	my $html_handler = $ffi->closure(
+		sub {
+			my ($chunk, $size) = @_;
+			$html .= pack('C*', unpack('C*', substr($chunk, 0, $size)));
+		}
+	);
 
 	if ($file =~ /\.(txt|html|css|js)$/) {
 		if ($1 eq 'html') {
@@ -36,8 +77,7 @@ sub read_page {
 			$layout = $metadata->{layout} || 'one-column';
 		}
 
-		my $o = Text::Markdown->new;
-		$html = $o->markdown($text);
+		md_html($text, length($text), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
 
 		while ($html =~ /\{\{\s*(.*?)\s*\}\}/) {
