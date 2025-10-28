@@ -39,7 +39,6 @@ pre {
 }
 
 pre, code {
-	font-size: 0.8em;
 	background-color: var(--code-bg-color);
 }
 
@@ -50,6 +49,11 @@ img {
 blockquote {
 	padding: 0 2em;
 	border-left: 1px solid rgba(0,0,0,0.5);
+}
+
+table {
+	width: 100%;
+	text-align: left;
 }
 
 section {
@@ -327,13 +331,7 @@ input#message-close:checked ~ label#message-close {
 	width: 8em;
 }
 
-#edit #filename {
-	display: flex;
-	gap: 0.5em;
-}
-
 #edit #filename input[type=text] {
-	flex-grow: 1;
 	font-family: monospace;
 }
 
@@ -352,6 +350,10 @@ input#message-close:checked ~ label#message-close {
 #files #controls {
 	display: flex;
 	flex-wrap: wrap;
+}
+
+#files #filter input[type=text], #files #rename input[type=text] {
+	font-family: monospace;
 }
 
 #files #upload {
