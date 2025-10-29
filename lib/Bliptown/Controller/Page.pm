@@ -22,13 +22,13 @@ sub render_page {
 	my $slug = $c->param('catchall');
 	$slug = 'index' if length($slug) == 0;
 
-	# my $home = Mojo::URL->new;
-	# $c->session('username') . '.' . $c->cookie('domain');
-	# $c->log->debug(dumper $home);
-
 	my $raw = path($root, $slug);
-	return $c->reply->not_found if $raw->extname && !-f $raw;
-	return $c->reply->file($raw) if -f $raw;
+	if ($raw->extname) {
+		return $c->reply->file($raw) if -f $raw;
+		my $fallback = path($c->app->static->paths->[0], 'fallback', $slug);
+		return $c->reply->file($fallback) if -f $fallback;
+		return $c->reply->not_found;
+	}
 
 	$slug = url_unescape($slug);
 	{
