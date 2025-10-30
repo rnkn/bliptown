@@ -27,7 +27,7 @@ my $md_flags = MD_FLAG_PERMISSIVEURLAUTOLINKS
 	| MD_FLAG_TABLES
 	| MD_FLAG_STRIKETHROUGH;
 
-my $ffi = FFI::Platypus->new(lib => 'lib/libmd4c.so');
+my $ffi = FFI::Platypus->new(api => 2, lib => '/usr/local/lib/libmd4c.so');
 $ffi->type('(string, int, opaque)->void' => 'callback');
 $ffi->attach(
 	md_html => [
