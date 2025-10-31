@@ -74,8 +74,8 @@ sub read_page {
 			my $o = YAML::Tiny->new;
 			$metadata = $o->read_string($yaml);
 			$metadata = $metadata->[0];
-			$layout = $metadata->{layout} || 'one-column';
 		}
+		$layout = $metadata->{layout} || 'one-column';
 
 		md_html($text, length($text), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
