@@ -331,7 +331,7 @@ input#message-close:checked ~ label#message-close {
 	width: 8em;
 }
 
-#edit #filename input[type=text] {
+input[type=text] {
 	font-family: monospace;
 }
 
@@ -350,10 +350,6 @@ input#message-close:checked ~ label#message-close {
 #files #controls {
 	display: flex;
 	flex-wrap: wrap;
-}
-
-#files #filter input[type=text], #files #rename input[type=text] {
-	font-family: monospace;
 }
 
 #files #upload {
@@ -399,7 +395,6 @@ input#message-close:checked ~ label#message-close {
 .row {
 	display: flex;
 	gap: 1em;
-	cursor: pointer;
 }
 
 .cell.name {
