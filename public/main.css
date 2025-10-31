@@ -162,9 +162,15 @@ main {
 	background-color: white;
 }
 
-main h1, main h2, main h3 {
+main h1 {
 	font-size: initial;
 	margin-bottom: 1rem;
+}
+
+main h2 {
+	font-size: initial;
+	font-weight: initial;
+	color: rgba(0,0,0,0.5);
 }
 
 main ul {
