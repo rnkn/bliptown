@@ -29,10 +29,6 @@ sub render_page {
 		return $c->reply->not_found;
 	}
 
-    unless ($c->req->url->to_abs =~ /\/$/) {
-        return $c->redirect_to($c->req->url->to_abs . '/');
-    }
-
 	$slug = url_unescape($slug);
 	{
 		my @elts = split('/', $slug);
