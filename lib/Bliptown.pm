@@ -80,13 +80,15 @@ sub startup {
 		get_file => sub {
 			my ($c, $slug) = @_;
 			my $root = path($c->get_src_dir, $c->get_domain_user);
-			my $f = path($root, $slug)->to_abs;
-			return $f if -f $f;
+			my $file = path($root, $slug)->to_abs;
+			return $file if -f $file;
 			my @exts = qw(html css js txt md);
 			foreach (@exts) {
-				$f = path($root, "$slug.$_")->to_abs;
+				my $f = path($root, "$slug.$_")->to_abs;
 				return $f if -f $f;
 			}
+			return "$file/index.md" if "$file/index.md";
+			return;
 		}
 	);
 
