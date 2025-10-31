@@ -76,10 +76,10 @@ sub render_page {
 		$skel_html{$_} = $page->{html};
 	}
 
-	my $f = path($root, "_title.txt");
+	my $title_f = path($root, "_title.txt");
 	my $title = "Untitled";
-	if (-f $f) {
-		open(my $fh, '<', $f);
+	if (-f $title_f) {
+		open(my $fh, '<', $title_f);
 		$title = <$fh>;
 		close($fh);
 	}
