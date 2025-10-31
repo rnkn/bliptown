@@ -100,7 +100,6 @@ sub render_page {
 		home => $c->get_home,
 		head => $head || '',
 		title => $title,
-		date => $date,
 		header => $skel_html{_header} || '',
 		sidebar => $skel_html{_sidebar} || '',
 		footer => $skel_html{_footer} || '',
