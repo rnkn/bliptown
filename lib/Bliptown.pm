@@ -79,15 +79,15 @@ sub startup {
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			my $root = path($c->get_src_dir, $c->get_domain_user);
-			my $file = path($root, $slug)->to_abs;
-			return $file if -f $file;
+			my $root = path($c->get_src_dir, $c->get_domain_user)->to_abs;
+			my $path = path($root, $slug)->to_abs;
+			return $path if -f $path;
 			my @exts = qw(html css js txt md);
 			foreach (@exts) {
 				my $f = path($root, "$slug.$_")->to_abs;
 				return $f if -f $f;
 			}
-			return "$file/index.md" if "$file/index.md";
+			return path("$path/index.md")->to_abs if -f "$path/index.md";
 			return;
 		}
 	);
