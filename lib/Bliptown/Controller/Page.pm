@@ -115,6 +115,7 @@ sub render_page {
 sub new_page {
 	my $c = shift;
 	my $slug = $c->param('catchall');
+	$slug =~ s/\/$//;
 	$c->stash(
 		template => 'edit',
 		title => 'New',
@@ -128,14 +129,14 @@ sub edit_page {
 	my $c = shift;
 	my $root = path($c->get_src_dir, $c->get_domain_user);
 	my $slug = $c->param('catchall');
-	$slug = 'index' if length($slug) == 0;
-	$slug =~ s/\.[^.]+?$//;
 	my $redirect = $c->param('back_to');
+	$slug =~ s/\/$//; $slug =~ s/\.[^.]+?$//;
 	my $file = $c->get_file($slug) || path($root, "$slug.md");
+	my $rel = $file->to_rel($root); $rel =~ s/\.[^.]+?$//;
 	my $ext = $c->param('ext') || $file->extname;
 	my $content = '';
 	my @includes;
-	if (-e $file) {
+	if (-f $file) {
 		$content = $c->file->read_file({ file => $file })->{chars};
 		while ($content =~ /\{\{\s*(.*?)\s*\}\}/g) {
 			unless (grep { $_ eq $1 } @includes ) {
@@ -146,7 +147,7 @@ sub edit_page {
 	$c->stash(
 		template => 'edit',
 		title => 'Editing ',
-		slug => $slug,
+		slug => $rel,
 		ext => $ext,
 		filename => $file->basename,
 		redirect => $redirect,
