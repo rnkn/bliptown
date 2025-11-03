@@ -25,7 +25,7 @@ sub startup {
 		});
 
 	my $migrations_path = $app->home->child('migrations.sql');
-	$app->sqlite->migrations->from_file($migrations_path)->migrate(1);
+	$app->sqlite->migrations->from_file($migrations_path)->migrate(2);
 
 	$app->helper(
 		user => sub {
