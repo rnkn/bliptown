@@ -39,9 +39,8 @@ sub render_page {
 	}
 
 	my $file = $c->get_file($slug);
-	if (!-f $file) {
-		my $u = $c->session('username');
-		if ($u && $u eq $c->get_domain_user) {
+	if (!$file) {
+		if ($user_cur) {
 			return $c->redirect_to('new_page');
 		} else {
 			return $c->reply->not_found;
