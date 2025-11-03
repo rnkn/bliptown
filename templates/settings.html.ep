@@ -41,6 +41,12 @@
 						modified time
 					</label>
 				</li>
+				<label for="create-backups">
+					<li class="row">
+						<span class="cell name">Create backups</span>
+						<input type="checkbox" id="create-backups" class="right" name="create_backups" value="true">
+					</li>
+				</label>
 			</ul>
 			<hr>
 			<details id="delete-account">
