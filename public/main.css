@@ -39,6 +39,7 @@ pre {
 }
 
 pre, code {
+	font-size: 0.9em;
 	background-color: var(--code-bg-color);
 }
 
@@ -337,7 +338,8 @@ input#message-close:checked ~ label#message-close {
 	width: 8em;
 }
 
-input[type=text] {
+textarea, input {
+	font-size: 0.9em;
 	font-family: monospace;
 }
 
