@@ -1,18 +1,18 @@
 % layout 'default';
 <main id="edit" class="backstage">
 	<nav>
-		<a href="<%= url_for('list_files') %>" id="exit">All Files</a>
+		<a href="<%= url_for('list_files') %>" id="exit">Files</a>
 		% if (current_route eq 'new_page') {
-		<h2><%= $title %></h2>
+		<h1><%= $title %></h1>
 		<a href="https://commonmark.org/help/" target="_blank" id="help-q">?</a>
 		% } elsif (current_route eq 'edit_page') {
-		<h2><%= $title %>
+		<h1><%= $title %>
 			% if ($relfile =~ /^_/) {
 			<%= $relfile %>
 			% } else {
 			<a href="/<%= $slug %>"><%= $relfile %></a>
 			% }
-		</h2>
+		</h1>
 		% if ($ext eq 'md') {
 		<a href="https://commonmark.org/help/" target="_blank" class="help-q">?</a>
 		% }

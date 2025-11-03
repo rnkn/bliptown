@@ -2,7 +2,7 @@
 <main id="settings" class="backstage">
 	<nav>
 		<a href="/" id="exit">View Site</a>
-		<h2><%= $title %></h2>
+		<h1><%= $title %></h1>
 	</nav>
 	<div class="one-column">
 		<form action="<%= url_for('settings') %>" method="post">
