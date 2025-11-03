@@ -137,7 +137,8 @@ sub edit_page {
 		$content = $c->file->read_file({ file => $file })->{chars};
 		while ($content =~ /\{\{\s*(.*?)\s*\}\}/g) {
 			unless (grep { $_ eq $1 } @includes ) {
-				push @includes, $1;
+				my $include = $1; $include =~ s/\.[^.]+?$//;
+				push @includes, $include;
 			}
 		}
 	}
