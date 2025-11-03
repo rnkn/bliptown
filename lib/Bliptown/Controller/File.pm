@@ -41,7 +41,7 @@ sub list_files {
 
 	@files = grep { $_->{relpath} =~ /$filter/i } @files if $filter;
 
-	if ($user->{sort_files} == 1) {
+	if ($user->{sort_new} == 1) {
 		@files = sort { $b->{mtime} cmp $a->{mtime} } @files;
 	} else {
 		@files = sort { $a->{relpath} cmp $b->{relpath} } @files;

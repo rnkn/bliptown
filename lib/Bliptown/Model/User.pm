@@ -44,7 +44,8 @@ sub read_user {
 	return;
 }
 
-my @allowed_keys = qw(username email password_hash totp_secret custom_domain);
+my @allowed_keys = qw(username email password_hash totp_secret
+custom_domain create_backups sort_new);
 
 sub update_user {
 	my ($self, $args) = @_;

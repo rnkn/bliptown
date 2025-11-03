@@ -10,6 +10,8 @@ sub list_settings {
 		username => $user->{username},
 		email => $user->{email},
 		custom_domain => $user->{custom_domain},
+		sort_new => $user->{sort_new} // 0,
+		create_backups => $user->{create_backups} // 0,
 	);
 	return $c->render;
 }
@@ -17,7 +19,7 @@ sub list_settings {
 sub save_settings {
 	my $c = shift;
 	my $u = $c->session('username');
-	my @keys_null = qw(custom_domain);
+	my @keys_null = qw(custom_domain create_backups sort_new);
 	my @keys_not_null = qw(email new_password);
 	my %args; $args{username} = $u;
 	foreach (@keys_null) {

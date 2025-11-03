@@ -33,18 +33,18 @@
 				<li class="row">
 					<span class="cell name">Sort files</span>
 					<label>
-						<input type="radio" name="sort-files" value="sort-file-alpha" checked>
+						<input type="radio" name="sort_new" value="0" <%= 'checked' if $sort_new == 0 %>>
 						alphabetically
 					</label>
 					<label>
-						<input type="radio" name="sort-files" value="sort-file-recent">
+						<input type="radio" name="sort_new" value="1" <%= 'checked' if $sort_new == 1 %>>
 						modified time
 					</label>
 				</li>
 				<label for="create-backups">
 					<li class="row">
 						<span class="cell name">Create backups</span>
-						<input type="checkbox" id="create-backups" class="right" name="create_backups" value="true">
+						<input type="checkbox" id="create-backups" class="right" name="create_backups" value="1" <%= 'checked' if $create_backups == 1 %>>
 					</li>
 				</label>
 			</ul>
