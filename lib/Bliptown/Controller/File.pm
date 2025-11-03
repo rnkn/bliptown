@@ -26,25 +26,23 @@ sub list_files {
 	my @files;
 	foreach ($tree->each) {
 		my @stats = stat($_);
-		my $relpath = $_;
-		$relpath =~ s/^$root\/?//;
-		my $url = $relpath;
-		$url =~ s/\.(md|txt|html|css|js)//;
+		my $rel_filename = $_->to_rel($root)->to_string;
+		my $url = $rel_filename; $url =~ s/\.(md|txt|html|css|js)$//;
 
 		push @files, {
-			relpath => $relpath,
+			filename => $rel_filename,
 			url => $url,
 			size => format_human_size($stats[7]),
 			mtime => strftime('%Y-%m-%d %H:%M', localtime($stats[9])),
 		}
 	};
 
-	@files = grep { $_->{relpath} =~ /$filter/i } @files if $filter;
+	@files = grep { $_->{filename} =~ /$filter/i } @files if $filter;
 
 	if ($user->{sort_new} == 1) {
 		@files = sort { $b->{mtime} cmp $a->{mtime} } @files;
 	} else {
-		@files = sort { $a->{relpath} cmp $b->{relpath} } @files;
+		@files = sort { $a->{filename} cmp $b->{filename} } @files;
 	}
 
 	$c->stash(

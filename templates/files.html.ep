@@ -23,7 +23,7 @@
 			<details name="files">
 				<summary class="row">
 					<span class="cell name">
-						%= $_->{relpath}
+						%= $_->{filename}
 					</span>
 					<span class="cell stat">
 						%= $_->{size}
@@ -34,16 +34,17 @@
 				</summary>
 				<ul>
 					<li>
-						<form id="rename" method="get" action="<%= url_for('rename_file', catchall => $_->{relpath} ) %>">
-							<input type="text" name="to" value="<%= $_->{relpath} %>">
+						<form id="rename" method="get" action="<%= url_for('rename_file', catchall => $_->{filename} ) %>">
+							<input type="text" name="to" value="<%= $_->{filename} %>">
 							<button type="submit">Rename</button>
 						</form>
 					</li>
-					% unless ($_->{relpath} =~ /^_/) {
+					% unless ($_->{filename} =~ /^_|~$/) {
 					<li><a href="<%= $_->{url} %>">View</a></li>
 					% }
-					% if ($_->{relpath} =~ /\.(md|txt|html|css|js)/) {
+					% if ($_->{filename} =~ /\.(md|txt|html|css|js)$/) {
 					<li><a href="<%= url_for('edit_page', catchall => $_->{url} )->query([back_to => url_for]) %>">Edit</a></li>
+					% } elsif ($_->{filename} =~ /\.(md|txt|html|css|js)~?$/) {
 					<li><a href="<%= url_for('render_raw', catchall => $_->{url} ) %>">Raw</a></li>
 					% }
 					<li><a class="warning" href="<%= url_for('delete_file', catchall => $_->{relpath} )->query([back_to => url_for])%>">Delete</a></li>
