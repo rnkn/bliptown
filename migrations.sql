@@ -1,3 +1,13 @@
+-- 3 up
+ALTER TABLE users
+    ADD COLUMN create_backups INTEGER;
+ALTER TABLE users
+    ADD COLUMN sort_new INTEGER;
+-- 3 down
+ALTER TABLE users
+    DROP COLUMN create_backups;
+ALTER TABLE users
+	DROP COLUMN sort_new;
 -- 2 up
 ALTER TABLE users
     ADD COLUMN custom_domain TEXT;
