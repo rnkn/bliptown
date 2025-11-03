@@ -7,7 +7,7 @@
 	</header>
 	<nav>
 		<%== $sidebar %>
-		% if ($c->get_domain_user eq 'mayor' && ! $c->session('username')) {
+		% if ($c->get_req_user eq 'mayor' && ! $c->session('username')) {
 		<ul>
 			<li><label for="drawer-toggle">Join/Login</label>
 		</ul>

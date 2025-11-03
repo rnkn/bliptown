@@ -12,14 +12,16 @@ sub yaml_true {
 
 sub render_page {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->get_domain_user);
+	my $root = path($c->get_user_home, $c->get_req_user);
+	my $user = $c->session('username');
+	my $user_cur = $user && $user eq $c->get_req_user;
+	my $slug = $c->param('catchall');
 	if (-d $root) {
 		my @skel = qw(index.md _title.txt _header.md _sidebar.md _footer.md);
 		foreach (@skel) {
 			path($root, $_)->touch;
 		}
 	}
-	my $slug = $c->param('catchall');
 
 	my $raw = path($root, $slug);
 	if ($raw->extname) {
@@ -72,10 +74,10 @@ sub render_page {
 		$skel_html{$_} = $page->{html};
 	}
 
-	my $title_f = path($root, "_title.txt");
+	my $title_file = path($root, "_title.txt");
 	my $title = "Untitled";
-	if (-f $title_f) {
-		open(my $fh, '<', $title_f);
+	if (-f $title_file) {
+		open(my $fh, '<', $title_file);
 		$title = <$fh>;
 		close($fh);
 	}
@@ -88,12 +90,12 @@ sub render_page {
 	my $file_head = path($root, "_head.html");
 	my $head = $file_head->slurp('utf-8') if -e $file_head;
 
-	my $show_join = 1 if $ENV{'BLIPTOWN_JOIN_ENABLED'} == 1
-		&& $c->get_domain_user eq 'mayor';
+	my $show_join = 1
+		if $ENV{'BLIPTOWN_JOIN_ENABLED'} == 1
+		&& $c->get_req_user eq 'mayor';
 
 	$c->stash(
 		template => 'page',
-		home => $c->get_home,
 		head => $head || '',
 		title => $title,
 		header => $skel_html{_header} || '',
@@ -122,7 +124,7 @@ sub new_page {
 
 sub edit_page {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->get_domain_user);
+	my $root = path($c->get_user_home, $c->get_req_user);
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	$slug =~ s/\/$//; $slug =~ s/\.[^.]+?$//;
@@ -154,7 +156,8 @@ sub edit_page {
 
 sub save_page {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->get_domain_user);
+	my $root = path($c->get_user_home, $c->get_req_user);
+
 	my $slug = $c->param('slug');
 	{
 		my @elts = split('/', $slug);
@@ -184,9 +187,7 @@ sub save_page {
 
 sub render_raw {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->get_domain_user);
 	my $slug = $c->param('catchall');
-	$slug = 'index' if length($slug) == 0;
 	my $file = $c->get_file($slug);
 	return $c->reply->not_found unless -f $file;
 	my $chars = $file->slurp('utf-8');

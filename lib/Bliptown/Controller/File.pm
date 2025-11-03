@@ -20,7 +20,7 @@ sub format_human_size {
 sub list_files {
 	my $c = shift;
 	my $user = $c->user->read_user({ username => $c->session('username')});
-	my $root = path($c->get_src_dir, $user->{username});
+	my $root = path($c->get_user_home, $user->{username});
 	my $filter = $c->param('filter');
 	my $tree = $root->list_tree;
 
@@ -59,7 +59,7 @@ sub list_files {
 
 sub rename_file {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->session('username'));
+	my $root = path($c->get_user_home, $c->session('username'));
 	my $old_slug = $c->param('catchall');
 	my $new_slug = $c->param('to');
 	my $old_file = $c->get_file($old_slug);
@@ -73,7 +73,6 @@ sub rename_file {
 
 sub delete_file {
 	my $c = shift;
-	my $root = path($c->get_src_dir, $c->session('username'));
 	my $slug = $c->param('catchall');
 	my $file = $c->get_file($slug);
 	$file->remove;
@@ -84,18 +83,18 @@ sub delete_file {
 sub upload_files {
 	my $c = shift;
 	my $user = $c->user->read_user({ username => $c->session('username')});
-	my $root = path($c->get_src_dir, $user->{username});
+	my $root = path($c->get_user_home, $user->{username});
 	my @files;
 	foreach (@{$c->req->uploads}) {
-		my $f = $_->filename;
+		my $file = $_->filename;
 		if ($_->size > 1024 * 1024 * 50) {
 			$c->flash(warning => "File too large");
 			$c->res->code(413);
 			return $c->redirect_to('list_files');
 		}
-		my $path = path($root, $f);
-		if (-e $path) {
-			$c->flash(warning => "$f already exists!");
+		my $path = path($root, $file);
+		if (-f $path) {
+			$c->flash(warning => "$file already exists!");
 			return $c->redirect_to('list_files');
 		};
 		$_->move_to($path);

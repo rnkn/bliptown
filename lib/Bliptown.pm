@@ -43,34 +43,13 @@ sub startup {
 		});
 
 	$app->helper(
-		get_home => sub {
-			my $c = shift;
-			my $url = Mojo::URL->new;
-			my $username = $c->session('username');
-			if ($username) {
-				$url->host("$username.$domain");
-			} else {
-				$url->host("$domain");
-			}
-			if ($c->app->mode eq 'production') {
-				$url->scheme('https');
-			} else {
-				$url->scheme('http');
-				$url->port(3000);
-			}
-			return $url;
-		}
-	);
-
-	$app->helper(
-		get_src_dir => sub {
-			state $src = $ENV{'BLIPTOWN_SRC'};
-			return $src;
+		get_user_home => sub {
+			return $ENV{'BLIPTOWN_USER_HOME'};
 		}
 	);
 	
 	$app->helper(
-		get_domain_user => sub {
+		get_req_user => sub {
 			my $c = shift;
 			my @hostname = split(/\./, $c->req->url->to_abs->host);
 			return @hostname >= 3 ? $hostname[-3] : 'mayor';
@@ -79,15 +58,16 @@ sub startup {
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			my $root = path($c->get_src_dir, $c->get_domain_user)->to_abs;
-			my $path = path($root, $slug)->to_abs;
-			return $path if -f $path;
+			my $root = path($c->get_user_home, $c->get_req_user)->to_abs;
+			my $file_path = path($root, $slug)->to_abs;
+			return $file_path if -f $file_path;
 			my @exts = qw(html css js txt md);
 			foreach (@exts) {
 				my $f = path($root, "$slug.$_")->to_abs;
 				return $f if -f $f;
 			}
-			return path("$path/index.md")->to_abs if -f "$path/index.md";
+			my $index_path = path("$file_path/index.md")->to_abs;
+			return $index_path if -f $index_path;
 			return;
 		}
 	);
@@ -127,7 +107,8 @@ sub startup {
 	my $protected = $r->under(
 		'/' => sub {
 			my $c = shift;
-			if ($c->session('username') && $c->session('username') eq $c->get_domain_user) {
+			my $u = $c->session('username');
+			if ($u && $u eq $c->get_req_user) {
 				return 1;
 			} else {
 				$c->flash(info => 'Login required');
