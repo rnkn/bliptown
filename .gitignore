@@ -1,5 +1,5 @@
 /TAGS
-/.env
+/.envrc
 /cpanfile.snapshot
 /local
 /*.db
