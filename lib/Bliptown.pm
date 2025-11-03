@@ -96,13 +96,6 @@ sub startup {
 
 	$r->get('/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
 	$r->post('/totp')->to(controller => 'TOTP', action => 'totp_check')->name('totp_check');
-	
-	$r->get(
-		'/denied' => sub {
-			my $c = shift;
-			$c->render(text => 'Access denied', status => 403)
-		}
-	)->name('access_denied');
 
 	my $protected = $r->under(
 		'/' => sub {

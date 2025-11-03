@@ -61,12 +61,6 @@ sub render_page {
 		}
 	);
 
-	# my $private = $page->{metadata}{private};
-	
-	# return $c->render(
-	# 	text => 'Access denied', status => 403
-	# ) if yaml_true($private);
-
 	my @skel = qw(_header _sidebar _footer);
 	my %skel_html;
 	foreach (@skel) {
