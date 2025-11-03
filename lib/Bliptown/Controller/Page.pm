@@ -21,6 +21,8 @@ sub render_page {
 		foreach (@skel) {
 			path($root, $_)->touch;
 		}
+	} else {
+		return $c->reply->not_found;
 	}
 
 	my $raw = path($root, $slug);
