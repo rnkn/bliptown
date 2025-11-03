@@ -44,17 +44,17 @@ sub read_user {
 	return;
 }
 
-my @allowed_keys = qw(username email password_hash totp_secret);
+my @allowed_keys = qw(username email password_hash totp_secret custom_domain);
 
 sub update_user {
 	my ($self, $args) = @_;
-	my $values = {};
+	my %values;
 	foreach my $key (keys %$args) {
 		if (grep { $key eq $_ } @allowed_keys) {
-			$values->{$key} = %$args{$key};
+			$values{$key} = %$args{$key};
 		}
 	};
-    $self->sqlite->db->update('users', { $values }, { id => $args->username });
+    $self->sqlite->db->update('users', \%values, { username => $args->{username} });
 }
 
 sub delete_user {
