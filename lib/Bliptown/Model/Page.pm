@@ -86,23 +86,25 @@ sub read_page {
 			my $slug = $1;
 			my $root = $args->{root};
 			my $includes = $args->{includes} || [ $file ];
-			my $file_md;
-			if ($slug =~ /^\//) {
-				$file_md = path($root, "$slug.md")->to_abs;
+			my $file_str;
+			$file_str = $slug !~ /\.[^.]+?$/ ? "$slug.md" : $slug;
+			my $file_path;
+			if ($file_str =~ /^\//) {
+				$file_path = path($root, $file_str)->to_abs;
 			} else {
-				$file_md = path($file->dirname, "$slug.md")->to_abs;
+				$file_path = path($file->dirname, $file_str)->to_abs;
 			}
 			my $frag = '';
-			if (!-e $file_md) {
+			if (!-f $file_path) {
 				$frag = "<span class=\"error\">Error: \"<a href=\"$slug\">$slug</a>\" not found</span>"
-			} elsif (grep { $file_md eq $_ } @$includes) {
+			} elsif (grep { $file_path eq $_ } @$includes) {
 				$frag = '<span class="error">Error: infinite recursion</span>';
 			} else {
-				push @$includes, $file_md;
+				push @$includes, $file_path;
 				my $page = read_page(
 					$self, {
 						root => $root,
-						file => $file_md,
+						file => $file_path,
 						includes => $includes,
 					});
 				$frag = $page->{html};
