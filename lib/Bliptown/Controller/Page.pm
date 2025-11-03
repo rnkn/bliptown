@@ -88,7 +88,7 @@ sub render_page {
 	my $date = $page->{metadata}{date};
 
 	my $file_head = path($root, "_head.html");
-	my $head = $file_head->slurp('utf-8') if -e $file_head;
+	my $head = $file_head->slurp('utf-8') if -f $file_head;
 
 	my $show_join = 1
 		if $ENV{'BLIPTOWN_JOIN_ENABLED'} == 1
