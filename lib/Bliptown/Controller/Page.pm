@@ -131,17 +131,19 @@ sub edit_page {
 	my $c = shift;
 	my $root = path($c->get_user_home, $c->get_req_user);
 	my $slug = $c->param('catchall');
+	$slug =~ s/\/$//;
 	my $redirect = $c->param('back_to');
-	$slug =~ s/\/$//; $slug =~ s/\.[^.]+?$//;
-	my $file = $c->get_file($slug) || path($root, "$slug.md");
+	my $file = $c->get_file($slug) ||
+		return $c->redirect_to('new_page', catchall => $slug);
+	my $ext = $c->param('ext') || $file->extname || 'md';
+	return $c->reply->not_found unless grep { $ext eq $_} @allowed_exts;
 	my $rel_file = $file->to_rel($root); $rel_file =~ s/\.[^.]+?$//;
-	my $ext = $c->param('ext') || $file->extname;
-	my $content = '';
+	my $content;
 	my @includes;
 	if (-f $file) {
 		$content = $c->file->read_file({ file => $file })->{chars};
 		while ($content =~ /\{\{\s*(.*?)\s*\}\}/g) {
-			unless (grep { $_ eq $1 } @includes ) {
+			unless (grep { $1 eq $_ } @includes ) {
 				my $include = $1; $include =~ s/\.[^.]+?$//;
 				push @includes, $include;
 			}
