@@ -15,9 +15,7 @@ sub get_user {
 
 sub create_user {
 	my ($self, $args) = @_;
-	my $password_hash = bcrypt(
-		$args->{password}, '2b', 12, $ENV{BLIPTOWN_SALT}
-	);
+	my $password_hash = bcrypt($args->{password}, '2b', 12, $ENV{BLIPTOWN_SALT});
 	my @base64_set = (0 .. 9, 'a' .. 'z', 'A' .. 'Z', '+', '/');
 	my $rand_str = join '', map $base64_set[rand @base64_set], 0 .. 21;
 	my $secret = encode_base32 $rand_str;
@@ -44,8 +42,8 @@ sub read_user {
 	return;
 }
 
-my @allowed_keys = qw(username email password_hash totp_secret
-custom_domain create_backups sort_new);
+my @allowed_keys = qw(username email totp_secret custom_domain
+create_backups sort_new);
 
 sub update_user {
 	my ($self, $args) = @_;
@@ -54,6 +52,11 @@ sub update_user {
 		if (grep { $key eq $_ } @allowed_keys) {
 			$values{$key} = %$args{$key};
 		}
+	};
+	my $new_password = $args->{new_password};
+	if ($new_password) {
+		my $password_hash = bcrypt($new_password, '2b', 12, $ENV{BLIPTOWN_SALT});
+		$values{password_hash} = $password_hash;
 	};
     $self->sqlite->db->update('users', \%values, { username => $args->{username} });
 }
