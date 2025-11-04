@@ -37,11 +37,6 @@ sub render_page {
 	}
 
 	$slug = url_unescape($slug);
-	{
-		my @elts = split('/', $slug);
-		@elts = map { slugify $_ } @elts;
-		$slug = join('/', @elts);
-	}
 
 	my $file = $c->get_file($slug);
 	if (!$file) {
