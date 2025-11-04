@@ -130,7 +130,7 @@ sub edit_page {
 	my $redirect = $c->param('back_to');
 	$slug =~ s/\/$//; $slug =~ s/\.[^.]+?$//;
 	my $file = $c->get_file($slug) || path($root, "$slug.md");
-	my $rel = $file->to_rel($root); $rel =~ s/\.[^.]+?$//;
+	my $rel_file = $file->to_rel($root); $rel_file =~ s/\.[^.]+?$//;
 	my $ext = $c->param('ext') || $file->extname;
 	my $content = '';
 	my @includes;
@@ -146,7 +146,7 @@ sub edit_page {
 	$c->stash(
 		template => 'edit',
 		title => 'Editing ',
-		slug => $rel,
+		slug => $rel_file,
 		ext => $ext,
 		filename => $file->basename,
 		redirect => $redirect,
