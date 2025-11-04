@@ -10,6 +10,8 @@ sub yaml_true {
 	}
 }
 
+my @allowed_exts = qw(html css js txt md);
+
 sub render_page {
 	my $c = shift;
 	my $root = path($c->get_user_home, $c->get_req_user);
@@ -113,11 +115,18 @@ sub render_page {
 sub new_page {
 	my $c = shift;
 	my $slug = $c->param('catchall');
+	my $ext = '';
 	$slug =~ s/\/$//;
+	$ext = $1 if $slug =~ /\.(.+)$/;
+	$slug = $1 if $slug =~ /(.+)(\..+)$/;
+	if ($ext) {
+		return $c->reply->not_found unless grep { $ext eq $_} @allowed_exts;
+	}
 	$c->stash(
 		template => 'edit',
 		title => 'New',
 		slug => $slug,
+		ext => $ext,
 		redirect => $c->url_for('edit_page', catchall => $slug),
 	);
 	return $c->render;
