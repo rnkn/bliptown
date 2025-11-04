@@ -37,7 +37,7 @@ sub list_files {
 		}
 	};
 
-	@files = grep { $_->{filename} =~ /$filter/i } @files if $filter;
+	@files = grep { $_->{filename} =~ /$filter/ } @files if $filter;
 
 	if ($user->{sort_new} == 1) {
 		@files = sort { $b->{mtime} cmp $a->{mtime} } @files;
