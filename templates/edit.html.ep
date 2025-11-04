@@ -35,7 +35,7 @@
 			<div id="includes">
 				<strong>Includes:</strong>
 				% foreach (@$includes) {
-				<a href="<%= url_for('edit_page', catchall => $_)->query(back_to => $redirect) %>"><%= $_ %></a>
+				<a href="<%= url_for($_)->query(back_to => $redirect) %>"><%= $_ %></a>
 				% }
 			</div>
 			% }
