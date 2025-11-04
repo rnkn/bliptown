@@ -19,7 +19,8 @@ sub render_page {
 	if (-d $root) {
 		my @skel = qw(index.md _title.txt _header.md _sidebar.md _footer.md);
 		foreach (@skel) {
-			path($root, $_)->touch;
+			my $f = path($root, $_);
+			$f->touch if !-f $f;
 		}
 	} else {
 		return $c->reply->not_found;
