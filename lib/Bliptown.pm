@@ -21,7 +21,8 @@ sub startup {
 
 	$app->helper(
 		sqlite => sub {
-			state $sql = Mojo::SQLite->new('sqlite:users.db');
+			my $db = path($ENV{BLIPTOWN_DB_HOME}, 'users.db');
+			state $sql = Mojo::SQLite->new("sqlite:$db");
 		});
 
 	my $migrations_path = $app->home->child('migrations.sql');
