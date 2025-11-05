@@ -2,7 +2,7 @@
 
 daemon="/bin/carton exec"
 daemon_flags="hypnotoad script/bliptown"
-daemon_execdir="/blip.town"
+daemon_execdir="/bliptown"
 daemon_user="_bliptown"
 daemon_timeout=300
 
