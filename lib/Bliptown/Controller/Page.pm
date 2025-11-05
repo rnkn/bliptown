@@ -93,6 +93,7 @@ sub render_page {
 		&& $c->get_req_user eq 'mayor';
 
 	$c->stash(
+		home => $c->get_home,
 		template => 'page',
 		head => $head || '',
 		title => $title,
