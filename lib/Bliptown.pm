@@ -57,6 +57,26 @@ sub startup {
 		});
 
 	$app->helper(
+		get_home => sub {
+			my $c = shift;
+			my $url = Mojo::URL->new;
+			my $username = $c->session('username');
+			if ($username) {
+				$url->host("$username.$domain");
+			} else {
+				$url->host("$domain");
+			}
+			if ($c->app->mode eq 'production') {
+				$url->scheme('https');
+			} else {
+				$url->scheme('http');
+				$url->port(3000);
+			}
+			return $url;
+		}
+	);
+
+	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
 			my $root = path($c->get_user_home, $c->get_req_user)->to_abs;
