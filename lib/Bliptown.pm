@@ -10,7 +10,7 @@ use Bliptown::Model::File;
 
 sub startup {
 	my $app = shift;
-	$app->secrets([ $ENV{'BLIPTOWN_SECRET'} ]);
+	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
 	$app->config(
 		hypnotoad => {
 			proxy  => 1
@@ -45,7 +45,7 @@ sub startup {
 
 	$app->helper(
 		get_user_home => sub {
-			return $ENV{'BLIPTOWN_USER_HOME'};
+			return $ENV{BLIPTOWN_USER_HOME};
 		}
 	);
 	
