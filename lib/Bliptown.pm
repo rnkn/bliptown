@@ -52,7 +52,7 @@ sub startup {
 	$app->helper(
 		get_req_user => sub {
 			my $c = shift;
-			my $hostname = $c->req->url->to_abs->host || '';
+			my $hostname = $c->req->headers->header('Host') || '';
 			my @hostname_a = split(/\./, $hostname);
 			return @hostname_a >= 3 ? $hostname_a[-3] : 'mayor';
 		});
