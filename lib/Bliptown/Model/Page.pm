@@ -3,6 +3,8 @@ use Mojo::Base -base;
 use Mojo::File qw(path);
 use FFI::Platypus;
 use YAML::Tiny;
+use Mojo::DOM::HTML;
+use Mojo::Util qw(dumper);
 
 use constant {
 	MD_FLAG_COLLAPSEWHITESPACE          => 1 << 0,
@@ -28,8 +30,8 @@ my $md_flags = MD_FLAG_PERMISSIVEURLAUTOLINKS
 	| MD_FLAG_STRIKETHROUGH;
 
 my $ffi = FFI::Platypus->new(api => 2);
-$ffi->lib(path($ENV{'BLIPTOWN_LIB_HOME'}, 'libmd4c.so.0')->to_string);
-$ffi->lib(path($ENV{'BLIPTOWN_LIB_HOME'}, 'libmd4c-html.so.0')->to_string);
+$ffi->lib(path($ENV{'BLIPTOWN_LIB_HOME'}, 'libmd4c.so')->to_string);
+$ffi->lib(path($ENV{'BLIPTOWN_LIB_HOME'}, 'libmd4c-html.so')->to_string);
 $ffi->type('(string, int, opaque)->void' => 'callback');
 $ffi->attach(
 	md_html => [
@@ -41,6 +43,14 @@ $ffi->attach(
 		'uint'
 	] => 'int'
 );
+
+sub convert_typography {
+	my $args = shift;
+	my $html = Mojo::DOM::HTML->new;
+	$html->parse($args->{html});
+	# say dumper $html->tree;
+	return $html->render;
+}
 
 sub read_page {
 	my ($self, $args) = @_;
@@ -112,6 +122,7 @@ sub read_page {
 			$html =~ s/\{\{.*?\}\}/$frag/;
 		}
 	}
+	$html = convert_typography({ html => $html });
 	return {
 		metadata => $metadata,
 		html => $html,
