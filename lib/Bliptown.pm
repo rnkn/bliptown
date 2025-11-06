@@ -2,7 +2,7 @@ package Bliptown;
 use Mojo::Base 'Mojolicious';
 use Mojo::File qw(curfile path);
 use Mojo::SQLite;
-use lib curfile->dirname->sibling('lib')->to_string;
+use lib '.';
 
 use Bliptown::Model::User;
 use Bliptown::Model::Page;
