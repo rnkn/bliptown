@@ -13,7 +13,8 @@ sub startup {
 	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
 	$app->config(
 		hypnotoad => {
-			proxy  => 1
+			proxy  => 1,
+			pid_file => $ENV{BLIPTOWN_PID_FILE},
 		});
 
 	my $domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
