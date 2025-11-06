@@ -125,8 +125,8 @@ sub startup {
 	my $protected = $r->under(
 		'/' => sub {
 			my $c = shift;
-			my $u = $c->session('username');
-			if ($u && $u eq $c->get_req_user) {
+			my $user = $c->session('username');
+			if ($user && $user eq $c->get_req_user) {
 				return 1;
 			} else {
 				$c->flash(info => 'Login required');
