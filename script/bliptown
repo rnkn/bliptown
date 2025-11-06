@@ -6,7 +6,7 @@ use warnings;
 chroot($ENV{BLIPTOWN_CHROOT});
 chdir('/bliptown');
 
-use lib 'lib', 'local/lib';
+use lib 'lib', 'local/lib/perl5';
 use Mojolicious::Commands;
 
 Mojolicious::Commands->start_app('Bliptown');
