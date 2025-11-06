@@ -62,10 +62,10 @@ sub render_page {
 	my @skel = qw(_header _sidebar _footer);
 	my %skel_html;
 	foreach (@skel) {
-		my $f = path($root, "$_.md");
+		my $file = path($root, "$_.md");
 		my $page = $c->page->read_page(
 			{
-				file => $f,
+				file => $file,
 				root => $root,
 			}
 		);
