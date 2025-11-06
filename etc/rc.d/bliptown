@@ -1,30 +1,26 @@
 #!/bin/ksh
 
-daemon="/usr/local/bin/carton exec"
-daemon_flags="/var/www/bliptown/local/bin/hypnotoad script/bliptown"
+daemon="/usr/local/bin/carton exec -- script/bliptown"
+daemon_flags="prefork -p -l http://*:8080 -P /run/bliptown.pid"
 daemon_execdir="/var/www/bliptown"
-daemon_timeout=300
+
+rc_bg=YES
+rc_reload=NO
 
 . /etc/rc.d/rc.subr
 
-rc_start() {
-	rc_exec "${daemon} -- ${daemon_flags}"
-}
+pid_file="/var/www/run/bliptown.pid"
 
 rc_stop() {
-	rc_exec "${daemon} -- ${daemon_flags} --stop"
+	rc_exec "kill -QUIT $(cat $pid_file)"
 }
 
 rc_configtest() {
-	rc_exec "${daemon} -- ${daemon_flags} --test"
-}
-
-rc_reload() {
-	rc_exec "${daemon} -- ${daemon_flags}"
+	rc_exec "${daemon} eval"
 }
 
 rc_check() {
-	rc_exec "kill -0 $(cat /var/www/run/hypnotoad.pid)"
+	rc_exec "test -f $pid_file && kill -0 $(cat $pid_file)"
 }
 
 rc_cmd $1
