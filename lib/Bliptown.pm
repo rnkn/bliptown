@@ -11,11 +11,6 @@ use Bliptown::Model::File;
 sub startup {
 	my $app = shift;
 	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
-	$app->config(
-		hypnotoad => {
-			proxy  => 1,
-			pid_file => $ENV{BLIPTOWN_PID_FILE},
-		});
 
 	my $domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
 	$app->sessions->cookie_domain($domain);
