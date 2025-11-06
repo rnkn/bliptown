@@ -25,21 +25,21 @@ sub user_join {
 	my $email = $c->param('email') || '';
 	my $username = $c->param('username') || '';
 	my $password = $c->param('password') || '';
-	my $redirect_to = $c->param('redirect-to') || '/';
+	my $redirect = $c->param('back_to') || '/';
 
 	unless (validate_user($c, { email => $email, username => $username, password => $password })) {
 		$c->flash(warning => 'Invalid credentials');
-		return $c->redirect_to($redirect_to);
+		return $c->redirect_to($redirect);
 	}
 
 	if (check_duplicate_user($c, { username => $username })) {
 		$c->flash(info => 'Username unavailable');
-		return $c->redirect_to($redirect_to);
+		return $c->redirect_to($redirect);
 	}
 
 	if (check_duplicate_email($c, { email => $email })) {
 		$c->flash(info => 'Account with email already exists');
-		return $c->redirect_to($redirect_to);
+		return $c->redirect_to($redirect);
 	}
 
 	$c->user->create_user(
@@ -49,7 +49,7 @@ sub user_join {
 			password => $password,
 		}
 	);
-	return $c->redirect_to($redirect_to);
+	return $c->redirect_to($redirect);
 }
 
 sub user_login {
@@ -57,13 +57,13 @@ sub user_login {
 	my $username = $c->param('username') || '';
 	my $password = $c->param('password') || '';
 	my $totp = $c->param('totp') || '';
-	my $redirect_to = $c->param('redirect-to') || '/';
+	my $redirect = $c->param('back_to') || '/';
 	if ($c->user->authenticate_user({ username => $username, password => $password, totp => $totp })) {
 		$c->session(expiration => 2592000, username => $username);
 	} else {
 		$c->flash(warning => 'Incorrect credentials');
 	}
-	return $c->redirect_to($redirect_to);
+	return $c->redirect_to($redirect);
 }
 
 sub user_logout {
