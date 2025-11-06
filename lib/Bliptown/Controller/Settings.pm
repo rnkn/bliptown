@@ -18,11 +18,11 @@ sub list_settings {
 
 sub save_settings {
 	my $c = shift;
-	my $u = $c->session('username');
+	my $user = $c->session('username');
 	my @keys_null = qw(custom_domain);
 	my @keys_not_null = qw(email new_password);
 	my @keys_int = qw(create_backups sort_new);
-	my %args; $args{username} = $u;
+	my %args; $args{username} = $user;
 	foreach (@keys_null) {
 		my $v = $c->param($_);
 		$args{$_} = $v;
