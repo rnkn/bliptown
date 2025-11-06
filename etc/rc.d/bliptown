@@ -1,8 +1,8 @@
 #!/bin/ksh
 
 daemon="/usr/local/bin/carton exec"
-daemon_flags="bliptown/local/bin/hypnotoad bliptown/script/bliptown"
-daemon_execdir="/var/www"
+daemon_flags="/var/www/bliptown/local/bin/hypnotoad script/bliptown"
+daemon_execdir="/var/www/bliptown"
 daemon_timeout=300
 
 . /etc/rc.d/rc.subr
@@ -24,7 +24,7 @@ rc_reload() {
 }
 
 rc_check() {
-	rc_exec "kill -0 $(cat run/hypnotoad.pid)"
+	rc_exec "kill -0 $(cat /var/www/run/hypnotoad.pid)"
 }
 
 rc_cmd $1
