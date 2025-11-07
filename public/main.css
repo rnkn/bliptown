@@ -561,7 +561,7 @@ textarea, input {
 	}
 }
 
-@media (max-width: 24rem) {
+@media (max-width: 420px) {
 	:root {
 		--drawer-height: 6rem;
 	}
