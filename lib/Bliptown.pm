@@ -1,18 +1,25 @@
 package Bliptown;
 use Mojo::Base 'Mojolicious';
-use Mojo::File qw(curfile path);
+use Mojo::File qw(path);
 use Mojo::SQLite;
 use lib '.';
 
 use Bliptown::Model::User;
 use Bliptown::Model::Page;
 use Bliptown::Model::File;
+use Cwd;
 
 sub startup {
 	my $app = shift;
+
+	my $cwd = getcwd();
+	$app->log->info("My uid: $<");
+	$app->log->info("My cwd: $cwd");
+
 	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
 
 	my $domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
+	$app->log->info("My domain: $domain");
 	$app->sessions->cookie_domain($domain);
 
 	$app->helper(
