@@ -7,12 +7,12 @@ use POSIX qw(setuid);
 my $uid;
 
 BEGIN {
-	die "$0 must run as root\n" unless $> == 0;
-	$uid = getpwnam('_bliptown') || die "Cannot get uid: _bliptown ($!)\n";
-	die unless $ENV{BLIPTOWN_CHROOT} || die "BLIPTOWN_CHROOT undefined\n";
-	chroot($ENV{BLIPTOWN_CHROOT}) || die "Cannot change root: $ENV{BLIPTOWN_CHROOT} ($!)\n";
+	die "$0 must run as root" unless $> == 0;
+	$uid = getpwnam('_bliptown') || die "Cannot get uid: _bliptown ($!)";
+	die unless $ENV{BLIPTOWN_CHROOT} || die "BLIPTOWN_CHROOT undefined";
+	chroot($ENV{BLIPTOWN_CHROOT}) || die "Cannot change root: $ENV{BLIPTOWN_CHROOT} ($!)";
 }
-		
+
 use lib 'lib', 'local/lib/perl5';
 
 BEGIN {
