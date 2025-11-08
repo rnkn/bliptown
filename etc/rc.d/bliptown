@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-daemon="/usr/local/bin/carton exec -- script/bliptown"
+daemon="chroot -u _bliptown . /usr/local/bin/carton exec -- script/bliptown"
 daemon_flags="prefork -p -m production -l http://*:8080 -P /run/bliptown.pid"
 daemon_execdir="/var/www/bliptown"
 
