@@ -54,6 +54,12 @@ sub update_file {
 	my $file = $payload->{filename};
 	my $content = $payload->{content};
 	create_file($payload);
+	if (open(my $fh, '>', $file)) {
+		print $fh $content;
+		close $fh;
+	} else {
+		die "Cannot open file: $file ($!)";
+	}
 }
 
 sub delete_file {
