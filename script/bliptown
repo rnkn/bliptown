@@ -3,23 +3,7 @@
 use strict;
 use warnings;
 use POSIX qw(setuid);
-
-my $uid;
-
-BEGIN {
-	die "$0 must be run as root" unless $> == 0;
-	$uid = getpwnam('_bliptown') || die "Cannot get uid: _bliptown ($!)";
-	die unless $ENV{BLIPTOWN_CHROOT} || die "BLIPTOWN_CHROOT undefined";
-	chroot($ENV{BLIPTOWN_CHROOT}) || die "Cannot change root: $ENV{BLIPTOWN_CHROOT} ($!)";
-}
-
 use lib 'lib', 'local/lib/perl5';
-
-BEGIN {
-	chdir('/bliptown') || die "Cannot change directory: /bliptown ($!)";
-	setuid($uid) || die "Cannot set uid: $uid ($!)";
-}
-
 use Mojolicious::Commands;
 
 Mojolicious::Commands->start_app('Bliptown');
