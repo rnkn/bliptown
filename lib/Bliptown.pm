@@ -13,8 +13,8 @@ sub startup {
 	my $app = shift;
 
 	my $cwd = getcwd();
-	$app->log->info("My uid: $<");
-	$app->log->info("My cwd: $cwd");
+	$app->log->info("My user id: $<");
+	$app->log->info("My working directory: $cwd");
 
 	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
 
