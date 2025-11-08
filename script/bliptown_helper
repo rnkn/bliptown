@@ -6,7 +6,7 @@ use Cwd qw(abs_path);
 use IO::Socket::UNIX;
 use Storable qw(retrieve_fd);
 
-die "$0 must run as root\n" if $> != 0;
+die "$0 must be run as root" unless $> == 0;
 
 my $sock_path = $ENV{BLIPTOWN_CHROOT} . '/run/bliptown.sock';
 unlink $sock_path if -e $sock_path;
