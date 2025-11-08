@@ -27,19 +27,25 @@ sub get_uid_gid {
 	return ($uid, $gid);
 }
 
+sub safe_file {
+	my ($user, $file) = @_;
+	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $user;
+	$file = $sandbox . '/' . $file;
+	my $file_abs = abs_path($file) || die "Cannot get file: $file ($!)";
+	die  "File $file_abs outside of sandbox $sandbox ($!)"
+		unless $file_abs =~ /^\Q$sandbox\E/;
+	return $file_abs;
+}
+
 sub create_file {
 	my $payload = shift;
 	my $user = $payload->{username};
 	my $file = $payload->{filename};
-	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $user;
-	$file = $sandbox . '/' . $file;
-	my $file_abs = abs_path($file) || die "Cannot get file: $file ($!)";
-	die "File $file_abs outside of sandbox $sandbox ($!)"
-		unless $file_abs =~ /^\Q$sandbox\E/;
-	touch $file_abs unless -f $file_abs || die "Cannot create file: $file_abs ($!)";
+	my $safe_file = safe_file($user, $file);
+	touch $safe_file unless -f $safe_file || die "Cannot create file: $safe_file ($!)";
 	my ($uid, $gid) = get_uid_gid($user);
-	chown($uid, $gid, $file_abs) || die "Cannot set ownership: $file_abs ($!)";
-	chmod(0644, $file_abs) || die "Cannot set permissions: $file_abs ($!)";
+	chown($uid, $gid, $safe_file) || die "Cannot set ownership: $safe_file ($!)";
+	chmod(0644, $safe_file) || die "Cannot set permissions: $safe_file ($!)";
 }
 
 sub update_file {
@@ -54,8 +60,8 @@ sub delete_file {
 	my $payload = shift;
 	my $user = $payload->{username};
 	my $file = $payload->{filename};
-	my $file_abs = abs_path($file) || die "Cannot get file: $file ($!)";
-	unlink $file_abs;
+	my $safe_file = safe_file($user, $file);
+	unlink $safe_file if -f $safe_file;
 }
 
 my %allowed_commands = (
