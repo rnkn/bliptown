@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Cwd qw(abs_path);
+use IO::Socket::UNIX;
+use Storable qw(retrieve_fd);
+
+die "$0 must run as root\n" if $> != 0;
+
+my $sock_path = $ENV{BLIPTOWN_CHROOT} . '/run/bliptown.sock';
+unlink $sock_path if -e $sock_path;
+
+my $sock = IO::Socket::UNIX->new(
+	Type => SOCK_STREAM,
+	Local => $sock_path,
+	Listen => 5,
+) or die "Cannot create socket: $sock_path ($!)";
+
+chown(0, getgrnam('_bliptown'), $sock);
+chmod(0660, $sock);
+
+sub get_uid_gid {
+	my $user = shift;
+	my $uid = getpwnam($user) || die "Cannot get uid: $user ($!)";
+	my $gid = getgrname($user) || die "Cannot get gid: $user ($!)";
+	return ($uid, $gid);
+}
+
+sub create_file {
+	my $payload = shift;
+	my $user = $payload->{username};
+	my $file = $payload->{filename};
+	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $user;
+	$file = $sandbox . '/' . $file;
+	my $file_abs = abs_path($file) || die "Cannot get file: $file ($!)";
+	die "File $file_abs outside of sandbox $sandbox ($!)"
+		unless $file_abs =~ /^\Q$sandbox\E/;
+	touch $file_abs unless -f $file_abs || die "Cannot create file: $file_abs ($!)";
+	my ($uid, $gid) = get_uid_gid($user);
+	chown($uid, $gid, $file_abs) || die "Cannot set ownership: $file_abs ($!)";
+	chmod(0644, $file_abs) || die "Cannot set permissions: $file_abs ($!)";
+}
+
+sub update_file {
+	my $payload = shift;
+	my $user = $payload->{username};
+	my $file = $payload->{filename};
+	my $content = $payload->{content};
+	create_file($payload);
+}
+
+sub delete_file {
+	my $payload = shift;
+	my $user = $payload->{username};
+	my $file = $payload->{filename};
+	my $file_abs = abs_path($file) || die "Cannot get file: $file ($!)";
+	unlink $file_abs;
+}
+
+my %allowed_commands = (
+	create_file => \&create_file,
+	update_file => \&update_file,
+	delete_file => \&delete_file,
+);
+
+while (my $client = $sock->accept()) {
+    my $req = fd_retrieve($client->fileno) || die "Cannot read socket ($!)";
+	my $command = $req->{command};
+	my $payload = $req->{payload};
+	my $func = $allowed_commands{$command} || die "Command not permitted: $command ($!)";
+	$func->($payload);
+    close($client);
+}
