@@ -1,13 +1,7 @@
 package Bliptown::Model::File;
 use Mojo::Base -base;
-
-sub create_file {
-	my ($self, $args) = @_;
-	my $file = Mojo::File->new($args->{file});
-	my $path = $file->dirname;
-	$path->make_path;
-	$file->touch;
-}
+use IO::Socket::UNIX;
+use Storable qw(store_fd);
 
 sub read_file {
 	my ($self, $args) = @_;
@@ -22,16 +16,24 @@ sub read_file {
 
 sub update_file {
 	my ($self, $args) = @_;
-	my $file = $args->{file};
-	my $chars = $args->{chars};
-	$self->create_file({ file => $file });
-	$file->spew($chars, 'utf-8');
-}
+	my $sock_path = '/tmp/bliptown_helper.sock';
+	my $client = IO::Socket::UNIX->new(
+		Type => SOCK_STREAM,
+		Peer => $sock_path,
+	) or die "Cannot connect to socket: $sock_path ($!)";
 
-sub delete_file {
-	my ($self, $args) = @_;
-	my $file = Mojo::File->new($args->{file});
-	$file->remove;
+	my $data = {
+		command => $args->{command},
+		payload => {
+			username => $args->{user},
+			filename => $args->{file},
+			content => $args->{content},
+		},
+	};
+
+	store_fd($data, $client);
+
+	$client->close;
 }
 
 return 1;
