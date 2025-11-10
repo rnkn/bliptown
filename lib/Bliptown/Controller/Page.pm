@@ -31,7 +31,7 @@ sub render_page {
 	my $raw = path($root, $slug);
 	if ($raw->extname) {
 		return $c->reply->file($raw) if -f $raw;
-		my $fallback = path($c->app->static->paths->[0], 'fallback', $slug);
+		my $fallback = path($c->app->static->paths->[0], 'defaults', $slug);
 		return $c->reply->file($fallback) if -f $fallback;
 		return $c->reply->not_found;
 	}
