@@ -92,6 +92,7 @@ sub upload_files {
 		my $path = path($root, $file);
 		if (-f $path) {
 			$c->flash(warning => "$file already exists!");
+			$c->res->code(409);
 			return $c->redirect_to('list_files');
 		};
 		$_->move_to($path);
