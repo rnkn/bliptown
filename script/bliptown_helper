@@ -48,8 +48,7 @@ sub update_file {
 	my $file = $payload->{filename};
 	my $content = $payload->{content};
 	my $safe_file = safe_file($user, $file);
-	touch $safe_file unless -f $safe_file || die "Cannot create file: $safe_file ($!)";
-	if (open(my $fh, '>', $file)) {
+	if (open(my $fh, '>', $safe_file)) {
 		print $fh $content;
 		close $fh;
 	} else {
