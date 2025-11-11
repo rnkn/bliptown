@@ -48,7 +48,7 @@
 					% if ($_->{filename} =~ /\.(md|txt|html|css|js)~?$/) {
 					<li><a href="<%= url_for('render_raw', catchall => $_->{url} ) %>">Raw</a></li>
 					% }
-					<li><a class="warning" href="<%= url_for('delete_file', catchall => $_->{relpath} )->query([back_to => url_for])%>">Delete</a></li>
+					<li><a class="warning" href="<%= url_for('delete_file', catchall => $_->{filename} )->query([back_to => url_for])%>">Delete</a></li>
 				</ul>
 			</details>
 			% }
