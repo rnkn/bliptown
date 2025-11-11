@@ -1,6 +1,6 @@
 package Bliptown::Controller::Page;
 use Mojo::Base 'Mojolicious::Controller';
-use Mojo::Util qw(slugify url_unescape);
+use Mojo::Util qw(url_unescape);
 use Mojo::File qw(path);
 
 sub yaml_true {
