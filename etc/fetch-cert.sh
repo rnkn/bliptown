@@ -3,5 +3,7 @@
 payload=/etc/ssl/private/porkbun-keys.json
 endpoint=https://api.porkbun.com/api/json/v3/ssl/retrieve/blip.town
 
-/usr/local/bin/curl -s -X POST -d @$payload $endpoint  | /usr/local/bin/jq -r .certificatechain > /etc/ssl/private/blip.town.crt
+/usr/local/bin/curl -s -X POST -d @$payload $endpoint  | /usr/local/bin/jq -r .certificatechain > /etc/ssl/blip.town.crt
 /usr/local/bin/curl -s -X POST -d @$payload $endpoint  | /usr/local/bin/jq -r .privatekey > /etc/ssl/private/blip.town.key
+
+/usr/sbin/rcctl reload nginx
