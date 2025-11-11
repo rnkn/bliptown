@@ -27,7 +27,7 @@ print "Socket created: $sock_path\n";
 sub get_uid_gid {
 	my $user = shift;
 	my $uid = getpwnam($user) || die "Cannot get uid: $user ($!)";
-	my $gid = getgrname($user) || die "Cannot get gid: $user ($!)";
+	my $gid = getgrnam($user) || die "Cannot get gid: $user ($!)";
 	return ($uid, $gid);
 }
 
