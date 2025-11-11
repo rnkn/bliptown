@@ -1,5 +1,6 @@
 package Bliptown::Model::File;
 use Mojo::Base -base;
+use Mojo::File;
 use IO::Socket::UNIX;
 use Storable qw(store_fd);
 
