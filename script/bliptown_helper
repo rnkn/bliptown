@@ -19,8 +19,8 @@ my $server = IO::Socket::UNIX->new(
 ) or die "Cannot create socket: $sock_path ($!)";
 
 my $gid = getgrnam('_bliptown');
-chown(0, $gid, $sock_path) || die "Cannot change ownership: $sock_path ($!)";
-chmod(0660, $sock_path) || die "Cannot change mode: $sock_path ($!)";
+chown(0, $gid, $sock_path) || die "Cannot chown: $sock_path ($!)";
+chmod(0660, $sock_path) || die "Cannot chmod: $sock_path ($!)";
 
 print "Socket created: $sock_path\n";
 
