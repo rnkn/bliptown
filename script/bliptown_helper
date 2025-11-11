@@ -44,8 +44,8 @@ sub safe_file {
 
 sub update_file {
 	my $payload = shift;
-	my $user = $payload->{username};
-	my $file = $payload->{filename};
+	my $user = $payload->{user};
+	my $file = $payload->{file};
 	my $content = $payload->{content};
 	my $safe_file = safe_file($user, $file);
 	if (open(my $fh, '>', $safe_file)) {
@@ -74,15 +74,16 @@ sub rename_file {
 
 sub delete_file {
 	my $payload = shift;
-	my $user = $payload->{username};
-	my $file = $payload->{filename};
+	my $user = $payload->{user};
+	my $file = $payload->{file};
 	my $safe_file = safe_file($user, $file);
-	unlink $safe_file if -f $safe_file;
+	unlink $safe_file if -f $safe_file ||
+		die "Cannot delete file: $file ($!)";
 }
 
 my %allowed_commands = (
-	create_file => \&create_file,
 	update_file => \&update_file,
+	rename_file => \&rename_file,
 	delete_file => \&delete_file,
 );
 
