@@ -1,0 +1,23 @@
+# Fetch SSL certificate
+
+payload=/etc/ssl/private/porkbun-keys.json
+endpoint=https://api.porkbun.com/api/json/v3/ssl/retrieve/blip.town
+cert_chain=/etc/ssl/blip.town.crt
+cert_key=/etc/ssl/private/blip.town.key
+
+echo "Fetching certificate chain..."
+/usr/local/bin/curl -s -X POST -d @$payload $endpoint  | /usr/local/bin/jq -r .certificatechain > "$cert_chain" &&
+	echo "Fetched: $cert_chain"
+
+echo "Fetching certificate key..."
+/usr/local/bin/curl -s -X POST -d @$payload $endpoint  | /usr/local/bin/jq -r .privatekey > "$cert_key" &&
+	echo "Fetched: $cert_key"
+
+echo "Reloading nginx..."
+/usr/sbin/rcctl reload nginx
+
+backup_db="/var/db/bliptown/users-$(date +%F).db"
+
+install -m 600 -o root -g wheel /dev/null $backup_db
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
+echo "Created backup: $backup_db"
