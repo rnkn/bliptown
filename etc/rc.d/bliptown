@@ -1,26 +1,28 @@
 #!/bin/ksh
 
-daemon="chroot -u _bliptown . /usr/local/bin/carton exec -- script/bliptown"
-daemon_flags="prefork -p -m production -l http://*:8080 -P /run/bliptown.pid"
-daemon_execdir="/var/www/bliptown"
+pid_file=/tmp/bliptown.pid
+
+daemon="/usr/local/bin/carton exec -- script/bliptown"
+daemon_flags="prefork -p -m production -l http://*:8080 -P $pid_file"
+daemon_user="_bliptown"
+daemon_execdir="/usr/local/www/bliptown"
+daemon_logger="daemon.info"
 
 rc_bg=YES
 rc_reload=NO
 
 . /etc/rc.d/rc.subr
 
-pid_file="/var/www/run/bliptown.pid"
-
 rc_stop() {
-	rc_exec "kill -QUIT $(cat $pid_file)"
+        rc_exec "kill -QUIT $(cat $pid_file)"
 }
 
 rc_configtest() {
-	rc_exec "${daemon} eval"
+        rc_exec "${daemon} eval"
 }
 
 rc_check() {
-	rc_exec "test -f $pid_file && kill -0 $(cat $pid_file)"
+        rc_exec "test -f $pid_file && kill -0 $(cat $pid_file)"
 }
 
 rc_cmd $1
