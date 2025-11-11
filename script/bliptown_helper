@@ -55,8 +55,21 @@ sub update_file {
 		die "Cannot open file: $file ($!)";
 	}
 	my ($uid, $gid) = get_uid_gid($user);
-	chown($uid, $gid, $safe_file) || die "Cannot set ownership: $safe_file ($!)";
-	chmod(0644, $safe_file) || die "Cannot set permissions: $safe_file ($!)";
+	chown($uid, $gid, $safe_file) ||
+		die "Cannot set ownership: $file ($!)";
+	chmod(0644, $safe_file) ||
+		die "Cannot set permissions: $file ($!)";
+}
+
+sub rename_file {
+	my $payload = shift;
+	my $user = $payload->{user};
+	my $file = $payload->{file};
+	my $new_filename = $payload->{new_filename};
+	my $safe_file = safe_file($user, $file);
+	my $safe_new_filename = safe_file($user, $new_filename);
+	rename($safe_file, $safe_new_filename) ||
+		die "Cannot rename file: $file ($!)";
 }
 
 sub delete_file {
