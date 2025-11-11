@@ -79,8 +79,8 @@ sub delete_file {
 
 sub upload_files {
 	my $c = shift;
-	my $user = $c->user->read_user({ username => $c->session('username')});
-	my $root = path($c->get_user_home, $user->{username});
+	my $user = $c->session('username');
+	my $root = path($c->get_user_home, $user);
 	my @files;
 	foreach (@{$c->req->uploads}) {
 		my $file = $_->filename;
