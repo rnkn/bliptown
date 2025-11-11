@@ -35,7 +35,6 @@ sub safe_file {
 	my ($user, $file) = @_;
 	die "Invalid username: $user" unless $user =~ /^[a-zA-Z0-9-_]+$/;
 	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $user;
-	$file = $sandbox . '/' . $file;
 	my $file_abs = abs_path($file) || die "Cannot get file: $file ($!)";
 	die "File outside of sandbox: $file_abs ($!)"
 		unless $file_abs =~ /^\Q$sandbox\E/;
