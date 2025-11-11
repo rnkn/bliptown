@@ -74,11 +74,11 @@ my %allowed_commands = (
 	delete_file => \&delete_file,
 );
 
-while (my $client = $sock->accept()) {
-    my $req = fd_retrieve($client->fileno) || die "Cannot read socket ($!)";
+while (my $conn = $server->accept()) {
+    my $req = fd_retrieve($conn->fileno) || die "Cannot read socket ($!)";
 	my $command = $req->{command};
 	my $payload = $req->{payload};
 	my $func = $allowed_commands{$command} || die "Command not permitted: $command ($!)";
 	$func->($payload);
-    close($client);
+    close($conn);
 }
