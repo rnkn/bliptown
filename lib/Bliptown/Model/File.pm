@@ -26,9 +26,10 @@ sub update_file {
 	my $data = {
 		command => $args->{command},
 		payload => {
-			username => $args->{user},
-			filename => $args->{file},
-			content => $args->{content},
+			user => $args->{user},
+			file => $args->{file},
+			new_name => $args->{new_name} // '',
+			content => $args->{content} // '',
 		},
 	};
 
