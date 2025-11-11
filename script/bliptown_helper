@@ -91,10 +91,13 @@ while (my $conn = $server->accept()) {
 		die "Cannot read socket ($!)";
 	my $command = $req->{command};
 	my $payload = $req->{payload};
-	my $func = $allowed_commands{$command} ||
-		die "Command not permitted: $command ($!)";
+	eval {
+		my $func = $allowed_commands{$command} ||
+			die "Command not permitted: $command ($!)";
 
-	eval { $func->($payload) };
+		$func->($payload)
+	};
+
 	if ($@) {
 		my $err = $@;
 		chomp($err);
