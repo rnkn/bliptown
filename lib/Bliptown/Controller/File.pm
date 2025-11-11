@@ -56,15 +56,21 @@ sub list_files {
 
 sub rename_file {
 	my $c = shift;
-	my $root = path($c->get_user_home, $c->session('username'));
+	my $user = $c->session('username');
+	my $root = path($c->get_user_home, $user);
 	my $old_slug = $c->param('catchall');
-	my $new_slug = $c->param('to');
-	my $old_file = $c->get_file($old_slug);
-	my $new_file = path($root, $new_slug);
-	$new_file->dirname->make_path;
-	$old_file->copy_to($new_file);
-	$old_file->remove;
-	$c->flash(info => "$old_slug renamed to $new_slug");
+	my $file = $c->get_file($old_slug)->to_abs->to_string;
+	my $new_name = $c->param('to');
+	my $new_file = path($root, $new_name)->to_abs->to_string;
+	$c->file->update_file(
+		{
+			command => 'rename_file',
+			user => $user,
+			file => $file,
+			new_name => $new_file,
+		}
+	);
+	$c->flash(info => "$old_slug renamed to $new_name");
 	return $c->redirect_to('list_files');
 }
 
