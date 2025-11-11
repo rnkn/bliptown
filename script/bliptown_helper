@@ -79,6 +79,13 @@ while (my $conn = $server->accept()) {
 	my $command = $req->{command};
 	my $payload = $req->{payload};
 	my $func = $allowed_commands{$command} || die "Command not permitted: $command ($!)";
-	$func->($payload);
+
+	eval { $func->($payload) };
+	if ($@) {
+		my $err = $@;
+		chomp($err);
+		print "$err\n";
+	}
+
     close($conn);
 }
