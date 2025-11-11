@@ -87,7 +87,7 @@ my %allowed_commands = (
 );
 
 while (my $conn = $server->accept()) {
-    my $req = fd_retrieve($conn->fileno) ||
+    my $req = fd_retrieve($conn) ||
 		die "Cannot read socket ($!)";
 	my $command = $req->{command};
 	my $payload = $req->{payload};
