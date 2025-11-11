@@ -165,26 +165,21 @@ sub edit_page {
 
 sub save_page {
 	my $c = shift;
-	my $root = path($c->get_user_home, $c->get_req_user);
-
+	my $user = $c->session('username');
+	my $root = path($c->get_user_home, $c->get_req_user)->to_string;
 	my $slug = $c->param('slug');
-	{
-		my @elts = split('/', $slug);
-		@elts = map { slugify $_ } @elts;
-		$slug = join('/', @elts);
-	}
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
 	my $filename = "$slug.$ext";
-	my $trigger = 'pubkeys' if $filename eq '_pubkeys.txt';
-	my $filepath = path($root, $filename);
-	my $chars = $c->param('content');
-	$chars =~ s/\r\n/\n/g;
+	my $file = path($root, $filename)->to_string;
+	my $content = $c->param('content');
+	$content =~ s/\r\n/\n/g;
 	$c->file->update_file(
 		{
-			file => $filepath,
-			chars => $chars,
-			trigger => $trigger,
+			command => 'update_file',
+			user => $user,
+			file => $file,
+			content => $content,
 		});
 	my $redirect;
 	if ($action eq 'save-changes') {
