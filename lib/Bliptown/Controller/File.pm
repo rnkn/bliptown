@@ -76,9 +76,16 @@ sub rename_file {
 
 sub delete_file {
 	my $c = shift;
+	my $user = $c->session('username');
 	my $slug = $c->param('catchall');
-	my $file = $c->get_file($slug);
-	$file->remove;
+	my $file = $c->get_file($slug)->to_abs->to_string;
+	$c->file->update_file(
+		{
+			command => 'delete_file',
+			user => $user,
+			file => $file,
+		}
+	);
 	$c->flash(info => "$slug deleted");
 	return $c->redirect_to('list_files');
 }
