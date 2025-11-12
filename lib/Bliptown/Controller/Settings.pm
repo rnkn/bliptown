@@ -20,11 +20,11 @@ sub list_settings {
 
 sub save_settings {
 	my $c = shift;
-	my $user = $c->session('username');
+	my $username = $c->session('username');
 	my @keys_null = qw(custom_domain);
 	my @keys_not_null = qw(email new_password);
 	my @keys_int = qw(create_backups sort_new);
-	my %args; $args{username} = $user;
+	my %args; $args{username} = $username;
 	foreach (@keys_null) {
 		my $v = $c->param($_);
 		$args{$_} = $v;
@@ -38,7 +38,19 @@ sub save_settings {
 		$args{$_} = $v;
 	}
 	$c->user->update_user(\%args);
-	return $c->redirect_to($c->url_for);
+	update_domain_list($c) if $args{custom_domain};
+	return $c->redirect_to($c->url_for('render_page'));
+}
+
+sub update_domain_list {
+	my $c = shift;
+	my $domains_col = $c->sqlite->db->select('users', 'custom_domain')->hashes;
+	my @domains = map { $_->{custom_domain} } $domains_col->each;
+	@domains = grep { defined $_ } @domains;
+	# @domains = push @domains, 'blip.town';
+	$c->file->update_file(
+		{ command => 'update_domain_list', domains => \@domains }
+	);
 }
 
 return 1;
