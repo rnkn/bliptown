@@ -67,9 +67,9 @@ sub rename_file {
 	my $file = $payload->{file};
 	my $new_name = $payload->{new_name};
 	my $safe_file = safe_file($user, $file);
+	die "File not found: $safe_file ($!)" unless -f $safe_file;
 	my $safe_new_name = safe_file($user, $new_name);
-	rename($safe_file, $safe_new_name) if -f $safe_file ||
-		die "Cannot rename file: $file ($!)";
+	rename($safe_file, $safe_new_name) || die "Cannot rename file: $file ($!)";
 }
 
 sub delete_file {
