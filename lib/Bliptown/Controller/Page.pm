@@ -19,7 +19,7 @@ sub render_page {
 	$c->stash( home => $c->get_home );
 	my $user_cur = $user && $user eq $c->get_req_user;
 	my $slug = $c->param('catchall');
-	if (-d $root) {
+	if (-d $root && $root gt $c->get_user_home) {
 		my @skel = qw(index.md _title.txt _header.md _sidebar.md _footer.md);
 		foreach (@skel) {
 			my $f = path($root, $_);
