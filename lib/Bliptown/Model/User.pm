@@ -15,8 +15,8 @@ sub create_user {
 	my $secret = encode_base32 $rand_str;
 	$self->sqlite->db->insert(
 		'users', {
-			email => $args->{email},
 			username => $args->{username},
+			email => $args->{email},
 			password_hash => $password_hash,
 			totp_secret => $secret,
 		}
