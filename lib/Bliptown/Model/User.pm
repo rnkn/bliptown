@@ -7,12 +7,6 @@ use Authen::OATH;
 
 has 'sqlite';
 
-sub get_user {
-	my $self = shift;
-	my @hostname = split(/\./, $self->req->url->to_abs->host);
-	return @hostname >= 3 ? $hostname[-3] : 'mayor';
-}
-
 sub create_user {
 	my ($self, $args) = @_;
 	my $password_hash = bcrypt($args->{password}, '2b', 12, $ENV{BLIPTOWN_SALT});
