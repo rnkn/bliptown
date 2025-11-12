@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 use POSIX qw(setuid);
-use lib 'lib', 'local/lib/perl5';
+use FindBin qw($Bin);
+use lib "$Bin/../lib", "$Bin/../local/lib/perl5";
 use Mojolicious::Commands;
 
 die "BLIPTOWN_SECRET not defined ($!)" unless $ENV{BLIPTOWN_SECRET};
