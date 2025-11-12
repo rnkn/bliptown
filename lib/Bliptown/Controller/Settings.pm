@@ -44,8 +44,8 @@ sub save_settings {
 
 sub update_domain_list {
 	my $c = shift;
-	my $domains_col = $c->sqlite->db->select('users', 'custom_domain')->hashes;
-	my @domains = map { $_->{custom_domain} } $domains_col->each;
+	my $domains_col = $c->sqlite->db->select('users', 'custom_domain')->arrays;
+	my @domains = @{$domains_col->flatten};
 	@domains = grep { defined $_ } @domains;
 	push @domains, 'blip.town';
 	@domains = sort @domains;
