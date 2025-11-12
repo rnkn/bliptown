@@ -2,7 +2,7 @@ package Bliptown::Model::File;
 use Mojo::Base -base;
 use Mojo::File;
 use IO::Socket::UNIX;
-use Storable qw(store_fd);
+use Data::MessagePack;
 
 sub read_file {
 	my ($self, $args) = @_;
@@ -14,6 +14,8 @@ sub read_file {
 		chars => $chars,
 	};
 }
+
+my $mp = Data::MessagePack->new();
 
 sub update_file {
 	my ($self, $args) = @_;
@@ -33,7 +35,9 @@ sub update_file {
 		},
 	};
 
-	store_fd($data, $client);
+	my $packed_data = $mp->pack($data);
+
+	$client->send($packed_data) || die "Cannot send data to socket ($!)";
 
 	$client->close;
 }
