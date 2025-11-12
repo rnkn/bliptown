@@ -16,6 +16,7 @@ sub render_page {
 	my $c = shift;
 	my $root = path($c->get_user_home, $c->get_req_user);
 	my $user = $c->session('username');
+	$c->stash( home => $c->get_home );
 	my $user_cur = $user && $user eq $c->get_req_user;
 	my $slug = $c->param('catchall');
 	if (-d $root) {
@@ -93,7 +94,6 @@ sub render_page {
 		&& $c->get_req_user eq 'mayor';
 
 	$c->stash(
-		home => $c->get_home,
 		template => 'page',
 		head => $head || '',
 		title => $title,
