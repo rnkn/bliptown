@@ -10,6 +10,7 @@ use Data::MessagePack::Stream;
 
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
+die "BLIPTOWN_DOMAIN_LIST not defined" unless $ENV{BLIPTOWN_DOMAIN_LIST};
 
 my $sock_path = '/var/run/bliptown_helper.sock';
 unlink $sock_path if -e $sock_path;
@@ -25,6 +26,19 @@ chown(0, $gid, $sock_path) || die "Cannot chown: $sock_path ($!)";
 chmod(0660, $sock_path) || die "Cannot chmod: $sock_path ($!)";
 
 print "Socket created: $sock_path\n";
+
+sub update_domain_list {
+	my $payload = shift;
+	my $all_domains = $payload->{domains};
+	my $domain_file = $ENV{BLIPTOWN_DOMAIN_LIST};
+	if (open(my $fh, '>', $domain_file)) {
+		foreach (@$all_domains) {
+			print $fh "tls keypair \"$_\"\n";
+		}
+		close $fh or die "Cannot close domain file: $domain_file ($!)";
+	} else { die "Cannot open domain file: $domain_file ($!)"; }
+	system('rcctl', 'reload', 'relayd');
+}
 
 sub get_uid_gid {
 	my $user = shift;
@@ -86,6 +100,7 @@ my %allowed_commands = (
 	update_file => \&update_file,
 	rename_file => \&rename_file,
 	delete_file => \&delete_file,
+	update_domain_list => \&update_domain_list,
 );
 
 my $unpacker = Data::MessagePack::Stream->new();
