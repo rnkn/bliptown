@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Cwd qw(abs_path);
 use IO::Socket::UNIX;
-use Storable qw(fd_retrieve);
+use lib 'local/lib/perl5';
+use Data::MessagePack::Stream;
 
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
@@ -86,20 +87,27 @@ my %allowed_commands = (
 	delete_file => \&delete_file,
 );
 
-while (my $conn = $server->accept()) {
-    my $req = fd_retrieve($conn) ||
-		die "Cannot read socket ($!)";
-	my $command = $req->{command};
-	my $payload = $req->{payload};
-	my $success = eval {
-		my $func = $allowed_commands{$command} ||
-			die "Command not permitted: $command ($!)";
+my $unpacker = Data::MessagePack::Stream->new();
 
-		$func->($payload);
-		return 1;
+while (my $conn = $server->accept()) {
+
+    while (read($conn, my $buf, 1024)) {
+        $unpacker->feed($buf);
+
+		while ($unpacker->next) {
+			my $data = $unpacker->data;
+			my $command = $data->{command};
+			my $payload = $data->{payload};
+			my $success = eval {
+				my $func = $allowed_commands{$command} ||
+					die "Command not permitted: $command ($!)";
+
+				$func->($payload);
+				return 1;
+			};
+			unless ($success) { warn };
+		}
 	};
 
-	unless ($success) { warn }
-
-    close($conn);
+	close($conn);
 }
