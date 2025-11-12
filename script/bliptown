@@ -10,5 +10,6 @@ use Mojolicious::Commands;
 die "BLIPTOWN_SECRET not defined ($!)" unless $ENV{BLIPTOWN_SECRET};
 die "BLIPTOWN_DB_HOME not defined" unless $ENV{BLIPTOWN_DB_HOME};
 die "BLIPTOWN_USER_HOME not defined " unless $ENV{BLIPTOWN_USER_HOME};
+die "BLIPTOWN_DOMAIN_LIST not defined " unless $ENV{BLIPTOWN_DOMAIN_LIST};
 
 Mojolicious::Commands->start_app('Bliptown');
