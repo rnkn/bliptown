@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 use POSIX qw(setuid);
-use Mojo::File qw(curfile);
-use lib curfile->dirname->sibling('lib')->to_string;
+use lib 'lib', 'local/lib/perl5';
 use Mojolicious::Commands;
 
 die "BLIPTOWN_SECRET not defined ($!)" unless $ENV{BLIPTOWN_SECRET};
