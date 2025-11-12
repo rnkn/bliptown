@@ -18,7 +18,9 @@ sub format_human_size {
 
 sub list_files {
 	my $c = shift;
-	my $user = $c->user->read_user({ username => $c->session('username')});
+	my $user = $c->user->read_user(
+		{ key => 'username', username => $c->session('username') }
+	);
 	my $root = path($c->get_user_home, $user->{username});
 	my $filter = $c->param('filter');
 	my $tree = $root->list_tree;

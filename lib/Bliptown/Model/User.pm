@@ -31,13 +31,12 @@ sub create_user {
 
 sub read_user {
     my ($self, $args) = @_;
-	my $key = $args->{username} ? 'username' : $args->{email} ? 'email' : undef;
+	my $key = $args->{key};
 	return unless $key;
 
 	my $user = $self->sqlite->db->select(
-		'users', undef, {
-			$key => $args->{$key},
-		})->hash;
+		'users', undef, { $key => $args->{$key} }
+	)->hash;
 	return $user if $user;
 	return;
 }
@@ -71,7 +70,9 @@ sub delete_user {
 
 sub authenticate_user {
     my ($self, $args) = @_;
-    my $user = $self->read_user({ username => $args->{username} });
+    my $user = $self->read_user(
+		{ key => 'username', username => $args->{username} }
+	);
 	return unless $user;
     my $hash = $user->{password_hash};
 	unless ($hash && bcrypt_check($args->{password}, $hash)) {

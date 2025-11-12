@@ -12,12 +12,16 @@ sub validate_user {
 
 sub check_duplicate_user {
 	my ($c, $args) = @_;
-	return $c->user->read_user({ username => $args->{username} });
+	return $c->user->read_user(
+		{ key => 'username', username => $args->{username} }
+	);
 }
 
 sub check_duplicate_email {
 	my ($c, $args) = @_;
-	return $c->user->read_user({ email => $args->{email} });
+	return $c->user->read_user(
+		{ key => 'email', email => $args->{email} }
+	);
 }
 
 sub user_join {

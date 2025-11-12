@@ -3,7 +3,9 @@ use Mojo::Base 'Mojolicious::Controller';
 
 sub list_settings {
 	my $c = shift;
-	my $user = $c->user->read_user({ username => $c->session('username')});
+	my $user = $c->user->read_user(
+		{ key => 'username', username => $c->session('username') }
+	);
 	$c->stash(
 		title => 'Settings',
 		template => 'settings',
