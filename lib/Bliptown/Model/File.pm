@@ -32,6 +32,7 @@ sub update_file {
 			file => $args->{file},
 			new_name => $args->{new_name} // '',
 			content => $args->{content} // '',
+			domains => $args->{domains} // '',
 		},
 	};
 
