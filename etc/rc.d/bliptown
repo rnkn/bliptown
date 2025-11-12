@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-pid_file=/tmp/bliptown.pid
+pid_file="/tmp/bliptown.pid"
 
 daemon="/usr/local/bin/carton exec -- script/bliptown"
 daemon_flags="prefork -p -m production -l http://*:8080 -P $pid_file"
@@ -14,7 +14,7 @@ rc_reload=NO
 . /etc/rc.d/rc.subr
 
 rc_stop() {
-        rc_exec "kill -QUIT $(cat $pid_file)"
+        rc_exec "kill -QUIT $(cat ${pid_file})"
 }
 
 rc_configtest() {
@@ -22,7 +22,7 @@ rc_configtest() {
 }
 
 rc_check() {
-        rc_exec "test -f $pid_file && kill -0 $(cat $pid_file)"
+        rc_exec "test -f ${pid_file} && kill -0 $(cat ${pid_file})"
 }
 
 rc_cmd $1
