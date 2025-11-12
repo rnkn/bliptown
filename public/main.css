@@ -31,6 +31,7 @@ p:first-child {
 
 a {
 	color: initial;
+	text-decoration: none;
 }
 
 pre {
@@ -199,7 +200,6 @@ main textarea {
 
 #sidebar a {
 	color: initial;
-	text-decoration: none;
 }
 
 #sidebar ul {
@@ -286,10 +286,6 @@ input#message-close:checked ~ label#message-close {
 	to { opacity: 0; visibility: hidden; }
 }
 
-#drawer .button a {
-	text-decoration: none;
-}
-
 #drawer .button a:hover {
 	text-decoration: underline;
 }
@@ -330,10 +326,6 @@ input#message-close:checked ~ label#message-close {
 	content: "← ";
 }
 
-#drawer ul li a {
-	text-decoration: none;
-}
-
 #edit textarea {
 	display: block;
 	width: 100%;
@@ -368,10 +360,6 @@ textarea, input {
 
 #files #upload {
 	margin-left: auto;
-}
-
-#files #list a {
-	text-decoration: none;
 }
 
 #files #list details ul li {
@@ -489,10 +477,6 @@ textarea, input {
 	flex-grow: 1;
 	flex-shrink: 1;
 	flex-basis: 20em;
-}
-
-.gallery-grid > p > a {
-	text-decoration: none;
 }
 
 .gallery-horizontal {
