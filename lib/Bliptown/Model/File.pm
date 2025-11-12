@@ -17,7 +17,7 @@ sub read_file {
 
 sub update_file {
 	my ($self, $args) = @_;
-	my $sock_path = '/tmp/bliptown_helper.sock';
+	my $sock_path = '/var/run/bliptown_helper.sock';
 	my $client = IO::Socket::UNIX->new(
 		Type => SOCK_STREAM,
 		Peer => $sock_path,

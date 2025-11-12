@@ -9,7 +9,7 @@ use Storable qw(fd_retrieve);
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
 
-my $sock_path = '/tmp/bliptown_helper.sock';
+my $sock_path = '/var/run/bliptown_helper.sock';
 unlink $sock_path if -e $sock_path;
 
 my $server = IO::Socket::UNIX->new(
