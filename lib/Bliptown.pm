@@ -55,9 +55,22 @@ sub startup {
 	$app->helper(
 		get_req_user => sub {
 			my $c = shift;
-			my $hostname = $c->req->headers->header('Host') || '';
-			my @hostname_a = split(/\./, $hostname);
-			return @hostname_a >= 3 ? $hostname_a[-3] : 'mayor';
+			my $host = $c->req->headers->header('Host') || '';
+			$host =~ s/:.*//;
+			$c->log->info("My host: $host");
+			if ($host =~ /$domain$/) {
+				my @host_a = split(/\./, $host);
+				my $user = @host_a >= 3 ? $host_a[-3] : 'mayor';
+				$c->log->info("My user: $user");
+				return $user if $user;
+			} elsif (
+				my $user = $c->user->read_user(
+					{ key => 'custom_domain', custom_domain => $host }
+				)
+			) {
+				my $user = $user->{username};
+				return $user if $user;
+			} else { return $c->reply->not_found }
 		});
 
 	$app->helper(
