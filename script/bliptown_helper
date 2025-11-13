@@ -31,13 +31,30 @@ print "Socket created: $sock_path\n";
 sub update_domain_list {
 	my $payload = shift;
 	my $all_domains = $payload->{domains};
-	my $domain_file = $ENV{BLIPTOWN_DOMAIN_LIST};
-	if (open(my $fh, '>', $domain_file)) {
-		foreach (@$all_domains) {
-			print $fh "tls keypair \"$_\"\n";
+	my $keypair_file = $ENV{BLIPTOWN_KEYPAIR_FILE};
+	my $acme_file = $ENV{BLIPTOWN_ACME_FILE};
+
+	if (open(my $fh, '>', $keypair_file)) {
+		foreach my $domain (@$all_domains) {
+			print $fh "tls keypair \"$domain\"\n";
 		}
-		close $fh or die "Cannot close domain file: $domain_file ($!)";
-	} else { die "Cannot open domain file: $domain_file ($!)"; }
+		close $fh or die "Cannot close keypair file: $keypair_file ($!)";
+	} else { die "Cannot open keypair file: $keypair_file ($!)"; }
+
+	if (open(my $fh, '>', $acme_file)) {
+		foreach my $domain (@$all_domains) {
+			print $fh <<"EOF";
+domain $domain {
+	alternative names { www.$domain }
+	domain certificate "/etc/ssl/$domain.crt"
+	domain key "/etc/ssl/private/$domain.key"
+	sign with "letsencrypt"
+}
+EOF
+		}
+		close $fh or die "Cannot close acme-client file: $acme_file ($!)";
+	} else { die "Cannot open acme-client file: $acme_file ($!)" }
+
 	system('rcctl', 'reload', 'relayd');
 }
 
