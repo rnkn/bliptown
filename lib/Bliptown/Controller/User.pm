@@ -59,16 +59,72 @@ sub user_join {
 
 sub user_login {
 	my $c = shift;
-	my $username = $c->param('username') || '';
-	my $password = $c->param('password') || '';
-	my $totp = $c->param('totp') || '';
-	my $redirect = $c->param('back_to') || '/';
-	if ($c->user->authenticate_user({ username => $username, password => $password, totp => $totp })) {
-		$c->session(expiration => 2592000, username => $username);
-	} else {
-		$c->flash(warning => 'Incorrect credentials');
+	my $username	= $c->param('username') // '';
+	my $password	= $c->param('password') // '';
+	my $totp		= $c->param('totp') // '';
+	my $token		= $c->param('token') // '';
+	my $redirect	= $c->param('back_to') // '/';
+
+	my $bliptown_domain = $c->stash('bliptown_domain');
+	my $host			= $c->req->headers->header('Host') || '';
+	$host =~ s/:.*//;
+	$host =~ s/^www\.(.+)/$1/;
+	$host = $1 if $host =~ /($bliptown_domain)$/;
+
+	if ($token) {
+		my $record = $c->token->read_token({ token => $token });
+
+		return $c->render(template => 'invalid', status => 403)
+			unless $record;
+		if ($record->{expires} <= time) {
+			$c->token->delete_token({ token => $token });
+			return $c->render(template => 'invalid', status => 403);
+		}
+		my $token_username = $record->{username};
+		return $c->render(template => 'invalid', status => 403)
+			unless $token_username;
+		if ($username eq $token_username) {
+			$c->session(expiration => 2592000, username => $username);
+			$c->token->delete_token({ token => $token });
+			return $c->redirect_to($redirect);
+		}
+		$c->token->delete_token({ token => $token });
+		return $c->redirect_to($redirect);
 	}
-	return $c->redirect_to($redirect);
+
+	if ($host ne $bliptown_domain) {
+		$c->res->code(307);
+		$c->redirect_to(
+			$c->url_for('user_login'),
+			username => $username,
+			password => $password,
+			totp => $totp,
+		);
+	}
+
+	my $creds = { username => $username, password => $password, totp => $totp };
+	if ($c->user->authenticate_user($creds)) {
+		$c->session(expiration => 2592000, username => $username);
+		my $user = $c->user->read_user({ key => 'username', username => $username});
+		my $custom_domain = $user->{custom_domain};
+
+		if ($custom_domain) {
+			my $token = $c->token->create_token({ username => $username });
+			my $url = Mojo::URL->new;
+			$url->host($custom_domain)->path('login')->query(
+				username => $username,
+				token => $token
+			);
+			if ($c->app->mode eq 'production') {
+				$url->scheme('https');
+			} else {
+				$url->scheme('http');
+				$url->port(3000);
+			}
+			return $c->redirect_to($url);
+		}
+		return $c->redirect_to($redirect);
+	}
 }
 
 sub user_logout {
