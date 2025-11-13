@@ -47,7 +47,6 @@ sub update_domain_list {
 	my $domains_col = $c->sqlite->db->select('users', 'custom_domain')->arrays;
 	my @domains = @{$domains_col->flatten};
 	@domains = grep { defined $_ } @domains;
-	push @domains, 'blip.town';
 	@domains = sort @domains;
 	$c->file->update_file(
 		{ command => 'update_domain_list', domains => \@domains }
