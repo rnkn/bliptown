@@ -13,8 +13,8 @@ echo "Fetching certificate key..."
 /usr/local/bin/curl -s -X POST -d @$payload $endpoint | /usr/local/bin/jq -r .privatekey > "$cert_key" &&
 	echo "Fetched: $cert_key"
 
-echo "Reloading nginx..."
-/usr/sbin/rcctl reload nginx
+echo "Reloading relayd..."
+/usr/sbin/rcctl reload relayd
 
 backup_db="/var/db/bliptown/users-$(date +%F).db"
 
