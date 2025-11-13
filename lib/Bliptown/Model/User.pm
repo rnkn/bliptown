@@ -56,7 +56,7 @@ sub update_user {
 
 sub delete_user {
 	my ($self, $args) = @_;
-    $self->pg->db->delete(
+    $self->sqlite->db->delete(
 		'users', {
 			username => $args->username,
 		});
