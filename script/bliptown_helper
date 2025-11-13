@@ -10,7 +10,8 @@ use Data::MessagePack::Stream;
 
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
-die "BLIPTOWN_DOMAIN_LIST not defined" unless $ENV{BLIPTOWN_DOMAIN_LIST};
+die "BLIPTOWN_KEYPAIR_FILE not defined "unless $ENV{BLIPTOWN_KEYPAIR_FILE};
+die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
 
 my $sock_path = '/var/run/bliptown_helper.sock';
 unlink $sock_path if -e $sock_path;
