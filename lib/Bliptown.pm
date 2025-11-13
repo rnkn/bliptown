@@ -18,9 +18,9 @@ sub startup {
 
 	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
 
-	my $domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
-	$app->log->info("My domain: $domain");
-	$app->sessions->cookie_domain($domain);
+	my $bliptown_domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
+	$app->log->info("My domain: $bliptown_domain");
+	$app->sessions->cookie_domain($bliptown_domain);
 
 	$app->helper(
 		sqlite => sub {
@@ -56,19 +56,17 @@ sub startup {
 		get_req_user => sub {
 			my $c = shift;
 			my $host = $c->req->headers->header('Host') || '';
-			$host =~ s/:.*//;
-			if ($host =~ /$domain$/) {
+			$host =~ s/:.*//; $host =~ s/^www\.(.+)/$1/;
+			if ($host =~ /$bliptown_domain$/) {
 				my @host_a = split(/\./, $host);
 				my $user = @host_a >= 3 ? $host_a[-3] : 'mayor';
 				return $user if $user;
-			} elsif (
-				my $user = $c->user->read_user(
-					{ key => 'custom_domain', custom_domain => $host }
-				)
-			) {
-				my $user = $user->{username} // '';
-				return $user if $user;
 			}
+			my $user = $c->user->read_user(
+				{ key => 'custom_domain', custom_domain => $host }
+			);
+			$user = $user->{username};
+			return $user if $user;
 			return;
 		});
 
@@ -78,9 +76,9 @@ sub startup {
 			my $url = Mojo::URL->new;
 			my $username = $c->session('username');
 			if ($username) {
-				$url->host("$username.$domain");
+				$url->host("$username.$bliptown_domain");
 			} else {
-				$url->host("$domain");
+				$url->host("$bliptown_domain");
 			}
 			if ($c->app->mode eq 'production') {
 				$url->scheme('https');
@@ -113,6 +111,7 @@ sub startup {
 	);
 
 	$app->defaults(
+		bliptown_domain => $bliptown_domain,
 		home => '/',
 		show_join => 0,
 		head => '',
