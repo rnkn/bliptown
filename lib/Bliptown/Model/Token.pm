@@ -24,11 +24,8 @@ sub read_token {
 	my $record = $self->sqlite->db->select(
 		'login_tokens', undef, { token => $token }
 	)->hash;
-	if ($record->{expires} <= time) {
-		$self->token->delete_token({ token => $token });
-	}
-	my $token_username = $record->{username} or return;
-	return $token if $token_username eq $username;
+	return $record if $record;
+	return;
 }
 
 sub delete_token {
