@@ -31,7 +31,8 @@ sub user_join {
 	my $password = $c->param('password') || '';
 	my $redirect = $c->param('back_to') || '/';
 
-	unless (validate_user($c, { email => $email, username => $username, password => $password })) {
+	my $creds = { email => $email, username => $username, password => $password };
+	unless (validate_user($c, $creds)) {
 		$c->flash(warning => 'Invalid credentials');
 		return $c->redirect_to($redirect);
 	}
