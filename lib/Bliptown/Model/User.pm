@@ -56,10 +56,11 @@ sub update_user {
 
 sub delete_user {
 	my ($self, $args) = @_;
+	my $username = $args->{username} or return;
     $self->sqlite->db->delete(
-		'users', {
-			username => $args->username,
-		});
+		'users', { username => $username }
+	);
+	return 1;
 }
 
 sub authenticate_user {
