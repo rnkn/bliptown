@@ -13,9 +13,9 @@ echo "Fetching certificate key..."
 /usr/local/bin/curl -s -X POST -d @$payload $endpoint | /usr/local/bin/jq -r .privatekey > "$cert_key" &&
 	echo "Fetched: $cert_key"
 
-/usr/bin/grep "tls keypair" /etc/domains.conf | while read -r line
+/usr/bin/grep "^domain" /etc/acme-domains.conf | while read -r line
 do
-	domain=$(echo "$line" | /usr/bin/sed -E 's/tls keypair "([a-z0-9.-]+)"/\1/')
+	domain=$(echo "$line" | /usr/bin/sed -E 's/^domain ([a-z0-9.-]+).*/\1/')
 	test -n "$domain" && /usr/sbin/acme-client "$domain"
 done
 
