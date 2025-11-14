@@ -7,20 +7,19 @@ use lib '.';
 use Bliptown::Model::User;
 use Bliptown::Model::Page;
 use Bliptown::Model::File;
-use Cwd;
+use Bliptown::Model::Token;
 
 sub startup {
 	my $app = shift;
 
-	my $cwd = getcwd();
 	$app->log->info("My user id: $<");
-	$app->log->info("My working directory: $cwd");
-
 	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
-
 	my $bliptown_domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
 	$app->log->info("My domain: $bliptown_domain");
-	$app->sessions->cookie_domain($bliptown_domain);
+
+	my $sessions = Bliptown::Sessions->new(default_expiration => 2592000);
+	$app->sessions($sessions);
+	$app->sessions->cookie_domain(".$bliptown_domain");
 
 	$app->helper(
 		sqlite => sub {
@@ -44,6 +43,11 @@ sub startup {
 	$app->helper(
 		file => sub {
 			state $src = Bliptown::Model::File->new;
+		});
+
+	$app->helper(
+		token => sub {
+			state $src = Bliptown::Model::Token->new(sqlite => shift->sqlite);
 		});
 
 	$app->helper(
@@ -136,6 +140,7 @@ sub startup {
 			})->name('acme_challenge');
 
 	$r->post('/join')->to(controller => 'User', action => 'user_join')->name('user_join');
+	$r->get('/login')->to(controller => 'User', action => 'user_login')->name('token_auth');
 	$r->post('/login')->to(controller => 'User', action => 'user_login')->name('user_login');
 	$r->get('/logout')->to(controller => 'User', action => 'user_logout')->name('user_logout');
 

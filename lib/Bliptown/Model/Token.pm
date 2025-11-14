@@ -2,6 +2,8 @@ package Bliptown::Model::Token;
 use Mojo::Base -base;
 use Mojo::Util qw(generate_secret);
 
+has 'sqlite';
+
 sub create_token {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
