@@ -51,7 +51,10 @@ sub update_user {
 		my $password_hash = bcrypt($new_password, '2b', 12, $ENV{BLIPTOWN_SALT});
 		$values{password_hash} = $password_hash;
 	};
-    $self->sqlite->db->update('users', \%values, { username => $args->{username} });
+    my $success = $self->sqlite->db->update(
+		'users', \%values, { username => $args->{username} }
+	);
+	return 1 if $success;
 }
 
 sub delete_user {
