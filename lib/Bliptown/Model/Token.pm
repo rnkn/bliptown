@@ -22,7 +22,6 @@ sub create_token {
 sub read_token {
 	my ($self, $args) = @_;
 	my $token = $args->{token} or return;
-	my $username = $args->{username} or return;
 	my $record = $self->sqlite->db->select(
 		'login_tokens', undef, { token => $token }
 	)->hash;
