@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious';
 use Mojo::File qw(path);
 use Mojo::SQLite;
 use lib '.';
+use Bliptown::Sessions;
 
 use Bliptown::Model::User;
 use Bliptown::Model::Page;
