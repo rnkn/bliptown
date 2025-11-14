@@ -1,3 +1,11 @@
+-- 4 up
+CREATE TABLE login_tokens (
+    token TEXT,
+    username TEXT,
+    expires INTEGER
+);
+-- 4 down
+DROP TABLE login_tokens;
 -- 3 up
 ALTER TABLE users
     ADD COLUMN create_backups INTEGER;
