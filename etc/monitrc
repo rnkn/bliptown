@@ -18,20 +18,22 @@ check host rnkn.xyz with address rnkn.xyz
 	if failed port 80 protocol http then alert
 	if failed port 443 protocol https then alert
 
-check program bliptown path "/usr/sbin/rcctl check bliptown"
-	if status != 0 then alert
+check process bliptown pidfile /tmp/bliptown.pid
+	if not exist then alert
 
-check program bliptown_helper path "/usr/sbin/rcctl check bliptown_helper"
-	if status != 0 then alert
+check process bliptown_helper matching "perl /usr/local/www/bliptown/script/bliptown_helper"
+	start program = "/usr/sbin/rcctl start bliptown_helper"
+	if not exist then alert
+	if not exist then start
 
-check program sshd path "/usr/sbin/rcctl check sshd"
-	if status != 0 then alert
+check process sshd pidfile /var/run/sshd.pid
+	if not exist then alert
 
-check program relayd path "/usr/sbin/rcctl check relayd"
-	if status != 0 then alert
+check process relayd matching "/usr/sbin/relayd"
+	if not exist then alert
 
-check program httpd path "/usr/sbin/rcctl check httpd"
-	if status != 0 then alert
+check process httpd matching "/usr/sbin/httpd"
+	if not exist then alert
 
 check file doas.conf path /etc/doas.conf
 	if failed uid 0 then alert
