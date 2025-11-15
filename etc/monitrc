@@ -1,0 +1,101 @@
+set daemon 30
+set log syslog
+set idfile /var/monit/id
+set statefile /var/monit/state
+
+set alert mayor@blip.town
+
+set httpd port 2812 readonly
+	allow localhost
+	unixsocket /var/run/monit.sock
+
+check host blip.town with address blip.town
+	if failed port 22 protocol ssh then alert
+	if failed port 80 protocol http then alert
+	if failed port 443 protocol https then alert
+
+check host rnkn.xyz with address rnkn.xyz
+	if failed port 80 protocol http then alert
+	if failed port 443 protocol https then alert
+
+check program bliptown path "/usr/sbin/rcctl check bliptown"
+	if status != 0 then alert
+
+check program bliptown_helper path "/usr/sbin/rcctl check bliptown_helper"
+	if status != 0 then alert
+
+check program sshd path "/usr/sbin/rcctl check sshd"
+	if status != 0 then alert
+
+check program relayd path "/usr/sbin/rcctl check relayd"
+	if status != 0 then alert
+
+check program httpd path "/usr/sbin/rcctl check httpd"
+	if status != 0 then alert
+
+check file doas.conf path /etc/doas.conf
+	if failed uid 0 then alert
+	if failed gid 0 then alert
+	if failed perm 0600 then alert
+	if failed md5 checksum expect cab8df0c860ce5696aeb4c9dac59ac7f then alert
+
+check file master.passwd path /etc/master.passwd
+	if failed uid 0 then alert
+	if failed gid 0 then alert
+	if failed perm 0600 then alert
+
+check file login.conf path /etc/login.conf
+	if failed uid 0 then alert
+	if failed gid 0 then alert
+	if failed perm 0600 then alert
+	if failed md5 checksum expect 82066e2401b584c00253edf58427db4e then alert
+
+check file letsencrypt.pem path /etc/acme/letsencrypt.pem
+	if failed uid 0 then alert
+	if failed gid 0 then alert
+	if failed perm 0400 then alert
+	if failed md5 checksum expect 372a374ad0a13ab7129e7dde425d8403 then alert
+
+check file usr/bin/login path /usr/bin/login
+	if failed uid 0 then alert
+	if failed gid 7 then alert
+	if failed perm 555 then alert
+	if failed md5 checksum expect 6c620a854ed0a13a91ebdbd53818d637 then alert
+
+check file usr/sbin/sshd path /usr/sbin/sshd
+	if failed uid 0 then alert
+	if failed gid 7 then alert
+	if failed perm 0511 then alert
+	if failed md5 checksum expect f15789088cda9858c37c8ce3654a8c33 then alert
+
+check file usr/bin/su path /usr/bin/su
+	if failed uid 0 then alert
+	if failed gid 7 then alert
+	if failed perm 4555 then alert
+	if failed md5 checksum expect d5f107f4bcf7796de6c097952dab48da then alert
+
+check file script/bliptown path /usr/local/www/bliptown/script/bliptown
+	if failed uid 0 then alert
+	if failed gid 1002 then alert
+	if failed perm 0750 then alert
+
+check file script/bliptown_helper path /usr/local/www/bliptown/script/bliptown_helper
+	if failed uid 0 then alert
+	if failed gid 1002 then alert
+	if failed perm 0750 then alert
+	if failed md5 checksum expect 152a0c548fc3e33bca31c888cbdafd64 then alert
+
+check file users.db path /var/db/bliptown/users.db
+	if failed uid 1002 then alert
+	if failed gid 1002 then alert
+	if failed perm 0600 then alert
+
+check directory usr/local/www/bliptown path /usr/local/www/bliptown
+	if failed uid 0 then alert
+	if failed gid 1002 then alert
+	if failed perm 0750 then alert
+
+check directory etc/ssl/private path /etc/ssl/private
+	if failed uid 0 then alert
+	if failed gid 0 then alert
+	if failed perm 0700 then alert
