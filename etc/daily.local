@@ -5,11 +5,11 @@ endpoint=https://api.porkbun.com/api/json/v3/ssl/retrieve/blip.town
 cert_chain=/etc/ssl/blip.town.crt
 cert_key=/etc/ssl/private/blip.town.key
 
-echo "Fetching certificate chain..."
+echo "Fetching certificate chain:"
 /usr/local/bin/curl -s -X POST -d @$payload $endpoint | /usr/local/bin/jq -r .certificatechain > "$cert_chain" &&
 	echo "Fetched: $cert_chain"
 
-echo "Fetching certificate key..."
+echo "Fetching certificate key:"
 /usr/local/bin/curl -s -X POST -d @$payload $endpoint | /usr/local/bin/jq -r .privatekey > "$cert_key" &&
 	echo "Fetched: $cert_key"
 
@@ -19,7 +19,7 @@ do
 	test -n "$domain" && /usr/sbin/acme-client "$domain"
 done
 
-echo "Reloading relayd..."
+echo "Reloading relayd:"
 /usr/sbin/rcctl reload relayd
 
 backup_db="/var/db/bliptown/users-$(date +%F).db"
@@ -28,7 +28,7 @@ install -m 600 -o root -g wheel /dev/null $backup_db
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
 echo "Created backup: $backup_db"
 
-next_part "Calculating system checksums"
+next_part "Calculating system checksums:"
 
 for d in /bin /sbin /usr/bin /usr/sbin /usr/lib /usr/libexec
 do
