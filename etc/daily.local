@@ -22,16 +22,9 @@ done
 echo "Reloading relayd:"
 /usr/sbin/rcctl reload relayd
 
+echo "Creating database backup:"
 backup_db="/var/db/bliptown/users-$(date +%F).db"
 
 install -m 600 -o root -g wheel /dev/null $backup_db
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
 echo "Created backup: $backup_db"
-
-next_part "Calculating system checksums:"
-
-for d in /bin /sbin /usr/bin /usr/sbin /usr/lib /usr/libexec
-do
-	sum=$(tar -cf - "$d" 2>/dev/null | sha256)
-	echo "$sum $d"
-done
