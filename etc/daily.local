@@ -22,6 +22,10 @@ done
 echo "Reloading relayd:"
 /usr/sbin/rcctl reload relayd
 
+echo "Expunging database dead login tokens:"
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $(date +%s)"
+echo "Done."
+
 echo "Creating database backup:"
 backup_db="/var/db/bliptown/users-$(date +%F).db"
 
