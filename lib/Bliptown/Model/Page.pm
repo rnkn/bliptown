@@ -5,6 +5,7 @@ use FFI::Platypus;
 use YAML::Tiny;
 use Mojo::DOM::HTML;
 use Mojo::Util qw(dumper);
+use Encode;
 
 use constant {
 	MD_FLAG_COLLAPSEWHITESPACE          => 1 << 0,
@@ -62,7 +63,8 @@ sub read_page {
 	my $html_handler = $ffi->closure(
 		sub {
 			my ($chunk, $size) = @_;
-			$html .= pack('C*', unpack('C*', substr($chunk, 0, $size)));
+			my $utf8_text = decode_utf8($chunk);
+			$html .= substr($utf8_text, 0, $size);
 		}
 	);
 
@@ -89,7 +91,8 @@ sub read_page {
 			$layout = $metadata->{layout} || 'one-column';
 		}
 
-		md_html($text, length($text), $html_handler, undef, $md_flags, 0);
+		my $octets = encode_utf8($text);
+		md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
 
 		while ($html =~ /\{\{\s*(.*?)\s*\}\}/) {
