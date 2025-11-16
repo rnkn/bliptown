@@ -89,7 +89,7 @@ a:hover, label.button:hover {
 
 #viewport {
 	background-color: var(--main-bg-color);
-	position: fixed;
+	position: absolute;
 	display: flex;
 	top: 0;
 	width: 100%;
