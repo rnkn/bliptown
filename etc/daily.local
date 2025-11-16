@@ -32,6 +32,6 @@ next_part "Calculating system checksums:"
 
 for d in /bin /sbin /usr/bin /usr/sbin /usr/lib /usr/libexec
 do
-	sum=$(tar -cf - "$d" | sha256)
+	sum=$(tar -cf - "$d" 2>/dev/null | sha256)
 	echo "$sum $d"
 done
