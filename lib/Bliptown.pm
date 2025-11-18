@@ -64,14 +64,14 @@ sub startup {
 			$host =~ s/:.*//; $host =~ s/^www\.(.+)/$1/;
 			if ($host =~ /$bliptown_domain$/) {
 				my @host_a = split(/\./, $host);
-				my $user = @host_a >= 3 ? $host_a[-3] : 'mayor';
-				return $user if $user;
+				my $username = @host_a >= 3 ? $host_a[-3] : 'mayor';
+				return $username if $username;
 			}
 			my $user = $c->user->read_user(
 				{ key => 'custom_domain', custom_domain => $host }
 			);
-			$user = $user->{username};
-			return $user if $user;
+			my $username = $user->{username};
+			return $username if $username;
 			return;
 		});
 
