@@ -130,6 +130,7 @@ sub new_page {
 
 sub edit_page {
 	my $c = shift;
+	my $partial_re = qr/\{\{ *> *(.*?) *\}\}/;
 	my $root = path($c->get_user_home, $c->get_req_user);
 	my $slug = $c->param('catchall');
 	$slug =~ s/\/$//;
@@ -143,7 +144,7 @@ sub edit_page {
 	my @includes;
 	if (-f $file) {
 		$content = $c->file->read_file({ file => $file })->{chars};
-		while ($content =~ /\{\{\s*(.*?)\s*\}\}/g) {
+		while ($content =~ /$partial_re/g) {
 			unless (grep { $1 eq $_ } @includes ) {
 				my $include = $1; $include =~ s/\.[^.]+?$//;
 				push @includes, $include;

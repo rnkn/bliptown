@@ -55,6 +55,7 @@ sub convert_typography {
 
 sub read_page {
 	my ($self, $args) = @_;
+	my $partial_re = qr/\{\{ *&gt; *(.*?) *\}\}/;
 	my $file = Mojo::File->new($args->{file});
 	my $chars = $file->slurp('utf-8');
 
@@ -95,7 +96,7 @@ sub read_page {
 		md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
 
-		while ($html =~ /\{\{\s*(.*?)\s*\}\}/) {
+		while ($html =~ /$partial_re/) {
 			my $slug = $1;
 			my $root = $args->{root};
 			my $includes = $args->{includes} || [ $file ];
