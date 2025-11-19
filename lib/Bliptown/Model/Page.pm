@@ -148,6 +148,9 @@ sub read_page {
 			if (scalar @page_list > 1) {
 				@page_list = grep { defined $_->{metadata}->{date} } @page_list;
 				@page_list = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @page_list;
+				map {
+					$_->{html} = "<div class=\"blog-post\">$_->{html}</div>"; $_
+				} @page_list;
 			}
 			my $frag = join("\n", map { $_->{html} } @page_list);
 			$html =~ s/\{\{.*?\}\}/$frag/;

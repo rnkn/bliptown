@@ -346,6 +346,10 @@ textarea, input {
 	font-family: monospace;
 }
 
+.blog-post {
+	margin-bottom: 4em;
+}
+
 .help-q {
 	margin-left: 1em;
 }
