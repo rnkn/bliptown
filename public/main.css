@@ -495,7 +495,11 @@ textarea, input {
 
 .gallery-horizontal > p {
 	display: inline-block;
-	width: 90%;
+	max-width: 90%;
+}
+
+.gallery-horizontal img {
+	vertical-align: middle;
 }
 
 .parallax {
