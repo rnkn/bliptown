@@ -55,7 +55,6 @@ sub convert_typography {
 
 sub read_page {
 	my ($self, $args) = @_;
-	my $partial_re = qr/\{\{ *&gt; *(.*?) *\}\}/;
 	my $file = Mojo::File->new($args->{file});
 	my $chars = $file->slurp('utf-8');
 
@@ -87,8 +86,7 @@ sub read_page {
 
 		if ($yaml) {
 			my $o = YAML::Tiny->new;
-			$metadata = $o->read_string($yaml);
-			$metadata = $metadata->[0];
+			$metadata = $o->read_string($yaml)->[0];
 			$layout = $metadata->{layout} || 'one-column';
 		}
 
@@ -96,40 +94,68 @@ sub read_page {
 		md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
 
+		my $partial_re = qr/\{\{ *&gt; *(.*?) *\}\}/;
 		while ($html =~ /$partial_re/) {
 			my $slug = $1;
 			my $root = $args->{root};
-			my $includes = $args->{includes} || [ $file ];
-			my $file_str;
-			$file_str = $slug !~ /\.[^.]+?$/ ? "$slug.md" : $slug;
-			my $file_path;
+			my $recur = $args->{recur} // 0;
+			my $file_str = $slug;
+			$file_str =~ s/\.md$//; $file_str = "$file_str.md";
+
 			if ($file_str =~ /^\//) {
-				$file_path = path($root, $file_str)->to_abs;
+				# Absolute path
+				$file = path($root, $file_str)->to_abs;
 			} else {
-				$file_path = path($file->dirname, $file_str)->to_abs;
+				# Relative path
+				$file = path($file->dirname, $file_str)->to_abs;
 			}
-			my $frag = '';
-			if (!-f $file_path) {
-				$frag = "<span class=\"error\">Error: \"<a href=\"$slug\">$slug</a>\" not found</span>"
-			} elsif (grep { $file_path eq $_ } @$includes) {
-				$frag = '<span class="error">Error: infinite recursion</span>';
-			} else {
-				push @$includes, $file_path;
-				my $page = read_page(
-					$self, {
-						root => $root,
-						file => $file_path,
-						includes => $includes,
-					});
-				$frag = $page->{html};
+
+			my @incl_glob_list = glob $file;
+
+			my @page_list;
+			foreach my $filename (@incl_glob_list) {
+				my $file = Mojo::File->new($filename);
+				my $page;
+
+				if (!-f $filename) {
+					$page = {
+						metadata => {
+							title => 'Error: File Not Found',
+							status => 404,
+						},
+						html => "<span class=\"error\">Error: \"<a href=\"$slug\">$filename</a>\" not found</span>",
+					}
+				} elsif ($recur >= 64) {
+					$page = {
+						metadata => {
+							title => 'Error: Recursion',
+							status => 508,
+						},
+						html => '<span class="error">Error: exceeded maximum level of recursion</span>',
+					}
+				} else {
+					$recur++;
+					$page = read_page(
+						$self, {
+							root => $root,
+							file => $file,
+							recur => $recur,
+						}
+					);
+				}
+				push @page_list, $page;
 			}
+			if (scalar @page_list > 1) {
+				@page_list = grep { defined $_->{metadata}->{date} } @page_list;
+				@page_list = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @page_list;
+			}
+			my $frag = join("\n", map { $_->{html} } @page_list);
 			$html =~ s/\{\{.*?\}\}/$frag/;
 		}
-	}
-	$html = convert_typography({ html => $html });
-	return {
-		metadata => $metadata,
-		html => $html,
+		return {
+			metadata => $metadata,
+			html => $html,
+		}
 	}
 }
 
