@@ -99,6 +99,7 @@ sub read_page {
 			my $slug = $1;
 			my $root = $args->{root};
 			my $recur = $args->{recur} // 0;
+			$recur++;
 			my $file_str = $slug;
 			$file_str =~ s/\.md$//; $file_str = "$file_str.md";
 
@@ -134,7 +135,6 @@ sub read_page {
 						html => '<span class="error">Error: exceeded maximum level of recursion</span>',
 					}
 				} else {
-					$recur++;
 					$page = read_page(
 						$self, {
 							root => $root,
