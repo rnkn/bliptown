@@ -124,7 +124,7 @@ sub read_page {
 							title => 'Error: File Not Found',
 							status => 404,
 						},
-						html => "<span class=\"error\">Error: \"<a href=\"$slug\">$filename</a>\" not found</span>",
+						html => "<span class=\"error\">Error: \"<a href=\"$slug\">$slug</a>\" not found</span>",
 					}
 				} elsif ($recur >= 64) {
 					$page = {
