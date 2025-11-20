@@ -30,7 +30,8 @@ sub read_user {
 	my $user = $self->sqlite->db->select(
 		'users', undef, { $key => $args->{$key} }
 	)->hash;
-	$user->{custom_domain} = '' if $user->{custom_domain} eq 'NULL';
+	$user->{custom_domain} = '' if $user->{custom_domain} &&
+		$user->{custom_domain} eq 'NULL';
 	return $user if $user;
 	return;
 }
