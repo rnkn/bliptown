@@ -6,19 +6,18 @@ use MIME::Base32;
 use Authen::OATH;
 
 has 'sqlite';
+has 'totp';
 
 sub create_user {
 	my ($self, $args) = @_;
 	my $password_hash = bcrypt($args->{password}, '2b', 12, $ENV{BLIPTOWN_SALT});
-	my @base64_set = (0 .. 9, 'a' .. 'z', 'A' .. 'Z', '+', '/');
-	my $rand_str = join '', map $base64_set[rand @base64_set], 0 .. 21;
-	my $secret = encode_base32 $rand_str;
+	my $totp_secret = $self->totp->create_totp;
 	$self->sqlite->db->insert(
 		'users', {
 			username => $args->{username},
 			email => $args->{email},
 			password_hash => $password_hash,
-			totp_secret => $secret,
+			totp_secret => $totp_secret,
 		}
 	);
 }
