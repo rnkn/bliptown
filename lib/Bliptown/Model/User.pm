@@ -7,6 +7,7 @@ use Authen::OATH;
 
 has 'sqlite';
 has 'totp';
+has 'domain_list';
 
 sub create_user {
 	my ($self, $args) = @_;
@@ -62,7 +63,11 @@ sub update_user {
     my $success = $self->sqlite->db->update(
 		'users', \%values, { username => $args->{username} }
 	);
-	return 1 if $success;
+	if ($values{custom_domain} && $values{custom_domain} ne 'NULL') {
+		$self->domain_list->update_domain_list;
+	}
+	unless ($success) { warn };
+	return 1;
 }
 
 sub delete_user {
