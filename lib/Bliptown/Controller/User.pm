@@ -1,5 +1,7 @@
 package Bliptown::Controller::User;
 use Mojo::Base 'Mojolicious::Controller';
+use Crypt::Bcrypt qw(bcrypt bcrypt_check);
+use Mojo::Util qw(secure_compare);
 
 sub validate_user {
 	my ($c, $args) = @_;

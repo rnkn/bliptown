@@ -21,24 +21,8 @@ sub list_settings {
 sub save_settings {
 	my $c = shift;
 	my $username = $c->session('username');
-	my @keys_null = qw(custom_domain);
-	my @keys_not_null = qw(email new_password);
-	my @keys_int = qw(create_backups sort_new);
-	my %args; $args{username} = $username;
-	foreach (@keys_null) {
-		my $v = $c->param($_);
-		$args{$_} = $v;
-	}
-	foreach (@keys_not_null) {
-		my $v = $c->param($_);
-		$args{$_} = $v if $v;
-	}
-	foreach (@keys_int) {
-		my $v = $c->param($_) // 0;
-		$args{$_} = $v;
-	}
-	$c->user->update_user(\%args);
-	update_domain_list($c) if $args{custom_domain};
+	my $params = $c->req->params->to_hash;
+	$c->user->update_user({ username => $username, %$params });
 	return $c->redirect_to($c->url_for('render_page'));
 }
 

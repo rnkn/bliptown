@@ -35,15 +35,24 @@ sub read_user {
 	return;
 }
 
-my @allowed_keys = qw(username email totp_secret custom_domain
-create_backups sort_new);
-
 sub update_user {
 	my ($self, $args) = @_;
 	my %values;
+	my @keys_null = qw(custom_domain);
+	my @keys_not_null = qw(email);
+	my @keys_int = qw(create_backups sort_new);
 	foreach my $key (keys %$args) {
-		if (grep { $key eq $_ } @allowed_keys) {
-			$values{$key} = %$args{$key};
+		if (grep { $key eq $_ } @keys_null) {
+			my $v = $args->{$key} || 'NULL';
+			$values{$key} = $v;
+		}
+		if (grep { $key eq $_ } @keys_not_null) {
+			my $v = $args->{$key};
+			$values{$key} = $v if $v;
+		}
+		if (grep { $key eq $_ } @keys_int) {
+			my $v = $args->{$key} // 0;
+			$values{$key} = $v;
 		}
 	};
 	my $new_password = $args->{new_password};
