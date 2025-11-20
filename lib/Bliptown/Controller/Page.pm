@@ -15,9 +15,9 @@ my @allowed_exts = qw(html css js txt md);
 sub render_page {
 	my $c = shift;
 	my $root = path($c->get_user_home, $c->get_req_user);
-	my $user = $c->session('username');
+	my $username = $c->session('username');
 	$c->stash( home => $c->get_home );
-	my $user_cur = $user && $user eq $c->get_req_user;
+	my $user_cur = $username && $username eq $c->get_req_user;
 	my $slug = $c->param('catchall');
 	if (-d $root && $root gt $c->get_user_home) {
 		my @skel = qw(index.md _title.txt _header.md _sidebar.md _footer.md);
@@ -56,7 +56,7 @@ sub render_page {
 	my $page = $c->page->read_page(
 		{
 			root => $root,
-			file => $file
+			file => $file,
 		}
 	);
 
@@ -81,7 +81,7 @@ sub render_page {
 		close($fh);
 	}
 
-	my $page_title = $page->{metadata}{title};
+	my $page_title = $page->{metadata}->{title};
 	$title = "$title – $page_title" if $page_title;
 
 	my $date = $page->{metadata}{date};
@@ -166,7 +166,7 @@ sub edit_page {
 
 sub save_page {
 	my $c = shift;
-	my $user = $c->session('username');
+	my $username = $c->session('username');
 	my $root = path($c->get_user_home, $c->get_req_user)->to_string;
 	my $slug = $c->param('slug');
 	my $ext = $c->param('ext');
@@ -178,7 +178,7 @@ sub save_page {
 	$c->file->update_file(
 		{
 			command => 'update_file',
-			user => $user,
+			username => $username,
 			file => $file,
 			content => $content,
 		});

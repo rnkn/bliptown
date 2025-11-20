@@ -59,59 +59,59 @@ EOF
 }
 
 sub get_uid_gid {
-	my $user = shift;
-	my $uid = getpwnam($user) || die "Cannot get uid: $user ($!)";
-	my $gid = getgrnam($user) || die "Cannot get gid: $user ($!)";
+	my $username = shift;
+	my $uid = getpwnam($username) || die "Cannot get uid: $username ($!)";
+	my $gid = getgrnam($username) || die "Cannot get gid: $username ($!)";
 	return ($uid, $gid);
 }
 
 sub safe_file {
-	my ($user, $file) = @_;
-	die "Invalid username: $user" unless $user =~ /^[a-zA-Z0-9-_]+$/;
-	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $user;
-	my $file_abs = abs_path($file) || die "Cannot get file: $file ($!)";
-	die "File outside of sandbox: $file_abs ($!)"
-		unless $file_abs =~ /^\Q$sandbox\E/;
-	return $file_abs;
+	my ($username, $filename) = @_;
+	die "Invalid username: $username" unless $username =~ /^[a-zA-Z0-9-_]+$/;
+	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $username;
+	my $filename_abs = abs_path($filename) || die "Cannot get file: $filename ($!)";
+	die "File outside of sandbox: $filename_abs ($!)"
+		unless $filename_abs =~ /^\Q$sandbox\E/;
+	return $filename_abs;
 }
 
 sub update_file {
 	my $payload = shift;
-	my $user = $payload->{user};
-	my $file = $payload->{file};
+	my $username = $payload->{username};
+	my $filename = $payload->{filename};
 	my $content = $payload->{content};
-	my $safe_file = safe_file($user, $file);
-	if (open(my $fh, '>', $safe_file)) {
+	my $safe_filename = safe_file($username, $filename);
+	if (open(my $fh, '>', $safe_filename)) {
 		print $fh $content;
 		close $fh;
 	} else {
-		die "Cannot open file: $file ($!)";
+		die "Cannot open file: $filename ($!)";
 	}
-	my ($uid, $gid) = get_uid_gid($user);
-	chown($uid, $gid, $safe_file) ||
-		die "Cannot set ownership: $file ($!)";
-	chmod(0644, $safe_file) ||
-		die "Cannot set permissions: $file ($!)";
+	my ($uid, $gid) = get_uid_gid($username);
+	chown($uid, $gid, $safe_filename) ||
+		die "Cannot set ownership: $filename ($!)";
+	chmod(0644, $safe_filename) ||
+		die "Cannot set permissions: $filename ($!)";
 }
 
 sub rename_file {
 	my $payload = shift;
-	my $user = $payload->{user};
-	my $file = $payload->{file};
-	my $new_name = $payload->{new_name};
-	my $safe_file = safe_file($user, $file);
-	die "File not found: $safe_file ($!)" unless -f $safe_file;
-	my $safe_new_name = safe_file($user, $new_name);
-	rename($safe_file, $safe_new_name) || die "Cannot rename file: $file ($!)";
+	my $username = $payload->{username};
+	my $filename = $payload->{file};
+	my $new_filename = $payload->{new_filename};
+	my $safe_filename = safe_file($username, $filename);
+	die "File not found: $safe_filename ($!)" unless -f $safe_filename;
+	my $safe_new_filename = safe_file($username, $new_filename);
+	rename($safe_filename, $safe_new_filename) || die "Cannot rename file: $filename ($!)";
 }
 
 sub delete_file {
 	my $payload = shift;
-	my $user = $payload->{user};
-	my $file = $payload->{file};
-	my $safe_file = safe_file($user, $file);
+	my $username = $payload->{username};
+	my $filename = $payload->{filename};
+	my $safe_file = safe_file($username, $filename);
 	unlink $safe_file if -f $safe_file ||
-		die "Cannot delete file: $file ($!)";
+		die "Cannot delete file: $filename ($!)";
 }
 
 my %allowed_commands = (

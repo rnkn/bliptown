@@ -58,34 +58,34 @@ sub list_files {
 
 sub rename_file {
 	my $c = shift;
-	my $user = $c->session('username');
-	my $root = path($c->get_user_home, $user);
+	my $username = $c->session('username');
+	my $root = path($c->get_user_home, $username);
 	my $old_slug = $c->param('catchall');
-	my $file = $c->get_file($old_slug)->to_abs->to_string;
-	my $new_name = $c->param('to');
-	my $new_file = path($root, $new_name)->to_abs->to_string;
+	my $filename = $c->get_file($old_slug)->to_abs->to_string;
+	my $rename_to = $c->param('to');
+	my $new_filename = path($root, $rename_to)->to_abs->to_string;
 	$c->file->update_file(
 		{
 			command => 'rename_file',
-			user => $user,
-			file => $file,
-			new_name => $new_file,
+			username => $username,
+			filename => $filename,
+			new_filename => $new_filename,
 		}
 	);
-	$c->flash(info => "$old_slug renamed to $new_name");
+	$c->flash(info => "$old_slug renamed to $rename_to");
 	return $c->redirect_to('list_files');
 }
 
 sub delete_file {
 	my $c = shift;
-	my $user = $c->session('username');
+	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
-	my $file = $c->get_file($slug)->to_abs->to_string;
+	my $filename = $c->get_file($slug)->to_abs->to_string;
 	$c->file->update_file(
 		{
 			command => 'delete_file',
-			user => $user,
-			file => $file,
+			username => $username,
+			filename => $filename,
 		}
 	);
 	$c->flash(info => "$slug deleted");
@@ -94,8 +94,8 @@ sub delete_file {
 
 sub upload_files {
 	my $c = shift;
-	my $user = $c->session('username');
-	my $root = path($c->get_user_home, $user);
+	my $username = $c->session('username');
+	my $root = path($c->get_user_home, $username);
 	my @files;
 	foreach (@{$c->req->uploads}) {
 		my $file = $_->filename;
