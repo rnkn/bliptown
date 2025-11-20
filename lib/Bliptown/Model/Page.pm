@@ -63,8 +63,8 @@ sub read_page {
 	my $html_handler = $ffi->closure(
 		sub {
 			my ($chunk, $size) = @_;
-			my $utf8_text = decode_utf8($chunk);
-			$html .= substr($utf8_text, 0, $size);
+			my $bytes = substr($chunk, 0, $size);
+			$html .= decode_utf8($bytes);
 		}
 	);
 
@@ -90,8 +90,7 @@ sub read_page {
 			$layout = $metadata->{layout} || '';
 		}
 
-		my $octets = encode_utf8($text);
-		md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
+		md_html($text, length($text), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
 
 		my $partial_re = qr/\{\{ *&gt; *(.*?) *\}\}/;
