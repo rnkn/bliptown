@@ -87,7 +87,7 @@ sub read_page {
 		if ($yaml) {
 			my $o = YAML::Tiny->new;
 			$metadata = $o->read_string($yaml)->[0];
-			$layout = $metadata->{layout} || 'one-column';
+			$layout = $metadata->{layout} || '';
 		}
 
 		my $octets = encode_utf8($text);
