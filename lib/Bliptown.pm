@@ -9,6 +9,7 @@ use Bliptown::Model::User;
 use Bliptown::Model::Page;
 use Bliptown::Model::File;
 use Bliptown::Model::TOTP;
+use Bliptown::Model::DomainList;
 use Bliptown::Model::Token;
 
 sub startup {
@@ -53,9 +54,9 @@ sub startup {
 		});
 
 	$app->helper(
-		domain => sub {
+		domain_list => sub {
 			my $c = shift;
-			return Bliptown::Model::Domain->new(
+			return Bliptown::Model::DomainList->new(
 				sqlite => $c->sqlite,
 				file => $c->file,
 			);
