@@ -140,6 +140,7 @@ label#menu-toggle:before {
 
 header {
 	flex-shrink: 0;
+	height: 2em;
 	margin-bottom: 1em;
 }
 
@@ -525,7 +526,7 @@ textarea, input {
 	#sidebar {
 		position: fixed;
 		width: 100%;
-		height: 3rem;
+		height: 6em;
 	}
 	header {
 		margin: 0 auto;
