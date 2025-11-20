@@ -82,7 +82,7 @@
 			% }
 		</div>
 		<input type="checkbox" id="drawer-toggle" hidden>
-		<div id="viewport">
+		<div id="viewport" class="<%= $stage %>">
 			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
 			% my $message = begin
 			% my $type = shift;

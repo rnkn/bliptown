@@ -8,6 +8,7 @@ sub list_settings {
 	);
 	$c->stash(
 		title => 'Settings',
+		stage => 'backstage',
 		template => 'settings',
 		username => $user->{username},
 		email => $user->{email},

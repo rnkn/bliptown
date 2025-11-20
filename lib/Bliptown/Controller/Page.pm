@@ -95,6 +95,7 @@ sub render_page {
 
 	$c->stash(
 		template => 'page',
+		stage => 'foh',
 		head => $head || '',
 		title => $title,
 		header => $skel_html{_header} || '',
