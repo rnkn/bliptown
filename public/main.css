@@ -496,11 +496,14 @@ textarea, input {
 	margin: 0;
 }
 
-.ratio-8x10 img, .ratio-10x8 img, .ratio-16x9 img, .ratio-1x1 img {
+.ratio-3x2 img, .ratio-2x3, .ratio-8x10 img,
+.ratio-10x8 img, .ratio-16x9 img, .ratio-1x1 img {
 	width: 100%;
 	object-fit: cover;
 }
 
+.ratio-3x2 img { aspect-ratio: 3 / 2; }
+.ratio-2x3 img { aspect-ratio: 2 / 3; }
 .ratio-8x10 img { aspect-ratio: 8 / 10; }
 .ratio-10x8 img { aspect-ratio: 10 / 8; }
 .ratio-16x9 img { aspect-ratio: 16 / 9; }
