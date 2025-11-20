@@ -27,6 +27,7 @@ sub startup {
 		sqlite => sub {
 			my $db = path($ENV{BLIPTOWN_DB_HOME}, 'users.db');
 			state $sql = Mojo::SQLite->new("sqlite:$db");
+			return $sql;
 		});
 
 	my $migrations_path = $app->home->child('migrations.sql');
@@ -34,27 +35,43 @@ sub startup {
 
 	$app->helper(
 		user => sub {
-			state $user = Bliptown::Model::User->new(sqlite => shift->sqlite);
+			my $c = shift;
+			return Bliptown::Model::User->new(
+				sqlite => $c->sqlite,
+				totp => $c->totp,
+			);
 		});
 
 	$app->helper(
 		page => sub {
-			state $page = Bliptown::Model::Page->new;
+			return Bliptown::Model::Page->new;
 		});
 
 	$app->helper(
 		file => sub {
-			state $src = Bliptown::Model::File->new;
+			return Bliptown::Model::File->new;
+		});
+
+	$app->helper(
+		domain => sub {
+			my $c = shift;
+			return Bliptown::Model::Domain->new(
+				sqlite => $c->sqlite,
+				file => $c->file,
+			);
 		});
 
 	$app->helper(
 		totp => sub {
-			state $src = Bliptown::Model::TOTP->new;
+			return Bliptown::Model::TOTP->new;
 		});
 
 	$app->helper(
 		token => sub {
-			state $src = Bliptown::Model::Token->new(sqlite => shift->sqlite);
+			my $c = shift;
+			return Bliptown::Model::Token->new(
+				sqlite => $c->sqlite
+			);
 		});
 
 	$app->helper(
