@@ -40,12 +40,12 @@ sub user_join {
 	}
 
 	if (check_duplicate_user($c, { username => $username })) {
-		$c->flash(info => 'Username unavailable');
+		$c->flash(info => 'Username already in use');
 		return $c->redirect_to($redirect);
 	}
 
 	if (check_duplicate_email($c, { email => $email })) {
-		$c->flash(info => 'Account with email already exists');
+		$c->flash(info => 'Account with that email already exists');
 		return $c->redirect_to($redirect);
 	}
 
@@ -139,12 +139,12 @@ sub user_login {
 			return $c->redirect_to($url);
 		}
 	}
- 	return $c->redirect_to($redirect);
+	return $c->redirect_to($redirect);
 }
 
 sub user_logout {
-    my $c = shift;
-    $c->session(expires => 1);
+	my $c = shift;
+	$c->session(expires => 1);
 	return $c->redirect_to('/');
 }
 
