@@ -26,10 +26,10 @@ sub read_user {
     my ($self, $args) = @_;
 	my $key = $args->{key};
 	return unless $key;
-
 	my $user = $self->sqlite->db->select(
 		'users', undef, { $key => $args->{$key} }
 	)->hash;
+	$user->{custom_domain} = '' if $user->{custom_domain} eq 'NULL';
 	return $user if $user;
 	return;
 }
