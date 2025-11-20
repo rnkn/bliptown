@@ -493,7 +493,7 @@ textarea, input {
 .gallery-horizontal > p {
 	flex-grow: 0;
 	flex-shrink: 0;
-	max-width: 90%;
+	width: 90%;
 	margin: 0;
 }
 
