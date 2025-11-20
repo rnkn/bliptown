@@ -8,6 +8,7 @@ use Bliptown::Sessions;
 use Bliptown::Model::User;
 use Bliptown::Model::Page;
 use Bliptown::Model::File;
+use Bliptown::Model::TOTP;
 use Bliptown::Model::Token;
 
 sub startup {
@@ -44,6 +45,11 @@ sub startup {
 	$app->helper(
 		file => sub {
 			state $src = Bliptown::Model::File->new;
+		});
+
+	$app->helper(
+		totp => sub {
+			state $src = Bliptown::Model::TOTP->new;
 		});
 
 	$app->helper(
