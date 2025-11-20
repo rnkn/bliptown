@@ -40,6 +40,7 @@ sub startup {
 			return Bliptown::Model::User->new(
 				sqlite => $c->sqlite,
 				totp => $c->totp,
+				domain_list => $c->domain_list,
 			);
 		});
 
