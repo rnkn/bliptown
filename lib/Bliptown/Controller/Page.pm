@@ -183,7 +183,7 @@ sub save_page {
 			content => $content,
 		});
 	my $redirect;
-	if ($action eq 'save-changes') {
+	if ($action eq 'save') {
 		return $c->redirect_to($c->url_for('edit_page', catchall => $slug));
 	} elsif ($action eq 'save-exit') {
 		return $c->redirect_to($c->url_for('render_page', catchall => $slug));

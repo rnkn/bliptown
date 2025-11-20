@@ -40,7 +40,7 @@
 			</div>
 			% }
 			<input name="back_to" value="<%= $redirect %>" hidden>
-			<button type="submit" name="action" value="save-changes">Save Changes</button>
+			<button type="submit" name="action" value="save">Save</button>
 			<button type="submit" name="action" value="save-exit">Save & Exit</button>
 			<a href="<%= param('back_to') || '/' %>">Cancel</a>
 		</form>
