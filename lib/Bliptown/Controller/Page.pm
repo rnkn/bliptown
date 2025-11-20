@@ -179,7 +179,7 @@ sub save_page {
 		{
 			command => 'update_file',
 			username => $username,
-			file => $file,
+			filename => $file,
 			content => $content,
 		});
 	my $redirect;
