@@ -62,10 +62,6 @@ table {
 	text-align: left;
 }
 
-section {
-	background-color: var(--main-bg-color);
-}
-
 details summary:hover {
 	cursor: pointer;
 }
@@ -161,7 +157,7 @@ main {
 	overflow: scroll;
 	padding: 2rem;
 	padding-right: 4rem;
-	background-color: white;
+	background-color: var(--main-bg-color);
 }
 
 main h1 {
