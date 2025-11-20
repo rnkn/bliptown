@@ -154,10 +154,10 @@ sub read_page {
 			my $frag = join("\n", map { $_->{html} } @page_list);
 			$html =~ s/\{\{.*?\}\}/$frag/;
 		}
-		return {
-			metadata => $metadata,
-			html => $html,
-		}
+	}
+	return {
+		metadata => $metadata,
+		html => $html,
 	}
 }
 
