@@ -480,33 +480,41 @@ textarea, input {
 
 .gallery-grid > p {
 	margin: 0;
-	flex-grow: 1;
-	flex-shrink: 1;
-	flex-basis: 20em;
 }
 
 .gallery-horizontal {
-	overflow-x: auto;
-	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	overflow-x: scroll;
+	max-height: 90vh;
+	gap: 1em;
 }
 
 .gallery-horizontal > p {
-	display: inline-block;
+	flex-grow: 0;
+	flex-shrink: 0;
 	max-width: 90%;
+	margin: 0;
 }
 
-.gallery-horizontal img {
-	vertical-align: middle;
+.ratio-8x10 img, .ratio-10x8 img, .ratio-16x9 img, .ratio-1x1 img {
+	width: 100%;
+	object-fit: cover;
 }
+
+.ratio-8x10 img { aspect-ratio: 8 / 10; }
+.ratio-10x8 img { aspect-ratio: 10 / 8; }
+.ratio-16x9 img { aspect-ratio: 16 / 9; }
+.ratio-1x1 img { aspect-ratio: 1 / 1; }
 
 .parallax {
-    perspective: 1px;
+	perspective: 1px;
 	overflow-y: auto;
 	height: calc(100vh - 4rem);
 }
 
 .parallax-bg {
-    transform: translateZ(-1px) scale(2);
+	transform: translateZ(-1px) scale(2);
 	position: absolute;
 	top: 0;
 	left: 0;
