@@ -50,6 +50,7 @@ sub list_files {
 	$c->stash(
 		template => 'files',
 		title => 'Files',
+		stage => 'backstage',
 		redirect => $c->url_for,
 		files => \@files,
 	);
