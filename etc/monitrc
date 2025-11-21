@@ -3,7 +3,7 @@ set log syslog
 set idfile /var/monit/id
 set statefile /var/monit/state
 
-set alert mayor@blip.town
+set alert root@blip.town
 
 set httpd port 2812 readonly
 	allow localhost
