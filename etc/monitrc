@@ -1,9 +1,11 @@
 set daemon 30
-set log syslog
+set log /var/log/monit
 set idfile /var/monit/id
 set statefile /var/monit/state
 
 set alert root@blip.town
+
+set mailserver localhost
 
 set httpd port 2812 readonly
 	allow localhost
