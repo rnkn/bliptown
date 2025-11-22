@@ -76,16 +76,16 @@ sub user_login {
 	if ($token) {
 		my $record = $c->token->read_token({ token => $token });
 
-		return $c->render(template => 'invalid', status => 403)
-			unless $record;
-		if ($record->{expires} <= time) {
-			$c->token->delete_token({ token => $token });
-			return $c->render(template => 'invalid', status => 403);
+		if (! $record || ! $record->{username} || $record->{expires} <= time) {
+			$c->token->delete_token({ token => $token }) if $record;
+			return $c->render(
+				status => 403,
+				template => 'message',
+				title => 'Oops...',
+				content => '403 Invalid or Expired Token',
+			);
 		}
-		my $token_username = $record->{username};
-		return $c->render(template => 'invalid', status => 403)
-			unless $token_username;
-		if ($username eq $token_username) {
+		if ($username eq $record->{username}) {
 			$c->stash(custom_domain => $domain);
 			$c->session(expiration => 2592000, username => $username);
 			$c->token->delete_token({ token => $token });
@@ -138,6 +138,14 @@ sub user_login {
 			}
 			return $c->redirect_to($url);
 		}
+	} else {
+		return $c->render(
+			status => 401,
+			template => 'message',
+			title => 'Oops...',
+			content => '401 Incorrect Username, Password or TOTP',
+			username => $username,
+		);
 	}
 	return $c->redirect_to($redirect);
 }
