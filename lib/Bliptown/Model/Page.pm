@@ -90,7 +90,8 @@ sub read_page {
 			$layout = $metadata->{layout} || '';
 		}
 
-		md_html($text, length($text), $html_handler, undef, $md_flags, 0);
+		my $octets = encode_utf8($text);
+		md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
 
 		my $partial_re = qr/\{\{ *&gt; *(.*?) *\}\}/;
