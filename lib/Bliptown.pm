@@ -8,6 +8,7 @@ use Bliptown::Sessions;
 use Bliptown::Model::User;
 use Bliptown::Model::Page;
 use Bliptown::Model::File;
+use Bliptown::Model::IPC;
 use Bliptown::Model::TOTP;
 use Bliptown::Model::DomainList;
 use Bliptown::Model::Token;
@@ -45,6 +46,12 @@ sub startup {
 		});
 
 	$app->helper(
+		ipc => sub {
+			state $ipc = Bliptown::Model::IPC->new;
+			return $ipc;
+		});
+
+	$app->helper(
 		page => sub {
 			return Bliptown::Model::Page->new;
 		});
@@ -59,7 +66,7 @@ sub startup {
 			my $c = shift;
 			return Bliptown::Model::DomainList->new(
 				sqlite => $c->sqlite,
-				file => $c->file,
+				ipc => $c->ipc,
 			);
 		});
 

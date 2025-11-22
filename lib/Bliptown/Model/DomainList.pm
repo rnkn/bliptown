@@ -2,16 +2,16 @@ package Bliptown::Model::DomainList;
 use Mojo::Base -base;
 
 has 'sqlite';
-has 'file';
+has 'ipc';
 
 sub update_domain_list {
 	my $self = shift;
 	my $coll = $self->sqlite->db->select('users', 'custom_domain')->arrays;
-	my @domains = @{$coll->flatten};
-	@domains = grep { defined $_ } @domains;
-	@domains = sort @domains;
-	$self->file->update_file(
-		{ command => 'update_domain_list', domains => \@domains }
+	my @all_domains = @{$coll->flatten};
+	@all_domains = grep { defined $_ } @all_domains;
+	@all_domains = sort @all_domains;
+	$self->ipc->send_message(
+		{ command => 'update_domain_list', all_domains => \@all_domains }
 	);
 }
 

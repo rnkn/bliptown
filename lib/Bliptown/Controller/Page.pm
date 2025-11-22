@@ -176,7 +176,7 @@ sub save_page {
 	my $file = path($root, $filename)->to_string;
 	my $content = $c->param('content');
 	$content =~ s/\r\n/\n/g;
-	$c->file->update_file(
+	$c->ipc->send_message(
 		{
 			command => 'update_file',
 			username => $username,

@@ -65,7 +65,7 @@ sub rename_file {
 	my $filename = $c->get_file($old_slug)->to_abs->to_string;
 	my $rename_to = $c->param('to');
 	my $new_filename = path($root, $rename_to)->to_abs->to_string;
-	$c->file->update_file(
+	$c->ipc->send_message(
 		{
 			command => 'rename_file',
 			username => $username,
@@ -82,7 +82,7 @@ sub delete_file {
 	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
 	my $filename = $c->get_file($slug)->to_abs->to_string;
-	$c->file->update_file(
+	$c->ipc->send_message(
 		{
 			command => 'delete_file',
 			username => $username,
@@ -111,7 +111,15 @@ sub upload_files {
 			$c->res->code(409);
 			return $c->redirect_to('list_files');
 		};
-		$_->move_to($path);
+		my $blob = $_->slurp;
+		$c->ipc->send_message(
+			{
+				command => 'write_blob',
+				username => $username,
+				filename => $path->to_abs->to_string,
+				blob => $blob,
+			}
+		);
 	}
 	return $c->redirect_to('list_files');
 }
