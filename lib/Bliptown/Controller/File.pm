@@ -126,17 +126,17 @@ sub upload_files {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $root = path($c->get_user_home, $username);
-	my @files;
 	foreach (@{$c->req->uploads}) {
-		my $file = $_->filename;
+		my $filename = $_->filename;
+		next unless $filename;
 		if ($_->size > 1024 * 1024 * 50) {
 			$c->flash(warning => "File too large");
 			$c->res->code(413);
 			return $c->redirect_to('list_files');
 		}
-		my $path = path($root, $file);
+		my $path = path($root, $filename);
 		if (-f $path) {
-			$c->flash(warning => "$file already exists!");
+			$c->flash(warning => "$filename already exists!");
 			$c->res->code(409);
 			return $c->redirect_to('list_files');
 		};
