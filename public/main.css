@@ -68,7 +68,7 @@ details summary:hover {
 }
 
 button {
-	width: 6em;
+	min-width: 6em;
 }
 
 iframe {
