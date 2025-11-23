@@ -18,11 +18,20 @@ sub format_human_size {
 
 sub list_files {
 	my $c = shift;
+	my $filter = $c->param('filter');
+	my $delete = $c->param('delete');
+	my $username = $c->session('username');
 	my $user = $c->user->read_user(
-		{ key => 'username', username => $c->session('username') }
+		{ key => 'username', username => $username }
 	);
 	my $root = path($c->get_user_home, $user->{username});
-	my $filter = $c->param('filter');
+
+	if ($filter && $delete) {
+		delete_files_regex(
+			$c, { username => $username, root => $root, filter => $filter });
+		return $c->redirect_to('list_files');
+	}
+
 	my $tree = $root->list_tree;
 
 	my @files;
@@ -75,6 +84,26 @@ sub rename_file {
 	);
 	$c->flash(info => "$old_slug renamed to $rename_to");
 	return $c->redirect_to('list_files');
+}
+
+sub delete_files_regex {
+	my ($c, $args) = @_;
+	my $username = $args->{username};
+	my $root =$args->{root};
+	my $filter = $args->{filter};
+	my @files = $root->list_tree->each;
+	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
+	my @filenames_abs = map { path($root, $_)->to_abs->to_string } @filenames;
+	foreach (@filenames_abs) {
+		$c->ipc->send_message(
+			{
+				command => 'delete_file',
+				username => $username,
+				filename => $_,
+			}
+		);
+	}
+	return 1;
 }
 
 sub delete_file {
