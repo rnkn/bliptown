@@ -1,24 +1,31 @@
 % layout 'default';
-<main id="edit" class="backstage">
-	<nav>
-		<a href="<%= url_for('list_files') %>" id="exit">Files</a>
-		% if (current_route eq 'new_page') {
-		<h1><%= $title %></h1>
-		<a href="https://commonmark.org/help/" target="_blank" id="help-q">?</a>
-		% } elsif (current_route eq 'edit_page') {
-		<h1><%= $title %>
+<div id="sidebar">
+	<header>
+		<h1>
+			% if (current_route eq 'new_page') {
+			<a href="https://commonmark.org/help/" target="_blank" id="help-q">?</a>
+			% } elsif (current_route eq 'edit_page') {
+			<%= $title %>
 			% if ($slug =~ /^_/) {
 			<%= $slug %>
 			% } else {
 			<a href="/<%= $slug %>"><%= $slug %></a>
 			% }
+			% }
+			% if ($ext eq 'md') {
+			<a href="https://commonmark.org/help/" target="_blank" class="help-q">?</a>
+			% }
 		</h1>
-		% if ($ext eq 'md') {
-		<a href="https://commonmark.org/help/" target="_blank" class="help-q">?</a>
-		% }
-		% }
+	</header>
+	<nav>
+		<ul>
+			<li><a href="/" class="exit">View Site</a>
+			<li><a href="<%= url_for('list_files') %>" class="exit">Files</a>
+		</ul>
 	</nav>
-	<div class="one-column">
+</div>
+<main id="edit">
+	<section class="one-column">
 		<form method="post" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">
 			<div id="filename">
 				<input type="text" name="slug" value="<%= $slug %>" required>
@@ -44,5 +51,5 @@
 			<button type="submit" name="action" value="save-exit">Save & Exit</button>
 			<a href="<%= param('back_to') || '/' %>">Cancel</a>
 		</form>
-	</div>
+	</section>		
 </main>
