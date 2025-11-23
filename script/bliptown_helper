@@ -41,7 +41,6 @@ sub provision_cert {
 	if ($pid == 0) {
 		exec('acme-client', $domain);
 	}
-	return 1;
 }
 
 sub update_domain_list {
@@ -75,7 +74,6 @@ EOF
 	if ($pid == 0) {
 		exec('rcctl', 'reload', 'relayd');
 	}
-	return 1;
 }
 
 sub get_uid_gid {
@@ -146,7 +144,6 @@ sub rename_file {
 	die "File not found: $safe_filename ($!)" unless -f $safe_filename;
 	my $safe_new_filename = safe_file($username, $new_filename);
 	rename($safe_filename, $safe_new_filename) || die "Cannot rename file: $filename ($!)";
-	return 1;
 }
 
 sub delete_file {
@@ -156,7 +153,6 @@ sub delete_file {
 	my $safe_file = safe_file($username, $filename);
 	unlink $safe_file if -f $safe_file ||
 		die "Cannot delete file: $filename ($!)";
-	return 1;
 }
 
 my %allowed_commands = (
