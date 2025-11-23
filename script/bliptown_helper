@@ -67,8 +67,13 @@ EOF
 		}
 		close $fh or die "Cannot close acme-client file: $acme_file ($!)";
 	} else { die "Cannot open acme-client file: $acme_file ($!)" }
-
-	system('rcctl', 'reload', 'relayd');
+	
+	my $pid = fork();
+	if ($pid == 0) {
+		exec('rcctl', 'reload', 'relayd');
+		exit 0;
+	}
+	return 1;
 }
 
 sub get_uid_gid {
