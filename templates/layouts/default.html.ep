@@ -98,6 +98,8 @@
 			% } elsif (flash('info')) {
 			%= $message->('info')
 			% }
+			<input type="checkbox" id="menu-toggle" hidden>
+			<label id="menu-toggle" class="button" for="menu-toggle"></label>
 			%= content
 		</div>
 	</body>
