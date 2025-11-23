@@ -60,7 +60,7 @@
 				<form action="<%= url_for('user_login') %>" method="POST">
 					<div>
 						<label for="login-username">Username</label>
-						<input type="text" id="login-username" name="username" required>
+						<input type="text" id="login-username" name="username" value="<%= $username %>" required>
 					</div>
 					<div>
 						<label for="login-password">Password</label>

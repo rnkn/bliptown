@@ -150,6 +150,7 @@ sub startup {
 	$app->defaults(
 		bliptown_domain => $bliptown_domain,
 		home => '/',
+		username => '',
 		stage => 'backstage',
 		show_join => 0,
 		head => '',
