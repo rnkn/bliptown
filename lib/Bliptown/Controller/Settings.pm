@@ -38,15 +38,4 @@ sub save_settings {
 	return $c->redirect_to($c->url_for('render_page'));
 }
 
-sub update_domain_list {
-	my $c = shift;
-	my $domains_col = $c->sqlite->db->select('users', 'custom_domain')->arrays;
-	my @domains = @{$domains_col->flatten};
-	@domains = grep { defined $_ } @domains;
-	@domains = sort @domains;
-	$c->file->update_file(
-		{ command => 'update_domain_list', domains => \@domains }
-	);
-}
-
 return 1;
