@@ -36,7 +36,6 @@ sub provision_cert {
 	my $pid = fork();
 	if ($pid == 0) {
 		exec('acme-client', $domain);
-		exit 0;
 	}
 	return 1;
 }
@@ -71,7 +70,6 @@ EOF
 	my $pid = fork();
 	if ($pid == 0) {
 		exec('rcctl', 'reload', 'relayd');
-		exit 0;
 	}
 	return 1;
 }
