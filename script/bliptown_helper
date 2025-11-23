@@ -93,6 +93,29 @@ sub safe_file {
 	return $filename_abs;
 }
 
+sub delete_empty_dirs {
+	my $dir = shift;
+	find(sub { return unless -d $_; rmdir $_}, $dir);
+}
+
+sub write_blob {
+	my $payload = shift;
+	my $username = $payload->{username};
+	my $filename = $payload->{filename};
+	my $blob = $payload->{blob};
+	my $safe_filename = safe_file($username, $filename);
+	open my $fh, '>', $safe_filename || die "Cannot write file: $filename ($!)";
+	binmode $fh;
+	print $fh $blob;
+	close $fh;
+	my ($uid, $gid) = get_uid_gid($username);
+	chown($uid, $gid, $safe_filename) ||
+		die "Cannot set ownership: $filename ($!)";
+	chmod(0644, $safe_filename) ||
+		die "Cannot set permissions: $filename ($!)";
+	return 1;
+}
+
 sub update_file {
 	my $payload = shift;
 	my $username = $payload->{username};
@@ -110,6 +133,7 @@ sub update_file {
 		die "Cannot set ownership: $filename ($!)";
 	chmod(0644, $safe_filename) ||
 		die "Cannot set permissions: $filename ($!)";
+	return 1;
 }
 
 sub rename_file {
@@ -121,6 +145,7 @@ sub rename_file {
 	die "File not found: $safe_filename ($!)" unless -f $safe_filename;
 	my $safe_new_filename = safe_file($username, $new_filename);
 	rename($safe_filename, $safe_new_filename) || die "Cannot rename file: $filename ($!)";
+	return 1;
 }
 
 sub delete_file {
@@ -130,12 +155,15 @@ sub delete_file {
 	my $safe_file = safe_file($username, $filename);
 	unlink $safe_file if -f $safe_file ||
 		die "Cannot delete file: $filename ($!)";
+	return 1;
 }
 
 my %allowed_commands = (
+	write_blob  => \&write_blob,
 	update_file => \&update_file,
 	rename_file => \&rename_file,
 	delete_file => \&delete_file,
+	provision_cert => \&provision_cert,
 	update_domain_list => \&update_domain_list,
 );
 
