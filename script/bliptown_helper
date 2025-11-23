@@ -9,6 +9,8 @@ use lib "$Bin/../local/lib/perl5";
 use File::Find;
 use Data::MessagePack::Stream;
 
+$SIG{CHLD} = 'IGNORE';
+
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
 die "BLIPTOWN_KEYPAIR_FILE not defined "unless $ENV{BLIPTOWN_KEYPAIR_FILE};
