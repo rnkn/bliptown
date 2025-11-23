@@ -1,8 +1,9 @@
 :root {
 	--main-bg-color: rgba(255,255,255,1.0);
 	--code-bg-color: rgba(235,235,235,1.0);
-	--row-hover-color: rgba(220,220,220,0.5);
+	--controls-color: rgba(220,220,220,0.5);
 	--warning-color: rgba(200,0,0,1.0);
+	--warning-bg-color: rgba(200,0,0,0.2);
 	--info-message-color: white;
 	--warning-message-color: rgba(255,200,200,1.0);
 	--drawer-height: 3.5rem;
@@ -439,7 +440,7 @@ fieldset {
 }
 
 #files details:hover, #files details[open] {
-	background-color: var(--row-hover-color);
+	background-color: var(--controls-color);
 }
 
 #files details ul {
@@ -470,7 +471,7 @@ fieldset {
 }
 
 #settings details#delete-account[open] {
-	background-color: rgba(200,0,0,0.2);
+	background-color: var(--warning-bg-color);
 }
 
 .left {
