@@ -3,7 +3,7 @@
 	<header>
 		<h1>
 			% if (current_route eq 'new_page') {
-			<a href="https://commonmark.org/help/" target="_blank" id="help-q">?</a>
+			<%= $title %>
 			% } elsif (current_route eq 'edit_page') {
 			<%= $title %>
 			% if ($slug =~ /^_/) {
