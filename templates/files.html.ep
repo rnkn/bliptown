@@ -1,23 +1,43 @@
 % layout 'default';
-<main id="files" class="backstage">
-	<nav>
-		<a href="/" id="exit">View Site</a>
+<div id="sidebar">
+	<header>
 		<h1><%= $title %></h1>
-	</nav>
-	<div class="one-column">
+	</header>
+	<nav>
 		<div id="controls">
-			<form id="filter" method="get" action="<%= url_for('list_files') %>">
-				<input type="text" name="filter" placeholder="regexp" value="<%= param('filter') %>">
-				<button type="submit">Filter</button>
+			<form id="filter" method="get" action="<%= url_for('list_files') %>"></form>
+			<form id="upload" method="post" action="<%= url_for('upload_files') %>" enctype="multipart/form-data"></form>
+			<input type="text" name="filter" form="filter" placeholder="regexp" value="<%= param('filter') %>">
+			% my $filtered = 'checked' if param('filter') && param('filter') gt 0;
+			<input type="checkbox" id="additional-controls-toggle" hidden <%= $filtered %>>
+			<fieldset id="filter-controls">
+				<button type="submit" form="filter">Filter</button>
 				% if (param('filter')) {
 				<a href="<%= url_for('list_files') %>">Reset</a>
 				% }
-			</form>
-			<form id="upload" method="post" action="<%= url_for('upload_files') %>" enctype="multipart/form-data">
-				<input type="file" accept="text/*,image/*,application/pdf" id="file-uploads" name="file-uploads" multiple>
-				<button type="submit">Upload</button>
-			</form>
+				<label id="additional-controls-toggle" class="button" for="additional-controls-toggle">+ more</label>
+			</fieldset>
+			<div id="additional-controls">
+				<fieldset>
+					<input type="text" form="filter" name="rename" placeholder="string">
+					<button type="submit" form="filter" name="rename">Replace Match in Filenames</button>
+				</fieldset>
+				<fieldset>				
+					<button type="submit" form="filter" name="delete" value="true">Delete Matching Files</button>
+				</fieldset>
+				<fieldset>
+					<input type="file" form="upload" accept="text/*,image/*,application/pdf" id="file-uploads" name="file-uploads" multiple>
+					<button type="submit" form="upload" class="button-wide">Upload</button>
+				</fieldset>
+			</div>
 		</div>
+		<ul>
+			<li><a href="/" class="exit">View Site</a>
+		</ul>
+	</nav>
+</div>
+<main id="files">
+	<section class="one-column">
 		<div id="list">
 			% foreach (@$files) {
 			<details name="files">
@@ -53,5 +73,5 @@
 			</details>
 			% }
 		</div>
-	</div>
+	</section>
 </main>
