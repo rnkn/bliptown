@@ -1,9 +1,15 @@
 % layout 'default';
-<main id="settings" class="backstage">
-	<nav>
-		<a href="/" id="exit">View Site</a>
+<div id="sidebar">
+	<header>
 		<h1><%= $title %></h1>
+	</header>
+	<nav>
+		<ul>
+			<li><a href="/" class="exit">View Site</a>
+		</ul>
 	</nav>
+</div>
+<main id="settings">
 	<div class="one-column">
 		<form action="<%= url_for('settings') %>" method="post">
 			<ul>
