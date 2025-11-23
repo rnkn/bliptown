@@ -6,6 +6,7 @@ use Cwd qw(abs_path);
 use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
+use File::Find;
 use Data::MessagePack::Stream;
 
 die "$0 must be run as root" unless $> == 0;
@@ -27,6 +28,18 @@ chown(0, $gid, $sock_path) || die "Cannot chown: $sock_path ($!)";
 chmod(0660, $sock_path) || die "Cannot chmod: $sock_path ($!)";
 
 print "Socket created: $sock_path\n";
+
+sub provision_cert {
+	my $payload = shift;
+	my $domain = $payload->{domain};
+	return unless $domain;
+	my $pid = fork();
+	if ($pid == 0) {
+		exec('acme-client', $domain);
+		exit 0;
+	}
+	return 1;
+}
 
 sub update_domain_list {
 	my $payload = shift;
