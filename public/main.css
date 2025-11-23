@@ -380,23 +380,44 @@ input#message-close:checked ~ label#message-close {
 	margin: 1em 0;
 }
 
-.backstage nav {
+fieldset {
+	border: none;
+	margin: 4px 0;
+}
+
+.backstage nav #filter-controls {
 	display: flex;
-	gap: 1em;
-	margin-bottom: 1em;
-	align-items: baseline;
+	gap: 8px;
 }
 
-.backstage nav * {
-	margin: 0;
-	padding: 0;
+.backstage nav #controls #filter-controls label#additional-controls-toggle {
+	margin-left: auto;
 }
 
-.backstage nav a#exit {
+.backstage nav #controls #additional-controls {
+	display: none;
+	background-color: var(--controls-color);
+	margin: 8px 0;
+	padding: 8px;
+}
+
+.backstage nav input#additional-controls-toggle:checked ~ #additional-controls {
+	display: block;
+}
+
+.backstage nav #controls input {
+	width: 100%;
+}
+
+.backstage nav #additional-controls button {
+	width: 100%;
+}
+
+.backstage nav a.exit {
 	font-size: 0.9em;
 }
 
-.backstage nav a#exit:before {
+.backstage nav a.exit:before {
 	content: "← ";
 }
 
