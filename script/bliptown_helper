@@ -6,6 +6,8 @@ use Cwd qw(abs_path);
 use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
+use File::Basename qw(dirname);
+use File::Temp qw(tempfile);
 use File::Find;
 use Data::MessagePack::Stream;
 
@@ -104,17 +106,15 @@ sub write_blob {
 	my $username = $payload->{username};
 	my $filename = $payload->{filename};
 	my $blob = $payload->{blob};
+	my ($uid, $gid) = get_uid_gid($username);
 	my $safe_filename = safe_file($username, $filename);
-	open my $fh, '>', $safe_filename || die "Cannot write file: $filename ($!)";
+	my $dir = dirname($safe_filename);
+	my ($fh, $tmp) = tempfile(DIR => $dir) or die "Cannot create tempfile ($!)";
 	binmode $fh;
 	print $fh $blob;
-	close $fh;
-	my ($uid, $gid) = get_uid_gid($username);
-	chown($uid, $gid, $safe_filename) ||
-		die "Cannot set ownership: $filename ($!)";
-	chmod(0644, $safe_filename) ||
-		die "Cannot set permissions: $filename ($!)";
-	return 1;
+	chown($uid, $gid, $tmp) or die "Cannot set ownership: $tmp ($!)";
+	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
+	rename $tmp, $safe_filename or die "Cannot write file: $safe_filename ($!)";
 }
 
 sub update_file {
