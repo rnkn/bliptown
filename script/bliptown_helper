@@ -120,19 +120,14 @@ sub update_file {
 	my $username = $payload->{username};
 	my $filename = $payload->{filename};
 	my $content = $payload->{content};
-	my $safe_filename = safe_file($username, $filename);
-	if (open(my $fh, '>', $safe_filename)) {
-		print $fh $content;
-		close $fh;
-	} else {
-		die "Cannot open file: $filename ($!)";
-	}
 	my ($uid, $gid) = get_uid_gid($username);
-	chown($uid, $gid, $safe_filename) ||
-		die "Cannot set ownership: $filename ($!)";
-	chmod(0644, $safe_filename) ||
-		die "Cannot set permissions: $filename ($!)";
-	return 1;
+	my $safe_filename = safe_file($username, $filename);
+	my $dir = dirname($safe_filename);
+	my ($fh, $tmp) = tempfile(DIR => $dir) or die "Cannot create tempfile ($!)";
+	print $fh $content;
+	chown($uid, $gid, $tmp) or die "Cannot set ownership: $tmp ($!)";
+	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
+	rename $tmp, $safe_filename or die "Cannot write file: $safe_filename ($!)";
 }
 
 sub rename_file {
@@ -143,7 +138,7 @@ sub rename_file {
 	my $safe_filename = safe_file($username, $filename);
 	die "File not found: $safe_filename ($!)" unless -f $safe_filename;
 	my $safe_new_filename = safe_file($username, $new_filename);
-	rename($safe_filename, $safe_new_filename) || die "Cannot rename file: $filename ($!)";
+	rename($safe_filename, $safe_new_filename) or die "Cannot rename file: $filename ($!)";
 }
 
 sub delete_file {
