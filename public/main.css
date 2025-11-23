@@ -338,7 +338,7 @@ input#message-close:checked ~ label#message-close {
 	width: 8em;
 }
 
-textarea, input {
+#edit textarea {
 	font-size: 0.9em;
 	font-family: monospace;
 }
