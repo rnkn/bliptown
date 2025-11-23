@@ -45,7 +45,7 @@ sub provision_cert {
 
 sub update_domain_list {
 	my $payload = shift;
-	my $all_domains = $payload->{domains};
+	my $all_domains = $payload->{all_domains};
 	my $keypair_file = $ENV{BLIPTOWN_KEYPAIR_FILE};
 	my $acme_file = $ENV{BLIPTOWN_ACME_FILE};
 
