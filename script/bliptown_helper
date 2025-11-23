@@ -27,9 +27,9 @@ my $server = IO::Socket::UNIX->new(
 	Listen => 5,
 ) or die "Cannot create socket: $sock_path ($!)";
 
-my $gid = getgrnam('_bliptown') || die "Cannot get gid: _bliptown ($!)";
-chown(0, $gid, $sock_path) || die "Cannot chown: $sock_path ($!)";
-chmod(0660, $sock_path) || die "Cannot chmod: $sock_path ($!)";
+my $gid = getgrnam('_bliptown') or die "Cannot get gid: _bliptown ($!)";
+chown(0, $gid, $sock_path) or die "Cannot chown: $sock_path ($!)";
+chmod(0660, $sock_path) or die "Cannot chmod: $sock_path ($!)";
 
 print "Socket created: $sock_path\n";
 
@@ -88,7 +88,7 @@ sub safe_file {
 	my ($username, $filename) = @_;
 	die "Invalid username: $username" unless $username =~ /^[a-zA-Z0-9-_]+$/;
 	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $username;
-	my $filename_abs = abs_path($filename) || die "Cannot get file: $filename ($!)";
+	my $filename_abs = abs_path($filename) or die "Cannot get file: $filename ($!)";
 	die "File outside of sandbox: $filename_abs ($!)"
 		unless $filename_abs =~ /^\Q$sandbox\/\E/;
 	return $filename_abs;
@@ -112,7 +112,7 @@ sub write_blob {
 	print $fh $blob;
 	chown($uid, $gid, $tmp) or die "Cannot set ownership: $tmp ($!)";
 	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
-	rename $tmp, $safe_filename or die "Cannot write file: $safe_filename ($!)";
+	rename $tmp, $safe_filename or die "Cannot write file: $filename ($!)";
 }
 
 sub update_file {
@@ -127,7 +127,7 @@ sub update_file {
 	print $fh $content;
 	chown($uid, $gid, $tmp) or die "Cannot set ownership: $tmp ($!)";
 	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
-	rename $tmp, $safe_filename or die "Cannot write file: $safe_filename ($!)";
+	rename $tmp, $safe_filename or die "Cannot write file: $filename ($!)";
 }
 
 sub rename_file {
@@ -145,9 +145,8 @@ sub delete_file {
 	my $payload = shift;
 	my $username = $payload->{username};
 	my $filename = $payload->{filename};
-	my $safe_file = safe_file($username, $filename);
-	unlink $safe_file if -f $safe_file ||
-		die "Cannot delete file: $filename ($!)";
+	my $safe_filename = safe_file($username, $filename);
+	unlink $safe_filename or die "Cannot delete file: $filename ($!)";
 }
 
 my %allowed_commands = (
