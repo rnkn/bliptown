@@ -41,7 +41,7 @@ check file doas.conf path /etc/doas.conf
 	if failed uid 0 then alert
 	if failed gid 0 then alert
 	if failed perm 0600 then alert
-	if failed md5 checksum expect cab8df0c860ce5696aeb4c9dac59ac7f then alert
+	if failed md5 checksum expect 9fb5cd8d843263a28d3723321a479d80 then alert
 
 check file master.passwd path /etc/master.passwd
 	if failed uid 0 then alert
