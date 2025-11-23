@@ -90,7 +90,7 @@ sub safe_file {
 	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $username;
 	my $filename_abs = abs_path($filename) || die "Cannot get file: $filename ($!)";
 	die "File outside of sandbox: $filename_abs ($!)"
-		unless $filename_abs =~ /^\Q$sandbox\E/;
+		unless $filename_abs =~ /^\Q$sandbox\/\E/;
 	return $filename_abs;
 }
 
