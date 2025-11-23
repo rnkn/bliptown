@@ -78,8 +78,9 @@ EOF
 
 sub get_uid_gid {
 	my $username = shift;
-	my $uid = getpwnam($username) || die "Cannot get uid: $username ($!)";
-	my $gid = getgrnam($username) || die "Cannot get gid: $username ($!)";
+	my @pw = getpwnam($username) or die "Cannot find user: $username";
+	my $uid = $pw[2];
+	my $gid = $pw[3];
 	return ($uid, $gid);
 }
 
