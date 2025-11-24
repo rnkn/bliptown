@@ -127,11 +127,27 @@ sub new_page {
 	my $c = shift;
 	my $slug = $c->param('catchall');
 	my $ext = '';
-	$slug =~ s/\/$//;
-	$ext = $1 if $slug =~ /\.(.+)$/;
-	$slug = $1 if $slug =~ /(.+)(\..+)$/;
+	if ($slug =~ /(.+)(\..+)$/) {
+		 $slug = $1;
+		 $ext = $2;
+	};
 	if ($ext) {
 		return $c->reply->not_found unless grep { $ext eq $_} @allowed_exts;
+	}
+	my $file;
+	if (!$slug || $slug =~ /\/$/) {
+		unless ($c->get_file("$slug/index")) {
+			$slug =~ s/\/$//;
+			if ($c->get_file($slug)) {
+				$c->redirect_to('edit_page', catchall => $slug);
+			}
+		};
+	} else {
+		unless ($c->get_file($slug)) {
+			if ($c->get_file("$slug/index")) {
+				$c->redirect_to('edit_page', catchall => "$slug/");
+			}
+		}
 	}
 	$c->stash(
 		template => 'edit',
