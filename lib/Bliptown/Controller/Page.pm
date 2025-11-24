@@ -56,11 +56,6 @@ sub render_page {
 		}
 	}
 
-	my $url = $c->req->url->to_string;
-	if ($file =~ /index\.md$/ && $url !~ /\/$/) {
-		return $c->redirect_to($url . '/');
-	}
-
 	my $page = $c->page->read_page(
 		{
 			root => $root,
