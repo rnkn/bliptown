@@ -131,8 +131,8 @@ sub startup {
 		get_file => sub {
 			my ($c, $slug) = @_;
 			my $root = path($c->get_user_home, $c->get_req_user)->to_abs;
-			my $file_path = path($root, $slug)->to_abs;
-			return $file_path if -f $file_path;
+			my $file = path($root, $slug)->to_abs;
+			return $file if -f $file;
 			$slug = $1 if $slug =~ /(.+)(\..+)$/;
 			my @exts = qw(html css js txt md);
 			foreach (@exts) {
