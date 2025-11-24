@@ -39,7 +39,21 @@ sub render_page {
 
 	$slug = url_unescape($slug);
 
-	my $file = $c->get_file($slug);
+	my $file;
+	if (!$slug || $slug =~ /\/$/) {
+		unless ($file = $c->get_file("$slug/index")) {
+			if ($file = $c->get_file($slug)) {
+				$c->redirect_to('render_page', catchall => $slug);
+			}
+		};
+	} else {
+		unless ($file = $c->get_file($slug)) {
+			if ($file = $c->get_file("$slug/index")) {
+				$c->redirect_to('render_page', catchall => "$slug/");
+			}
+		}
+	}
+
 	if (!$file) {
 		if ($user_cur) {
 			return $c->redirect_to('new_page');
@@ -131,13 +145,26 @@ sub new_page {
 
 sub edit_page {
 	my $c = shift;
+	my $slug = $c->param('catchall');
+	my $redirect = $c->param('back_to');
 	my $partial_re = qr/\{\{ *> *(.*?) *\}\}/;
 	my $root = path($c->get_user_home, $c->get_req_user);
-	my $slug = $c->param('catchall');
-	$slug =~ s/\/$//;
-	my $redirect = $c->param('back_to');
-	my $file = $c->get_file($slug) ||
-		return $c->redirect_to('new_page', catchall => $slug);
+	my $file;
+	if (!$slug || $slug =~ /\/$/) {
+		unless ($file = $c->get_file("$slug/index")) {
+			$slug =~ s/\/$//;
+			if ($file = $c->get_file($slug)) {
+				$c->redirect_to('edit_page', catchall => $slug);
+			}
+		};
+	} else {
+		unless ($file = $c->get_file($slug)) {
+			if ($file = $c->get_file("$slug/index")) {
+				$c->redirect_to('edit_page', catchall => "$slug/");
+			}
+		}
+	}
+	return $c->redirect_to('new_page', catchall => $slug) unless $file;
 	my $ext = $c->param('ext') || $file->extname || 'md';
 	return $c->reply->not_found unless grep { $ext eq $_} @allowed_exts;
 	my $rel_file = $file->to_rel($root); $rel_file =~ s/\.[^.]+?$//;
