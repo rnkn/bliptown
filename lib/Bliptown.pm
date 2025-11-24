@@ -191,6 +191,29 @@ sub startup {
 		}
 	);
 
+	$protected->get('/mysite' => sub {
+		my $c = shift;
+		my $username = $c->session('username');
+		my $url = Mojo::URL->new;
+		if ($c->app->mode eq 'production') {
+			$url->scheme('https');
+		} else {
+			$url->scheme('http');
+			$url->port(3000);
+		}
+		my $user = $c->user->read_user(
+			{ key => 'username', username => $username }
+		);
+		my $custom_domain = $user->{custom_domain};
+		if ($custom_domain) {
+			$url->host($custom_domain);
+		} elsif ($username) {
+			$url->host("$username.$bliptown_domain");
+		} else {
+			$url->host("$bliptown_domain");
+		}
+		$c->redirect_to($url)})->name('my_site');
+
 	$protected->get('/new/*catchall')->to(controller => 'Page', action => 'new_page', catchall => '')->name('new_page');
 	$protected->get('/edit/*catchall')->to(controller => 'Page', action => 'edit_page', catchall => '')->name('edit_page');
 	$protected->post('/edit/*catchall')->to(controller => 'Page', action => 'save_page', catchall => '')->name('save_page');

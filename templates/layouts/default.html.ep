@@ -27,7 +27,7 @@
 				<div class="button"><a href="/style">Style</a></div>
 				<div class="button"><a href="<%= url_for('list_settings') %>">Settings</a></div>
 				% } else {
-				<div class="button"><a href="<%= $home %>" id="my-site">My Site</a></div>
+				<div class="button"><a href="<%= url_for('my_site') %>" id="my-site">My Site</a></div>
 				% }
 				<div class="button"><a href="https://blip.town/faq">Help</a></div>
 				<div class="button"><a href="<%= url_for('user_logout') %>">Log Out</a></div>
