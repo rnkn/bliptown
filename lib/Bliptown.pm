@@ -133,16 +133,12 @@ sub startup {
 			my $root = path($c->get_user_home, $c->get_req_user)->to_abs;
 			my $file_path = path($root, $slug)->to_abs;
 			return $file_path if -f $file_path;
-			$slug =~ s/\/$//;
 			$slug = $1 if $slug =~ /(.+)(\..+)$/;
-			
 			my @exts = qw(html css js txt md);
 			foreach (@exts) {
 				my $f = path($root, "$slug.$_")->to_abs;
 				return $f if -f $f;
 			}
-			my $index_path = path("$file_path/index.md")->to_abs;
-			return $index_path if -f $index_path;
 			return;
 		}
 	);
