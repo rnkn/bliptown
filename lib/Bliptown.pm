@@ -93,10 +93,11 @@ sub startup {
 		get_req_user => sub {
 			my $c = shift;
 			my $host = $c->req->headers->header('Host') || '';
-			$host =~ s/:.*//; $host =~ s/^www\.(.+)/$1/;
+			$host =~ s/:.*//;
+			$host =~ s/^www\.(.+)/$1/;
 			if ($host =~ /$bliptown_domain$/) {
-				my @host_a = split(/\./, $host);
-				my $username = @host_a >= 3 ? $host_a[-3] : 'mayor';
+				my @host_array = split(/\./, $host);
+				my $username = @host_array >= 3 ? $host_array[-3] : 'mayor';
 				return $username if $username;
 			}
 			my $user = $c->user->read_user(
