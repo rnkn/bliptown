@@ -181,12 +181,13 @@ sub startup {
 	my $protected = $r->under(
 		'/' => sub {
 			my $c = shift;
-			my $user = $c->session('username');
-			if ($user && $user eq $c->get_req_user) {
+			my $username = $c->session('username');
+			if ($username && $username eq $c->get_req_user) {
 				return 1;
 			} else {
 				$c->flash(info => 'Login required');
-				return $c->redirect_to('/');
+				$c->redirect_to('/');
+				return;
 			}
 		}
 	);
