@@ -20,14 +20,14 @@
 			<div id="additional-controls">
 				<fieldset>
 					<input type="text" form="filter" name="rename" placeholder="string">
-					<button type="submit" form="filter" name="rename">Replace Match in Filenames</button>
+					<button type="submit" form="filter">Replace Match in Filenames</button>
 				</fieldset>
 				<fieldset>				
 					<button type="submit" form="filter" name="delete" value="true">Delete Matching Files</button>
 				</fieldset>
 				<fieldset>
 					<input type="file" form="upload" accept="text/*,image/*,application/pdf" id="file-uploads" name="file-uploads" multiple>
-					<button type="submit" form="upload" class="button-wide">Upload</button>
+					<button type="submit" form="upload">Upload</button>
 				</fieldset>
 			</div>
 		</div>
