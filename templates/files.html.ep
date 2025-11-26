@@ -23,7 +23,7 @@
 					<button type="submit" form="filter">Replace Match in Filenames</button>
 				</fieldset>
 				<fieldset>				
-					<button type="submit" form="filter" name="delete" value="true">Delete Matching Files</button>
+					<button type="submit" form="filter" name="delete" value="1">Delete Matching Files</button>
 				</fieldset>
 				<fieldset>
 					<input type="file" form="upload" accept="text/*,image/*,application/pdf" id="file-uploads" name="file-uploads" multiple>
