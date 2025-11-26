@@ -173,23 +173,14 @@ sub startup {
 	$r->get('/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
 	$r->post('/totp')->to(controller => 'TOTP', action => 'totp_check')->name('totp_check');
 
-	my $protected = $r->under(
-		'/' => sub {
-			my $c = shift;
-			my $username = $c->session('username');
-			if ($username && $username eq $c->get_req_user) {
-				return 1;
-			} else {
-				$c->flash(info => 'Login required');
-				$c->redirect_to('/');
-				return;
-			}
-		}
-	);
-
-	$protected->get('/mysite' => sub {
+	$r->get('/mysite' => sub {
 		my $c = shift;
 		my $username = $c->session('username');
+		unless ($username) {
+			$c->flash(info => 'Login required');
+			$c->redirect_to('/');
+			return;
+		}
 		my $url = Mojo::URL->new;
 		if ($c->app->mode eq 'production') {
 			$url->scheme('https');
@@ -208,7 +199,22 @@ sub startup {
 		} else {
 			$url->host("$bliptown_domain");
 		}
-		$c->redirect_to($url)})->name('my_site');
+		$c->redirect_to($url)}
+	)->name('my_site');
+
+	my $protected = $r->under(
+		'/' => sub {
+			my $c = shift;
+			my $username = $c->session('username');
+			if ($username && $username eq $c->get_req_user) {
+				return 1;
+			} else {
+				$c->flash(info => 'Login required');
+				$c->redirect_to('/');
+				return;
+			}
+		}
+	);
 
 	$protected->get('/new/*catchall')->to(controller => 'Page', action => 'new_page', catchall => '')->name('new_page');
 	$protected->get('/edit/*catchall')->to(controller => 'Page', action => 'edit_page', catchall => '')->name('edit_page');
