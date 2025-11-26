@@ -4,9 +4,9 @@
 	<p>
 		Bliptown uses mandatory
 		<a href="https://en.wikipedia.org/wiki/Multi-factor_authentication">two-factor
-		authentication</a> in the form of a
+		authentication</a> in the form of
 		<a href="https://en.wikipedia.org/wiki/Time-based_one-time_password">time-based
-		one-time password</a>. A secret verification key is stored on
+		one-time passwords</a>. A secret verification key is stored on
 		your device and used to generate a six-digit code required in
 		addition to your regular password to log into the site.
 	</p>
