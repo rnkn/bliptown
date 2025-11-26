@@ -13,8 +13,7 @@ sub create_totp {
 
 sub read_totp {
 	my ($self, $args) = @_;
-	my $user = $args->{user};
-	my $secret = decode_base32 $user->{totp_secret};
+	my $secret = decode_base32 $args->{totp_secret};
 	my $oath = Authen::OATH->new;
 	return $oath->totp($secret);
 }
