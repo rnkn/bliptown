@@ -2,6 +2,7 @@ package Bliptown::Model::TOTP;
 use Mojo::Base -base;
 use Authen::OATH;
 use MIME::Base32;
+use Mojo::Util qw(secure_compare);
 
 sub create_totp {
 	my $self = shift;
@@ -16,6 +17,14 @@ sub read_totp {
 	my $secret = decode_base32 $args->{totp_secret};
 	my $oath = Authen::OATH->new;
 	return $oath->totp($secret);
+}
+
+sub check_totp {
+	my ($self, $args) = @_;
+	unless (secure_compare $args->{totp}, $args->{totp_check}) {
+		return;
+    }
+	return 1;
 }
 
 return 1;
