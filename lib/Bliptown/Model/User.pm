@@ -35,9 +35,10 @@ sub read_user {
 
 sub update_user {
 	my ($self, $args) = @_;
+	my $username = $args->{username};
 	my %values;
 	my @keys_null = qw(custom_domain);
-	my @keys_not_null = qw(email);
+	my @keys_not_null = qw(email totp_secret);
 	my @keys_int = qw(create_backups sort_new);
 	foreach my $key (keys %$args) {
 		if (grep { $key eq $_ } @keys_null) {
@@ -58,13 +59,13 @@ sub update_user {
 		my $password_hash = bcrypt($new_password, '2b', 12, $ENV{BLIPTOWN_SALT});
 		$values{password_hash} = $password_hash;
 	};
-    my $success = $self->sqlite->db->update(
-		'users', \%values, { username => $args->{username} }
+    my $ok = $self->sqlite->db->update(
+		'users', \%values, { username => $username }
 	);
 	if ($values{custom_domain} && $values{custom_domain} ne 'NULL') {
 		$self->domain_list->update_domain_list;
 	}
-	unless ($success) { warn };
+	warn unless $ok;
 	return 1;
 }
 
