@@ -1,0 +1,4 @@
+% layout 'default';
+<main>
+	<p><%= $content %></p>
+</main>
