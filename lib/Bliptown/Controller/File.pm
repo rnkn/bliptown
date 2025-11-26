@@ -20,6 +20,7 @@ sub list_files {
 	my $c = shift;
 	my $filter = $c->param('filter');
 	my $delete = $c->param('delete');
+	my $rename = $c->param('rename');
 	my $username = $c->session('username');
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
@@ -27,8 +28,25 @@ sub list_files {
 	my $root = path($c->get_user_home, $user->{username});
 
 	if ($filter && $delete) {
-		delete_files_regex(
-			$c, { username => $username, root => $root, filter => $filter });
+		my $res = delete_files_regex(
+			$c, {
+				username => $username,
+				root => $root,
+				filter => $filter
+			});
+		my $message = $res > 1 ? "$res files deleted" : "$res file deleted";
+		$c->flash(info => $message);
+		return $c->redirect_to('list_files');
+	}
+
+	if ($filter && $rename) {
+		rename_files_regex(
+			$c, {
+				username => $username,
+				root => $root,
+				filter => $filter,
+				rename => $rename
+			});
 		return $c->redirect_to('list_files');
 	}
 
@@ -64,6 +82,31 @@ sub list_files {
 		files => \@files,
 	);
 	return $c->render;
+}
+
+sub rename_files_regex {
+	my ($c, $args) = @_;
+	my $username = $args->{username};
+	my $root =$args->{root};
+	my $filter = $args->{filter};
+	my $rename = $args->{rename};
+	my @files = $root->list_tree->each;
+	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
+	my @filenames_abs = map { path($root, $_)->to_abs->to_string } @filenames;
+	foreach (@filenames_abs) {
+		# FIXME: regex needs to apply to relative filenames
+		my $new_filename = $_;
+		$new_filename =~ s/$filter/$rename/g;
+		$c->ipc->send_message(
+			{
+				command => 'rename_file',
+				username => $username,
+				filename => $_,
+				new_filename => $new_filename,
+			}
+		);
+	}
+	return @filenames_abs;
 }
 
 sub rename_file {
@@ -103,7 +146,7 @@ sub delete_files_regex {
 			}
 		);
 	}
-	return 1;
+	return @filenames_abs;
 }
 
 sub delete_file {
