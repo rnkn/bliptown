@@ -33,7 +33,7 @@
 					<a href="<%= url_for('edit_page', catchall => '_pubkeys' )->query([ext => 'txt', back_to => url_for])%>">SSH public keys</a>
 				</li>
 				<li class="row">
-					<a href="/totp">Reset 2FA</a>
+					<a href="<%= url_for('totp_initiate')->query(back_to => url_for)%>">Reset 2FA</a>
 				</li>
 				<hr>
 				<li class="row">

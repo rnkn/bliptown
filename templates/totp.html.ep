@@ -30,6 +30,6 @@
 		<input type="hidden" name="secret" value="<%= $secret %>">
 		<input type="text" placeholder="123456" pattern="[0-9]*" id="totp-check" name="totp" maxlength="6" required>
 		<button type="submit">Submit</button>
-		<a href="#">Cancel</a>
+		<a href="<%= param('back_to') || '/' %>">Cancel</a>
 	</form>
 </main>
