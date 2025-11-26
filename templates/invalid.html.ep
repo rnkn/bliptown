@@ -1,4 +1,0 @@
-% layout 'default';
-<main>
-	<p>403 Invalid or Expired Token</p>
-</main>
