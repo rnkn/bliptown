@@ -95,7 +95,7 @@ sub startup {
 			my $host = $c->req->headers->header('Host') || '';
 			$host =~ s/:.*//;
 			$host =~ s/^www\.(.+)/$1/;
-			if ($host =~ /$bliptown_domain$/) {
+			if ($host =~ /\Q$bliptown_domain\E$/) {
 				my @host_array = split(/\./, $host);
 				my $username = @host_array >= 3 ? $host_array[-3] : 'mayor';
 				return $username if $username;
