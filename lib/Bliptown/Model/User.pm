@@ -9,7 +9,7 @@ has 'domain_list';
 sub create_user {
 	my ($self, $args) = @_;
 	my $password_hash = bcrypt($args->{password}, '2b', 12, $ENV{BLIPTOWN_SALT});
-	my $totp_secret = $self->totp->create_totp;
+	my $totp_secret = $self->totp->create_secret;
 	$self->sqlite->db->insert(
 		'users', {
 			username => $args->{username},
