@@ -12,9 +12,6 @@
 			<a href="/<%= $slug %>"><%= $slug %></a>
 			% }
 			% }
-			% if ($ext eq 'md') {
-			<a href="https://commonmark.org/help/" target="_blank" class="help-q">?</a>
-			% }
 		</h1>
 	</header>
 	<nav>
