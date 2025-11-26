@@ -2,8 +2,6 @@ package Bliptown::Model::User;
 use Mojo::Base -base;
 use Mojo::Util qw(secure_compare);
 use Crypt::Bcrypt qw(bcrypt bcrypt_check);
-use MIME::Base32;
-use Authen::OATH;
 
 has 'sqlite';
 has 'totp';
@@ -90,9 +88,8 @@ sub authenticate_user {
 	unless ($hash && bcrypt_check($args->{password}, $hash)) {
 		return;
     }
-	my $secret = decode_base32 $user->{totp_secret};
-	my $oath = Authen::OATH->new;
-	unless ($secret && secure_compare $oath->totp($secret), $args->{totp}) {
+	my $totp_check = $self->totp->read_totp({ user => $user });
+	unless (secure_compare $args->{totp}, $totp_check) {
 		return;
     }
     return 1;
