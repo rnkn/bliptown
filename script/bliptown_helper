@@ -2,12 +2,10 @@
 
 use strict;
 use warnings;
-use Cwd qw(abs_path);
 use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
-use File::Basename qw(dirname);
-use File::Temp qw(tempfile);
+use Path::Tiny;
 use File::Find;
 use Data::MessagePack::Stream;
 
@@ -87,16 +85,33 @@ sub get_uid_gid {
 sub safe_file {
 	my ($username, $filename) = @_;
 	die "Invalid username: $username" unless $username =~ /^[a-zA-Z0-9-_]+$/;
-	my $sandbox = $ENV{BLIPTOWN_USER_HOME} . '/' . $username;
-	my $filename_abs = abs_path($filename) or die "Cannot get file: $filename ($!)";
-	die "File outside of sandbox: $filename_abs ($!)"
-		unless $filename_abs =~ /^\Q$sandbox\/\E/;
-	return $filename_abs;
+	my $sandbox = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	$sandbox->realpath;
+
+	my $safe_filename;
+	my $path = path($filename);
+	eval {
+		die "File is not absolute" unless $path->is_absolute;
+		$safe_filename = $path->realpath;
+	};
+
+	if (!$safe_filename) {
+		my @parts = split '/', $filename;
+		die "File contains directory traversal: $filename"
+			if grep { /^\.{1,2}$/ } @parts;
+		$safe_filename = '/' . join '/', @parts;
+	}
+
+	die "File outside of sandbox: $filename"
+		unless $sandbox->subsumes($safe_filename);
+	return $safe_filename;
 }
 
 sub delete_empty_dirs {
-	my $dir = shift;
-	find(sub { return unless -d $_; rmdir $_}, $dir);
+	my $username = shift;
+	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	$root->realpath;
+	finddepth(sub { return unless -d $_; rmdir $_}, $root);
 }
 
 sub write_blob {
@@ -106,13 +121,16 @@ sub write_blob {
 	my $blob = $payload->{blob};
 	my ($uid, $gid) = get_uid_gid($username);
 	my $safe_filename = safe_file($username, $filename);
-	my $dir = dirname($safe_filename);
-	my ($fh, $tmp) = tempfile(DIR => $dir) or die "Cannot create tempfile ($!)";
-	binmode $fh;
+	my $dir = path($safe_filename)->parent;
+	$dir = safe_file($username, $dir);
+	$dir->mkdir({ owner => $uid, group => $gid });
+	my $tmp = $dir->tempfile or die "Cannot create tempfile ($!)";
+	my $fh = $tmp->filehandle('>', ':raw');
 	print $fh $blob;
 	chown($uid, $gid, $tmp) or die "Cannot set ownership: $tmp ($!)";
 	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
 	rename $tmp, $safe_filename or die "Cannot write file: $filename ($!)";
+	delete_empty_dirs($username);
 }
 
 sub update_file {
@@ -122,23 +140,33 @@ sub update_file {
 	my $content = $payload->{content};
 	my ($uid, $gid) = get_uid_gid($username);
 	my $safe_filename = safe_file($username, $filename);
-	my $dir = dirname($safe_filename);
-	my ($fh, $tmp) = tempfile(DIR => $dir) or die "Cannot create tempfile ($!)";
+	my $dir = path($safe_filename)->parent;
+	$dir = safe_file($username, $dir);
+	$dir->mkdir({ owner => $uid, group => $gid });
+	my $tmp = $dir->tempfile  or die "Cannot create tempfile ($!)";
+	my $fh = $tmp->filehandle('>', ':raw');
 	print $fh $content;
 	chown($uid, $gid, $tmp) or die "Cannot set ownership: $tmp ($!)";
 	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
 	rename $tmp, $safe_filename or die "Cannot write file: $filename ($!)";
+	delete_empty_dirs($username);
 }
 
 sub rename_file {
 	my $payload = shift;
 	my $username = $payload->{username};
-	my $filename = $payload->{file};
+	my $filename = $payload->{filename};
 	my $new_filename = $payload->{new_filename};
 	my $safe_filename = safe_file($username, $filename);
-	die "File not found: $safe_filename ($!)" unless -f $safe_filename;
+	die "File not found: $safe_filename" unless -f $safe_filename;
 	my $safe_new_filename = safe_file($username, $new_filename);
-	rename($safe_filename, $safe_new_filename) or die "Cannot rename file: $filename ($!)";
+	my ($uid, $gid) = get_uid_gid($username);
+	my $dir = path($safe_new_filename)->parent;
+	$dir = safe_file($username, $dir);
+	$dir->mkdir({ owner => $uid, group => $gid });
+	rename($safe_filename, $safe_new_filename)
+		or die "Cannot rename file: $safe_filename -> $safe_new_filename ($!)";
+	delete_empty_dirs($username);
 }
 
 sub delete_file {
@@ -147,6 +175,7 @@ sub delete_file {
 	my $filename = $payload->{filename};
 	my $safe_filename = safe_file($username, $filename);
 	unlink $safe_filename or die "Cannot delete file: $filename ($!)";
+	delete_empty_dirs($username);
 }
 
 my %allowed_commands = (
@@ -169,14 +198,14 @@ while (my $conn = $server->accept()) {
 			my $data = $unpacker->data;
 			my $command = $data->{command};
 			my $payload = $data->{payload};
-			my $success = eval {
+			my $ok = eval {
 				my $func = $allowed_commands{$command} ||
 					die "Command not permitted: $command ($!)";
 
 				$func->($payload);
 				return 1;
 			};
-			unless ($success) { warn };
+			warn unless $ok;
 		}
 	};
 
