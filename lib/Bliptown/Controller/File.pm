@@ -36,7 +36,7 @@ sub list_files {
 			});
 		my $message = $res > 1 ? "$res files deleted" : "$res file deleted";
 		$c->flash(info => $message);
-		return $c->redirect_to('list_files');
+		return $c->redirect_to($c->url_for('list_files')->query(filter => $filter));
 	}
 
 	if ($filter && $rename) {
@@ -47,7 +47,7 @@ sub list_files {
 				filter => $filter,
 				rename => $rename
 			});
-		return $c->redirect_to('list_files');
+		return $c->redirect_to($c->url_for('list_files')->query(filter => $rename));
 	}
 
 	my $tree = $root->list_tree;
