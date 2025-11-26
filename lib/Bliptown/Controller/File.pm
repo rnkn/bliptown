@@ -92,21 +92,21 @@ sub rename_files_regex {
 	my $rename = $args->{rename};
 	my @files = $root->list_tree->each;
 	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
-	my @filenames_abs = map { path($root, $_)->to_abs->to_string } @filenames;
-	foreach (@filenames_abs) {
-		# FIXME: regex needs to apply to relative filenames
-		my $new_filename = $_;
+	foreach (@filenames) {
+		my ($old_filename, $new_filename) = ($_, $_);
+		$old_filename = path($root, $old_filename)->to_abs->to_string;
 		$new_filename =~ s/$filter/$rename/g;
+		$new_filename = path($root, $new_filename)->to_abs->to_string;
 		$c->ipc->send_message(
 			{
 				command => 'rename_file',
 				username => $username,
-				filename => $_,
+				filename => $old_filename,
 				new_filename => $new_filename,
 			}
 		);
 	}
-	return @filenames_abs;
+	return @filenames;
 }
 
 sub rename_file {
