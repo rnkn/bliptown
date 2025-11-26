@@ -171,7 +171,7 @@ sub startup {
 	$r->get('/logout')->to(controller => 'User', action => 'user_logout')->name('user_logout');
 
 	$r->get('/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
-	$r->post('/totp')->to(controller => 'TOTP', action => 'totp_check')->name('totp_check');
+	$r->post('/totp')->to(controller => 'TOTP', action => 'totp_update')->name('totp_update');
 
 	$r->get('/mysite' => sub {
 		my $c = shift;

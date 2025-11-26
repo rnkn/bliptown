@@ -1,0 +1,35 @@
+% layout 'default';
+<main class="one-column">
+	<h1>Set Up Two-Factor Authentication</h1>
+	<p>
+		Bliptown uses mandatory
+		<a href="https://en.wikipedia.org/wiki/Multi-factor_authentication">two-factor
+		authentication</a> in the form of a
+		<a href="https://en.wikipedia.org/wiki/Time-based_one-time_password">time-based
+		one-time password</a>. A secret verification key is stored on
+		your device and used to generate a six-digit code required in
+		addition to your regular password to log into the site.
+	</p>
+	<p>
+		To set up your verification key, either scan this QR code with
+		your device, or input the verification key below.
+	</p>
+
+	<p>
+		<strong>Verification Key:</strong>
+		<br>
+		<code><%= $secret %></code></p>
+	<p>
+		For security this verification key will be shown only once.
+	</p>
+	<p>
+		Once you have recorded your verification key, input the
+		generated six-digit code below to activate it.
+	</p>
+	<form method="post" action="<%= url_for('totp_update')%>">
+		<input type="hidden" name="secret" value="<%= $secret %>">
+		<input type="text" placeholder="123456" pattern="[0-9]*" id="totp-check" name="totp" maxlength="6" required>
+		<button type="submit">Submit</button>
+		<a href="#">Cancel</a>
+	</form>
+</main>
