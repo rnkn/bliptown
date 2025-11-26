@@ -36,6 +36,7 @@ sub render_page {
 	my $file;
 	if (!$slug || $slug =~ /\/$/) {
 		unless ($file = $c->get_file("$slug/index")) {
+			$slug =~ s/\/$//;
 			if ($file = $c->get_file($slug)) {
 				$c->redirect_to('render_page', catchall => $slug);
 			}
