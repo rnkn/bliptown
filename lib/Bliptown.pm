@@ -165,12 +165,6 @@ sub startup {
 
 	my $r = $app->routes;
 
-    $r->get('/.well-known/acme-challenge/:file' => sub {
-		my $c = shift;
-		my $file = $c->param('file');
-		$c->reply->file("/var/www/acme/$file");
-			})->name('acme_challenge');
-
 	$r->post('/join')->to(controller => 'User', action => 'user_join')->name('user_join');
 	$r->get('/login')->to(controller => 'User', action => 'user_login')->name('token_auth');
 	$r->post('/login')->to(controller => 'User', action => 'user_login')->name('user_login');
