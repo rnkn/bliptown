@@ -14,7 +14,7 @@
 		To set up your verification key, either scan this QR code with
 		your device, or input the verification key below.
 	</p>
-	<img src="<%= $data_url %>" alt="QR code">
+	<img id="qrcode" src="<%= $data_url %>" alt="QR code">
 	<p>
 		<strong>Verification Key:</strong>
 		<br>

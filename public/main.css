@@ -260,6 +260,10 @@ input#message-close:checked ~ label#message-close {
 	display: block;
 }
 
+#qrcode {
+	width: 135px;
+}
+
 #message {
 	position: absolute;
 	z-index: 100;
