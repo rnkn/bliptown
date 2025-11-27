@@ -7,3 +7,4 @@ requires 'FFI::Platypus' => 2;
 requires 'YAML::Tiny' => 1;
 requires 'Data::MessagePack' => 1;
 requires 'Data::MessagePack::Stream' => 1;
+requires 'Imager::QRCode' => 0;

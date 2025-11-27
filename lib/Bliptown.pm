@@ -10,6 +10,7 @@ use Bliptown::Model::Page;
 use Bliptown::Model::File;
 use Bliptown::Model::IPC;
 use Bliptown::Model::TOTP;
+use Bliptown::Model::QRCode;
 use Bliptown::Model::DomainList;
 use Bliptown::Model::Token;
 
@@ -73,6 +74,11 @@ sub startup {
 	$app->helper(
 		totp => sub {
 			return Bliptown::Model::TOTP->new;
+		});
+
+	$app->helper(
+		qrcode => sub {
+			return Bliptown::Model::QRCode->new;
 		});
 
 	$app->helper(

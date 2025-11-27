@@ -24,10 +24,17 @@ sub totp_initiate {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $secret = $c->totp->create_secret;
+	my $data_url = $c->qrcode->create_qrcode(
+		{
+			username => $username,
+			secret => $secret,
+		}
+	);
 	$c->stash(
 		template => 'totp',
 		title => 'Bliptown Two-Factor Authentication',
 		secret => $secret,
+		data_url => $data_url,
 	);
 	return $c->render;
 }
