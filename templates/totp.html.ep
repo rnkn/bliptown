@@ -1,5 +1,5 @@
 % layout 'default';
-<main class="one-column">
+<main class="backstage one-column">
 	<h1>Set Up Two-Factor Authentication</h1>
 	<p>
 		Bliptown uses mandatory
