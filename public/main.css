@@ -436,6 +436,10 @@ fieldset {
 	gap: 1em;
 }
 
+.file-row-controls {
+	margin: 0;
+}
+
 .cell.name {
 	flex-grow: 1;
 }
