@@ -557,6 +557,7 @@ fieldset {
 
 .parallax-fg {
 	transform: translateZ(0);
+	background-color: var(--main-bg-color);
 }
 
 .button {
