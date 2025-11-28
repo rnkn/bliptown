@@ -106,7 +106,6 @@ sub user_login {
 			$url->port(3000);
 		}
 		$c->res->code(307);
-		$c->log->info("My Bliptown redirect URL: $url");
 		return $c->redirect_to(
 			$url,
 			username => $username,
