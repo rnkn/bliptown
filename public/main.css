@@ -117,7 +117,7 @@ nav header {
 }
 
 nav header h1 {
-	font-size: initial;
+	font-size: 1em;
 }
 
 nav footer {
@@ -165,12 +165,12 @@ main h1 {
 }
 
 main h2 {
-	font-size: initial;
+	font-size: 1em;
 	margin-top: 3rem;
 }
 
 main h3 {
-	font-size: initial;
+	font-size: 1em;
 	font-weight: initial;
 	color: rgba(0,0,0,0.5);
 }
