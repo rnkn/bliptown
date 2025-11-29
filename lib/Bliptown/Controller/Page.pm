@@ -99,7 +99,7 @@ sub render_page {
 
 	$c->stash(
 		template => 'page',
-		stage => 'foh',
+		nav_style => 'sidebar',
 		head => $head || '',
 		title => $title,
 		header => $skel_html{_header} || '',
