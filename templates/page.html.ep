@@ -1,20 +1,20 @@
 % layout 'default';
-<div id="sidebar">
-	<header>
+<nav id="blip-nav" class="<%= $nav_style %>">
+	<header id="blip-header">
 		<%== $header %>
 	</header>
-	<nav>
+	<menu id="blip-menu">
 		<%== $sidebar %>
 		% if ($c->get_req_user eq 'mayor' && ! $c->session('username')) {
 		<ul>
 			<li><label for="drawer-toggle">Join/Login</label>
 		</ul>
 		% }
-	</nav>
-	<footer>
+	</menu>
+	<footer id="blip-footer">
 		<%== $footer %>
 	</footer>
-</div>
-<main>
+</nav>
+<main id="blip-main">
 	<%== $content %>
 </main>

@@ -98,7 +98,7 @@ input::placeholder {
 	color: rgba(0,0,0,0.25);
 }
 
-/** structure semantic styles */
+/** structural semantic styles */
 
 nav {
 	z-index: 80;

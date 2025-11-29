@@ -1,5 +1,5 @@
 % layout 'default';
-<div id="sidebar">
+<nav>
 	<header>
 		<h1>
 			% if (current_route eq 'new_page') {
@@ -14,13 +14,13 @@
 			% }
 		</h1>
 	</header>
-	<nav>
+	<menu>
 		<ul>
 			<li><a href="/" class="exit">View Site</a>
 			<li><a href="<%= url_for('list_files') %>" class="exit">Files</a>
 		</ul>
-	</nav>
-</div>
+	</menu>
+</nav>
 <main id="edit">
 	<section class="one-column">
 		<form method="post" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">

@@ -1,9 +1,9 @@
 % layout 'default';
-<div id="sidebar">
+<nav>
 	<header>
 		<h1><%= $title %></h1>
 	</header>
-	<nav>
+	<menu>
 		<div id="controls">
 			<form id="filter" method="get" action="<%= url_for('list_files') %>"></form>
 			<form id="upload" method="post" action="<%= url_for('upload_files') %>" enctype="multipart/form-data"></form>
@@ -34,11 +34,11 @@
 		<ul>
 			<li><a href="/" class="exit">View Site</a>
 		</ul>
-	</nav>
-</div>
+	</menu>
+</nav>
 <main id="files">
 	<section class="one-column">
-		<div id="list">
+		<div id="list" class="table">
 			% foreach (@$files) {
 			<details name="files">
 				<summary class="row">
@@ -52,7 +52,7 @@
 						%= $_->{mtime}
 					</span>
 				</summary>
-				<ul class="file-row-controls">
+				<ul class="controls">
 					<li>
 						<form id="rename" method="get" action="<%= url_for('rename_file', catchall => $_->{filename} ) %>">
 							<input type="text" name="to" value="<%= $_->{filename} %>">
