@@ -175,6 +175,10 @@ main h3 {
 	color: rgba(0,0,0,0.5);
 }
 
+main ul {
+	padding-left: 2em;
+}
+
 main textarea {
 	margin: 1em 0;
 }
@@ -265,11 +269,6 @@ label#nav-toggle {
 
 label#nav-toggle:before {
 	content: "=";
-}
-
-
-#viewport.foh main ul {
-	padding-left: 2em;
 }
 
 #drawer {
