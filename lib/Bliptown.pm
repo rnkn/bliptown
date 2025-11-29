@@ -17,10 +17,8 @@ use Bliptown::Model::Token;
 sub startup {
 	my $app = shift;
 
-	$app->log->info("My user id: $<");
 	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
 	my $bliptown_domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
-	$app->log->info("My domain: $bliptown_domain");
 
 	my $sessions = Bliptown::Sessions->new(default_expiration => 2592000);
 	$app->sessions($sessions);
