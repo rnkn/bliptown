@@ -207,6 +207,15 @@ main textarea {
 	gap: 1em;
 }
 
+#drawer {
+	visibility: hidden;
+	transition: visibility 0.3s;
+}
+
+input#drawer-toggle:checked ~ #drawer {
+	visibility: visible;
+}
+
 input#drawer-toggle:checked ~ #viewport {
 	transform: translateY(var(--drawer-height));
 }

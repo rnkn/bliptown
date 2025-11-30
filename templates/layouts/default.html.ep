@@ -13,6 +13,7 @@
 	<body>
 		<input type="radio" id="drawer-switch-login" name="drawer-switch" hidden>
 		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden checked>
+		<input type="checkbox" id="drawer-toggle" hidden>
 		<div id="drawer">
 			% if (session('username')) {
 			<div id="user" class="panel">
@@ -81,7 +82,6 @@
 			</div>
 			% }
 		</div>
-		<input type="checkbox" id="drawer-toggle" hidden>
 		<div id="viewport" class="<%= $stage %>">
 			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
 			% my $message = begin
