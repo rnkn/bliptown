@@ -11,8 +11,8 @@
 </nav>
 <main id="settings">
 	<div class="one-column">
-		<form class="table" action="<%= url_for('settings') %>" method="post">
-			<ul>
+		<form action="<%= url_for('settings') %>" method="post">
+			<ul class="table">
 				<li class="row">
 					<label class="cell name" for="username">Username (cannot be changed)</label>
 					<input class="cell" type="text" name="username" value="<%= $username %>" disabled>
