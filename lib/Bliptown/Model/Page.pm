@@ -31,8 +31,8 @@ my $md_flags = MD_FLAG_PERMISSIVEURLAUTOLINKS
 	| MD_FLAG_STRIKETHROUGH;
 
 my $ffi = FFI::Platypus->new(api => 2);
-$ffi->lib(path($ENV{'BLIPTOWN_LIB_HOME'}, 'libmd4c.so')->to_string);
-$ffi->lib(path($ENV{'BLIPTOWN_LIB_HOME'}, 'libmd4c-html.so')->to_string);
+$ffi->lib(path($ENV{'BLIPTOWN_MD4C_LIB'})->to_string);
+$ffi->lib(path($ENV{'BLIPTOWN_MD4C_HTML_LIB'})->to_string);
 $ffi->type('(string, int, opaque)->void' => 'callback');
 $ffi->attach(
 	md_html => [
