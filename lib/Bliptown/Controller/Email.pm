@@ -1,6 +1,5 @@
 package Bliptown::Controller::Email;
 use Mojo::Base 'Mojolicious::Controller';
-use Mojo::SMTP::Client;
 use Mojo::Util 'generate_secret';
 use POSIX 'strftime';
 
