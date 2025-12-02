@@ -42,7 +42,7 @@ sub update_user {
 	my @keys_int = qw(create_backups sort_new);
 	foreach my $key (keys %$args) {
 		if (grep { $key eq $_ } @keys_null) {
-			my $v = $args->{$key} || 'NULL';
+			my $v = $args->{$key};
 			$values{$key} = $v;
 		}
 		if (grep { $key eq $_ } @keys_not_null) {
