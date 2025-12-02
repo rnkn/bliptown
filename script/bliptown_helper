@@ -82,31 +82,6 @@ sub get_uid_gid {
 	return ($uid, $gid);
 }
 
-sub safe_file {
-	my ($username, $filename) = @_;
-	die "Invalid username: $username" unless $username =~ /^[a-zA-Z0-9-_]+$/;
-	my $sandbox = path($ENV{BLIPTOWN_USER_HOME}, $username);
-	$sandbox->realpath;
-
-	my $safe_filename;
-	my $path = path($filename);
-	eval {
-		die "File is not absolute" unless $path->is_absolute;
-		$safe_filename = $path->realpath;
-	};
-
-	if (!$safe_filename) {
-		my @parts = split '/', $filename;
-		die "File contains directory traversal: $filename"
-			if grep { /^\.{1,2}$/ } @parts;
-		$safe_filename = '/' . join '/', @parts;
-	}
-
-	die "File outside of sandbox: $filename"
-		unless $sandbox->subsumes($safe_filename);
-	return $safe_filename;
-}
-
 sub delete_empty_dirs {
 	my $username = shift;
 	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
@@ -116,66 +91,44 @@ sub delete_empty_dirs {
 
 sub write_blob {
 	my $payload = shift;
-	my $username = $payload->{username};
 	my $filename = $payload->{filename};
 	my $blob = $payload->{blob};
-	my ($uid, $gid) = get_uid_gid($username);
-	my $safe_filename = safe_file($username, $filename);
-	my $dir = path($safe_filename)->parent;
-	$dir = safe_file($username, $dir);
-	$dir->mkdir({ owner => $uid, group => $gid });
+	my $dir = path($filename)->parent;
+	$dir->mkdir;
 	my $tmp = $dir->tempfile or die "Cannot create tempfile ($!)";
 	my $fh = $tmp->filehandle('>', ':raw');
 	print $fh $blob;
-	chown($uid, $gid, $tmp) or die "Cannot set ownership: $tmp ($!)";
 	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
-	rename $tmp, $safe_filename or die "Cannot write file: $filename ($!)";
-	delete_empty_dirs($username);
+	rename $tmp, $filename or die "Cannot write file: $filename ($!)";
 }
 
 sub update_file {
 	my $payload = shift;
-	my $username = $payload->{username};
 	my $filename = $payload->{filename};
 	my $content = $payload->{content};
-	my ($uid, $gid) = get_uid_gid($username);
-	my $safe_filename = safe_file($username, $filename);
-	my $dir = path($safe_filename)->parent;
-	$dir = safe_file($username, $dir);
-	$dir->mkdir({ owner => $uid, group => $gid });
+	my $dir = path($filename)->parent;
+	$dir->mkdir;
 	my $tmp = $dir->tempfile  or die "Cannot create tempfile ($!)";
 	my $fh = $tmp->filehandle('>', ':raw');
 	print $fh $content;
-	chown($uid, $gid, $tmp) or die "Cannot set ownership: $tmp ($!)";
 	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
-	rename $tmp, $safe_filename or die "Cannot write file: $filename ($!)";
-	delete_empty_dirs($username);
+	rename $tmp, $filename or die "Cannot write file: $filename ($!)";
 }
 
 sub rename_file {
 	my $payload = shift;
-	my $username = $payload->{username};
 	my $filename = $payload->{filename};
 	my $new_filename = $payload->{new_filename};
-	my $safe_filename = safe_file($username, $filename);
-	die "File not found: $safe_filename" unless -f $safe_filename;
-	my $safe_new_filename = safe_file($username, $new_filename);
-	my ($uid, $gid) = get_uid_gid($username);
-	my $dir = path($safe_new_filename)->parent;
-	$dir = safe_file($username, $dir);
-	$dir->mkdir({ owner => $uid, group => $gid });
-	rename($safe_filename, $safe_new_filename)
-		or die "Cannot rename file: $safe_filename -> $safe_new_filename ($!)";
-	delete_empty_dirs($username);
+	my $dir = path($new_filename)->parent;
+	$dir->mkdir;
+	rename($filename, $new_filename)
+		or die "Cannot rename file: $filename -> $new_filename ($!)";
 }
 
 sub delete_file {
 	my $payload = shift;
-	my $username = $payload->{username};
 	my $filename = $payload->{filename};
-	my $safe_filename = safe_file($username, $filename);
-	unlink $safe_filename or die "Cannot delete file: $filename ($!)";
-	delete_empty_dirs($username);
+	unlink $filename or die "Cannot delete file: $filename ($!)";
 }
 
 my %allowed_commands = (
@@ -199,12 +152,22 @@ while (my $conn = $server->accept()) {
 			my $command = $data->{command};
 			my $payload = $data->{payload};
 			my $ok = eval {
-				my $func = $allowed_commands{$command} ||
-					die "Command not permitted: $command ($!)";
+				my $username = $payload->{username};
+				my ($uid, $gid) = get_uid_gid($username);
 
+				$) = "$gid $gid" or die "Cannot set group: $gid ($!)";
+				$> = $uid or die "Cannot set user: $uid ($!)";
+
+				my $func = $allowed_commands{$command} or
+					die "Command not permitted: $command ($!)";
 				$func->($payload);
+
+				delete_empty_dirs($username);
+
 				return 1;
 			};
+			$> = 0;
+			$) = 0;
 			warn unless $ok;
 		}
 	};
