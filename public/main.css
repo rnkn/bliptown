@@ -91,10 +91,6 @@ hr {
 	color: rgba(0,0,0,0.5);
 }
 
-a:hover, label.button:hover {
-	opacity: 0.5;
-}
-
 input::placeholder {
 	color: rgba(0,0,0,0.25);
 }
