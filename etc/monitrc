@@ -12,30 +12,30 @@ set httpd port 2812 readonly
 	unixsocket /var/run/monit.sock
 
 check host blip.town with address blip.town
-	if failed port 22 protocol ssh then alert
-	if failed port 80 protocol http then alert
-	if failed port 443 protocol https then alert
+	if failed port 22 protocol ssh for 3 cycles then alert
+	if failed port 80 protocol http for 3 cycles then alert
+	if failed port 443 protocol https for 3 cycles then alert
 
 check host rnkn.xyz with address rnkn.xyz
-	if failed port 80 protocol http then alert
-	if failed port 443 protocol https then alert
+	if failed port 80 protocol http for 3 cycles then alert
+	if failed port 443 protocol https for 3 cycles then alert
 
 check process bliptown pidfile /tmp/bliptown.pid
-	if not exist then alert
+	if not exist for 3 cycles then alert
 
 check process bliptown_helper matching "perl /usr/local/www/bliptown/script/bliptown_helper"
 	start program = "/usr/sbin/rcctl start bliptown_helper"
-	if not exist then alert
-	if not exist then start
+	if not exist for 3 cycles then alert
+	if not exist for 3 cycles then start
 
 check process sshd pidfile /var/run/sshd.pid
-	if not exist then alert
+	if not exist for 3 cycles then alert
 
 check process relayd matching "/usr/sbin/relayd"
-	if not exist then alert
+	if not exist for 3 cycles then alert
 
 check process httpd matching "/usr/sbin/httpd"
-	if not exist then alert
+	if not exist for 3 cycles then alert
 
 check file doas.conf path /etc/doas.conf
 	if failed uid 0 then alert
