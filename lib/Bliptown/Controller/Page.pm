@@ -206,14 +206,14 @@ sub save_page {
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
 	my $filename = "$slug.$ext";
-	my $file = path($root, $filename)->to_string;
+	$filename = path($root, $filename)->to_string;
 	my $content = $c->param('content');
 	$content =~ s/\r\n/\n/g;
 	$c->ipc->send_message(
 		{
 			command => 'update_file',
 			username => $username,
-			filename => $file,
+			filename => $filename,
 			content => $content,
 		});
 	my $redirect;
