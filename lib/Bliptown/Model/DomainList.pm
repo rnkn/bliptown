@@ -11,7 +11,11 @@ sub update_domain_list {
 	@all_domains = grep { defined $_ } @all_domains;
 	@all_domains = sort @all_domains;
 	$self->ipc->send_message(
-		{ command => 'update_domain_list', all_domains => \@all_domains }
+		{
+			username => 'root',
+			command => 'update_domain_list',
+			all_domains => \@all_domains
+		}
 	);
 }
 
