@@ -2,6 +2,7 @@
 
 :root {
 	--main-bg-color: rgba(255,255,255,1.0);
+	--main-link-color: black;
 	--code-bg-color: rgba(235,235,235,1.0);
 	--controls-color: rgba(220,220,220,0.5);
 	--warning-color: rgba(200,0,0,1.0);
@@ -130,10 +131,6 @@ nav menu {
 	margin: 2em 0;
 }
 
-nav a {
-	color: initial;
-}
-
 nav ul {
 	margin: 0;
 	list-style: none;
@@ -157,6 +154,15 @@ main {
 	padding: 2rem;
 	padding-right: 4rem;
 	background-color: var(--main-bg-color);
+}
+
+main a {
+	color: var(--main-link-color);
+	border-bottom: 1px solid var(--main-link-color);
+}
+
+main a:has(img) {
+	border: none;
 }
 
 main h1 {
@@ -202,11 +208,6 @@ main textarea {
 	transition: transform 0.3s ease;
 }
 
-#drawer form {
-	display: flex;
-	gap: 1em;
-}
-
 #drawer {
 	visibility: hidden;
 	transition: visibility 0.3s;
@@ -220,8 +221,13 @@ input#drawer-toggle:checked ~ #viewport {
 	transform: translateY(var(--drawer-height));
 }
 
-#drawer .button a:hover {
-	text-decoration: underline;
+#drawer a:hover {
+	border-bottom: 1px solid var(--main-link-color);
+}
+
+#drawer form {
+	display: flex;
+	gap: 1em;
 }
 
 #drawer .extras {
