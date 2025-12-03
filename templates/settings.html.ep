@@ -40,11 +40,11 @@
 					<span class="cell name">Sort files</span>
 					<label>
 						<input type="radio" name="sort_new" value="0" <%= 'checked' if $sort_new == 0 %>>
-						alphabetically
+						<span class="cell">alphabetically</span>
 					</label>
 					<label>
 						<input type="radio" name="sort_new" value="1" <%= 'checked' if $sort_new == 1 %>>
-						modified time
+						<span class="cell">by modification time</span>
 					</label>
 				</li>
 				<label for="create-backups">
