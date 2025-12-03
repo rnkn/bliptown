@@ -17,7 +17,7 @@ sub render_page {
 	my $c = shift;
 	my $root = path($c->get_user_home, $c->get_req_user);
 	my $username = $c->session('username');
-	my $use_cache = $c->param('cache');
+	my $use_cache = $c->param('cache') // 1;
 	$c->stash( home => $c->get_home );
 	my $user_cur = $username && $username eq $c->get_req_user;
 	my $slug = $c->param('catchall');
