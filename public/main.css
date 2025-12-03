@@ -404,6 +404,10 @@ nav a.exit:before {
 	margin: 0;
 }
 
+#files #list .controls a {
+	border: none;
+}
+
 #files details {
 	padding: 2px 4px;
 }
