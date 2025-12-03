@@ -2,6 +2,7 @@ package Bliptown::Controller::Page;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(url_unescape);
 use Mojo::File qw(path);
+use Digest::SHA qw(sha1_hex);
 
 sub yaml_true {
 	my $p = shift;
@@ -16,6 +17,7 @@ sub render_page {
 	my $c = shift;
 	my $root = path($c->get_user_home, $c->get_req_user);
 	my $username = $c->session('username');
+	my $use_cache = $c->param('cache');
 	$c->stash( home => $c->get_home );
 	my $user_cur = $username && $username eq $c->get_req_user;
 	my $slug = $c->param('catchall');
@@ -25,7 +27,18 @@ sub render_page {
 
 	my $raw = path($root, $slug);
 	if ($raw->extname) {
-		return $c->reply->file($raw) if -f $raw;
+		if (-f $raw) {
+			my $sha = sha1_hex($slug);
+			my $cache_file = path($root, '.cache', $sha);
+			if (-f $cache_file && ! $use_cache == 0) {
+				my @src_stats = stat($raw);
+				my $src_modtime = $src_stats[9];
+				my @cache_stats = stat($cache_file);
+				my $cache_mtime = $cache_stats[9];
+				return $c->reply->file($cache_file) if $cache_mtime >= $src_modtime;
+			}
+			return $c->reply->file($raw);
+		}
 		my $fallback = path($c->app->static->paths->[0], 'defaults', $slug);
 		return $c->reply->file($fallback) if -f $fallback;
 		return $c->reply->not_found;
