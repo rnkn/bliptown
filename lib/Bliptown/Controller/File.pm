@@ -199,4 +199,32 @@ sub upload_files {
 	return $c->redirect_to('list_files');
 }
 
+sub create_cache {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $redirect = $c->param('back_to') // '/';
+	my $root = path($c->get_user_home, $username);
+	$c->image_cache->create_cache({ username => $username });
+	return $c->redirect_to($redirect);
+}
+
+sub delete_cache {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $redirect = $c->param('back_to') // '/';
+	my $cache = path($c->app->config->{user_home}, $username, '.cache');
+
+	my $tree = $cache->list_tree;
+	foreach ($tree->each) {
+		$c->ipc->send_message(
+			{
+				command => 'delete_file',
+				username => $username,
+				filename => $_->to_string,
+			}
+		)
+	}
+	return $c->redirect_to($redirect);
+}
+
 return 1;

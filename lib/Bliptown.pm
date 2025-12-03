@@ -95,10 +95,18 @@ sub startup {
 		});
 
 	$app->helper(
+		image_cache => sub {
+			my $c = shift;
+			return Bliptown::Model::Cache->new(
+				config => $c->config,
+				ipc => $c->ipc,
+			);
+		});
+
+	$app->helper(
 		get_user_home => sub {
 			return $ENV{BLIPTOWN_USER_HOME};
-		}
-	);
+		});
 	
 	$app->helper(
 		get_req_user => sub {
