@@ -7,7 +7,7 @@ use Imager;
 has 'config';
 has 'ipc';
 
-Imager->set_file_limits(reset=>1, bytes=>10_000_000);
+Imager->set_file_limits(reset=>1, bytes=>1_000_000_000);
 
 sub create_cache {
 	my ($self, $args) = @_;
