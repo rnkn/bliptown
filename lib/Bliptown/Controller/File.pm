@@ -2,6 +2,7 @@ package Bliptown::Controller::File;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::File qw(path);
 use POSIX qw(strftime);
+use Encode;
 
 sub format_human_size {
 	my $size = shift;
@@ -54,8 +55,10 @@ sub list_files {
 
 	my @files;
 	foreach ($tree->each) {
-		my @stats = stat($_);
-		my $rel_filename = $_->to_rel($root)->to_string;
+		my $filename = decode_utf8($_);
+		my @stats = stat($filename);
+		my $rel_file = $_->to_rel($root)->to_string;
+		my $rel_filename = decode_utf8($rel_file);
 		my $url = $rel_filename; $url =~ s/\.(md|txt|html|css|js)$//;
 
 		push @files, {
