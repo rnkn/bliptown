@@ -154,7 +154,7 @@ main {
 
 main a {
 	color: var(--main-link-color);
-	border-bottom: 1px solid var(--main-link-color);
+	border-bottom: 1px solid;
 }
 
 main a:has(img) {
@@ -218,7 +218,7 @@ input#drawer-toggle:checked ~ #viewport {
 }
 
 #drawer a:hover {
-	border-bottom: 1px solid var(--main-link-color);
+	border-bottom: 1px solid;
 }
 
 #drawer form {
@@ -349,7 +349,7 @@ input#message-close:checked ~ label#message-close {
 #message.warning {
 	color: rgba(100,0,0,1.0);
 	background: var(--warning-message-color);
-	border: 1px solid red;
+	border: 1px solid;
 }
 
 /** 2FA  */
