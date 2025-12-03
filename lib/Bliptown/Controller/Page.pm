@@ -35,7 +35,10 @@ sub render_page {
 				my $src_modtime = $src_stats[9];
 				my @cache_stats = stat($cache_file);
 				my $cache_mtime = $cache_stats[9];
-				return $c->reply->file($cache_file) if $cache_mtime >= $src_modtime;
+				if ($cache_mtime >= $src_modtime) {
+					$c->res->headers->content_type('image/jpeg');
+					return $c->reply->file($cache_file) ;
+				}
 			}
 			return $c->reply->file($raw);
 		}
