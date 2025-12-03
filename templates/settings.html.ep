@@ -53,6 +53,11 @@
 						<input type="checkbox" id="create-backups" class="right" name="create_backups" value="1" <%= 'checked' if $create_backups == 1 %>>
 					</li>
 				</label>
+				<li class="row">
+					<span class="cell name">Cache web-optimised images?</span>
+					<a href="<%= url_for('create_cache')->query(back_to => url_for) %>">Create cache</a>
+					<a href="<%= url_for('delete_cache')->query(back_to => url_for) %>">Delete cache</a>
+				</li>
 			</ul>
 			<hr>
 			<details id="delete-account">

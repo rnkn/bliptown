@@ -244,6 +244,9 @@ sub startup {
 	$protected->get('/delete/*catchall')->to(controller => 'File', action => 'delete_file', catchall => '')->name('delete_file');
 	$protected->post('/upload')->to(controller => 'File', action => 'upload_files')->name('upload_files');
 
+	$protected->get('/cache/create')->to(controller => 'File', action => 'create_cache')->name('create_cache');
+	$protected->get('/cache/delete')->to(controller => 'File', action => 'delete_cache')->name('delete_cache');
+
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 	$protected->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
 
