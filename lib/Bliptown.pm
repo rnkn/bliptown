@@ -13,11 +13,18 @@ use Bliptown::Model::TOTP;
 use Bliptown::Model::QRCode;
 use Bliptown::Model::DomainList;
 use Bliptown::Model::Token;
+use Bliptown::Model::Cache;
 
 sub startup {
 	my $app = shift;
 
-	$app->secrets([ $ENV{BLIPTOWN_SECRET} ]);
+	$app->config(
+		user_home => $ENV{BLIPTOWN_USER_HOME},
+	);
+	$app->secrets(
+		[ $ENV{BLIPTOWN_SECRET} ]
+	);
+
 	my $bliptown_domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
 
 	my $sessions = Bliptown::Sessions->new(default_expiration => 2592000);
