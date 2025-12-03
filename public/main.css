@@ -97,20 +97,26 @@ input::placeholder {
 
 /** structural semantic styles */
 
+nav header, nav menu, nav footer {
+	padding: 2rem;
+}
+
 nav {
 	z-index: 80;
 	width: 24em;
 	display: flex;
 	flex-direction: column;
-	overflow-y: hidden;
-	padding: 2em;
+	overflow-y: scroll;
 	background-color: var(--main-bg-color);
 }
 
 nav header {
+	position: sticky;
+	top: 0;
+	padding-bottom: 3rem;
 	flex-shrink: 0;
-	height: 2em;
-	margin-bottom: 1em;
+	height: 2rem;
+	background-color: var(--main-bg-color);
 }
 
 nav header h1 {
@@ -120,11 +126,6 @@ nav header h1 {
 nav footer {
 	margin: auto 0 0;
 	flex-shrink: 0;
-}
-
-nav menu {
-	flex-shrink: 0;
-	margin: 2em 0;
 }
 
 nav ul {
@@ -608,7 +609,7 @@ nav #additional-controls button {
 		height: 5em;
 	}
 	header {
-		margin: 0 auto;
+		text-align: center;
 	}
 	main {
 		padding-top: 5rem;
@@ -623,7 +624,6 @@ nav #additional-controls button {
 	input#nav-toggle:checked ~ nav {
 		z-index: 90;
 		height: 100%;
-		background-color: var(--main-bg-color);
 	}
 	input#nav-toggle:checked ~ label#nav-toggle {
 		transform: rotate(45deg);
