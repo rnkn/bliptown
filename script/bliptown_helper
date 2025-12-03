@@ -107,6 +107,10 @@ sub update_file {
 	my $filename = $payload->{filename};
 	my $content = $payload->{content};
 	my $dir = path($filename)->parent;
+	if ($payload->{create_backup} && -e $filename) {
+		rename $filename, "${filename}~"
+			or die "Cannot create backup: $filename~ ($!)"
+	}
 	$dir->mkdir;
 	my $tmp = $dir->tempfile  or die "Cannot create tempfile ($!)";
 	my $fh = $tmp->filehandle('>', ':raw');

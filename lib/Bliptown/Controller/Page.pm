@@ -209,12 +209,15 @@ sub save_page {
 	$filename = path($root, $filename)->to_string;
 	my $content = $c->param('content');
 	$content =~ s/\r\n/\n/g;
+	my $user = $c->user->read_user({ key => 'username', username => $username });
+	my $backup = $user->{create_backups} // 0;
 	$c->ipc->send_message(
 		{
 			command => 'update_file',
 			username => $username,
 			filename => $filename,
 			content => $content,
+			create_backup => $backup,
 		});
 	my $redirect;
 	if ($action eq 'save') {

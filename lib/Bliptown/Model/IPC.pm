@@ -18,9 +18,10 @@ sub send_message {
 		payload => {
 			username => $args->{username},
 			filename => $args->{filename},
-			blob => $args->{blob} // '',
 			new_filename => $args->{new_filename} // '',
+			create_backup => $args->{create_backup} // 0,
 			content => $args->{content} // '',
+			blob => $args->{blob} // '',
 			domain => $args->{domain} // '',
 			all_domains => $args->{all_domains} // [],
 		},
