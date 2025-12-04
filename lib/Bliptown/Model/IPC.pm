@@ -1,9 +1,9 @@
 package Bliptown::Model::IPC;
 use Mojo::Base -base;
 use IO::Socket::UNIX;
-use Data::MessagePack;
+use Sereal::Encoder;
 
-my $mp = Data::MessagePack->new();
+my $encoder = Sereal::Encoder->new;
 
 sub send_message {
 	my ($self, $args) = @_;
@@ -27,8 +27,8 @@ sub send_message {
 		},
 	};
 
-	my $packed_data = $mp->pack($data);
-	$client->send($packed_data) || die "Cannot send data to socket ($!)";
+	my $blob = $encoder->encode($data);
+	$client->send($blob) || die "Cannot send data to socket ($!)";
 	$client->close;
 }
 

@@ -4,6 +4,5 @@ requires 'Crypt::Bcrypt' => 0;
 requires 'Authen::OATH' => 2;
 requires 'FFI::Platypus' => 2;
 requires 'YAML::Tiny' => 1;
-requires 'Data::MessagePack' => 1;
-requires 'Data::MessagePack::Stream' => 1;
+requires 'Sereal' => 5;
 requires 'Imager::QRCode' => 0;

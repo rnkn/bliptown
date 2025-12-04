@@ -7,7 +7,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
 use Path::Tiny;
 use File::Find;
-use Data::MessagePack::Stream;
+use Sereal::Decoder;
 
 $SIG{CHLD} = 'IGNORE';
 
@@ -144,37 +144,36 @@ my %allowed_commands = (
 	update_domain_list => \&update_domain_list,
 );
 
-my $unpacker = Data::MessagePack::Stream->new();
+my $decoder = Sereal::Decoder->new;
 
 while (my $conn = $server->accept()) {
 
-    while (read($conn, my $buf, 1024)) {
-        $unpacker->feed($buf);
+	my $blob;
+	while (read($conn, my $buf, 1024)) {
+		$blob .= $buf;
+	}
 
-		while ($unpacker->next) {
-			my $data = $unpacker->data;
-			my $command = $data->{command};
-			my $payload = $data->{payload};
-			my $ok = eval {
-				my $username = $payload->{username};
-				my ($uid, $gid) = get_uid_gid($username);
+	my $data = $decoder->decode($blob);
+	my $command = $data->{command};
+	my $payload = $data->{payload};
+	my $ok = eval {
+		my $username = $payload->{username};
+		my ($uid, $gid) = get_uid_gid($username);
 
-				$) = "$gid $gid" or die "Cannot set group: $gid ($!)";
-				$> = $uid or die "Cannot set user: $uid ($!)";
+		$) = "$gid $gid" or die "Cannot set group: $gid ($!)";
+		$> = $uid or die "Cannot set user: $uid ($!)";
 
-				my $func = $allowed_commands{$command} or
-					die "Command not permitted: $command ($!)";
-				$func->($payload);
+		my $func = $allowed_commands{$command} or
+			die "Command not permitted: $command ($!)";
+		$func->($payload);
 
-				delete_empty_dirs($username);
+		delete_empty_dirs($username);
 
-				return 1;
-			};
-			$> = 0;
-			$) = 0;
-			warn unless $ok;
-		}
+		return 1;
 	};
+	$> = 0;
+	$) = 0;
+	warn unless $ok;
 
 	close($conn);
 }
