@@ -30,7 +30,7 @@ sub render_page {
 		if (-f $raw) {
 			my $sha = sha1_hex($slug);
 			my $cache_file = path($root, '.cache', $sha);
-			if (-f $cache_file && ! $use_cache == 0) {
+			if (-f $cache_file && $use_cache != 0) {
 				my @src_stats = stat($raw);
 				my $src_modtime = $src_stats[9];
 				my @cache_stats = stat($cache_file);
