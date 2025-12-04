@@ -6,7 +6,9 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title><%= $title %></title>
 		<link href="/main.css" rel="stylesheet">
+		% if ($user_style) {
 		<link href="/style.css" rel="stylesheet" sandbox>
+		% }
 		<link rel="icon" type="image/png" href="/favicon.png" />
 		%== $head
 	</head>

@@ -115,9 +115,10 @@ sub render_page {
 
 	$c->stash(
 		template => 'page',
-		nav_style => 'sidebar',
-		head => $head || '',
 		title => $title,
+		head => $head || '',
+		user_style => 1,
+		nav_style => 'sidebar',
 		header => $skel_html{_header} || '',
 		sidebar => $skel_html{_sidebar} || '',
 		footer => $skel_html{_footer} || '',
