@@ -1,9 +1,9 @@
 % layout 'default';
-<nav id="blip-nav" class="<%= $nav_style %>">
-	<header id="blip-header">
+<nav class="<%= $nav_style %>">
+	<header>
 		<%== $header %>
 	</header>
-	<menu id="blip-menu">
+	<menu>
 		<%== $sidebar %>
 		% if ($c->get_req_user eq 'mayor' && ! $c->session('username')) {
 		<ul>
@@ -11,10 +11,10 @@
 		</ul>
 		% }
 	</menu>
-	<footer id="blip-footer">
+	<footer>
 		<%== $footer %>
 	</footer>
 </nav>
-<main id="blip-main">
+<main>
 	<%== $content %>
 </main>
