@@ -53,7 +53,7 @@ label {
 	cursor: pointer;
 }
 
-ul {
+p > ul {
 	margin: 1em 0;
 }
 
