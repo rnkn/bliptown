@@ -530,6 +530,18 @@ nav #additional-controls button {
 
 /* layouts */
 
+main:has(.cover) {
+	padding: 0;
+}
+
+main:has(.cover) footer {
+	padding: 2em;
+}
+
+.pad {
+	padding: 2em;
+}
+
 .left {
 	margin-right: auto;
 }
@@ -591,6 +603,10 @@ nav #additional-controls button {
 	perspective: 1px;
 	overflow-y: auto;
 	height: calc(100vh - 4rem);
+}
+
+.parallax.cover {
+	height: 100vh;
 }
 
 .parallax-bg {
