@@ -1,4 +1,4 @@
-% my $drawer_toggle_style = param('toggle') == 1 ? 'display: block' : '';
+% my $drawer_toggle_style = param('toggle') ? 'display: block' : '';
 <!DOCTYPE html>
 <html>
 	<head>
