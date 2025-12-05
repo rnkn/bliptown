@@ -1,3 +1,4 @@
+% my $drawer_toggle_style = param('toggle') == 1 ? 'display: block' : '';
 <!DOCTYPE html>
 <html>
 	<head>
@@ -85,7 +86,7 @@
 			% }
 		</div>
 		<div id="viewport" class="<%= $stage %>">
-			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
+			<label id="drawer-toggle" style="<%= $drawer_toggle_style %>" class="button" for="drawer-toggle"></label>
 			% my $message = begin
 			% my $type = shift;
 			<input type="checkbox" id="message-close" hidden checked>
