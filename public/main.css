@@ -100,11 +100,14 @@ nav header, nav menu, nav footer {
 
 nav {
 	z-index: 80;
-	width: 24em;
 	display: flex;
-	flex-direction: column;
-	overflow-y: scroll;
 	background-color: var(--main-bg-color);
+}
+
+nav.sidebar {
+	width: 24em;
+	overflow-y: scroll;
+	flex-direction: column;
 }
 
 nav header {
@@ -118,6 +121,30 @@ nav header {
 
 nav header h1 {
 	font-size: 1em;
+}
+
+nav.sidebar menu ul ul {
+	display: none;
+}
+
+nav.sidebar menu ul li:hover ul {
+	display: block;
+}
+
+nav.topbar menu ul {
+	display: flex;
+	gap: 1em;
+}
+
+nav.topbar menu ul ul {
+	display: none;
+	position: absolute;
+	padding: 1em;
+	background-color: var(--main-bg-color);
+}
+
+nav.topbar menu ul li:hover ul {
+	display: block;
 }
 
 nav footer {
@@ -204,6 +231,14 @@ main textarea {
 	height: 100%;
 	box-shadow: 0 0 25px rgba(0,0,0,0.1);
 	transition: transform 0.3s ease;
+}
+
+#viewport.sidebar {
+	flex-direction: row;
+}
+
+#viewport.topbar {
+	flex-direction: column;
 }
 
 #drawer {
@@ -610,7 +645,7 @@ nav #additional-controls button {
 @media (max-width: 800px) {
 	nav {
 		position: fixed;
-		width: 100%;
+		width: 100% !important;
 		height: 5em;
 	}
 	header {
