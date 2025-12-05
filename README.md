@@ -5,7 +5,7 @@
 Install required packages:
 
 ```
-# pkg_add cmake gcc jq libqrencode png sqlports
+# pkg_add libqrencode png jpeg sqlports jq
 ```
 
 Build required packages:
