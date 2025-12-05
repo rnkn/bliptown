@@ -11,10 +11,17 @@
 		</ul>
 		% }
 	</menu>
-	<footer>
+	% if ($nav_style eq 'sidebar') {
+	<footer class="sidebar">
 		<%== $footer %>
 	</footer>
+	% }
 </nav>
 <main>
 	<%== $content %>
+	% if ($nav_style eq 'topbar') {
+	<footer class="topbar">
+		<%== $footer %>
+	</footer>
+	% }
 </main>
