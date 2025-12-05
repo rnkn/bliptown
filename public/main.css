@@ -173,8 +173,11 @@ main {
 	width: 100%;
 	overflow: scroll;
 	padding: 2rem;
-	padding-right: 4rem;
 	background-color: var(--main-bg-color);
+}
+
+.sidebar main {
+	padding-right: 4rem;
 }
 
 main p:first-child {
