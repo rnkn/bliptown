@@ -4,7 +4,7 @@
 		<%== $header %>
 	</header>
 	<menu>
-		<%== $sidebar %>
+		<%== $menu %>
 		% if ($c->get_req_user eq 'mayor' && ! $c->session('username')) {
 		<ul>
 			<li><label for="drawer-toggle">Join/Login</label>
