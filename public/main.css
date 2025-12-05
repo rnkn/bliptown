@@ -29,10 +29,6 @@ p {
 	margin: 1em 0;
 }
 
-p:first-child {
-	margin-top: 0;
-}
-
 a {
 	color: initial;
 	text-decoration: none;
@@ -151,6 +147,10 @@ main {
 	padding: 2rem;
 	padding-right: 4rem;
 	background-color: var(--main-bg-color);
+}
+
+main p:first-child {
+	margin-top: 0;
 }
 
 main a {
