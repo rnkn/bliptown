@@ -672,7 +672,7 @@ main:has(.cover) footer {
 	}
 	main {
 		padding-top: 5rem;
-		padding-right: 2rem;
+		padding-right: 2rem !important;
 	}
 	#files .cell.stat {
 		display: none;
