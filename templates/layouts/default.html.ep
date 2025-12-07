@@ -85,7 +85,7 @@
 			</div>
 			% }
 		</div>
-		<div id="viewport" class="<%= $nav_style %>">
+		<div id="viewport">
 			<label id="drawer-toggle" style="<%= $drawer_toggle_style %>" class="button" for="drawer-toggle"></label>
 			% my $message = begin
 			% my $type = shift;

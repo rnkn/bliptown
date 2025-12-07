@@ -1,5 +1,5 @@
 % layout 'default';
-<nav class="<%= $nav_style %>">
+<nav>
 	<header>
 		<%== $header %>
 	</header>
@@ -11,17 +11,10 @@
 		</ul>
 		% }
 	</menu>
-	% if ($nav_style eq 'sidebar') {
-	<footer class="sidebar">
+	<footer>
 		<%== $footer %>
 	</footer>
-	% }
 </nav>
 <main>
 	<%== $content %>
-	% if ($nav_style eq 'topbar') {
-	<footer class="topbar">
-		<%== $footer %>
-	</footer>
-	% }
 </main>

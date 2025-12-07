@@ -80,7 +80,7 @@ sub render_page {
 		}
 	);
 
-	my @skel = qw(header topbar sidebar footer);
+	my @skel = qw(header sidebar footer);
 	my %skel_html;
 	foreach (@skel) {
 		my $file = path($root, "_$_.md");
@@ -94,8 +94,6 @@ sub render_page {
 			$skel_html{$_} = $page->{html};
 		}
 	}
-
-	my $nav_style = $skel_html{topbar} ? 'topbar' : 'sidebar';
 
 	my $title_file = path($root, "_title.txt");
 	my $title = "Untitled";
@@ -122,12 +120,11 @@ sub render_page {
 		title => $title,
 		head => $head || '',
 		user_style => 1,
-		nav_style => $nav_style,
+		editable => 1,
 		header => $skel_html{header} || '',
-		menu => $skel_html{$nav_style} || '',
+		menu => $skel_html{sidebar} || '',
 		footer => $skel_html{footer} || '',
 		content => $page->{html},
-		editable => 1,
 		redirect => $c->url_for('render_page'),
 		show_join => $show_join,
 	);
