@@ -53,8 +53,12 @@ label {
 	cursor: pointer;
 }
 
-p > ul {
+ul {
 	margin: 1em 0;
+}
+
+ul ul {
+	margin: 0;
 }
 
 blockquote {
