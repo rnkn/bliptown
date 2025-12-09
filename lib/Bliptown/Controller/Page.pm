@@ -74,7 +74,7 @@ sub render_page {
 
 	if (!$file) {
 		if ($user_cur) {
-			return $c->redirect_to('new_page');
+			return $c->redirect_to('new_page', catchall => $slug);
 		} else {
 			return $c->reply->not_found;
 		}
