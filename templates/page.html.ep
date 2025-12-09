@@ -1,4 +1,5 @@
 % layout 'default';
+% if ($show_sidebar) {
 <nav>
 	<header>
 		<%== $header %>
@@ -15,6 +16,7 @@
 		<%== $footer %>
 	</footer>
 </nav>
+% }
 <main>
 	<%== $content %>
 </main>

@@ -101,8 +101,10 @@
 			% } elsif (flash('info')) {
 			%= $message->('info')
 			% }
+			% if ($show_sidebar) {
 			<input type="checkbox" id="nav-toggle" hidden>
 			<label id="nav-toggle" class="button" for="nav-toggle"></label>
+			% }
 			%= content
 		</div>
 	</body>

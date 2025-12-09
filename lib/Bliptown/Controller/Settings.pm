@@ -8,8 +8,8 @@ sub list_settings {
 	);
 	$c->stash(
 		title => 'Settings',
-		stage => 'backstage',
 		template => 'settings',
+		show_sidebar => 1,
 		username => $user->{username},
 		email => $user->{email},
 		custom_domain => $user->{custom_domain},

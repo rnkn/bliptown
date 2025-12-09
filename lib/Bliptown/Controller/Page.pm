@@ -82,9 +82,11 @@ sub render_page {
 
 	my @skel = qw(header sidebar footer);
 	my %skel_html;
+	my $show_sidebar = 0;
 	foreach (@skel) {
 		my $file = path($root, "_$_.md");
 		if (-f $file) {
+			$show_sidebar = 1 if $_ eq 'sidebar';
 			my $page = $c->page->read_page(
 				{
 					file => $file,
@@ -119,14 +121,15 @@ sub render_page {
 		template => 'page',
 		title => $title,
 		head => $head || '',
+		show_join => $show_join,
 		user_style => 1,
+		show_sidebar => $show_sidebar,
 		editable => 1,
 		header => $skel_html{header} || '',
 		menu => $skel_html{sidebar} || '',
 		footer => $skel_html{footer} || '',
-		content => $page->{html},
+		content => $page->{html} || '',
 		redirect => $c->url_for('render_page'),
-		show_join => $show_join,
 	);
 	return $c->render;
 }
@@ -160,6 +163,7 @@ sub new_page {
 	$c->stash(
 		template => 'edit',
 		title => 'New',
+		show_sidebar => 1,
 		slug => $slug,
 		ext => $ext,
 		redirect => $c->url_for('edit_page', catchall => $slug),
@@ -206,6 +210,7 @@ sub edit_page {
 	$c->stash(
 		template => 'edit',
 		title => 'Editing ',
+		show_sidebar => 1,
 		slug => $rel_file,
 		ext => $ext,
 		filename => $file->basename,

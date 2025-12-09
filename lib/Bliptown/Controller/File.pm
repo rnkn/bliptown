@@ -80,7 +80,7 @@ sub list_files {
 	$c->stash(
 		template => 'files',
 		title => 'Files',
-		stage => 'backstage',
+		show_sidebar => 1,
 		redirect => $c->url_for,
 		files => \@files,
 	);
