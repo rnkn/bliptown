@@ -2,7 +2,6 @@
 
 :root {
 	--main-bg-color: rgba(255,255,255,1.0);
-	--main-link-color: black;
 	--code-bg-color: rgba(235,235,235,1.0);
 	--controls-color: rgba(220,220,220,0.5);
 	--warning-color: rgba(200,0,0,1.0);
@@ -159,7 +158,7 @@ main p:first-child {
 }
 
 main a {
-	color: var(--main-link-color);
+	color: black;
 	border-bottom: 1px solid;
 }
 
