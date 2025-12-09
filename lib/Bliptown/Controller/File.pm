@@ -22,6 +22,7 @@ sub list_files {
 	my $filter = $c->param('filter');
 	my $delete = $c->param('delete');
 	my $rename = $c->param('rename');
+	my $rename_to = $c->param('rename_to');
 	my $username = $c->session('username');
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
@@ -40,15 +41,15 @@ sub list_files {
 		return $c->redirect_to($c->url_for('list_files')->query(filter => $filter));
 	}
 
-	if ($filter && $rename) {
+	if ($filter && $rename && $rename_to) {
 		rename_files_regex(
 			$c, {
 				username => $username,
 				root => $root,
 				filter => $filter,
-				rename => $rename
+				rename => $rename_to
 			});
-		return $c->redirect_to($c->url_for('list_files')->query(filter => $rename));
+		return $c->redirect_to($c->url_for('list_files')->query(filter => $rename_to));
 	}
 
 	my $tree = $root->list_tree;

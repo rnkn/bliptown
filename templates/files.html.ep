@@ -19,8 +19,8 @@
 			</fieldset>
 			<div id="additional-controls">
 				<fieldset>
-					<input type="text" form="filter" name="rename" placeholder="string">
-					<button type="submit" form="filter">Replace Match in Filenames</button>
+					<input type="text" form="filter" name="rename_to" placeholder="string">
+					<button type="submit" form="filter" name="rename" value="1">Replace Match in Filenames</button>
 				</fieldset>
 				<fieldset>				
 					<button type="submit" form="filter" name="delete" value="1">Delete Matching Files</button>
