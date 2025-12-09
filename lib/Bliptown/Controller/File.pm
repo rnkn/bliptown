@@ -21,8 +21,7 @@ sub list_files {
 	my $c = shift;
 	my $filter = $c->param('filter');
 	my $delete = $c->param('delete');
-	my $rename = $c->param('rename');
-	my $rename_to = $c->param('rename_to');
+	my $replace = $c->param('replace');
 	my $username = $c->session('username');
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
@@ -47,9 +46,9 @@ sub list_files {
 				username => $username,
 				root => $root,
 				filter => $filter,
-				rename => $rename_to
+				replace => $replace
 			});
-		return $c->redirect_to($c->url_for('list_files')->query(filter => $rename_to));
+		return $c->redirect_to($c->url_for('list_files')->query(filter => $replace));
 	}
 
 	my $tree = $root->list_tree;
@@ -93,13 +92,13 @@ sub rename_files_regex {
 	my $username = $args->{username};
 	my $root =$args->{root};
 	my $filter = $args->{filter};
-	my $rename = $args->{rename};
+	my $replace = $args->{replace};
 	my @files = $root->list_tree->each;
 	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
 	foreach (@filenames) {
 		my ($old_filename, $new_filename) = ($_, $_);
 		$old_filename = path($root, $old_filename)->to_abs->to_string;
-		$new_filename =~ s/$filter/$rename/g;
+		$new_filename =~ s/$filter/$replace/g;
 		$new_filename = path($root, $new_filename)->to_abs->to_string;
 		$c->ipc->send_message(
 			{
