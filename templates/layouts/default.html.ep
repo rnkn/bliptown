@@ -21,11 +21,9 @@
 			% if (session('username')) {
 			<div id="user" class="panel">
 				% if (session('username') eq get_req_user) {
-				<div class="button"><a href="<%= url_for('new_page', catchall => '')->query(back_to => $redirect) %>">New</a></div>
-				% if ($editable && $redirect) {
-				<div class="button"><a href="<%= url_for('edit_page')->query(back_to => $redirect) %>">Edit</a></div>
-				% } elsif ($editable) {
-				<div class="button"><a href="<%= url_for('edit_page') %>">Edit</a></div>
+				<div class="button"><a href="<%= url_for('new_page')->query(back_to => $redirect) %>">New</a></div>
+				% if ($editable) {
+				<div class="button"><a href="<%= url_for('edit_page', catchall => get_slug)->query(back_to => $redirect) %>">Edit</a></div>
 				% }
 				<div class="button"><a href="<%= url_for('list_files') %>">Files</a></div>
 				<div class="button"><a href="/style">Style</a></div>

@@ -1,6 +1,7 @@
 package Bliptown;
 use Mojo::Base 'Mojolicious';
 use Mojo::File qw(path);
+use Mojo::Util qw(url_unescape);
 use Mojo::SQLite;
 use lib '.';
 use Bliptown::Sessions;
@@ -101,6 +102,14 @@ sub startup {
 				config => $c->config,
 				ipc => $c->ipc,
 			);
+		});
+
+	$app->helper(
+		get_slug => sub {
+			my $slug = shift->req->url->path->to_string;
+			$slug = url_unescape($slug);
+			$slug =~ s/^\///;
+			return $slug;
 		});
 
 	$app->helper(
@@ -217,8 +226,8 @@ sub startup {
 		} else {
 			$url->host("$bliptown_domain");
 		}
-		$c->redirect_to($url)}
-	)->name('my_site');
+		$c->redirect_to($url)
+	})->name('my_site');
 
 	my $protected = $r->under(
 		'/' => sub {
@@ -228,11 +237,13 @@ sub startup {
 				return 1;
 			} else {
 				$c->flash(info => 'Login required');
-				$c->redirect_to('/');
+				$c->reply->not_found;
 				return;
 			}
 		}
 	);
+
+	$protected->get('/private/*catchall')->to(controller => 'Page', action => 'render_private', catchall => '')->name('render_private');
 
 	$protected->get('/new/*catchall')->to(controller => 'Page', action => 'new_page', catchall => '')->name('new_page');
 	$protected->get('/edit/*catchall')->to(controller => 'Page', action => 'edit_page', catchall => '')->name('edit_page');

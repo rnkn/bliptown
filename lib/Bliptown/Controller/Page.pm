@@ -13,6 +13,13 @@ sub yaml_true {
 
 my @allowed_exts = qw(html css js txt md);
 
+sub render_private {
+	my $c = shift;
+	my $catchall = $c->param('catchall') || '';
+	$c->stash(catchall => 'private/' . $catchall);
+	$c->render_page;
+}
+
 sub render_page {
 	my $c = shift;
 	my $root = path($c->get_user_home, $c->get_req_user);
@@ -20,7 +27,7 @@ sub render_page {
 	my $use_cache = $c->param('cache') // 1;
 	$c->stash( home => $c->get_home );
 	my $user_cur = $username && $username eq $c->get_req_user;
-	my $slug = $c->param('catchall');
+	my $slug = $c->stash('catchall');
 	unless (-d $root && $root gt $c->get_user_home) {
 		return $c->reply->not_found;
 	}
