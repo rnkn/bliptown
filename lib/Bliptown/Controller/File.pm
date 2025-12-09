@@ -40,7 +40,7 @@ sub list_files {
 		return $c->redirect_to($c->url_for('list_files')->query(filter => $filter));
 	}
 
-	if ($filter && $rename && $rename_to) {
+	if ($filter && defined $replace) {
 		rename_files_regex(
 			$c, {
 				username => $username,
