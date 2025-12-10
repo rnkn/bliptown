@@ -182,7 +182,7 @@ sub edit_page {
 	my $c = shift;
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
-	my $partial_re = qr/\{\{ *> *(.*?) *\}\}/;
+	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
 	my $root = path($c->get_user_home, $c->get_req_user);
 	my $file;
 	if (!$slug || $slug =~ /\/$/) {
@@ -207,8 +207,9 @@ sub edit_page {
 	my @includes;
 	if (-f $file) {
 		$content = $c->file->read_file({ file => $file })->{chars};
-		while ($content =~ /$partial_re/g) {
-			unless (grep { $1 eq $_ } @includes ) {
+		my @lines = split /\n/, $content;
+		foreach (@lines) {
+			if ($_ =~ $partial_re) {
 				my $include = $1; $include =~ s/\.[^.]+?$//;
 				push @includes, $include;
 			}
