@@ -73,7 +73,7 @@ sub read_page {
 			$chars =~ s/&/&amp;/g;
 			$chars =~ s/</&lt;/g;
 		}
-		$html = "<pre>$chars</pre>";
+		$html = "<section class=\"one-column\">\n<pre>$chars</pre></section>\n";
 	} elsif ($file =~ /\.md$/) {
 		my ($yaml, $text, $layout);
 
