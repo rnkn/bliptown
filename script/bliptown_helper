@@ -44,29 +44,45 @@ sub provision_cert {
 sub update_domain_list {
 	my $payload = shift;
 	my $all_domains = $payload->{all_domains};
-	my $keypair_file = $ENV{BLIPTOWN_KEYPAIR_FILE};
-	my $acme_file = $ENV{BLIPTOWN_ACME_FILE};
+	my $keypair_file = path($ENV{BLIPTOWN_KEYPAIR_FILE});
+	$keypair_file->touch unless -f $keypair_file;
+	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
+	$acme_file->touch unless -f $acme_file;
 
-	if (open(my $fh, '>', $keypair_file)) {
-		foreach my $domain (@$all_domains) {
-			print $fh "tls keypair \"$domain\"\n";
+	my $keypairs_str;
+	foreach (@$all_domains) {
+		$keypairs_str .= "tls keypair \"$_\"\n";
+	}
+
+	my $keypair_file_str = $keypair_file->slurp('utf-8');
+
+	unless ($keypairs_str eq $keypair_file_str) {
+		$keypair_file->spew($keypairs_str, 'utf-8')
+			or die "Cannot write keypair file: $keypair_file ($!)";
+
+		my $pid = fork();
+		if ($pid == 0) {
+			exec('rcctl', 'reload', 'relayd');
 		}
-		close $fh or die "Cannot close keypair file: $keypair_file ($!)";
-	} else { die "Cannot open keypair file: $keypair_file ($!)"; }
+	}
 
-	if (open(my $fh, '>', $acme_file)) {
-		foreach my $domain (@$all_domains) {
-			print $fh <<"EOF";
-domain $domain {
-	alternative names { www.$domain }
-	domain certificate "/etc/ssl/$domain.crt"
-	domain key "/etc/ssl/private/$domain.key"
+	my $acme_domains_str;
+	foreach (@$all_domains) {
+		$acme_domains_str .= <<"EOF";
+domain $_ {
+	alternative names { www.$_ }
+	domain certificate "/etc/ssl/$_.crt"
+	domain key "/etc/ssl/private/$_.key"
 	sign with "letsencrypt"
 }
 EOF
-		}
-		close $fh or die "Cannot close acme-client file: $acme_file ($!)";
-	} else { die "Cannot open acme-client file: $acme_file ($!)" }
+	}
+
+	my $acme_file_str = $acme_file->slurp('utf-8');
+
+	unless ($acme_domains_str eq $acme_file_str) {
+		$acme_file->spew($acme_domains_str, 'utf-8');
+	}
 	
 	my $pid = fork();
 	if ($pid == 0) {
@@ -113,7 +129,7 @@ sub update_file {
 		rename $filename, "${filename}~"
 			or die "Cannot create backup: $filename~ ($!)"
 	}
-	$path->spew($content, 'UTF-8') or die "Cannot write file: $path ($!)";
+	$path->spew($content, 'utf-8') or die "Cannot write file: $path ($!)";
 }
 
 sub rename_file {
