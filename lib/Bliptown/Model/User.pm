@@ -62,7 +62,7 @@ sub update_user {
     my $ok = $self->sqlite->db->update(
 		'users', \%values, { username => $username }
 	);
-	if ($values{custom_domain} && $values{custom_domain} ne 'NULL') {
+	if ($values{custom_domain}) {
 		$self->domain_list->update_domain_list;
 	}
 	warn unless $ok;
