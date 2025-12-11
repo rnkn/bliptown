@@ -3,8 +3,10 @@ use Mojo::Base 'Mojolicious::Controller';
 
 sub list_settings {
 	my $c = shift;
+	my $username = $c->session('username');
+	return unless $username;
 	my $user = $c->user->read_user(
-		{ key => 'username', username => $c->session('username') }
+		{ key => 'username', username => $username }
 	);
 	$c->stash(
 		title => 'Settings',
@@ -22,6 +24,7 @@ sub list_settings {
 sub save_settings {
 	my $c = shift;
 	my $username = $c->session('username');
+	return unless $username;
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
 	);
