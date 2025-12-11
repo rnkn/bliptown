@@ -159,11 +159,11 @@ while (my $conn = $server->accept()) {
 		my $username = $payload->{username};
 		my ($uid, $gid) = get_uid_gid($username);
 
-		$) = "$gid $gid" or die "Cannot set group: $gid ($!)";
-		$> = $uid or die "Cannot set user: $uid ($!)";
+		$) = "$gid $gid" or die "Cannot set group: $gid";
+		$> = $uid or die "Cannot set user: $uid";
 
 		my $func = $allowed_commands{$command} or
-			die "Command not permitted: $command ($!)";
+			die "Command not permitted: $command";
 		$func->($payload);
 
 		delete_empty_dirs($username);
