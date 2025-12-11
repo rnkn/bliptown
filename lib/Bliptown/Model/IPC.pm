@@ -7,7 +7,7 @@ my $encoder = Sereal::Encoder->new;
 
 sub send_message {
 	my ($self, $args) = @_;
-	my $sock_path = '/var/run/bliptown_helper.sock';
+	my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
 	my $client = IO::Socket::UNIX->new(
 		Type => SOCK_STREAM,
 		Peer => $sock_path,

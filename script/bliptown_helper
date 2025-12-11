@@ -12,11 +12,12 @@ use Sereal::Decoder;
 $SIG{CHLD} = 'IGNORE';
 
 die "$0 must be run as root" unless $> == 0;
+die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
 die "BLIPTOWN_KEYPAIR_FILE not defined "unless $ENV{BLIPTOWN_KEYPAIR_FILE};
 die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
 
-my $sock_path = '/var/run/bliptown_helper.sock';
+my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
 unlink $sock_path if -e $sock_path;
 
 my $server = IO::Socket::UNIX->new(
