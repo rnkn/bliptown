@@ -5,8 +5,7 @@ use warnings;
 use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
-use Path::Tiny;
-use File::Find;
+use Mojo::File qw(path);
 use Sereal::Decoder;
 
 $SIG{CHLD} = 'IGNORE';
@@ -86,54 +85,53 @@ sub get_uid_gid {
 sub delete_empty_dirs {
 	my $username = shift;
 	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
-	$root->realpath;
-	finddepth(sub { return unless -d $_; rmdir $_}, $root);
+	$root = $root->realpath;
+	foreach ($root->list_tree({ dir => 1 })->each) {
+		next unless -d $_;
+		rmdir $_;
+	}
 }
 
 sub write_blob {
 	my $payload = shift;
 	my $filename = $payload->{filename};
 	my $blob = $payload->{blob};
-	my $dir = path($filename)->parent;
-	$dir->mkdir;
-	my $tmp = $dir->tempfile or die "Cannot create tempfile ($!)";
-	my $fh = $tmp->filehandle('>', ':raw');
-	print $fh $blob;
-	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
-	rename $tmp, $filename or die "Cannot write file: $filename ($!)";
+	my $path = path($filename);
+	my $dir = $path->dirname;
+	$dir->make_path or die "Cannot creat path: $dir ($!)";;
+	$path->spew($blob) or die "Cannot write file: $path ($!)";
 }
 
 sub update_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
 	my $content = $payload->{content};
-	my $dir = path($filename)->parent;
+	my $path = path($filename);
+	my $dir = $path->dirname;
+	$dir->make_path or die "Cannot creat path: $dir ($!)";
 	if ($payload->{create_backup} && -e $filename) {
 		rename $filename, "${filename}~"
 			or die "Cannot create backup: $filename~ ($!)"
 	}
-	$dir->mkdir;
-	my $tmp = $dir->tempfile  or die "Cannot create tempfile ($!)";
-	my $fh = $tmp->filehandle('>', ':raw');
-	print $fh $content;
-	chmod(0644, $tmp) or die "Cannot set permissions: $tmp ($!)";
-	rename $tmp, $filename or die "Cannot write file: $filename ($!)";
+	$path->spew($content, 'UTF-8') or die "Cannot write file: $path ($!)";
 }
 
 sub rename_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
+	my $path = path($filename);
 	my $new_filename = $payload->{new_filename};
-	my $dir = path($new_filename)->parent;
-	$dir->mkdir;
-	rename($filename, $new_filename)
-		or die "Cannot rename file: $filename -> $new_filename ($!)";
+	my $new_path = path($new_filename);
+	my $dir = $new_path->dirname;
+	$dir->make_path or die "Cannot creat path: $dir ($!)";
+	$path->move_to($new_path) or die "Cannot move file: $path ($!)";
 }
 
 sub delete_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
-	unlink $filename or die "Cannot delete file: $filename ($!)";
+	my $path = path($filename);
+	$path->remove or die "Cannot delete file: $filename ($!)";
 }
 
 my %allowed_commands = (
