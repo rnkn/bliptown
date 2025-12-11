@@ -159,8 +159,8 @@ while (my $conn = $server->accept()) {
 		my $username = $payload->{username};
 		my ($uid, $gid) = get_uid_gid($username);
 
-		$) = "$gid $gid" or die "Cannot set group: $gid";
-		$> = $uid or die "Cannot set user: $uid";
+		$) = "$gid $gid" or die "Cannot set group: $gid" unless $gid == 0;
+		$> = $uid or die "Cannot set user: $uid" unless $uid == 0;
 
 		my $func = $allowed_commands{$command} or
 			die "Command not permitted: $command";
