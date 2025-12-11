@@ -2,10 +2,10 @@
 % if ($show_sidebar) {
 <nav>
 	<header>
-		<%== $header %>
+		%== $header
 	</header>
 	<menu>
-		<%== $menu %>
+		%== $menu
 		% if ($c->get_req_user eq 'mayor' && ! $c->session('username')) {
 		<ul>
 			<li><label for="drawer-toggle">Join/Login</label>
@@ -13,10 +13,20 @@
 		% }
 	</menu>
 	<footer>
-		<%== $footer %>
+		%== $footer
 	</footer>
 </nav>
 % }
 <main>
-	<%== $content %>
+	% unless ($show_sidebar) {
+	<header>
+		%== $header
+	</header>
+	% }
+	%== $content
+	% unless ($show_sidebar) {
+	<footer>
+		%== $footer
+	</footer>
+	% }
 </main>
