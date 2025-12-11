@@ -102,16 +102,17 @@ sub read_page {
 			$recur++;
 			my $file_str = $slug;
 			$file_str =~ s/\.md$//; $file_str = "$file_str.md";
+			my $path;
 
 			if ($file_str =~ /^\//) {
 				# Absolute path
-				$file = path($root, $file_str)->to_abs;
+				$path = path($root, $file_str)->to_abs;
 			} else {
 				# Relative path
-				$file = path($file->dirname, $file_str)->to_abs;
+				$path = path($file->dirname, $file_str)->to_abs;
 			}
 
-			my @incl_glob_list = glob $file;
+			my @incl_glob_list = glob $path;
 
 			my @page_list;
 			foreach my $filename (@incl_glob_list) {
