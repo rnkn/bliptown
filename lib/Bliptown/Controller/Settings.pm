@@ -35,7 +35,7 @@ sub save_settings {
 	if ($cur_domain && $new_domain and $cur_domain ne $new_domain) {
 		$c->ipc->send_message(
 			command => 'provision_cert',
-			payload => { domain => $new_domain },
+			domain => $new_domain,
 		)
 	};
 	return $c->redirect_to($c->url_for('render_page'));
