@@ -28,11 +28,11 @@ sub save_settings {
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
 	);
-	my $cur_domain = $user->{custom_domain};
+	my $cur_domain = $user->{custom_domain} || '';
 	my $params = $c->req->params->to_hash;
 	$c->user->update_user({ username => $username, %$params });
-	my $new_domain = $params->{custom_domain};
-	if ($cur_domain && $new_domain and $cur_domain ne $new_domain) {
+	my $new_domain = $params->{custom_domain} || '';
+	if ($new_domain && $new_domain ne $cur_domain) {
 		$c->ipc->send_message(
 			command => 'provision_cert',
 			domain => $new_domain,
