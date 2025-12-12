@@ -606,6 +606,10 @@ main:has(.cover) footer {
 	flex-grow: 1;
 }
 
+.table details > summary::before {
+	display: none;
+}
+
 /* decorations */
 
 .button {
