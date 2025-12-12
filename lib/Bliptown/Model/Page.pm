@@ -94,7 +94,7 @@ sub read_page {
 		md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
 
-		my $partial_re = qr/\{\{ *(?:>|&gt;) *(.*?) *\}\}/;
+		my $partial_re = qr/(?:<p>)?\{\{ *(?:>|&gt;) *(.*?) *\}\}(?:<\/p>)?/;
 		while ($html =~ /$partial_re/) {
 			my $slug = $1;
 			my $root = $args->{root};
@@ -154,7 +154,7 @@ sub read_page {
 				} @page_list;
 			}
 			my $frag = join("\n", map { $_->{html} } @page_list);
-			$html =~ s/\{\{.*?\}\}/$frag/;
+			$html =~ s/$partial_re/$frag/;
 		}
 	}
 	return {
