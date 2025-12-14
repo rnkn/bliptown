@@ -151,13 +151,32 @@ sub delete_file {
 	$path->remove or die "Cannot delete file: $filename ($!)";
 }
 
+sub git_log {
+	my $payload = shift;
+	my $username = $payload->{username};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $out = `git -C "$repo" log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b" --max-count=50`;
+	my @commits;
+	foreach (split /\n/, $out) {
+		my ($hash, $subject, $date, $body) = split /\0/, $_, 4;
+		push @commits, {
+			hash => $hash,
+			subject => $subject,
+			date => $date,
+			body => $body,
+		};
+	}
+	return \@commits;
+}
+
 my %allowed_commands = (
-	write_blob  => \&write_blob,
-	update_file => \&update_file,
-	rename_file => \&rename_file,
-	delete_file => \&delete_file,
-	provision_cert => \&provision_cert,
-	update_domain_list => \&update_domain_list,
+	write_blob			=> \&write_blob,
+	update_file			=> \&update_file,
+	rename_file			=> \&rename_file,
+	delete_file			=> \&delete_file,
+	git_log				=> \&git_log,
+	provision_cert		=> \&provision_cert,
+	update_domain_list	=> \&update_domain_list,
 );
 
 my $decoder = Sereal::Decoder->new;
