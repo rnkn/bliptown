@@ -7,6 +7,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
 use Mojo::File qw(path);
 use Sereal::Decoder;
+use Sereal::Encoder;
 
 $SIG{CHLD} = 'IGNORE';
 
@@ -160,35 +161,43 @@ my %allowed_commands = (
 );
 
 my $decoder = Sereal::Decoder->new;
+my $encoder = Sereal::Encoder->new;
 
 while (my $conn = $server->accept()) {
-
-	my $blob;
-	while (read($conn, my $buf, 1024)) {
-		$blob .= $buf;
+	my $req_blob;
+	while (read($conn, my $buf, 512)) {
+		$req_blob .= $buf;
 	}
 
-	my $data = $decoder->decode($blob);
+	my $data = $decoder->decode($req_blob);
 	my $command = $data->{command};
 	my $payload = $data->{payload};
-	my $ok = eval {
+	my $res;
+	eval {
 		my $username = $payload->{username};
-		my ($uid, $gid) = get_uid_gid($username);
 
-		$) = "$gid $gid" or die "Cannot set group: $gid" unless $gid == 0;
-		$> = $uid or die "Cannot set user: $uid" unless $uid == 0;
+		unless ($username eq 'root') {
+			my ($uid, $gid) = get_uid_gid($username);
+
+			die "Cannot set group: $gid ($!)" unless $) = "$gid $gid";
+			die "Cannot set user: $uid ($!)" unless $> = $uid;
+		}
 
 		my $func = $allowed_commands{$command} or
 			die "Command not permitted: $command";
-		$func->($payload);
-
+		$res = $func->($payload);
 		delete_empty_dirs($username);
-
-		return 1;
 	};
+	my $err = $@;
+
 	$> = 0;
 	$) = 0;
-	warn unless $ok;
 
+	my $res_blob = $encoder->encode(
+		{
+			response => $res,
+			error => $err,
+		});
+	$conn->send($res_blob) or warn "Cannot send response ($!)";
 	close($conn);
 }
