@@ -1,0 +1,39 @@
+% layout 'default';
+<nav>
+	<header>
+		<h1><%= $title %></h1>
+	</header>
+	<menu>
+		<p>
+			<small>
+				Restoring a snapshot will make the files available
+				at <code>/snapshots/&lt;HASH&gt;</code>. Downloading a
+				snapshot will retrieve a tarball of the files of that
+				snapshot.
+			</small>
+		</p>
+		<ul>
+			<li><a href="<%= url_for('list_files') %>" class="exit">Files</a>
+		</ul>
+	</menu>
+</nav>
+<main id="snapshots">
+	<section class="one-column">
+		<div id="list" class="table">
+			% foreach (@$snapshots) {
+			<details name="snapshot">
+				<summary class="row">
+					<span class="cell"><code><%= $_->{hash} %></code></span>
+					<span class="cell commit-subject"><%= $_->{subject} %></span>
+					<span class="cell right date"><%= $_->{date} %></span>
+				</summary>
+				<pre><%= $_->{body} || 'No commit message' %></pre>
+				<ul class="controls">
+					<li><a href="<%= url_for('restore_snapshot', hash => $_->{hash}) %>">Restore</a></li>
+					<li><a href="<%= url_for('download_snapshot') %>">Download</a></li>
+				</ul>
+			</details>
+			% }
+		</div>
+	</section>
+</main>
