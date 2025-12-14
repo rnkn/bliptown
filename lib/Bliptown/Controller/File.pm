@@ -65,7 +65,7 @@ sub list_files {
 			filename => $rel_filename,
 			url => $url,
 			size => format_human_size($stats[7]),
-			mtime => strftime('%Y-%m-%d %H:%M', localtime($stats[9])),
+			mtime => strftime('%Y-%m-%d %H:%M %z', localtime($stats[9])),
 		}
 	};
 
