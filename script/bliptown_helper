@@ -151,6 +151,32 @@ sub delete_file {
 	$path->remove or die "Cannot delete file: $filename ($!)";
 }
 
+sub git_init {
+	my $payload = shift;
+	my $username = $payload->{username};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	chdir $repo or die "Cannot change directory: $repo ($!)";
+
+	my $ok = system('git init --quiet');
+	my $ignore_file = path($repo, '.gitignore');
+	unless (-f $ignore_file) {
+		my $ignore_str = <<EOF;
+.cache/
+snapshots/
+*~
+.#*
+#*#
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+EOF
+		$ignore_file->spew($ignore_str, 'utf-8') or die "Cannot write file: $ignore_file ($!)";
+	}
+	return $ok;
+}
+
 sub git_log {
 	my $payload = shift;
 	my $username = $payload->{username};
