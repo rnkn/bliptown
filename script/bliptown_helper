@@ -6,6 +6,7 @@ use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
 use Mojo::File qw(path);
+use Mojo::Util qw(trim);
 use Sereal::Decoder;
 use Sereal::Encoder;
 
@@ -186,7 +187,8 @@ sub git_log {
 
 	my @commits;
 	foreach (split /\x01/, $out) {
-		my ($hash, $subject, $date, $body) = split /\x00/, $_, 4;
+		my $commit = trim($_);
+		my ($hash, $subject, $date, $body) = split /\x00/, $commit, 4;
 		push @commits, {
 			hash => $hash,
 			subject => $subject,
