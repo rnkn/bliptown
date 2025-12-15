@@ -4,6 +4,12 @@
 		<h1><%= $title %></h1>
 	</header>
 	<menu>
+		<p>
+			<small>
+				Filter by filename to rename/delete multiple files at
+				once. Deleting a file will remove it immediately.
+			</small>
+		</p>
 		<div id="controls">
 			<form id="filter" method="get" action="<%= url_for('list_files') %>">
 				<input type="text" name="filter" placeholder="regexp" value="<%= param('filter') %>">
