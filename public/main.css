@@ -141,8 +141,8 @@ nav details ul {
 	padding-left: 1em;
 }
 
-nav details summary {
-	list-style: none;
+nav details summary::before {
+	content: none;
 }
 
 main {
