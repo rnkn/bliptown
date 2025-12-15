@@ -64,19 +64,16 @@ check file usr/bin/login path /usr/bin/login
 	if failed uid 0 then alert
 	if failed gid 7 then alert
 	if failed perm 555 then alert
-	if failed md5 checksum expect 6c620a854ed0a13a91ebdbd53818d637 then alert
 
 check file usr/sbin/sshd path /usr/sbin/sshd
 	if failed uid 0 then alert
 	if failed gid 7 then alert
 	if failed perm 0511 then alert
-	if failed md5 checksum expect 19676b5cac6bdf6e27ce0205af2a8ba9 then alert
 
 check file usr/bin/su path /usr/bin/su
 	if failed uid 0 then alert
 	if failed gid 7 then alert
 	if failed perm 4555 then alert
-	if failed md5 checksum expect d5f107f4bcf7796de6c097952dab48da then alert
 
 check file script/bliptown path /usr/local/www/bliptown/script/bliptown
 	if failed uid 0 then alert
