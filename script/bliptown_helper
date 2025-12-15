@@ -155,10 +155,12 @@ sub git_log {
 	my $payload = shift;
 	my $username = $payload->{username};
 	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
-	my $out = `git -C "$repo" log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b" --max-count=50`;
+	chdir $repo or die "Cannot change directory: $repo ($!)";
+	my $out = `git log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b%x01" --max-count=50`;
+
 	my @commits;
-	foreach (split /\n/, $out) {
-		my ($hash, $subject, $date, $body) = split /\0/, $_, 4;
+	foreach (split /\x01/, $out) {
+		my ($hash, $subject, $date, $body) = split /\x00/, $_, 4;
 		push @commits, {
 			hash => $hash,
 			subject => $subject,
