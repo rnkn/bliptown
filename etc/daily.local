@@ -2,33 +2,73 @@
 
 payload=/etc/ssl/private/porkbun-keys.json
 endpoint=https://api.porkbun.com/api/json/v3/ssl/retrieve/blip.town
+
+cleanup() {
+	rm -f $tmpfiles
+}
+trap cleanup EXIT
+
+next_part "Fetching blip.town certificate:"
+
 cert_chain=/etc/ssl/blip.town.crt
 cert_key=/etc/ssl/private/blip.town.key
+json_tmp=$(mktemp)
+tmpfiles="$json_tmp $tmpfiles"
 
-echo "Fetching certificate chain:"
-/usr/local/bin/curl -s -X POST -d @$payload $endpoint | /usr/local/bin/jq -r .certificatechain > "$cert_chain" &&
-	echo "Fetched: $cert_chain"
+/usr/local/bin/curl -fsS -X POST -d "@$payload" -m 30 "$endpoint" > "$json_tmp"
 
-echo "Fetching certificate key:"
-/usr/local/bin/curl -s -X POST -d @$payload $endpoint | /usr/local/bin/jq -r .privatekey > "$cert_key" &&
-	echo "Fetched: $cert_key"
+if [ ! -s "$json_tmp" ]
+then
+	echo "Certificate fetch failed!"
+else
+	cert_chain_tmp=$(mktemp)
+	tmpfiles="$cert_chain_tmp $tmpfiles"
+	cert_key_tmp=$(mktemp)
+	tmpfiles="$cert_key_tmp $tmpfiles"
 
+	ok=true
+	/usr/local/bin/jq -r .certificatechain < "$json_tmp" > "$cert_chain_tmp" || ok=false
+	/usr/local/bin/jq -r .privatekey < "$json_tmp" > "$cert_key_tmp" || ok=false
+fi
+
+if [ $ok ]
+then
+	cert_hash=$(/usr/bin/openssl x509 -in "$cert_chain_tmp" -pubkey \
+					| /usr/bin/openssl pkey -pubin | /bin/md5)
+	key_hash=$(/usr/bin/openssl pkey -in "$cert_key_tmp" -pubout | /bin/md5)
+
+	next_part "Matching certificate with key:"
+	if [ "X$cert_hash" != "X$key_hash" ]
+	then
+		echo "Certificate chain and key do not match!"
+	else
+		echo "Certificate chain and key match."
+		echo "Installing certificate:"
+		install -m 0644 -o root -g wheel "$cert_chain_tmp" "$cert_chain" && echo "$cert_chain installed."
+		install -m 0600 -o root -g wheel "$cert_key_tmp" "$cert_key" && echo "$cert_key installed."
+	fi
+fi
+
+next_part "Renewing user certificates:"
 /usr/bin/grep "^domain" /etc/acme-domains.conf | while read -r line
 do
 	domain=$(echo "$line" | /usr/bin/cut -d' ' -f2)
+	echo "$domain"
 	test -n "$domain" && /usr/sbin/acme-client "$domain"
 done
 
-echo "Reloading relayd:"
+next_part "Reloading relayd:"
 /usr/sbin/rcctl reload relayd
 
-echo "Expunging database dead login tokens:"
-/usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $(date +%s)"
+next_part "Expunging database dead login tokens:"
+now=$(date +%s)
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now"
 echo "Done."
 
-echo "Creating database backup:"
-backup_db="/var/db/bliptown/users-$(date +%F).db"
+next_part "Creating database backup:"
+date=$(date +%F)
+backup_db="/var/db/bliptown/users-${date}.db"
 
-install -m 600 -o root -g wheel /dev/null $backup_db
+install -m 0600 -o root -g wheel /dev/null "$backup_db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
 echo "Created backup: $backup_db"
