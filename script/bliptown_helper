@@ -213,7 +213,7 @@ sub git_commit {
 	die "No changes to commit" unless (length($body));
 
 	die "Cannot commit files to repo: $repo ($!)"
-		unless system("git commit -m '$subject' -m '$body' > /dev/null");
+		unless system("git commit -m '$subject' -m '$body'");
 
 	my $commits = git_log($payload);
 	my $hash = $commits->[0]->{hash};
