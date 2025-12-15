@@ -197,11 +197,33 @@ sub git_log {
 	return \@commits;
 }
 
+sub git_commit {
+	my $payload = shift;
+	my $username = $payload->{username};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	git_init($payload);
+	chdir $repo or die "Cannot change directory: $repo ($!)";
+
+	die "Cannot add files to $repo" unless system('git add -A');
+
+	my $subject = 'Full snapshot on blip.town';
+	my $body = `git status --porcelain`;
+	die "No changes to commit" unless (length($body));
+
+	die "Cannot commit files to repo: $repo ($!)"
+		unless system("git commit -m '$subject' -m '$body' > /dev/null");
+
+	my $commits = git_log($payload);
+	my $hash = $commits->[0]->{hash};
+	return $hash;
+}
+
 my %allowed_commands = (
 	write_blob			=> \&write_blob,
 	update_file			=> \&update_file,
 	rename_file			=> \&rename_file,
 	delete_file			=> \&delete_file,
+	git_commit			=> \&git_commit,
 	git_log				=> \&git_log,
 	provision_cert		=> \&provision_cert,
 	update_domain_list	=> \&update_domain_list,
