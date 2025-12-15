@@ -26,6 +26,7 @@ sub send_message {
 			create_backup	=> $args->{create_backup} // 0,
 			content			=> $args->{content} // '',
 			blob			=> $args->{blob} // '',
+			hash			=> $args->{hash} // '',
 			domain			=> $args->{domain} // '',
 			all_domains		=> $args->{all_domains} // [],
 		},

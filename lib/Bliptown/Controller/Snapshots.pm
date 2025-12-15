@@ -11,8 +11,8 @@ sub take_snapshot {
 			username => $username,
 		});
 
-	my $hash = $data->{response};
-	$c->flash(info => "Snapshot $hash taken");
+	my $res_hash = $data->{response};
+	$c->flash(info => "Snapshot $res_hash taken");
 	return $c->redirect_to('list_snapshots');
 }
 
@@ -35,6 +35,23 @@ sub list_snapshots {
 		snapshots => $snapshots,
 	);
 	return $c->render;
+}
+
+sub restore_snapshot {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $hash = $c->param('hash');
+
+	my $data = $c->ipc->send_message(
+		{
+			command => 'git_checkout',
+			username => $username,
+			hash => $hash,
+		});
+
+	my $res_hash = $data->{response};
+	$c->flash(info => "Snapshot $res_hash restored");
+	return $c->redirect_to($c->url_for('list_files')->query(filter => "snapshots/$res_hash"));
 }
 
 return 1;

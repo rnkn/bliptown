@@ -220,6 +220,20 @@ sub git_commit {
 	return $hash;
 }
 
+sub git_checkout {
+	my $payload = shift;
+	my $username = $payload->{username};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $hash = $payload->{hash};
+	my $dir = path($repo, 'snapshots', $hash);
+	$dir->make_path or die "Cannot make path: $dir ($!)";
+	git_init($payload);
+	chdir $repo or die "Cannot change directory: $repo ($!)";
+	die "Failed to extract archive from hash: $hash"
+		unless system("git archive '$hash' | tar -x -C '$dir'");
+	return $hash;
+}
+
 my %allowed_commands = (
 	write_blob			=> \&write_blob,
 	update_file			=> \&update_file,
@@ -227,6 +241,7 @@ my %allowed_commands = (
 	delete_file			=> \&delete_file,
 	git_commit			=> \&git_commit,
 	git_log				=> \&git_log,
+	git_checkout		=> \&git_checkout,
 	provision_cert		=> \&provision_cert,
 	update_domain_list	=> \&update_domain_list,
 );
