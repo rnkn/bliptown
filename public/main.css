@@ -387,53 +387,50 @@ nav a.exit:before {
 	margin: 1em 0;
 }
 
-/* Files  */
+/* Lists (Files, Snapshots)  */
 
-#files #controls {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-#files #upload {
-	margin-left: auto;
-}
-
-#files #list {
+#list {
 	margin: 1em 0;
 }
 
-#files #list .row .controls {
+#list .row .controls {
 	margin: 0;
 }
 
-#files #list .controls a {
-	border: none;
-}
-
-#files details {
+#list details {
 	padding: 2px 4px;
 }
 
-#files details:hover, #files details[open] {
+#list details:hover, #list details[open] {
 	background-color: var(--controls-color);
 }
 
-#files #list details ul {
+#list details ul {
 	display: flex;
 	gap: 0.5em 1em;
 	list-style: none;
 	padding: 4px;
 }
 
-#files #list details ul li {
+#list details ul li {
 	font-size: 0.9em
 }
 
-#files #list details ul li a.warning {
+#list details ul li a.warning {
 	color: var(--warning-color);
 }
 
-/** Files controls  */
+#list .commit-message, #list .date {
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#list .date {
+	width: 26ex;
+	text-align: right;
+}
+
+/* Files controls  */
 
 nav #controls input {
 	width: 100%;
@@ -444,7 +441,7 @@ nav #controls fieldset {
 	margin: 4px 0;
 }
 
-nav #controls #filter-controls {
+nav #controls fieldset#filter-controls {
 	display: flex;
 	gap: 8px;
 }
@@ -466,6 +463,15 @@ nav input#additional-controls-toggle:checked ~ #additional-controls {
 
 nav #additional-controls button {
 	width: 100%;
+	margin: 4px 0;
+}
+
+nav #additional-controls hr {
+	margin: 10px;
+}
+
+nav #additional-controls a:hover {
+	border-bottom: 1px solid;
 }
 
 /* Settings */
@@ -591,6 +597,14 @@ main:has(.cover) footer {
 
 /* tables */
 
+.table a {
+	border: none;
+}
+
+.table a:hover {
+	border-bottom: 1px solid;
+}
+
 .table .row {
 	display: flex;
 	gap: 1em;
@@ -606,6 +620,10 @@ main:has(.cover) footer {
 
 .table details > summary::before {
 	display: none;
+}
+
+.table code {
+	background-color: initial;
 }
 
 /* decorations */
