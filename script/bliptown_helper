@@ -41,6 +41,7 @@ sub provision_cert {
 	if ($pid == 0) {
 		exec('acme-client', $domain);
 	}
+	return "Provisioned certificate: $domain";
 }
 
 sub update_domain_list {
@@ -85,6 +86,7 @@ EOF
 	unless ($acme_domains_str eq $acme_file_str) {
 		$acme_file->spew($acme_domains_str, 'utf-8');
 	}
+	return "Domain list up-to-date";
 }
 
 sub get_uid_gid {
@@ -113,6 +115,7 @@ sub write_blob {
 	my $dir = $path->dirname;
 	$dir->make_path or die "Cannot creat path: $dir ($!)";;
 	$path->spew($blob) or die "Cannot write file: $path ($!)";
+	return "Wrote file: $filename";
 }
 
 sub update_file {
@@ -127,6 +130,7 @@ sub update_file {
 			or die "Cannot create backup: $filename~ ($!)"
 	}
 	$path->spew($content, 'utf-8') or die "Cannot write file: $path ($!)";
+	return "Updated file: $filename"
 }
 
 sub rename_file {
@@ -138,6 +142,7 @@ sub rename_file {
 	my $dir = $new_path->dirname;
 	$dir->make_path or die "Cannot creat path: $dir ($!)";
 	$path->move_to($new_path) or die "Cannot move file: $path ($!)";
+	return "Renamed file: $filename -> $new_filename"
 }
 
 sub delete_file {
@@ -145,6 +150,7 @@ sub delete_file {
 	my $filename = $payload->{filename};
 	my $path = path($filename);
 	$path->remove or die "Cannot delete file: $filename ($!)";
+	return "Deleted file: $filename"
 }
 
 sub git_init {
@@ -158,7 +164,7 @@ sub git_init {
 		unless system('git init --quiet');
 	die "Cannot configure repository ignore file"
 		unless system("git config set core.excludesFile $excludes_file");
-	return 1;
+	return "Initialized Git repository: $repo";
 }
 
 sub git_log {
