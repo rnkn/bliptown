@@ -237,7 +237,10 @@ sub startup {
 				return 1;
 			} else {
 				$c->flash(info => 'Login required');
-				$c->reply->not_found;
+				$c->render(
+						template => 'message',
+						content => 'Sorry, this page requires a login.'
+				);
 				return;
 			}
 		}
