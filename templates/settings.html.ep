@@ -30,8 +30,10 @@
 					<input class="cell" type="text" id="custom-domain" name="custom_domain" value="<%= $custom_domain %>" placeholder="example.com">
 				</li>
 				<li class="row">
-					<a href="<%= url_for('edit_page', catchall => '_pubkeys' )->query([ext => 'txt', back_to => url_for])%>">SSH public keys</a>
-					<a href="https://blip.town/faq/shell_access" target="_blank" class="help-q">?</a>
+					<span>
+						<a href="<%= url_for('edit_page', catchall => '_pubkeys' )->query([ext => 'txt', back_to => url_for])%>">SSH public keys</a>
+						<a href="https://blip.town/faq/shell_access" target="_blank" class="help-q">?</a>
+					</span>
 				</li>
 				<li class="row">
 					<a href="<%= url_for('totp_initiate')->query(back_to => url_for)%>">Reset 2FA</a>
