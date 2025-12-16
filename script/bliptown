@@ -7,8 +7,8 @@ use FindBin qw($Bin);
 use lib "$Bin/../lib", "$Bin/../local/lib/perl5";
 use Mojolicious::Commands;
 
-die "BLIPTOWN_SECRET not defined ($!)" unless $ENV{BLIPTOWN_SECRET};
-die "BLIPTOWN_SALT not defined ($!)" unless $ENV{BLIPTOWN_SALT};
+die "BLIPTOWN_SECRET not defined" unless $ENV{BLIPTOWN_SECRET};
+die "BLIPTOWN_SALT not defined" unless $ENV{BLIPTOWN_SALT};
 die "BLIPTOWN_USER_HOME not defined " unless $ENV{BLIPTOWN_HELPER_SOCKET};
 die "BLIPTOWN_USER_HOME not defined " unless $ENV{BLIPTOWN_USER_HOME};
 die "BLIPTOWN_DB_HOME not defined" unless $ENV{BLIPTOWN_DB_HOME};
