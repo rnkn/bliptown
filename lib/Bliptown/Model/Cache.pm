@@ -3,6 +3,7 @@ use Mojo::Base -base;
 use Mojo::File qw(path);
 use Digest::SHA qw(sha1_hex);
 use Imager;
+use Encode;
 
 has 'config';
 has 'ipc';
@@ -19,11 +20,13 @@ sub create_cache {
 
 	my @imgs = grep { /\.jpe?g$/i } @$tree;
 	foreach (@imgs) {
-		my $sha = sha1_hex($_->to_rel($root));
+		my $filename = decode_utf8($_->to_string);
+		my $rel_filename = decode_utf8($_->to_rel($root));
+		my $sha = sha1_hex($rel_filename);
 		my $cache_file = path($cache, $sha);
 
 		my $img = Imager->new;
-		$img->read(file => $_->to_string, type => 'jpeg')
+		$img->read(file => $filename, type => 'jpeg')
 			or die "Cannot read file: ", $img->errstr;
 
 		my $width = $img->getwidth;
