@@ -26,11 +26,12 @@
 					<input class="cell" type="password" id="new-password" name="new_password">
 				</li>
 				<li class="row">
-					<label class="cell name" for="custom-domain">Custom domain <a href="" target="_blank" class="help-q">?</a></label>
-					<input class="cell" type="text" id="custom-domain" name="custom_domain" value="<%= $custom_domain %>"placeholder="example.com">
+					<label class="cell name" for="custom-domain">Custom domain <a href="https://blip.town/faq/custom_domain" target="_blank" class="help-q">?</a></label>
+					<input class="cell" type="text" id="custom-domain" name="custom_domain" value="<%= $custom_domain %>" placeholder="example.com">
 				</li>
 				<li class="row">
 					<a href="<%= url_for('edit_page', catchall => '_pubkeys' )->query([ext => 'txt', back_to => url_for])%>">SSH public keys</a>
+					<a href="https://blip.town/faq/shell_access" target="_blank" class="help-q">?</a>
 				</li>
 				<li class="row">
 					<a href="<%= url_for('totp_initiate')->query(back_to => url_for)%>">Reset 2FA</a>
@@ -54,7 +55,7 @@
 					</li>
 				</label>
 				<li class="row">
-					<span class="cell name">Cache web-optimised images?</span>
+					<span class="cell name">Cache web-optimised images <a href="https://blip.town/faq/image_cache" target="_blank" class="help-q">?</a></span>
 					<a href="<%= url_for('create_cache')->query(back_to => url_for) %>">Create cache</a>
 					<a href="<%= url_for('delete_cache')->query(back_to => url_for) %>">Delete cache</a>
 				</li>
