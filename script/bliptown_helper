@@ -85,11 +85,6 @@ EOF
 	unless ($acme_domains_str eq $acme_file_str) {
 		$acme_file->spew($acme_domains_str, 'utf-8');
 	}
-	
-	my $pid = fork();
-	if ($pid == 0) {
-		exec('rcctl', 'reload', 'relayd');
-	}
 }
 
 sub get_uid_gid {
