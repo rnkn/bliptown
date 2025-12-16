@@ -565,6 +565,16 @@ main:has(.cover) footer {
 	margin: 0;
 }
 
+.gallery-columns {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1em;
+}
+
+.gallery-columns > p {
+	margin: 0;
+}
+
 .ratio-3x2 img, .ratio-2x3, .ratio-8x10 img,
 .ratio-10x8 img, .ratio-16x9 img, .ratio-1x1 img {
 	width: 100%;
