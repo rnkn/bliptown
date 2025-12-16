@@ -615,11 +615,11 @@ main:has(.cover) footer {
 /* tables */
 
 .table a {
-	border: none;
+	border: 1px solid transparent;
 }
 
 .table a:hover {
-	border-bottom: 1px solid;
+	border-bottom-color: currentcolor;
 }
 
 .table .row {
