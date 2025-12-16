@@ -8,7 +8,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-next_part "Fetching blip.town certificate:"
+start_part "Fetching blip.town certificate:"
 
 cert_chain=/etc/ssl/blip.town.crt
 cert_key=/etc/ssl/private/blip.town.key
@@ -72,3 +72,4 @@ backup_db="/var/db/bliptown/users-${date}.db"
 install -m 0600 -o root -g wheel /dev/null "$backup_db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
 echo "Created backup: $backup_db"
+end_part
