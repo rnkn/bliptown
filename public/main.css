@@ -299,6 +299,13 @@ label#nav-toggle:before {
 	flex-wrap: wrap;
 	align-content: flex-end;
 	gap: 1em;
+	font-size: initial;
+	font-family: sans-serif;
+	font-weight: initial;
+}
+
+#drawer .panel a:hover {
+	color: initial;
 }
 
 #drawer #join,
