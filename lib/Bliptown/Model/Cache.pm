@@ -18,7 +18,7 @@ sub create_cache {
 	my $cache = path($root, '.cache');
 	my $tree = $root->list_tree;
 
-	my @imgs = grep { /\.jpe?g$/i } @$tree;
+	my @imgs = grep { /\.(jpe?g|png|tiff?)$/i } @$tree;
 	foreach (@imgs) {
 		my $filename = decode_utf8($_->to_string);
 		my $rel_filename = decode_utf8($_->to_rel($root));
@@ -26,7 +26,7 @@ sub create_cache {
 		my $cache_file = path($cache, $sha);
 
 		my $img = Imager->new;
-		$img->read(file => $filename, type => 'jpeg')
+		$img->read(file => $filename)
 			or die "Cannot read file: ", $img->errstr;
 
 		my $width = $img->getwidth;
