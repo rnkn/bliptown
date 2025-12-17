@@ -204,7 +204,21 @@ sub create_cache {
 	my $username = $c->session('username');
 	my $redirect = $c->param('back_to') // '/';
 	my $root = path($c->get_user_home, $username);
-	$c->image_cache->create_cache({ username => $username });
+
+	my $sub = Mojo::IOLoop::Subprocess->new;
+
+	$sub->run(
+		sub {
+			return $c->image_cache->create_cache({ username => $username });
+		},
+		sub {
+			my ($sub, $err) = @_;
+			return $c->log->error("$err") if $err;
+			return $c->log->info("Cache created");
+		}
+	);
+
+	$c->flash(info => 'Creating cache...');
 	return $c->redirect_to($redirect);
 }
 
