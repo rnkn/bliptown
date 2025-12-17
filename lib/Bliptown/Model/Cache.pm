@@ -33,7 +33,7 @@ sub create_cache {
 		my $height = $img->getheight;
 		$width = $width < 2048 ? $width : 2048;
 		$height = $height < 2048 ? $height : 2048;
-		my $side = $width > $height ? $width : $height;
+		my $side = $width < $height ? $width : $height;
 
 		my $scaled_img = $img->scale(xpixels => $side, ypixels => $side, type => 'min');
 
