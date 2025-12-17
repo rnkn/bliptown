@@ -49,6 +49,7 @@ sub create_cache {
 			}
 		);
 	}
+	return;
 }
 
 return 1;
