@@ -509,6 +509,10 @@ nav #additional-controls a:hover {
 
 /* layouts */
 
+section {
+	margin: 1em 0;
+}
+
 main:has(.cover) {
 	padding: 0;
 }
