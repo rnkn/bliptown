@@ -19,6 +19,17 @@
 </nav>
 <main id="snapshots">
 	<section class="one-column">
+		% if (@$snapshots) {
+		<details>
+			<summary>
+				<small>
+					History limited to 50 commits. For entire history, clone
+					this repository.
+				</small>
+			</summary>
+			<pre>git clone <%= $repo %></pre>
+		</details>
+		% }
 		<div id="list" class="table">
 			% foreach (@$snapshots) {
 			<details name="snapshot">
