@@ -224,6 +224,7 @@ sub delete_cache {
 			}
 		)
 	}
+	$c->flash(info => 'Deleted cache');
 	return $c->redirect_to($redirect);
 }
 
