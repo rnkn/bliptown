@@ -4,8 +4,7 @@ use Mojo::File qw(path);
 use FFI::Platypus;
 use YAML::Tiny;
 use Mojo::DOM::HTML;
-use Mojo::Util qw(dumper);
-use Encode;
+use Mojo::Util qw(encode decode);
 
 use constant {
 	MD_FLAG_COLLAPSEWHITESPACE          => 1 << 0,
@@ -64,7 +63,7 @@ sub read_page {
 		sub {
 			my ($chunk, $size) = @_;
 			my $bytes = substr($chunk, 0, $size);
-			$html .= decode_utf8($bytes);
+			$html .= decode('utf-8', $bytes);
 		}
 	);
 
@@ -90,7 +89,7 @@ sub read_page {
 			$layout = $metadata->{layout} || '';
 		}
 
-		my $octets = encode_utf8($text);
+		my $octets = encode('utf-8', $text);
 		md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
 		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
 

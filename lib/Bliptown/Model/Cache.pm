@@ -3,7 +3,7 @@ use Mojo::Base -base;
 use Mojo::File qw(path);
 use Digest::SHA qw(sha1_hex);
 use Imager;
-use Encode;
+use Mojo::Util qw(decode);
 
 has 'config';
 has 'ipc';
@@ -20,8 +20,8 @@ sub create_cache {
 
 	my @imgs = grep { /\.(jpe?g|png|tiff?)$/i } @$tree;
 	foreach (@imgs) {
-		my $filename = decode_utf8($_->to_string);
-		my $rel_filename = decode_utf8($_->to_rel($root));
+		my $filename = decode('utf-8', $_->to_string);
+		my $rel_filename = decode('utf-8', $_->to_rel($root));
 		my $sha = sha1_hex($rel_filename);
 		my $cache_file = path($cache, $sha);
 
