@@ -52,4 +52,23 @@ sub create_cache {
 	return;
 }
 
+sub delete_cache {
+	my ($self, $args) = @_;
+	my $username = $args->{username};
+	my $cache = path($self->config->{user_home}, $username, '.cache');
+
+	my $tree = $cache->list_tree;
+
+	foreach ($tree->each) {
+		$self->ipc->send_message(
+			{
+				command => 'delete_file',
+				username => $username,
+				filename => $_->to_string,
+			}
+		)
+	}
+
+}
+
 return 1;

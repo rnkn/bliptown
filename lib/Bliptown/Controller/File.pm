@@ -214,7 +214,7 @@ sub create_cache {
 		sub {
 			my ($sub, $err) = @_;
 			return $c->log->error("$err") if $err;
-			return $c->log->info("Cache created");
+			return 1;
 		}
 	);
 
@@ -226,19 +226,21 @@ sub delete_cache {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $redirect = $c->param('back_to') // '/';
-	my $cache = path($c->app->config->{user_home}, $username, '.cache');
 
-	my $tree = $cache->list_tree;
-	foreach ($tree->each) {
-		$c->ipc->send_message(
-			{
-				command => 'delete_file',
-				username => $username,
-				filename => $_->to_string,
-			}
-		)
-	}
-	$c->flash(info => 'Deleted cache');
+	my $sub = Mojo::IOLoop::Subprocess->new;
+
+	$sub->run(
+		sub {
+			return $c->image_cache->delete_cache({ username => $username })
+		},
+		sub {
+			my ($sub, $err) = @_;
+			return $c->log->error("$err") if $err;
+			return 1;
+		}
+	);
+
+	$c->flash(info => 'Cache deleted');
 	return $c->redirect_to($redirect);
 }
 
