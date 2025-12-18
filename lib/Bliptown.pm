@@ -259,6 +259,7 @@ sub startup {
 
 	$protected->get('/cache/create')->to(controller => 'File', action => 'create_cache')->name('create_cache');
 	$protected->get('/cache/delete')->to(controller => 'File', action => 'delete_cache')->name('delete_cache');
+	$r->get('/cache/:sha1')->to(controller => 'Page', action => 'render_cache')->name('render_cache');
 
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 	$protected->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');

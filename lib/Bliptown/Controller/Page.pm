@@ -43,8 +43,7 @@ sub render_page {
 				my @cache_stats = stat($cache_file);
 				my $cache_mtime = $cache_stats[9];
 				if ($cache_mtime >= $src_modtime) {
-					$c->res->headers->content_type('image/jpeg');
-					return $c->reply->file($cache_file) ;
+					return $c->redirect_to('render_cache', sha1 => $sha);
 				}
 			}
 			return $c->reply->file($raw);
@@ -139,6 +138,16 @@ sub render_page {
 		redirect => $c->url_for('render_page'),
 	);
 	return $c->render;
+}
+
+sub render_cache {
+	my $c = shift;
+	my $sha = $c->param('sha1');
+	my $root = path($c->get_user_home, $c->get_req_user);
+	my $cache_file = path($root, '.cache', $sha);
+
+	$c->res->headers->content_type('image/jpeg');
+	return $c->reply->file($cache_file);
 }
 
 sub new_page {
