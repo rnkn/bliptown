@@ -509,6 +509,10 @@ nav #additional-controls a:hover {
 
 /* layouts */
 
+section:first-child {
+	margin-top: 0;
+}
+
 section {
 	margin: 1em 0;
 }
