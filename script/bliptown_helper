@@ -254,8 +254,8 @@ while (my $conn = $sock->accept()) {
 		unless ($username eq 'root') {
 			my ($uid, $gid) = get_uid_gid($username);
 
-			die "Cannot set group: $gid ($!)" unless $) = "$gid $gid";
-			die "Cannot set user: $uid ($!)" unless $> = $uid;
+			$) = "$gid $gid"	or die "Cannot set group: $gid ($!)";
+			$> = $uid			or die "Cannot set user: $uid ($!)";
 		}
 
 		my $func = $allowed_commands{$command} or
