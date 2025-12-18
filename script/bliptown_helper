@@ -21,7 +21,7 @@ die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
 my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
 unlink $sock_path if -e $sock_path;
 
-my $server = IO::Socket::UNIX->new(
+my $sock = IO::Socket::UNIX->new(
 	Type => SOCK_STREAM,
 	Local => $sock_path,
 	Listen => 5,
@@ -238,7 +238,7 @@ my %allowed_commands = (
 my $decoder = Sereal::Decoder->new;
 my $encoder = Sereal::Encoder->new;
 
-while (my $conn = $server->accept()) {
+while (my $conn = $sock->accept()) {
 	my $req_blob;
 	while (read($conn, my $buf, 512)) {
 		$req_blob .= $buf;
