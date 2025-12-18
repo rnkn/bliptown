@@ -7,8 +7,6 @@ use Sereal::Decoder;
 my $encoder = Sereal::Encoder->new;
 my $decoder = Sereal::Decoder->new;
 
-$SIG{CHLD} = 'IGNORE';
-
 sub send_message {
 	my ($self, $args) = @_;
 	my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
