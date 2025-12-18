@@ -1,4 +1,4 @@
-package Bliptown::Controller::File;
+package Bliptown::Controller::Files;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::File qw(path);
 use POSIX qw(strftime);

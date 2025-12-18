@@ -1,4 +1,4 @@
-package Bliptown::Controller::Page;
+package Bliptown::Controller::Pages;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(url_unescape);
 use Mojo::File qw(path);

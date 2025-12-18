@@ -192,10 +192,10 @@ sub startup {
 
 	my $r = $app->routes;
 
-	$r->post('/join')->to(controller => 'User', action => 'user_join')->name('user_join');
-	$r->get('/login')->to(controller => 'User', action => 'user_login')->name('token_auth');
-	$r->post('/login')->to(controller => 'User', action => 'user_login')->name('user_login');
-	$r->get('/logout')->to(controller => 'User', action => 'user_logout')->name('user_logout');
+	$r->post('/join')->to(controller => 'Users', action => 'user_join')->name('user_join');
+	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('token_auth');
+	$r->post('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
+	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
 
 	$r->get('/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
 	$r->post('/totp')->to(controller => 'TOTP', action => 'totp_update')->name('totp_update');
@@ -246,20 +246,21 @@ sub startup {
 		}
 	);
 
-	$protected->get('/private/*catchall')->to(controller => 'Page', action => 'render_private', catchall => '')->name('render_private');
+	$protected->get('/private/*catchall')->to(controller => 'Pages', action => 'render_private', catchall => '')->name('render_private');
 
-	$protected->get('/new/*catchall')->to(controller => 'Page', action => 'new_page', catchall => '')->name('new_page');
-	$protected->get('/edit/*catchall')->to(controller => 'Page', action => 'edit_page', catchall => '')->name('edit_page');
-	$protected->post('/edit/*catchall')->to(controller => 'Page', action => 'save_page', catchall => '')->name('save_page');
+	$protected->get('/new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
+	$protected->get('/edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');
+	$protected->post('/edit/*catchall')->to(controller => 'Pages', action => 'save_page', catchall => '')->name('save_page');
 
-	$protected->get('/files')->to(controller => 'File', action => 'list_files')->name('list_files');
-	$protected->get('/rename/*catchall')->to(controller => 'File', action => 'rename_file', catchall => '')->name('rename_file');
-	$protected->get('/delete/*catchall')->to(controller => 'File', action => 'delete_file', catchall => '')->name('delete_file');
-	$protected->post('/upload')->to(controller => 'File', action => 'upload_files')->name('upload_files');
+	$protected->get('/files')->to(controller => 'Files', action => 'list_files')->name('list_files');
+	$protected->get('/rename/*catchall')->to(controller => 'Files', action => 'rename_file', catchall => '')->name('rename_file');
+	$protected->get('/delete/*catchall')->to(controller => 'Files', action => 'delete_file', catchall => '')->name('delete_file');
+	$protected->post('/upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');
 
-	$protected->get('/cache/create')->to(controller => 'File', action => 'create_cache')->name('create_cache');
-	$protected->get('/cache/delete')->to(controller => 'File', action => 'delete_cache')->name('delete_cache');
-	$r->get('/cache/:sha1')->to(controller => 'Page', action => 'render_cache')->name('render_cache');
+	$protected->get('/cache/create')->to(controller => 'Files', action => 'create_cache')->name('create_cache');
+	$protected->get('/cache/delete')->to(controller => 'Files', action => 'delete_cache')->name('delete_cache');
+
+	$r->get('/cache/:sha1')->to(controller => 'Pages', action => 'render_cache')->name('render_cache');
 
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 	$protected->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
@@ -269,8 +270,8 @@ sub startup {
 	$protected->get('/snapshots/download/:hash')->to(controller => 'Snapshots', action => 'download_snapshot')->name('download_snapshot');
 	$protected->get('/snapshots/restore/:hash')->to(controller => 'Snapshots', action => 'restore_snapshot')->name('restore_snapshot');
 
-	$r->get('/raw/*catchall')->to(controller => 'Page', action => 'render_raw', catchall => '')->name('render_raw');
-	$r->get('/*catchall')->to(controller => 'Page', action => 'render_page', catchall => '')->name('render_page');
+	$r->get('/raw/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_raw');
+	$r->get('/*catchall')->to(controller => 'Pages', action => 'render_page', catchall => '')->name('render_page');
 }
 
 return 1;

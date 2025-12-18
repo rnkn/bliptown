@@ -1,4 +1,4 @@
-package Bliptown::Controller::User;
+package Bliptown::Controller::Users;
 use Mojo::Base 'Mojolicious::Controller';
 use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 use Mojo::Util qw(secure_compare);
