@@ -10,6 +10,7 @@ my $decoder = Sereal::Decoder->new;
 sub send_message {
 	my ($self, $args) = @_;
 	my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
+
 	my $client = IO::Socket::UNIX->new(
 		Type => SOCK_STREAM,
 		Peer => $sock_path,
@@ -31,10 +32,10 @@ sub send_message {
 	};
 
 	my $req_blob = $encoder->encode($data);
-	my $res_blob;
-	$client->send($req_blob) or die "Cannot send data to socket ($!)";
+	my $res_blob = '';
 
-	shutdown($client, 1) or die "Cannot shutdown socket ($!)";
+	$client->send($req_blob)	or die "Cannot send data to socket ($!)";
+	$client->shutdown(1)		or die "Cannot shutdown socket ($!)";
 
 	while (read($client, my $buf, 512)) {
 		$res_blob .= $buf;
