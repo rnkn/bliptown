@@ -244,4 +244,14 @@ sub delete_cache {
 	return $c->redirect_to($redirect);
 }
 
+sub render_cache {
+	my $c = shift;
+	my $sha = $c->param('sha1');
+	my $root = path($c->get_user_home, $c->get_req_user);
+	my $cache_file = path($root, '.cache', $sha);
+
+	$c->res->headers->content_type('image/jpeg');
+	return $c->reply->file($cache_file);
+}
+
 return 1;
