@@ -5,12 +5,11 @@ use warnings;
 use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
+use POSIX qw(WNOHANG);
 use Mojo::File qw(path);
 use Mojo::Util qw(trim);
 use Sereal::Decoder;
 use Sereal::Encoder;
-
-$SIG{CHLD} = 'IGNORE';
 
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
@@ -32,6 +31,10 @@ chown(0, $gid, $sock_path) or die "Cannot chown: $sock_path ($!)";
 chmod(0660, $sock_path) or die "Cannot chmod: $sock_path ($!)";
 
 print "Socket created: $sock_path\n";
+
+sub reap_children {
+	1 while waitpid(-1, WNOHANG) > 0;
+}
 
 sub provision_cert {
 	my $payload = shift;
@@ -248,31 +251,38 @@ while (my $conn = $sock->accept()) {
 	my $command = $data->{command};
 	my $payload = $data->{payload};
 	my $res;
-	eval {
-		my $username = $payload->{username};
 
-		unless ($username eq 'root') {
-			my ($uid, $gid) = get_uid_gid($username);
+	my $pid = fork();
+	die "Cannot fork process ($!)" unless defined $pid;
 
-			$) = "$gid $gid"	or die "Cannot set group: $gid ($!)";
-			$> = $uid			or die "Cannot set user: $uid ($!)";
-		}
+	if ($pid == 0) {
+		eval {
+			my $username = $payload->{username};
 
-		my $func = $allowed_commands{$command} or
-			die "Command not permitted: $command";
-		$res = $func->($payload);
-		delete_empty_dirs($username);
+			unless ($username eq 'root') {
+				my ($uid, $gid) = get_uid_gid($username);
+
+				$) = "$gid $gid"	or die "Cannot set group: $gid ($!)";
+				$> = $uid			or die "Cannot set user: $uid ($!)";
+			}
+
+			my $func = $allowed_commands{$command} or
+				die "Command not permitted: $command";
+			
+			$res = $func->($payload);
+			delete_empty_dirs($username);
+		};
+		my $err = $@;
+
+		my $res_blob = $encoder->encode(
+			{
+				response => $res,
+				error => $err,
+			});
+		$conn->send($res_blob) or warn "Cannot send response ($!)";
+		close($conn);
+		exit 0;
 	};
-	my $err = $@;
-
-	$> = 0;
-	$) = 0;
-
-	my $res_blob = $encoder->encode(
-		{
-			response => $res,
-			error => $err,
-		});
-	$conn->send($res_blob) or warn "Cannot send response ($!)";
 	close($conn);
+	reap_children();
 }
