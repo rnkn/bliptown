@@ -8,7 +8,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-start_part "Fetching blip.town certificate:"
+echo "Fetching blip.town certificate:"
 
 cert_chain=/etc/ssl/blip.town.crt
 cert_key=/etc/ssl/private/blip.town.key
@@ -37,7 +37,7 @@ then
 					| /usr/bin/openssl pkey -pubin | /bin/md5)
 	key_hash=$(/usr/bin/openssl pkey -in "$cert_key_tmp" -pubout | /bin/md5)
 
-	next_part "Matching certificate with key:"
+	echo "Matching certificate with key:"
 	if [ "X$cert_hash" != "X$key_hash" ]
 	then
 		echo "Certificate chain and key do not match!"
@@ -49,7 +49,7 @@ then
 	fi
 fi
 
-next_part "Renewing user certificates:"
+echo "Renewing user certificates:"
 /usr/bin/grep "^domain" /etc/acme-domains.conf | while read -r line
 do
 	domain=$(echo "$line" | /usr/bin/cut -d' ' -f2)
@@ -57,19 +57,18 @@ do
 	test -n "$domain" && /usr/sbin/acme-client "$domain"
 done
 
-next_part "Reloading relayd:"
+echo "Reloading relayd:"
 /usr/sbin/rcctl reload relayd
 
-next_part "Expunging database dead login tokens:"
+echo "Expunging database dead login tokens:"
 now=$(date +%s)
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now"
 echo "Done."
 
-next_part "Creating database backup:"
+echo "Creating database backup:"
 date=$(date +%F)
 backup_db="/var/db/bliptown/users-${date}.db"
 
 install -m 0600 -o root -g wheel /dev/null "$backup_db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
 echo "Created backup: $backup_db"
-end_part
