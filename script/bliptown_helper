@@ -163,10 +163,10 @@ sub git_init {
 	my $excludes_file = '/etc/gitignore';
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
-	die "Cannot initialize repository: $repo"
-		unless system('git init --quiet');
-	die "Cannot configure repository ignore file"
-		unless system("git config set core.excludesFile $excludes_file");
+	system('git init --quiet') == 0
+		or die "Cannot initialize repository: $repo ($!)";
+	system("git config set core.excludesFile $excludes_file") == 0
+		or die "Cannot configure repository ignore file ($!)";
 	return "Initialized Git repository: $repo";
 }
 
@@ -198,14 +198,15 @@ sub git_commit {
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
-	die "Cannot add files to $repo" unless system('git add -A');
+	system('git add -A') == 0
+		or die "Cannot add files to $repo";
 
 	my $subject = 'Full snapshot on blip.town';
 	my $body = `git status --porcelain`;
 	die "No changes to commit" unless (length($body));
 
-	die "Cannot commit files to repo: $repo ($!)"
-		unless system("git commit -m '$subject' -m '$body'");
+	system("git commit -m '$subject' -m '$body'") == 0
+		or die "Cannot commit files to repo: $repo ($!)";
 
 	my $commits = git_log($payload);
 	my $hash = $commits->[0]->{hash};
@@ -221,8 +222,8 @@ sub git_checkout {
 	$dir->make_path or die "Cannot make path: $dir ($!)";
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
-	die "Failed to extract archive from hash: $hash"
-		unless system("git archive '$hash' | tar -x -C '$dir'");
+	system("git archive '$hash' | tar -x -C '$dir'") == 0
+		or die "Failed to extract archive from hash: $hash";
 	return $hash;
 }
 
