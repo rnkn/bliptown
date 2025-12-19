@@ -111,11 +111,6 @@ sub startup {
 			$slug =~ s/^\///;
 			return $slug;
 		});
-
-	$app->helper(
-		get_user_home => sub {
-			return $ENV{BLIPTOWN_USER_HOME};
-		});
 	
 	$app->helper(
 		get_req_user => sub {
@@ -159,7 +154,7 @@ sub startup {
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			my $root = path($c->get_user_home, $c->get_req_user)->to_abs;
+			my $root = path($c->config->{user_home}, $c->get_req_user)->to_abs;
 			my $file = path($root, $slug)->to_abs;
 			return $file if -f $file;
 			$slug = $1 if $slug =~ /(.+)(\..+)$/;

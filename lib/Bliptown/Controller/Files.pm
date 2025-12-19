@@ -26,7 +26,7 @@ sub list_files {
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
 	);
-	my $root = path($c->get_user_home, $user->{username});
+	my $root = path($c->config->{user_home}, $username);
 
 	if ($filter && $delete) {
 		my $res = delete_files_regex(
@@ -115,7 +115,7 @@ sub rename_files_regex {
 sub rename_file {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $root = path($c->get_user_home, $username);
+	my $root = path($c->config->{user_home}, $username);
 	my $old_slug = $c->param('catchall');
 	my $filename = $c->get_file($old_slug)->to_abs->to_string;
 	my $rename_to = $c->param('to');
@@ -171,7 +171,7 @@ sub delete_file {
 sub upload_files {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $root = path($c->get_user_home, $username);
+	my $root = path($c->config->{user_home}, $username);
 	foreach (@{$c->req->uploads}) {
 		my $filename = $_->filename;
 		next unless $filename;
@@ -203,7 +203,6 @@ sub create_cache {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $redirect = $c->param('back_to') // '/';
-	my $root = path($c->get_user_home, $username);
 
 	my $sub = Mojo::IOLoop::Subprocess->new;
 
@@ -247,7 +246,7 @@ sub delete_cache {
 sub render_cache {
 	my $c = shift;
 	my $sha = $c->param('sha1');
-	my $root = path($c->get_user_home, $c->get_req_user);
+	my $root = path($c->config->{user_home}, $c->get_req_user);
 	my $cache_file = path($root, '.cache', $sha);
 
 	$c->res->headers->content_type('image/jpeg');

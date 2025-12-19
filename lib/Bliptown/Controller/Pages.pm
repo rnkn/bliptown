@@ -22,13 +22,14 @@ sub render_private {
 
 sub render_page {
 	my $c = shift;
-	my $root = path($c->get_user_home, $c->get_req_user);
+	my $user_home = $c->config->{user_home};
+	my $root = path($user_home, $c->get_req_user);
 	my $username = $c->session('username');
 	my $use_cache = $c->param('cache') // 1;
 	$c->stash( home => $c->get_home );
 	my $user_cur = $username && $username eq $c->get_req_user;
 	my $slug = $c->stash('catchall');
-	unless (-d $root && $root gt $c->get_user_home) {
+	unless (-d $root && $root gt $user_home) {
 		return $c->reply->not_found;
 	}
 
@@ -182,7 +183,7 @@ sub edit_page {
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
-	my $root = path($c->get_user_home, $c->get_req_user);
+	my $root = path($c->config->{user_home}, $c->get_req_user);
 	my $file;
 	if (!$slug || $slug =~ /\/$/) {
 		unless ($file = $c->get_file("$slug/index")) {
@@ -231,7 +232,7 @@ sub edit_page {
 sub save_page {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $root = path($c->get_user_home, $c->get_req_user)->to_string;
+	my $root = path($c->config->{user_home}, $c->get_req_user)->to_string;
 	my $slug = $c->param('slug');
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
