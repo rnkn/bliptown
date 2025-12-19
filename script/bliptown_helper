@@ -6,7 +6,7 @@ use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
 use POSIX qw(WNOHANG);
-use Mojo::File qw(path);
+use Mojo::File qw(path tempfile);
 use Mojo::Util qw(trim);
 use Sereal::Decoder;
 use Sereal::Encoder;
@@ -226,6 +226,20 @@ sub git_checkout {
 	return $hash;
 }
 
+sub git_archive {
+	my $payload = shift;
+	my $username = $payload->{username};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $hash = $payload->{hash};
+	my $tmpfile = tempfile(UNLINK => 0);
+	chmod(0644, $tmpfile);
+	git_init($payload);
+	chdir $repo or die "Cannot change directory: $repo ($!)";
+	system("git archive --format=tar.gz '$hash' > $tmpfile") == 0
+		or die "Failed to extract archive from hash: $hash";
+	return $tmpfile->to_string;
+}
+
 my %allowed_commands = (
 	write_blob			=> \&write_blob,
 	update_file			=> \&update_file,
@@ -234,6 +248,7 @@ my %allowed_commands = (
 	git_commit			=> \&git_commit,
 	git_log				=> \&git_log,
 	git_checkout		=> \&git_checkout,
+	git_archive			=> \&git_archive,
 	provision_cert		=> \&provision_cert,
 	update_domain_list	=> \&update_domain_list,
 );

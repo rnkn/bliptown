@@ -41,7 +41,7 @@
 				<pre><%= $_->{body} || 'No commit message' %></pre>
 				<ul class="controls">
 					<li><a href="<%= url_for('restore_snapshot', hash => $_->{hash}) %>">Restore</a></li>
-					<li><a href="<%= url_for('download_snapshot') %>">Download</a></li>
+					<li><a href="<%= url_for('download_snapshot', hash => $_->{hash}) %>">Download</a></li>
 				</ul>
 			</details>
 			% }
