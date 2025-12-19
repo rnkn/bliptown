@@ -34,7 +34,7 @@ sub list_snapshots {
 		title => 'Snapshots',
 		show_sidebar => 1,
 		snapshots => $snapshots,
-		repo => "${username}\@blip.town:www",
+		repo => "${username}\@blip.town:site",
 	);
 	return $c->render;
 }
