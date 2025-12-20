@@ -1,5 +1,6 @@
 package Bliptown::Controller::Pages;
 use Mojo::Base 'Mojolicious::Controller';
+use Mojo::DOM;
 use Mojo::Util qw(url_unescape);
 use Mojo::File qw(path);
 use Digest::SHA qw(sha1_hex);
@@ -9,6 +10,27 @@ sub yaml_true {
 	if ($p && $p =~ /^(true|y(es)?|1)$/) {
 		return 1;
 	}
+}
+
+sub pp_html {
+	my ($html, $slug) = @_;
+	$slug =~ s/^\/?/\//;
+	my $dom = Mojo::DOM->new($html);
+	foreach ($dom->find("a[href=$slug]")->each) {
+		my $cur_class = $_->attr('class') // '';
+		my @classes = split /\s+/, $cur_class;
+		push @classes, 'selected';
+		$_->attr(class => join ' ', @classes);
+
+		my $ancestor = $_->parent;
+		while ($ancestor) {
+			if ($ancestor->type eq 'tag' && $ancestor->tag eq 'details') {
+				$ancestor->attr(open => undef);
+			}
+			$ancestor = $ancestor->parent;
+		}
+	}
+	return $dom->to_string;
 }
 
 my @allowed_exts = qw(html css js txt md);
@@ -100,6 +122,7 @@ sub render_page {
 					root => $root,
 				}
 			);
+			$page->{html} = pp_html($page->{html}, $slug);
 			$skel_html{$_} = $page->{html};
 		}
 	}
