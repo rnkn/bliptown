@@ -222,7 +222,7 @@ sub git_checkout {
 	$dir->make_path or die "Cannot make path: $dir ($!)";
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
-	system("git archive '$hash' | tar -x -C '$dir'") == 0
+	system("git archive '$hash' | tar -xf - -C '$dir'") == 0
 		or die "Failed to extract archive from hash: $hash";
 	return $hash;
 }
