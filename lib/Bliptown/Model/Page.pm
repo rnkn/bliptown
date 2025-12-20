@@ -45,17 +45,40 @@ $ffi->attach(
 );
 
 sub convert_typography {
-	my $args = shift;
-	my $html = Mojo::DOM::HTML->new;
-	$html->parse($args->{html});
-	# say dumper $html->tree;
-	return $html->render;
+	my $s = shift;
+	$s =~ s/(?<!\S)'/&lsquo;/g;
+	$s =~ s/'/&rsquo;/g;
+	$s =~ s/(?<!\S)"/&ldquo;/g;
+	$s =~ s/"/&rdquo;/g;
+	$s =~ s/---/&mdash;/g;
+	$s =~ s/--/&ndash;/g;
+	return $s;
+}
+
+sub walk_dom {
+	my $node = shift;
+	
+	my @skip_tags = qw(pre code kbd script);
+
+	return if $node->tag && grep { $node->tag eq $_ } @skip_tags;
+
+    if ($node->type eq 'text') {
+		my $content = $node->content;
+        my $converted = convert_typography($content);
+        $node->replace($converted);
+        return;
+    }
+
+	foreach my $child ($node->child_nodes->each) {
+		walk_dom($child);
+	}
 }
 
 sub read_page {
 	my ($self, $args) = @_;
 	my $file = Mojo::File->new($args->{file});
 	my $chars = $file->slurp('utf-8');
+	my $recur = $args->{recur} // 0;
 
 	my $metadata;
 	my $html = '';
@@ -97,8 +120,6 @@ sub read_page {
 		while ($html =~ /$partial_re/) {
 			my $slug = $1;
 			my $root = $args->{root};
-			my $recur = $args->{recur} // 0;
-			$recur++;
 			my $file_str = $slug;
 			$file_str =~ s/\.md$//; $file_str = "$file_str.md";
 			my $path;
@@ -139,7 +160,7 @@ sub read_page {
 						$self, {
 							root => $root,
 							file => $file,
-							recur => $recur,
+							recur => $recur + 1,
 						}
 					);
 				}
@@ -156,6 +177,15 @@ sub read_page {
 			$html =~ s/$partial_re/$frag/;
 		}
 	}
+
+	unless ($recur) {
+		my $dom = Mojo::DOM->new($html);
+
+		walk_dom($dom);
+
+		$html = $dom->to_string;
+	}
+
 	return {
 		metadata => $metadata,
 		html => $html,
