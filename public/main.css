@@ -701,6 +701,10 @@ details[open] > summary::before {
 		padding-top: 5rem;
 		padding-right: 2rem;
 	}
+	main:has(.cover) {
+		padding: 0;
+		padding-top: 5rem;
+	}
 	#files .cell.stat {
 		display: none;
 	}
