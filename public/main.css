@@ -259,6 +259,8 @@ label#drawer-toggle {
 	top: 0;
 	right: 0;
 	cursor: pointer;
+	font-family: sans-serif;
+	font-weight: initial;
 }
 
 label#drawer-toggle:before {
@@ -278,6 +280,8 @@ label#nav-toggle {
 	padding-top: 0.2rem;
 	line-height: 0.5;
 	font-size: 2rem;
+	font-family: sans-serif;
+	font-weight: initial;
 	cursor: pointer;
 }
 
