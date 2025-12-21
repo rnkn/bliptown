@@ -61,10 +61,10 @@ sub render_page {
 			my $cache_file = path($root, '.cache', $sha);
 			if (-f $cache_file && $use_cache != 0) {
 				my @src_stats = stat($raw);
-				my $src_modtime = $src_stats[9];
+				my $src_mtime = $src_stats[9];
 				my @cache_stats = stat($cache_file);
 				my $cache_mtime = $cache_stats[9];
-				if ($cache_mtime >= $src_modtime) {
+				if ($cache_mtime >= $src_mtime) {
 					return $c->redirect_to('render_cache', sha1 => $sha);
 				}
 			}
