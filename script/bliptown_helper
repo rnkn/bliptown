@@ -258,20 +258,22 @@ my $decoder = Sereal::Decoder->new;
 my $encoder = Sereal::Encoder->new;
 
 while (my $conn = $sock->accept()) {
-	my $req_blob;
-	while (read($conn, my $buf, 512)) {
-		$req_blob .= $buf;
-	}
-
-	my $data = $decoder->decode($req_blob);
-	my $command = $data->{command};
-	my $payload = $data->{payload};
-	my $res;
-
 	my $pid = fork();
 	die "Cannot fork process ($!)" unless defined $pid;
 
 	if ($pid == 0) {
+		$sock->close();
+
+		my $req_blob;
+		while (read($conn, my $buf, 512)) {
+			$req_blob .= $buf;
+		}
+
+		my $data = $decoder->decode($req_blob);
+		my $command = $data->{command};
+		my $payload = $data->{payload};
+		my $res;
+
 		eval {
 			my $username = $payload->{username};
 
@@ -298,9 +300,10 @@ while (my $conn = $sock->accept()) {
 				error => $err,
 			});
 		$conn->send($res_blob) or warn "Cannot send response ($!)";
-		close($conn);
+		$conn->close();
 		exit 0;
 	};
-	close($conn);
+
+	$conn->close();
 	reap_children();
 }
