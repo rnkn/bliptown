@@ -205,6 +205,17 @@ sub create_cache {
 	my $redirect = $c->param('back_to') // '/';
 
 	my $sub = Mojo::IOLoop::Subprocess->new;
+	my $pid;
+
+	$sub->on(spawn => sub { $pid = $sub->pid });
+
+	my $timeout = Mojo::IOLoop->timer(
+		300 => sub {
+			kill 'TERM', $pid if $pid;
+			sleep 1;
+			kill 'KILL', $pid if $pid;
+		}
+	);
 
 	$sub->run(
 		sub {
