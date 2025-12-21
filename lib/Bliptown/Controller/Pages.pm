@@ -11,7 +11,7 @@ sub yaml_true {
 	}
 }
 
-sub pp_html {
+sub post_skel {
 	my ($html, $slug) = @_;
 	$slug =~ s/^\/?/\//;
 	my $dom = Mojo::DOM->new($html);
@@ -121,7 +121,7 @@ sub render_page {
 					root => $root,
 				}
 			);
-			$page->{html} = pp_html($page->{html}, $slug);
+			$page->{html} = post_skel($page->{html}, $slug);
 			$skel_html{$_} = $page->{html};
 		}
 	}
