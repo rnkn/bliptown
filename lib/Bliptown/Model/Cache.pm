@@ -24,6 +24,14 @@ sub create_cache {
 		my $sha = sha1_sum($rel_filename);
 		my $cache_file = path($cache, $sha);
 
+		if (-f $cache_file) {
+			my @src_stats = stat($filename);
+			my $src_mtime = $src_stats[9];
+			my @cache_stats = stat($cache_file);
+			my $cache_mtime = $cache_stats[9];
+			next if $cache_mtime >= $src_mtime;
+		}
+
 		my $img = Imager->new;
 		$img->read(file => $filename)
 			or die "Cannot read file: ", $img->errstr;
