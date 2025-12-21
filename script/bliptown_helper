@@ -5,7 +5,7 @@ use warnings;
 use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
-use POSIX qw(setgid setuid WNOHANG);
+use POSIX qw(setgid setuid pause WNOHANG);
 use Mojo::File qw(path tempfile);
 use Mojo::Util qw(trim);
 use Sereal::Decoder;
@@ -13,9 +13,13 @@ use Sereal::Encoder;
 
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
+die "BLIPTOWN_HELPER_PREFORK not defined" unless $ENV{BLIPTOWN_HELPER_PREFORK};
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
 die "BLIPTOWN_KEYPAIR_FILE not defined "unless $ENV{BLIPTOWN_KEYPAIR_FILE};
 die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
+
+my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
+my %children;
 
 my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
 unlink $sock_path if -e $sock_path;
@@ -32,18 +36,11 @@ chmod(0660, $sock_path) or die "Cannot chmod: $sock_path ($!)";
 
 print "Socket created: $sock_path\n";
 
-sub reap_children {
-	1 while waitpid(-1, WNOHANG) > 0;
-}
-
 sub provision_cert {
 	my $payload = shift;
 	my $domain = $payload->{domain};
 	return unless $domain;
-	my $pid = fork();
-	if ($pid == 0) {
-		exec('acme-client', $domain);
-	}
+	system('acme-client', $domain);
 	return "Provisioned certificate: $domain";
 }
 
@@ -66,10 +63,7 @@ sub update_domain_list {
 		$keypair_file->spew($keypairs_str, 'utf-8')
 			or die "Cannot write keypair file: $keypair_file ($!)";
 
-		my $pid = fork();
-		if ($pid == 0) {
-			exec('rcctl', 'reload', 'relayd');
-		}
+		system('rcctl', 'reload', 'relayd');
 	}
 
 	my $acme_domains_str;
@@ -257,53 +251,78 @@ my %allowed_commands = (
 my $decoder = Sereal::Decoder->new;
 my $encoder = Sereal::Encoder->new;
 
-while (my $conn = $sock->accept()) {
+sub handle_conn {
+	my $conn = shift;
+
+	my $req_blob;
+	while (read($conn, my $buf, 512)) {
+		$req_blob .= $buf;
+	}
+
+	my $data = $decoder->decode($req_blob);
+	my $command = $data->{command};
+	my $payload = $data->{payload};
+
+	my ($res, $err);
+
+	eval {
+		my $username = $payload->{username};
+
+		unless ($username eq 'root') {
+			my ($uid, $gid) = get_uid_gid($username);
+
+			setgid($gid) == 0 or die "Cannot set group: $gid ($!)";
+			setuid($uid) == 0 or die "Cannot set user: $uid ($!)";
+		}
+
+		my $func = $allowed_commands{$command} or
+			die "Command not permitted: $command";
+
+		$res = $func->($payload);
+		delete_empty_dirs($username);
+	};
+	$err = $@;
+
+	my $res_blob = $encoder->encode(
+		{
+			response => $res,
+			error => $err,
+		});
+
+	$conn->send($res_blob) or warn "Cannot send response ($!)";
+	return;
+}
+
+sub spawn_worker {
 	my $pid = fork();
 	die "Cannot fork process ($!)" unless defined $pid;
 
 	if ($pid == 0) {
-		$sock->close();
+		while (1) {
+			my $conn = $sock->accept();
+			next unless $conn;
 
-		my $req_blob;
-		while (read($conn, my $buf, 512)) {
-			$req_blob .= $buf;
+			handle_conn($conn);
+			close $conn;
+			last;
 		}
-
-		my $data = $decoder->decode($req_blob);
-		my $command = $data->{command};
-		my $payload = $data->{payload};
-		my $res;
-
-		eval {
-			my $username = $payload->{username};
-
-			unless ($username eq 'root') {
-				my ($uid, $gid) = get_uid_gid($username);
-
-				setgid($gid);
-				die "Cannot set group: $gid ($!)" if $) == 0;
-				setuid($uid);
-				die "Cannot set user: $uid ($!)"  if $> == 0;
-			}
-
-			my $func = $allowed_commands{$command} or
-				die "Command not permitted: $command";
-			
-			$res = $func->($payload);
-			delete_empty_dirs($username);
-		};
-		my $err = $@;
-
-		my $res_blob = $encoder->encode(
-			{
-				response => $res,
-				error => $err,
-			});
-		$conn->send($res_blob) or warn "Cannot send response ($!)";
-		$conn->close();
 		exit 0;
-	};
+	}
 
-	$conn->close();
-	reap_children();
+	$children{$pid} = 1;
+}
+
+$SIG{CHLD} = sub {
+	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
+		delete $children{$pid};
+		spawn_worker();
+	}
+};
+
+for (1 .. $prefork) {
+	spawn_worker();
+}
+
+while (1) {
+	pause();
 }
