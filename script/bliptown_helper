@@ -5,7 +5,7 @@ use warnings;
 use IO::Socket::UNIX;
 use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
-use POSIX qw(WNOHANG);
+use POSIX qw(setgid setuid WNOHANG);
 use Mojo::File qw(path tempfile);
 use Mojo::Util qw(trim);
 use Sereal::Decoder;
@@ -278,8 +278,10 @@ while (my $conn = $sock->accept()) {
 			unless ($username eq 'root') {
 				my ($uid, $gid) = get_uid_gid($username);
 
-				$) = "$gid $gid"	or die "Cannot set group: $gid ($!)";
-				$> = $uid			or die "Cannot set user: $uid ($!)";
+				setgid($gid);
+				die "Cannot set group: $gid ($!)" if $) == 0;
+				setuid($uid);
+				die "Cannot set user: $uid ($!)"  if $> == 0;
 			}
 
 			my $func = $allowed_commands{$command} or
