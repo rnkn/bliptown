@@ -23,7 +23,7 @@ unlink $sock_path if -e $sock_path;
 my $sock = IO::Socket::UNIX->new(
 	Type => SOCK_STREAM,
 	Local => $sock_path,
-	Listen => 5,
+	Listen => 128,
 ) or die "Cannot create socket: $sock_path ($!)";
 
 my $gid = getgrnam('bliptown') or die "Cannot get gid: bliptown ($!)";
