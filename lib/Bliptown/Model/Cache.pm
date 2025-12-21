@@ -1,9 +1,8 @@
 package Bliptown::Model::Cache;
 use Mojo::Base -base;
 use Mojo::File qw(path);
-use Digest::SHA qw(sha1_hex);
+use Mojo::Util qw(decode sha1_sum);
 use Imager;
-use Mojo::Util qw(decode);
 
 has 'config';
 has 'ipc';
@@ -22,7 +21,7 @@ sub create_cache {
 	foreach (@imgs) {
 		my $filename = decode('utf-8', $_->to_string);
 		my $rel_filename = decode('utf-8', $_->to_rel($root));
-		my $sha = sha1_hex($rel_filename);
+		my $sha = sha1_sum($rel_filename);
 		my $cache_file = path($cache, $sha);
 
 		my $img = Imager->new;

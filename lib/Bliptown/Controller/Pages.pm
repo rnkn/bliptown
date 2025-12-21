@@ -1,9 +1,8 @@
 package Bliptown::Controller::Pages;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::DOM;
-use Mojo::Util qw(url_unescape);
 use Mojo::File qw(path);
-use Digest::SHA qw(sha1_hex);
+use Mojo::Util qw(url_unescape sha1_sum);
 
 sub yaml_true {
 	my $p = shift;
@@ -58,7 +57,7 @@ sub render_page {
 	my $raw = path($root, $slug);
 	if ($raw->extname) {
 		if (-f $raw) {
-			my $sha = sha1_hex($slug);
+			my $sha = sha1_sum($slug);
 			my $cache_file = path($root, '.cache', $sha);
 			if (-f $cache_file && $use_cache != 0) {
 				my @src_stats = stat($raw);
