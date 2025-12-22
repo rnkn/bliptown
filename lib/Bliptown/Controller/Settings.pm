@@ -34,9 +34,10 @@ sub save_settings {
 	my $new_domain = $params->{custom_domain} || '';
 	if ($new_domain && $new_domain ne $cur_domain) {
 		$c->ipc->send_message(
-			command => 'provision_cert',
-			domain => $new_domain,
-		)
+			{
+				command => 'provision_cert',
+				domain => $new_domain,
+			})
 	};
 	return $c->redirect_to($c->url_for('render_page'));
 }
