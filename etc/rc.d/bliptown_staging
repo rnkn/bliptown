@@ -1,0 +1,28 @@
+#!/bin/ksh
+
+pid_file="/tmp/bliptown-staging.pid"
+
+daemon="/usr/local/bin/carton exec -- script/bliptown"
+daemon_flags="prefork -p -m production -l http://127.0.0.1:8081 -P $pid_file"
+daemon_user="bliptown_staging"
+daemon_execdir="/usr/local/www/bliptown-staging"
+daemon_logger="daemon.debug"
+
+rc_bg=YES
+rc_reload=NO
+
+. /etc/rc.d/rc.subr
+
+rc_stop() {
+        rc_exec "kill -QUIT $(cat ${pid_file})"
+}
+
+rc_configtest() {
+        rc_exec "${daemon} eval"
+}
+
+rc_check() {
+        rc_exec "test -f ${pid_file} && kill -0 $(cat ${pid_file})"
+}
+
+rc_cmd $1

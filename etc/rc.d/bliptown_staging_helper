@@ -1,0 +1,12 @@
+#!/bin/ksh
+
+daemon="/usr/local/www/bliptown-staging/script/bliptown_helper"
+
+rc_bg=YES
+rc_reload=NO
+
+. /etc/rc.d/rc.subr
+
+pexp="perl ${daemon}"
+
+rc_cmd $1
