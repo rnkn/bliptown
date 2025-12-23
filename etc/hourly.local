@@ -1,0 +1,36 @@
+# -*- mode: sh; -*-
+
+log_home=/var/log/bliptown/users
+user_home=/home/bliptown/users
+
+new_conf_file() {
+	cat <<EOF > "$1"
+$2 root:wheel 600 90 * \$D0 Z
+EOF
+}
+
+for dir in "$log_home"/*
+do
+	user=$(basename "$dir")
+	log_file="${log_home}/${user}/access.log"
+	conf_file="${log_home}/${user}/rotate.conf"
+	html_file="${user_home}/${user}/private/stats.html"
+
+	if [ ! -f "$log_file" ]
+	then
+		/usr/bin/install -m 600 /dev/null "$log_file"
+	fi
+
+	if [ ! -f "$html_file" ]
+	then
+		/usr/bin/install -D -o $user -g $user -m 640 /dev/null "$html_file"
+	fi
+
+	/usr/bin/install -m 600 /dev/null "$conf_file"
+	new_conf_file "$conf_file" "$log_file"
+
+	newsyslog -f "$conf_file"
+
+	zcat -f "$log_file"* |
+		/usr/local/bin/goaccess -p /etc/goaccess.conf -o "$html_file" > /dev/null 2>&1
+done
