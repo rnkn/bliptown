@@ -185,6 +185,40 @@ sub startup {
 		}
 	);
 
+	$app->hook(
+		after_dispatch => sub {
+			my $c = shift;
+
+			my $accesslog = Mojo::Log->new(
+				level => 'info',
+				path => $c->stash('logpath')
+			);
+
+			$accesslog->format(
+				sub {
+					my ($time, $level, @lines) = @_;
+					my $line = join '|', @lines;
+					$time = int($time);
+					return "$time|$line\n";
+				}
+			);
+
+			my $http_vers = 'HTTP/' . $c->req->version;
+			$accesslog->info(
+				$c->tx->remote_address						|| '',
+				$c->req->method								|| '',
+				$http_vers									|| '',
+				$c->req->url->to_abs->host					|| '',
+				$c->req->url->to_abs->path_query			|| '',
+				$c->req->headers->referrer					|| '',
+				$c->req->headers->user_agent				|| '',
+				$c->tx->res->code							|| '',
+				$c->tx->res->body_size						|| '',
+				$c->res->headers->header('Content-Type')	|| '',
+			);
+		}
+	);
+
 	my $r = $app->routes;
 
 	$r->post('/join')->to(controller => 'Users', action => 'user_join')->name('user_join');

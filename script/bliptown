@@ -14,6 +14,7 @@ die "BLIPTOWN_HELPER_SOCKER not defined " unless $ENV{BLIPTOWN_HELPER_SOCKET};
 die "BLIPTOWN_DOMAIN not defined " unless $ENV{BLIPTOWN_DOMAIN};
 die "BLIPTOWN_USER_HOME not defined " unless $ENV{BLIPTOWN_USER_HOME};
 die "BLIPTOWN_DB_HOME not defined" unless $ENV{BLIPTOWN_DB_HOME};
+die "BLIPTOWN_LOG_HOME not defined" unless $ENV{BLIPTOWN_LOG_HOME};
 
 die "BLIPTOWN_MD4C_LIB not defined" unless $ENV{BLIPTOWN_MD4C_LIB};
 die "BLIPTOWN_MD4C_HTML_LIB not defined" unless $ENV{BLIPTOWN_MD4C_HTML_LIB};
