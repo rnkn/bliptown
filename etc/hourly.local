@@ -5,7 +5,7 @@ user_home=/home/bliptown/users
 
 new_conf_file() {
 	cat <<EOF > "$1"
-$2 root:wheel 600 90 * \$D0 Z
+$2 bliptown:bliptown 600 90 * \$D0 Z
 EOF
 }
 
