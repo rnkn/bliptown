@@ -9,9 +9,8 @@ $2 bliptown:bliptown 600 90 * \$D0 Z
 EOF
 }
 
-for dir in "$log_home"/*
-do
-	user=$(basename "$dir")
+process_user_stats() {
+	user=$1
 	log_file="${log_home}/${user}/access.log"
 	conf_file="${log_home}/${user}/rotate.conf"
 	html_file="${user_home}/${user}/private/stats.html"
@@ -26,8 +25,20 @@ do
 
 	if [ -f "$html_file" ]
 	then
-		zcat -f "$log_file"* |
-			/usr/local/bin/goaccess -p /etc/goaccess.conf \
+		zcat -f "$log_file"* | grep -v newsyslog |
+			/usr/local/bin/goaccess -p /etc/goaccess/goaccess.conf \
 									-o "$html_file" > /dev/null 2>&1
 	fi
+}
+
+for dir in "$log_home"/*
+do
+	user=$(basename "$dir")
+	process_user_stats "$user"
+done
+
+for user in mayor demo staging
+do
+/bin/cp "${user_home}/${user}/private/stats.html" \
+		"${user_home}/rnkn/private/stats-${user}.html"
 done
