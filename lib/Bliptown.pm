@@ -215,33 +215,22 @@ sub startup {
 	$app->hook(
 		after_dispatch => sub {
 			my $c = shift;
+			my $logpath = $c->stash('logpath') or return;
+			my $log = $c->accesslog($logpath);
+			my $tx = $c->tx;
 
-			my $accesslog = Mojo::Log->new(
-				level => 'info',
-				path => $c->stash('logpath')
-			);
-
-			$accesslog->format(
-				sub {
-					my ($time, $level, @lines) = @_;
-					my $line = join '|', @lines;
-					$time = int($time);
-					return "$time|$line\n";
-				}
-			);
-
-			my $http_vers = 'HTTP/' . $c->req->version;
-			$accesslog->info(
-				$c->tx->remote_address						|| '',
-				$c->req->method								|| '',
-				$http_vers									|| '',
-				$c->req->url->to_abs->host					|| '',
-				$c->req->url->to_abs->path_query			|| '',
-				$c->req->headers->referrer					|| '',
-				$c->req->headers->user_agent				|| '',
-				$c->tx->res->code							|| '',
-				$c->tx->res->body_size						|| '',
-				$c->res->headers->header('Content-Type')	|| '',
+			$log->info(
+				$tx->remote_address					//
+				$tx->req->headers->header('X-Forwarded-For')
+													// '',
+				$tx->req->method					// '',
+				'HTTP/' . $tx->req->version			// '',
+				$tx->req->headers->host				// '',
+				$tx->req->url->path_query			// '',
+				$tx->req->headers->referrer			// '',
+				$tx->req->headers->user_agent		// '',
+				$tx->res->code						// '',
+				$tx->res->headers->content_type		// '',
 			);
 		}
 	);
