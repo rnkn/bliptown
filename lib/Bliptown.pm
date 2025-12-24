@@ -149,6 +149,33 @@ sub startup {
 		}
 	);
 
+	my %ACCESSLOGS;
+
+	$app->helper(
+		accesslog => sub {
+			my ($c, $logpath) = @_;
+
+			return $ACCESSLOGS{$logpath} ||= do {
+				my $log = Mojo::Log->new(
+					level => 'info',
+					path => $logpath,
+				);
+
+				$log->format(
+					sub {
+						my ($time, $level, @lines) = @_;
+						$time = int($time);
+						return join('|', $time, @lines) . "\n";
+					}
+				);
+
+				$log;
+			}
+		}
+	);
+
+	$SIG{HUP} = sub { %ACCESSLOGS = () };
+
 	$app->defaults(
 		title => 'Untitled',
 		head => '',
