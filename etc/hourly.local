@@ -15,20 +15,17 @@ process_user_stats() {
 	conf_file="${log_home}/${user}/rotate.conf"
 	html_file="${user_home}/${user}/private/stats.html"
 
-	if [ ! -f "$log_file" ]
-	then
-		/usr/bin/install -m 600 /dev/null "$log_file"
-	fi
+	test -f "$log_file" || /usr/bin/install -m 600 /dev/null "$log_file"
 
-	new_conf_file "$conf_file" "$log_file"
-	newsyslog -f "$conf_file"
-
-	if [ -f "$html_file" ]
+	if [ -s "$log_file" -a -f "$html_file" ]
 	then
 		zcat -f "$log_file"* | grep -v newsyslog |
 			/usr/local/bin/goaccess -p /etc/goaccess/goaccess.conf \
 									-o "$html_file" > /dev/null 2>&1
 	fi
+
+	new_conf_file "$conf_file" "$log_file"
+	newsyslog -f "$conf_file"
 }
 
 for dir in "$log_home"/*
