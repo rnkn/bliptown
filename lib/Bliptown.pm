@@ -20,16 +20,17 @@ sub startup {
 
 	$app->config(
 		user_home => $ENV{BLIPTOWN_USER_HOME},
+		domain => $app->mode eq 'production' ? 'blip.town' : 'blip.local',
+		scheme => $app->mode eq 'production' ? 'https' : 'http',
+		port => $app->mode eq 'production' ? '' : '3000',
 	);
 	$app->secrets(
 		[ $ENV{BLIPTOWN_SECRET} ]
 	);
 
-	my $bliptown_domain = $app->mode eq 'production' ? 'blip.town' : 'blip.local';
-
 	my $sessions = Bliptown::Sessions->new(default_expiration => 2592000);
 	$app->sessions($sessions);
-	$app->sessions->cookie_domain(".$bliptown_domain");
+	$app->sessions->cookie_domain('.' . $app->config->{domain});
 
 	$app->helper(
 		sqlite => sub {
@@ -117,7 +118,8 @@ sub startup {
 			my $host = $c->req->headers->header('Host') || '';
 			$host =~ s/:.*//;
 			$host =~ s/^www\.(.+)/$1/;
-			if ($host =~ /\Q$bliptown_domain\E$/) {
+			my $domain = $c->config->{domain};
+			if ($host =~ /\Q$domain\E$/) {
 				my @host_array = split(/\./, $host);
 				my $username = @host_array >= 3 ? $host_array[-3] : 'mayor';
 				return $username if $username;
@@ -135,16 +137,13 @@ sub startup {
 			my $c = shift;
 			my $url = Mojo::URL->new;
 			my $username = $c->session('username');
+			my $domain = $c->config->{domain};
+			$url->scheme($c->config->{scheme});
+			$url->port($c->config->{port});
 			if ($username) {
-				$url->host("$username.$bliptown_domain");
+				$url->host("$username.$domain");
 			} else {
-				$url->host("$bliptown_domain");
-			}
-			if ($c->app->mode eq 'production') {
-				$url->scheme('https');
-			} else {
-				$url->scheme('http');
-				$url->port(3000);
+				$url->host("$domain");
 			}
 			return $url;
 		}
@@ -167,7 +166,6 @@ sub startup {
 	);
 
 	$app->defaults(
-		bliptown_domain => $bliptown_domain,
 		title => 'Untitled',
 		head => '',
 		username => '',
@@ -189,8 +187,9 @@ sub startup {
 			my $c = shift;
 			my $req_url = $c->tx->req->url->to_abs;
 			my $host = $req_url->host;
+			my $domain = $c->config->{domain};
 
-			if ($host eq "cdn-origin.$bliptown_domain") {
+			if ($host eq "cdn-origin.$domain") {
 				my $req_user = shift @{$req_url->path->parts};
 				my $path = join '/', @{$req_url->path->parts};
 				my $user_home = $c->config->{user_home};
@@ -219,21 +218,20 @@ sub startup {
 			$c->redirect_to('/');
 			return;
 		}
+
 		my $url = Mojo::URL->new;
-		if ($c->app->mode eq 'production') {
-			$url->scheme('https');
-		} else {
-			$url->scheme('http');
-			$url->port(3000);
-		}
+		$url->scheme($c->config->{scheme});
+		$url->port($c->config->{port});
+
 		my $user = $c->user->read_user(
 			{ key => 'username', username => $username }
 		);
+		my $domain = $c->config->{domain};
 		my $custom_domain = $user->{custom_domain};
 		if ($custom_domain) {
 			$url->host($custom_domain);
 		} else {
-			$url->host("$username.$bliptown_domain");
+			$url->host("$username.$domain");
 		}
 		$c->redirect_to($url)
 	})->name('my_site');
