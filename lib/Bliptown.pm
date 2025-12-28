@@ -185,6 +185,23 @@ sub startup {
 		includes => [],
 	);
 
+	$app->hook(
+		before_routes => sub {
+			my $c = shift;
+			my $req_url = $c->tx->req->url->to_abs;
+			my $host = $req_url->host;
+
+			if ($host eq "cdn-origin.$bliptown_domain") {
+				my $req_user = shift @{$req_url->path->parts};
+				my $path = join '/', @{$req_url->path->parts};
+				my $user_home = $c->config->{user_home};
+				my $file = path($user_home, $req_user, $path);
+				return $c->reply->file($file) if -f $file;
+			}
+			return;
+		}
+	);
+
 	my $r = $app->routes;
 
 	$r->post('/join')->to(controller => 'Users', action => 'user_join')->name('user_join');
