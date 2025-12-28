@@ -115,21 +115,21 @@ sub startup {
 	$app->helper(
 		get_req_user => sub {
 			my $c = shift;
-			my $host = $c->req->headers->header('Host') || '';
-			$host =~ s/:.*//;
-			$host =~ s/^www\.(.+)/$1/;
-			my $domain = $c->config->{domain};
-			if ($host =~ /\Q$domain\E$/) {
-				my @host_array = split(/\./, $host);
-				my $username = @host_array >= 3 ? $host_array[-3] : 'mayor';
+			my $req_domain = $c->req->url->to_abs->host;
+			$req_domain =~ s/^www\.//;
+			my $bliptown_domain = $c->config->{domain};
+			if ($req_domain =~ /\Q$bliptown_domain\E$/) {
+				my @req_domain_array = split(/\./, $req_domain);
+				my $username =
+					@req_domain_array >= 3 ? $req_domain_array[-3] : 'mayor';
 				return $username if $username;
 			}
 			my $user = $c->user->read_user(
-				{ key => 'custom_domain', custom_domain => $host }
+				{ key => 'custom_domain', custom_domain => $req_domain }
 			);
 			my $username = $user->{username};
 			return $username if $username;
-			return;
+			return '';
 		});
 
 	$app->helper(
