@@ -156,7 +156,11 @@ sub delete_file {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
-	my $filename = $c->get_file($slug)->to_abs->to_string;
+	my $filename = path(
+		$c->config->{user_home},
+		$username,
+		$slug
+	)->to_abs->to_string;
 	$c->ipc->send_message(
 		{
 			command => 'delete_file',
