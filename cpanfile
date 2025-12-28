@@ -5,5 +5,4 @@ requires 'Authen::OATH' => 2;
 requires 'FFI::Platypus' => 2;
 requires 'YAML::Tiny' => 1;
 requires 'Sereal' => 5;
-requires 'Imager' => 1;
 requires 'Imager::QRCode' => 0;

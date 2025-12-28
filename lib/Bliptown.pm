@@ -14,7 +14,6 @@ use Bliptown::Model::TOTP;
 use Bliptown::Model::QRCode;
 use Bliptown::Model::DomainList;
 use Bliptown::Model::Token;
-use Bliptown::Model::Cache;
 
 sub startup {
 	my $app = shift;
@@ -267,10 +266,6 @@ sub startup {
 	$protected->get('/rename/*catchall')->to(controller => 'Files', action => 'rename_file', catchall => '')->name('rename_file');
 	$protected->get('/delete/*catchall')->to(controller => 'Files', action => 'delete_file', catchall => '')->name('delete_file');
 	$protected->post('/upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');
-
-	$protected->get('/cache/create')->to(controller => 'Files', action => 'create_cache')->name('create_cache');
-	$protected->get('/cache/delete')->to(controller => 'Files', action => 'delete_cache')->name('delete_cache');
-	$r->get('/cache/:sha1')->to(controller => 'Files', action => 'render_cache')->name('render_cache');
 
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 	$protected->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
