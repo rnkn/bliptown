@@ -216,10 +216,8 @@ sub startup {
 		my $custom_domain = $user->{custom_domain};
 		if ($custom_domain) {
 			$url->host($custom_domain);
-		} elsif ($username) {
-			$url->host("$username.$bliptown_domain");
 		} else {
-			$url->host("$bliptown_domain");
+			$url->host("$username.$bliptown_domain");
 		}
 		$c->redirect_to($url)
 	})->name('my_site');
