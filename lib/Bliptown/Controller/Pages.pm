@@ -57,18 +57,11 @@ sub render_page {
 	}
 
 	my $raw = path($root, $slug);
-	if ($raw->extname) {
+	my $ext = $raw->extname;
+	if ($ext) {
 		if (-f $raw) {
-			my $sha = sha1_sum($slug);
-			my $cache_file = path($root, '.cache', $sha);
-			if (-f $cache_file && $use_cache != 0) {
-				my @src_stats = stat($raw);
-				my $src_mtime = $src_stats[9];
-				my @cache_stats = stat($cache_file);
-				my $cache_mtime = $cache_stats[9];
-				if ($cache_mtime >= $src_mtime) {
-					return $c->redirect_to('render_cache', sha1 => $sha);
-				}
+			if ($ext =~ /jpe?g|png|gif|tiff?/i) {
+				return $c->redirect_to("https://cdn.blip.town/$req_user/$slug");
 			}
 			return $c->reply->file($raw);
 		}
