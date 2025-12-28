@@ -60,7 +60,7 @@ sub render_page {
 	my $ext = $raw->extname;
 	if ($ext) {
 		if (-f $raw) {
-			if ($ext =~ /jpe?g|png|gif|tiff?/i) {
+			if ($ext =~ /jpe?g|png|webp|gif|tiff?/i) {
 				return $c->redirect_to("https://cdn.blip.town/$req_user/$slug");
 			}
 			return $c->reply->file($raw);
