@@ -44,11 +44,13 @@ sub render_private {
 sub render_page {
 	my $c = shift;
 	my $user_home = $c->config->{user_home};
-	my $root = path($user_home, $c->get_req_user);
+	my $req_user = $c->get_req_user;
+	my $root = path($user_home, $req_user);
 	my $username = $c->session('username');
+
 	my $use_cache = $c->param('cache') // 1;
 	$c->stash( home => $c->get_home );
-	my $user_cur = $username && $username eq $c->get_req_user;
+	my $user_cur = $username && $username eq $req_user;
 	my $slug = $c->stash('catchall');
 	unless (-d $root && $root gt $user_home) {
 		return $c->reply->not_found;
@@ -143,8 +145,7 @@ sub render_page {
 	my $head = $file_head->slurp('utf-8') if -f $file_head;
 
 	my $show_join = 1
-		if $ENV{'BLIPTOWN_JOIN_ENABLED'} == 1
-		&& $c->get_req_user eq 'mayor';
+		if $ENV{'BLIPTOWN_JOIN_ENABLED'} == 1 && $req_user eq 'mayor';
 
 	$c->stash(
 		template => 'page',
