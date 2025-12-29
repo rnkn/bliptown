@@ -115,17 +115,18 @@ sub startup {
 	$app->helper(
 		get_req_user => sub {
 			my $c = shift;
-			my $req_domain = $c->req->url->to_abs->host;
-			$req_domain =~ s/^www\.//;
+			my $host = $c->req->url->to_abs->host;
+			return '' unless $host;
+			$host =~ s/^www\.//;
 			my $bliptown_domain = $c->config->{domain};
-			if ($req_domain =~ /\Q$bliptown_domain\E$/) {
-				my @req_domain_array = split(/\./, $req_domain);
+			if ($host =~ /\Q$bliptown_domain\E$/) {
+				my @host_array = split(/\./, $host);
 				my $username =
-					@req_domain_array >= 3 ? $req_domain_array[-3] : 'mayor';
+					@host_array >= 3 ? $host_array[-3] : 'mayor';
 				return $username if $username;
 			}
 			my $user = $c->user->read_user(
-				{ key => 'custom_domain', custom_domain => $req_domain }
+				{ key => 'custom_domain', custom_domain => $host }
 			);
 			my $username = $user->{username};
 			return $username if $username;
@@ -169,8 +170,8 @@ sub startup {
 		before_routes => sub {
 			my $c = shift;
 			my $req_url = $c->req->url->to_abs;
-			return unless $req_url;
 			my $host = $req_url->host;
+			return unless $host;
 			my $domain = $c->config->{domain};
 
 			if ($host eq "cdn-origin.$domain") {
