@@ -47,10 +47,9 @@ sub render_page {
 	my $req_user = $c->get_req_user;
 	my $root = path($user_home, $req_user);
 	my $username = $c->session('username');
-
-	$c->stash( home => $c->get_home );
 	my $user_cur = $username && $username eq $req_user;
 	my $slug = $c->stash('catchall');
+
 	unless (-d $root && $root gt $user_home) {
 		return $c->reply->not_found;
 	}

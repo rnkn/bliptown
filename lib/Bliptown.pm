@@ -133,23 +133,6 @@ sub startup {
 		});
 
 	$app->helper(
-		get_home => sub {
-			my $c = shift;
-			my $url = Mojo::URL->new;
-			my $username = $c->session('username');
-			my $domain = $c->config->{domain};
-			$url->scheme($c->config->{scheme});
-			$url->port($c->config->{port});
-			if ($username) {
-				$url->host("$username.$domain");
-			} else {
-				$url->host("$domain");
-			}
-			return $url;
-		}
-	);
-
-	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
 			my $root = path($c->config->{user_home}, $c->get_req_user)->to_abs;
