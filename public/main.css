@@ -39,7 +39,7 @@ pre {
 
 pre, code {
 	font-size: 0.9em;
-	background-color: rgba(235,235,235,1.0);
+	background-color: rgba(235,235,235,0.5);
 }
 
 img {
