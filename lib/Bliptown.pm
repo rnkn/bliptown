@@ -168,7 +168,8 @@ sub startup {
 	$app->hook(
 		before_routes => sub {
 			my $c = shift;
-			my $req_url = $c->tx->req->url->to_abs;
+			my $req_url = $c->req->url->to_abs;
+			return unless $req_url;
 			my $host = $req_url->host;
 			my $domain = $c->config->{domain};
 
