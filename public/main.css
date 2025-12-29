@@ -697,6 +697,7 @@ details[open] > summary::before {
 		position: fixed;
 		width: 100%;
 		height: 5rem;
+		overflow-y: hidden;
 	}
 	header {
 		text-align: center;
@@ -718,6 +719,7 @@ details[open] > summary::before {
 	input#nav-toggle:checked ~ nav {
 		z-index: 90;
 		height: 100%;
+		overflow-y: scroll;
 	}
 	input#nav-toggle:checked ~ label#nav-toggle {
 		transform: rotate(45deg);
