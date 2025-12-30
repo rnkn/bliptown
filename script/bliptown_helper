@@ -298,13 +298,10 @@ sub spawn_worker {
 	die "Cannot fork process ($!)" unless defined $pid;
 
 	if ($pid == 0) {
-		while (1) {
-			my $conn = $sock->accept();
-			next unless $conn;
-
+		my $conn = $sock->accept();
+		if ($conn) {
 			handle_conn($conn);
 			close $conn;
-			last;
 		}
 		exit 0;
 	}
