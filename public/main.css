@@ -208,6 +208,7 @@ main textarea {
 #drawer {
 	visibility: hidden;
 	transition: visibility 0.3s;
+	background-color: white;
 }
 
 input#drawer-toggle:checked ~ #drawer {
