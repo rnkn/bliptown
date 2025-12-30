@@ -315,7 +315,6 @@ sub spawn_worker {
 $SIG{CHLD} = sub {
 	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
 		delete $children{$pid};
-		spawn_worker();
 	}
 };
 
@@ -324,5 +323,8 @@ for (1 .. $prefork) {
 }
 
 while (1) {
+	while (keys(%children) < $prefork) {
+		spawn_worker();
+	}
 	pause();
 }
