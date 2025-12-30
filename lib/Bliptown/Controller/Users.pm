@@ -68,8 +68,9 @@ sub user_login {
 	my $redirect	= $c->param('back_to') // '/';
 
 	my $bliptown_domain = $c->config->{domain};
-	my $req_domain = $c->req->url->host;
-	$req_domain =~ s/^www\.//;
+	my $host = $c->req->url->host;
+	return unless $host;
+	$host =~ s/^www\.//;
 
 	if ($token) {
 		my $record = $c->token->read_token({ token => $token });
@@ -84,7 +85,7 @@ sub user_login {
 			);
 		}
 		if ($username eq $record->{username}) {
-			$c->stash(custom_domain => $req_domain);
+			$c->stash(custom_domain => $host);
 			$c->session(expiration => 2592000, username => $username);
 			$c->token->delete_token({ token => $token });
 			return $c->redirect_to($redirect);
@@ -93,7 +94,7 @@ sub user_login {
 		return $c->redirect_to($redirect);
 	}
 
-	if ($req_domain ne $bliptown_domain) {
+	if ($host ne $bliptown_domain) {
 		my $url = Mojo::URL->new;
 		my $path = $c->url_for('user_login')->path->to_string;
 		$url->host($bliptown_domain)->path($path);
