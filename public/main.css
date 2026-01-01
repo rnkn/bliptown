@@ -28,7 +28,7 @@ p {
 }
 
 a {
-	color: initial;
+	color: black;
 	text-decoration: none;
 }
 
@@ -156,7 +156,6 @@ main p:first-child {
 }
 
 main a {
-	color: black;
 	border-bottom: 1px solid;
 }
 
