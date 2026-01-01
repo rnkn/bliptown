@@ -384,6 +384,16 @@ a.exit:before {
 
 /* Edit */
 
+#edit #filename {
+	width: 20rem;
+	display: flex;
+	gap: 8px;
+}
+
+#edit #filename input {
+	width: 100%;
+}
+
 #edit textarea {
 	display: block;
 	width: 100%;
