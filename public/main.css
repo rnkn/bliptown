@@ -373,11 +373,12 @@ input#message-close:checked ~ label#message-close {
 
 /* backstage */
 
-nav a.exit {
+a.exit {
 	font-size: 0.9em;
+	border-bottom: none;
 }
 
-nav a.exit:before {
+a.exit:before {
 	content: "\2190\00A0";
 }
 
