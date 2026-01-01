@@ -441,6 +441,16 @@ a.exit:before {
 	text-align: right;
 }
 
+#list #rename {
+	width: 20rem;
+	display: flex;
+	gap: 8px;
+}
+
+#list #rename input {
+	width: 100%;
+}
+
 /* Files controls  */
 
 nav #controls input {
