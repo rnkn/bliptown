@@ -94,7 +94,7 @@ sub user_login {
 		return $c->redirect_to($redirect);
 	}
 
-	if ($host ne $bliptown_domain) {
+	if ($host !~ /$bliptown_domain$/) {
 		my $url = Mojo::URL->new;
 		my $path = $c->url_for('user_login')->path->to_string;
 		$url->host($bliptown_domain)->path($path);
