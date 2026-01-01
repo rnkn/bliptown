@@ -98,12 +98,8 @@ sub user_login {
 		my $url = Mojo::URL->new;
 		my $path = $c->url_for('user_login')->path->to_string;
 		$url->host($bliptown_domain)->path($path);
-		if ($c->app->mode eq 'production') {
-			$url->scheme('https');
-		} else {
-			$url->scheme('http');
-			$url->port(3000);
-		}
+		$url->scheme($c->config->{scheme});
+		$url->port($c->config->{port});
 		$c->res->code(307);
 		return $c->redirect_to(
 			$url,
@@ -128,12 +124,8 @@ sub user_login {
 				username => $username,
 				token => $token
 			);
-			if ($c->app->mode eq 'production') {
-				$url->scheme('https');
-			} else {
-				$url->scheme('http');
-				$url->port(3000);
-			}
+			$url->scheme($c->config->{scheme});
+			$url->port($c->config->{port});
 			return $c->redirect_to($url);
 		}
 	} else {
