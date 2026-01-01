@@ -453,6 +453,10 @@ a.exit:before {
 
 /* Files controls  */
 
+nav #controls {
+	margin: 1em 0;
+}
+
 nav #controls input {
 	width: 100%;
 }
