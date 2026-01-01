@@ -68,7 +68,7 @@ sub user_login {
 	my $redirect	= $c->param('back_to') // '/';
 
 	my $bliptown_domain = $c->config->{domain};
-	my $host = $c->req->url->host;
+	my $host = $c->req->url->to_abs->host;
 	return unless $host;
 	$host =~ s/^www\.//;
 
