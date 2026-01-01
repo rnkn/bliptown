@@ -59,6 +59,58 @@ sub user_join {
 	return $c->redirect_to($redirect);
 }
 
+sub token_login {
+	my ($c, $args)	= @_;
+	my $host		= $args->{host} // '';
+	my $username	= $args->{username} // '';
+	my $token		= $args->{token} // '';
+	my $redirect	= $args->{redirect} // '/';
+	my $record		= $c->token->read_token({ token => $args->{token} });
+
+	$c->log->debug('=> token login');
+
+	if (! $record || ! $record->{username} || $record->{expires} <= time) {
+		$c->token->delete_token({ token => $token }) if $record;
+		return $c->render(
+			status => 403,
+			template => 'message',
+			title => 'Oops...',
+			content => '403 Invalid or Expired Token',
+		);
+	}
+
+	if ($username eq $record->{username}) {
+		$c->stash(custom_domain => $host);
+		$c->session(expiration => 2592000, username => $username);
+		$c->token->delete_token({ token => $token });
+		return $c->redirect_to($redirect);
+	}
+
+	$c->token->delete_token({ token => $token });
+	return $c->redirect_to($redirect);
+}
+
+sub login_our_domain {
+	my ($c, $args)	= @_;
+	my $username	= $args->{username};
+	my $password	= $args->{password};
+	my $totp		= $args->{totp};
+	my $url			= Mojo::URL->new;
+	my $path		= $c->url_for('user_login')->path->to_string;
+
+	$url->host($c->config->{domain})->path($path);
+	$url->scheme($c->config->{scheme});
+	$url->port($c->config->{port});
+	$c->res->code(307);
+
+	return $c->redirect_to(
+		$url,
+		username => $username,
+		password => $password,
+		totp => $totp,
+	);
+}
+
 sub user_login {
 	my $c = shift;
 	my $username	= $c->param('username') // '';
@@ -67,49 +119,34 @@ sub user_login {
 	my $token		= $c->param('token') // '';
 	my $redirect	= $c->param('back_to') // '/';
 
-	my $bliptown_domain = $c->config->{domain};
+	my $our_domain = $c->config->{domain};
 	my $host = $c->req->url->to_abs->host;
 	return unless $host;
 	$host =~ s/^www\.//;
 
-	if ($token) {
-		my $record = $c->token->read_token({ token => $token });
-
-		if (! $record || ! $record->{username} || $record->{expires} <= time) {
-			$c->token->delete_token({ token => $token }) if $record;
-			return $c->render(
-				status => 403,
-				template => 'message',
-				title => 'Oops...',
-				content => '403 Invalid or Expired Token',
-			);
+	return $c->token_login(
+		{
+			host		=> $host,
+			username	=> $username,
+			token		=> $token,
+			redirect	=> $redirect
 		}
-		if ($username eq $record->{username}) {
-			$c->stash(custom_domain => $host);
-			$c->session(expiration => 2592000, username => $username);
-			$c->token->delete_token({ token => $token });
-			return $c->redirect_to($redirect);
+	) if $token;
+
+	return $c->login_our_domain(
+		{
+			username	=> $username,
+			password	=> $password,
+			totp		=> $totp
 		}
-		$c->token->delete_token({ token => $token });
-		return $c->redirect_to($redirect);
-	}
+	) if $host !~ /$our_domain$/;
 
-	if ($host !~ /$bliptown_domain$/) {
-		my $url = Mojo::URL->new;
-		my $path = $c->url_for('user_login')->path->to_string;
-		$url->host($bliptown_domain)->path($path);
-		$url->scheme($c->config->{scheme});
-		$url->port($c->config->{port});
-		$c->res->code(307);
-		return $c->redirect_to(
-			$url,
-			username => $username,
-			password => $password,
-			totp => $totp,
-		);
-	}
+	my $creds = {
+		username => $username,
+		password => $password,
+		totp => $totp
+	};
 
-	my $creds = { username => $username, password => $password, totp => $totp };
 	if ($c->user->authenticate_user($creds)) {
 		$c->session(username => $username);
 
@@ -128,16 +165,15 @@ sub user_login {
 			$url->port($c->config->{port});
 			return $c->redirect_to($url);
 		}
-	} else {
-		return $c->render(
-			status => 401,
-			template => 'message',
-			title => 'Oops...',
-			content => '401 Incorrect Username, Password or TOTP',
-			username => $username,
-		);
+		return $c->redirect_to($redirect);
 	}
-	return $c->redirect_to($redirect);
+	return $c->render(
+		status => 401,
+		template => 'message',
+		title => 'Oops...',
+		content => '401 Incorrect Username, Password or TOTP',
+		username => $username,
+	);
 }
 
 sub user_logout {
