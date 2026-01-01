@@ -76,15 +76,13 @@ check file usr/bin/su path /usr/bin/su
 	if failed perm 4555 then alert
 
 check file script/bliptown path /usr/local/www/bliptown/script/bliptown
-	if failed uid 0 then alert
-	if failed gid 1008 then alert
-	if failed perm 0750 then alert
+	if failed perm 0755 then alert
 
 check file script/bliptown_helper path /usr/local/www/bliptown/script/bliptown_helper
 	if failed uid 0 then alert
 	if failed gid 0 then alert
-	if failed perm 0750 then alert
-	if failed md5 checksum expect df2cbc042bb1f17c2612b17423a1248c then alert
+	if failed perm 0755 then alert
+	if failed md5 checksum expect 34870ef89a750ddb8a6b0cb792f41b2b then alert
 
 check file users.db path /var/db/bliptown/users.db
 	if failed uid 1008 then alert
@@ -94,7 +92,7 @@ check file users.db path /var/db/bliptown/users.db
 check directory usr/local/www/bliptown path /usr/local/www/bliptown
 	if failed uid 0 then alert
 	if failed gid 1008 then alert
-	if failed perm 0755 then alert
+	if failed perm 0750 then alert
 
 check directory etc/ssl/private path /etc/ssl/private
 	if failed uid 0 then alert
