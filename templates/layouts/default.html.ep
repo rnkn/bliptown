@@ -78,7 +78,10 @@
 			% }
 		</div>
 		<div id="viewport">
-			<label id="drawer-toggle" style="<%= $drawer_toggle_style %>" class="button" for="drawer-toggle"></label>
+			<input type="checkbox" id="nav-toggle" hidden>
+			% if ($show_sidebar) {
+			<label id="nav-toggle" class="button" for="nav-toggle"></label>
+			% }
 			% my $message = begin
 			% my $type = shift;
 			<input type="checkbox" id="message-close" hidden checked>
@@ -93,10 +96,7 @@
 			% } elsif (flash('info')) {
 			%= $message->('info')
 			% }
-			% if ($show_sidebar) {
-			<input type="checkbox" id="nav-toggle" hidden>
-			<label id="nav-toggle" class="button" for="nav-toggle"></label>
-			% }
+			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
 			%= content
 		</div>
 	</body>
