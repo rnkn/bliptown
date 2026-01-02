@@ -231,8 +231,8 @@ sub startup {
 			} else {
 				$c->flash(info => 'Login required');
 				$c->render(
-						template => 'message',
-						content => 'Sorry, this page requires a login.'
+					template => 'message',
+					content => 'Sorry, this page requires a login.'
 				);
 				return;
 			}
