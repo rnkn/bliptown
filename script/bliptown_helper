@@ -20,6 +20,7 @@ die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
 
 my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
 my %children;
+my $needs_reap = 0;
 
 my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
 unlink $sock_path if -e $sock_path;
@@ -293,6 +294,8 @@ sub handle_conn {
 	return;
 }
 
+$SIG{CHLD} = sub { $needs_reap = 1 };
+
 sub spawn_worker {
 	my $pid = fork();
 	die "Cannot fork process ($!)" unless defined $pid;
@@ -309,17 +312,22 @@ sub spawn_worker {
 	$children{$pid} = 1;
 }
 
-$SIG{CHLD} = sub {
+sub reap_children {
 	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
 		delete $children{$pid};
 	}
-};
+}
 
 for (1 .. $prefork) {
 	spawn_worker();
 }
 
 while (1) {
+	if ($needs_reap) {
+		reap_children();
+		$needs_reap = 0;
+	}
+
 	while (keys(%children) < $prefork) {
 		spawn_worker();
 	}
