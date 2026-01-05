@@ -48,13 +48,6 @@ sub render_page {
 	my $root = path($user_home, $req_user);
 	my $username = $c->session('username');
 
-	my $logpath = path($ENV{BLIPTOWN_LOG_HOME}, $req_user, 'access.log');
-	my $logdir = $logpath->dirname;
-	$logdir->make_path;
-	$c->stash(logpath => $logpath->to_string);
-
-	my $use_cache = $c->param('cache') // 1;
-	$c->stash( home => $c->get_home );
 	my $user_cur = $username && $username eq $req_user;
 	my $slug = $c->stash('catchall');
 

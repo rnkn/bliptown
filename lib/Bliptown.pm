@@ -19,10 +19,11 @@ sub startup {
 	my $app = shift;
 
 	$app->config(
-		user_home => $ENV{BLIPTOWN_USER_HOME},
 		domain => $ENV{BLIPTOWN_DOMAIN},
 		scheme => $app->mode eq 'production' ? 'https' : 'http',
 		port => $app->mode eq 'production' ? '' : '3000',
+		user_home => $ENV{BLIPTOWN_USER_HOME},
+		log_home => $ENV{BLIPTOWN_LOG_HOME},
 	);
 	$app->secrets(
 		[ $ENV{BLIPTOWN_SECRET} ]
@@ -149,13 +150,13 @@ sub startup {
 		}
 	);
 
-	my %ACCESSLOGS;
+	my %accesslogs;
 
 	$app->helper(
 		accesslog => sub {
 			my ($c, $logpath) = @_;
 
-			return $ACCESSLOGS{$logpath} ||= do {
+			return $accesslogs{$logpath} ||= do {
 				my $log = Mojo::Log->new(
 					level => 'info',
 					path => $logpath,
@@ -168,13 +169,12 @@ sub startup {
 						return join('|', $time, @lines) . "\n";
 					}
 				);
-
 				$log;
 			}
 		}
 	);
 
-	$SIG{HUP} = sub { %ACCESSLOGS = () };
+	$SIG{HUP} = sub { %accesslogs = () };
 
 	$app->defaults(
 		title => 'Untitled',
@@ -215,11 +215,16 @@ sub startup {
 	$app->hook(
 		after_dispatch => sub {
 			my $c = shift;
-			my $logpath = $c->stash('logpath') or return;
-			my $log = $c->accesslog($logpath);
+			my $logpath = path($c->config->{log_home}, 'users', $c->get_req_user, 'access.log');
+			my $logdir = $logpath->dirname;
+			$logdir->make_path;
+			my $user_log = $c->accesslog($logpath);
+			my $master_logpath = path($c->config->{log_home}, 'master', 'access.log');
+			my $master_log = $c->accesslog($master_logpath);
+
 			my $tx = $c->tx;
 
-			$log->info(
+			my @data = (
 				$tx->remote_address					//
 				$tx->req->headers->header('X-Forwarded-For')
 													// '',
@@ -232,6 +237,9 @@ sub startup {
 				$tx->res->code						// '',
 				$tx->res->headers->content_type		// '',
 			);
+
+			$user_log->info(@data);
+			$master_log->info(@data);
 		}
 	);
 
