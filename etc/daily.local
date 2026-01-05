@@ -1,53 +1,58 @@
 # -*- mode: sh; -*-
 
 payload=/etc/ssl/private/porkbun-keys.json
-endpoint=https://api.porkbun.com/api/json/v3/ssl/retrieve/blip.town
 
 cleanup() {
 	rm -f $tmpfiles
 }
 trap cleanup EXIT
 
-echo "Fetching blip.town certificate:"
+fetch_cert() {
+	domain=$1
+	endpoint="https://api.porkbun.com/api/json/v3/ssl/retrieve/${domain}"
+	echo "Fetching certificate: $domain"
+	cert_chain="/etc/ssl/${domain}.crt"
+	cert_key="/etc/ssl/private/${domain}.key"
+	json_tmp=$(mktemp)
+	tmpfiles="$json_tmp $tmpfiles"
 
-cert_chain=/etc/ssl/blip.town.crt
-cert_key=/etc/ssl/private/blip.town.key
-json_tmp=$(mktemp)
-tmpfiles="$json_tmp $tmpfiles"
+	/usr/local/bin/curl -fsS -X POST -d "@$payload" -m 30 "$endpoint" > "$json_tmp"
 
-/usr/local/bin/curl -fsS -X POST -d "@$payload" -m 30 "$endpoint" > "$json_tmp"
-
-if [ ! -s "$json_tmp" ]
-then
-	echo "Certificate fetch failed!"
-else
-	cert_chain_tmp=$(mktemp)
-	tmpfiles="$cert_chain_tmp $tmpfiles"
-	cert_key_tmp=$(mktemp)
-	tmpfiles="$cert_key_tmp $tmpfiles"
-
-	ok=true
-	/usr/local/bin/jq -r .certificatechain < "$json_tmp" > "$cert_chain_tmp" || ok=false
-	/usr/local/bin/jq -r .privatekey < "$json_tmp" > "$cert_key_tmp" || ok=false
-fi
-
-if [ $ok ]
-then
-	cert_hash=$(/usr/bin/openssl x509 -in "$cert_chain_tmp" -pubkey \
-					| /usr/bin/openssl pkey -pubin | /bin/md5)
-	key_hash=$(/usr/bin/openssl pkey -in "$cert_key_tmp" -pubout | /bin/md5)
-
-	echo "Matching certificate with key:"
-	if [ "X$cert_hash" != "X$key_hash" ]
+	if [ ! -s "$json_tmp" ]
 	then
-		echo "Certificate chain and key do not match!"
+		echo "Certificate fetch failed!"
 	else
-		echo "Certificate chain and key match."
-		echo "Installing certificate:"
-		install -m 0644 -o root -g wheel "$cert_chain_tmp" "$cert_chain" && echo "$cert_chain installed."
-		install -m 0600 -o root -g wheel "$cert_key_tmp" "$cert_key" && echo "$cert_key installed."
+		cert_chain_tmp=$(mktemp)
+		tmpfiles="$cert_chain_tmp $tmpfiles"
+		cert_key_tmp=$(mktemp)
+		tmpfiles="$cert_key_tmp $tmpfiles"
+
+		ok=true
+		/usr/local/bin/jq -r .certificatechain < "$json_tmp" > "$cert_chain_tmp" || ok=false
+		/usr/local/bin/jq -r .privatekey < "$json_tmp" > "$cert_key_tmp" || ok=false
 	fi
-fi
+
+	if [ $ok ]
+	then
+		cert_hash=$(/usr/bin/openssl x509 -in "$cert_chain_tmp" -pubkey \
+						| /usr/bin/openssl pkey -pubin | /bin/md5)
+		key_hash=$(/usr/bin/openssl pkey -in "$cert_key_tmp" -pubout | /bin/md5)
+
+		echo "Matching certificate with key:"
+		if [ "X$cert_hash" != "X$key_hash" ]
+		then
+			echo "Certificate chain and key do not match!"
+		else
+			echo "Certificate chain and key match."
+			echo "Installing certificate:"
+			install -m 0644 -o root -g wheel "$cert_chain_tmp" "$cert_chain" && echo "$cert_chain installed."
+			install -m 0600 -o root -g wheel "$cert_key_tmp" "$cert_key" && echo "$cert_key installed."
+		fi
+	fi
+}
+
+fetch_cert blip.town
+fetch_cert bliptown-staging.com
 
 echo "Renewing user certificates:"
 /usr/bin/grep "^domain" /etc/acme-domains.conf | while read -r line
@@ -72,3 +77,8 @@ backup_db="/var/db/bliptown/users-${date}.db"
 install -m 0600 -o root -g wheel /dev/null "$backup_db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
 echo "Created backup: $backup_db"
+
+echo "Copying database to staging:"
+staging_db="/var/db/bliptown-staging/users.db"
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $staging_db"
+echo "Copied: $staging_db"
