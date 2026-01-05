@@ -9,9 +9,12 @@ use Mojolicious::Commands;
 
 die "BLIPTOWN_SECRET not defined" unless $ENV{BLIPTOWN_SECRET};
 die "BLIPTOWN_SALT not defined" unless $ENV{BLIPTOWN_SALT};
-die "BLIPTOWN_USER_HOME not defined " unless $ENV{BLIPTOWN_HELPER_SOCKET};
+die "BLIPTOWN_HELPER_SOCKER not defined " unless $ENV{BLIPTOWN_HELPER_SOCKET};
+
+die "BLIPTOWN_DOMAIN not defined " unless $ENV{BLIPTOWN_DOMAIN};
 die "BLIPTOWN_USER_HOME not defined " unless $ENV{BLIPTOWN_USER_HOME};
 die "BLIPTOWN_DB_HOME not defined" unless $ENV{BLIPTOWN_DB_HOME};
+
 die "BLIPTOWN_MD4C_LIB not defined" unless $ENV{BLIPTOWN_MD4C_LIB};
 die "BLIPTOWN_MD4C_HTML_LIB not defined" unless $ENV{BLIPTOWN_MD4C_HTML_LIB};
 die "BLIPTOWN_KEYPAIR_FILE not defined "unless $ENV{BLIPTOWN_KEYPAIR_FILE};

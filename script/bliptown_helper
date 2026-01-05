@@ -14,7 +14,11 @@ use Sereal::Encoder;
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
 die "BLIPTOWN_HELPER_PREFORK not defined" unless $ENV{BLIPTOWN_HELPER_PREFORK};
+
+die "BLIPTOWN_DOMAIN not defined" unless $ENV{BLIPTOWN_DOMAIN};
+die "BLIPTOWN_GID not defined" unless $ENV{BLIPTOWN_GID};
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
+
 die "BLIPTOWN_KEYPAIR_FILE not defined "unless $ENV{BLIPTOWN_KEYPAIR_FILE};
 die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
 
@@ -203,7 +207,7 @@ sub git_commit {
 	system('git add -A') == 0
 		or die "Cannot add files to $repo";
 
-	my $subject = 'Full snapshot on blip.town';
+	my $subject = 'Full snapshot on $ENV{BLIPTOWN_DOMAIN}';
 	my $body = `git status --porcelain`;
 	die "No changes to commit" unless (length($body));
 

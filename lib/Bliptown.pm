@@ -20,7 +20,7 @@ sub startup {
 
 	$app->config(
 		user_home => $ENV{BLIPTOWN_USER_HOME},
-		domain => $app->mode eq 'production' ? 'blip.town' : 'blip.local',
+		domain => $ENV{BLIPTOWN_DOMAIN},
 		scheme => $app->mode eq 'production' ? 'https' : 'http',
 		port => $app->mode eq 'production' ? '' : '3000',
 	);
