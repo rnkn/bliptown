@@ -116,6 +116,14 @@ sub write_blob {
 	return "Wrote file: $filename";
 }
 
+sub backup_file {
+	my $payload = shift;
+	my $filename = $payload->{filename};
+	my $path = path($filename);
+	$path->copy_to("${filename}~") or die "Cannot backup file: $path ($!)";
+	return "Created backup file: ${filename}~"
+}
+
 sub update_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
@@ -124,8 +132,7 @@ sub update_file {
 	my $dir = $path->dirname;
 	$dir->make_path or die "Cannot creat path: $dir ($!)";
 	if ($payload->{create_backup} && -e $filename) {
-		rename $filename, "${filename}~"
-			or die "Cannot create backup: $filename~ ($!)"
+		backup_file($payload);
 	}
 	$path->spew($content, 'utf-8') or die "Cannot write file: $path ($!)";
 	return "Updated file: $filename"
@@ -241,6 +248,7 @@ my %allowed_commands = (
 	update_file			=> \&update_file,
 	rename_file			=> \&rename_file,
 	delete_file			=> \&delete_file,
+	backup_file			=> \&backup_file,
 	git_commit			=> \&git_commit,
 	git_log				=> \&git_log,
 	git_checkout		=> \&git_checkout,

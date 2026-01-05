@@ -155,6 +155,21 @@ sub render_page {
 	return $c->render;
 }
 
+sub backup_page {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $filename = $c->param('catchall');
+	my $file = path($c->config->{user_home}, $c->get_req_user, $filename);
+	my $redirect = $c->param('back_to') || $c->url_for('list_files');
+	$c->ipc->send_message(
+		{
+			command => 'backup_file',
+			username => $username,
+			filename => $file->to_string
+		});
+	return $c->redirect_to($redirect);
+}
+
 sub new_page {
 	my $c = shift;
 	my $slug = $c->param('catchall');

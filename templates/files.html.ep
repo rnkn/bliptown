@@ -78,6 +78,7 @@
 					% }
 					% if ($_->{filename} =~ /\.(md|txt|html|css|js)$/) {
 					<li><a href="<%= url_for('edit_page', catchall => $_->{url} )->query([back_to => url_for]) %>">Edit</a></li>
+					<li><a href="<%= url_for('backup_page', catchall => $_->{filename} )->query([back_to => url_for]) %>">Backup</a></li>
 					% }
 					% if ($_->{filename} =~ /\.(md|txt|html|css|js)~?$/) {
 					<li><a href="<%= url_for('render_raw', catchall => $_->{url} ) %>">Raw</a></li>

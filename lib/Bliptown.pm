@@ -244,6 +244,7 @@ sub startup {
 	$protected->get('/new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
 	$protected->get('/edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');
 	$protected->post('/edit/*catchall')->to(controller => 'Pages', action => 'save_page', catchall => '')->name('save_page');
+	$protected->get('/backup/*catchall')->to(controller => 'Pages', action => 'backup_page', catchall => '')->name('backup_page');
 
 	$protected->get('/files')->to(controller => 'Files', action => 'list_files')->name('list_files');
 	$protected->get('/rename/*catchall')->to(controller => 'Files', action => 'rename_file', catchall => '')->name('rename_file');
