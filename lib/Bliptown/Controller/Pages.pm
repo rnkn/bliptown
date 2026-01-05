@@ -190,14 +190,14 @@ sub new_page {
 		unless ($c->get_file("$slug/index")) {
 			$slug =~ s/\/$//;
 			if ($c->get_file($slug)) {
-				$c->redirect_to('edit_page', catchall => $slug);
+				return $c->redirect_to('edit_page', catchall => $slug);
 			}
 		};
 	} else {
 		if ($c->get_file($slug)) {
-			$c->redirect_to('edit_page', catchall => "$slug");
+			return $c->redirect_to('edit_page', catchall => "$slug");
 		} elsif ($c->get_file("$slug/index")) {
-			$c->redirect_to('edit_page', catchall => "$slug/");
+			return $c->redirect_to('edit_page', catchall => "$slug/");
 		}
 	}
 
@@ -223,13 +223,13 @@ sub edit_page {
 		unless ($file = $c->get_file("$slug/index")) {
 			$slug =~ s/\/$//;
 			if ($file = $c->get_file($slug)) {
-				$c->redirect_to('edit_page', catchall => $slug);
+				return $c->redirect_to('edit_page', catchall => $slug);
 			}
 		};
 	} else {
 		unless ($file = $c->get_file($slug)) {
 			if ($file = $c->get_file("$slug/index")) {
-				$c->redirect_to('edit_page', catchall => "$slug/");
+				return $c->redirect_to('edit_page', catchall => "$slug/");
 			}
 		}
 	}
