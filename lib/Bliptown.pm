@@ -118,8 +118,8 @@ sub startup {
 			my $host = $c->req->url->to_abs->host;
 			return '' unless $host;
 			$host =~ s/^www\.//;
-			my $bliptown_domain = $c->config->{domain};
-			if ($host =~ /\Q$bliptown_domain\E$/) {
+			my $domain = $c->config->{domain};
+			if ($host =~ /\Q$domain\E$/) {
 				my @host_array = split(/\./, $host);
 				my $username =
 					@host_array >= 3 ? $host_array[-3] : 'mayor';
