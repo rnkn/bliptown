@@ -175,12 +175,13 @@ sub new_page {
 			}
 		};
 	} else {
-		unless ($c->get_file($slug)) {
-			if ($c->get_file("$slug/index")) {
-				$c->redirect_to('edit_page', catchall => "$slug/");
-			}
+		if ($c->get_file($slug)) {
+			$c->redirect_to('edit_page', catchall => "$slug");
+		} elsif ($c->get_file("$slug/index")) {
+			$c->redirect_to('edit_page', catchall => "$slug/");
 		}
 	}
+
 	$c->stash(
 		template => 'edit',
 		title => 'New',
