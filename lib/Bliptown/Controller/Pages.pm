@@ -170,7 +170,7 @@ sub backup_page {
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 
-	$c->flash(info => "$filename created");
+	$c->flash(info => "${filename}~ created");
 	return $c->redirect_to($redirect);
 }
 
