@@ -289,8 +289,10 @@ sub startup {
 			} else {
 				$c->flash(info => 'Login required');
 				$c->render(
+					status => 403,
 					template => 'message',
-					content => 'Sorry, this page requires a login.'
+					title => '403 Forbidden',
+					content => '403 Forbidden: sorry, this page requires a login.'
 				);
 				return;
 			}

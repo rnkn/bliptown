@@ -74,8 +74,8 @@ sub token_login {
 		return $c->render(
 			status => 403,
 			template => 'message',
-			title => 'Oops...',
-			content => '403 Invalid or Expired Token',
+			title => '403 Forbidden',
+			content => '403 Forbidden: invalid or expired token',
 		);
 	}
 
@@ -170,8 +170,8 @@ sub user_login {
 	return $c->render(
 		status => 401,
 		template => 'message',
-		title => 'Oops...',
-		content => '401 Incorrect Username, Password or TOTP',
+		title => '401 Unauthorized',
+		content => '401 Unauthorized: incorrect username, password or TOTP',
 		username => $username,
 	);
 }
