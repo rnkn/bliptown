@@ -1,5 +1,6 @@
 % layout 'default';
 <main>
 	<p>500 Internal Server Error</p>
+	<p>Request ID: <strong><%= $c->req->request_id %></strong></p>
 	<p><a href="/" class="exit">Home</a>
 </main>

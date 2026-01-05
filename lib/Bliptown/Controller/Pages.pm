@@ -161,12 +161,16 @@ sub backup_page {
 	my $filename = $c->param('catchall');
 	my $file = path($c->config->{user_home}, $c->get_req_user, $filename);
 	my $redirect = $c->param('back_to') || $c->url_for('list_files');
-	$c->ipc->send_message(
+	my $res = $c->ipc->send_message(
 		{
 			command => 'backup_file',
 			username => $username,
 			filename => $file->to_string
 		});
+
+	return $c->reply->exception($res->{error}) if $res->{error};
+
+	$c->flash(info => "$filename created");
 	return $c->redirect_to($redirect);
 }
 
@@ -272,7 +276,7 @@ sub save_page {
 	$content =~ s/\r\n/\n/g;
 	my $user = $c->user->read_user({ key => 'username', username => $username });
 	my $backup = $user->{create_backups} // 0;
-	$c->ipc->send_message(
+	my $res = $c->ipc->send_message(
 		{
 			command => 'update_file',
 			username => $username,
@@ -280,7 +284,9 @@ sub save_page {
 			content => $content,
 			create_backup => $backup,
 		});
-	my $redirect;
+
+	return $c->reply->exception($res->{error}) if $res->{error};
+
 	if ($action eq 'save') {
 		return $c->redirect_to($c->url_for('edit_page', catchall => $slug));
 	} elsif ($action eq 'save-exit') {

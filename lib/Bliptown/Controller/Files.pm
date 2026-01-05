@@ -100,7 +100,7 @@ sub rename_files_regex {
 		$old_filename = path($root, $old_filename)->to_abs->to_string;
 		$new_filename =~ s/$filter/$replace/g;
 		$new_filename = path($root, $new_filename)->to_abs->to_string;
-		$c->ipc->send_message(
+		my $res = $c->ipc->send_message(
 			{
 				command => 'rename_file',
 				username => $username,
@@ -108,6 +108,7 @@ sub rename_files_regex {
 				new_filename => $new_filename,
 			}
 		);
+		return $c->reply->exception($res->{error}) if $res->{error};
 	}
 	return @filenames;
 }
@@ -120,7 +121,7 @@ sub rename_file {
 	my $filename = $c->get_file($old_slug)->to_abs->to_string;
 	my $rename_to = $c->param('to');
 	my $new_filename = path($root, $rename_to)->to_abs->to_string;
-	$c->ipc->send_message(
+	my $res = $c->ipc->send_message(
 		{
 			command => 'rename_file',
 			username => $username,
@@ -128,6 +129,9 @@ sub rename_file {
 			new_filename => $new_filename,
 		}
 	);
+
+	return $c->reply->exception($res->{error}) if $res->{error};
+
 	$c->flash(info => "$old_slug renamed to $rename_to");
 	return $c->redirect_to('list_files');
 }
@@ -141,13 +145,14 @@ sub delete_files_regex {
 	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
 	my @filenames_abs = map { path($root, $_)->to_abs->to_string } @filenames;
 	foreach (@filenames_abs) {
-		$c->ipc->send_message(
+		my $res = $c->ipc->send_message(
 			{
 				command => 'delete_file',
 				username => $username,
 				filename => $_,
 			}
 		);
+		return $c->reply->exception($res->{error}) if $res->{error};
 	}
 	return @filenames_abs;
 }
@@ -161,13 +166,16 @@ sub delete_file {
 		$username,
 		$slug
 	)->to_abs->to_string;
-	$c->ipc->send_message(
+	my $res = $c->ipc->send_message(
 		{
 			command => 'delete_file',
 			username => $username,
 			filename => $filename,
 		}
 	);
+
+	return $c->reply->exception($res->{error}) if $res->{error};
+
 	$c->flash(info => "$slug deleted");
 	return $c->redirect_to('list_files');
 }
@@ -191,7 +199,7 @@ sub upload_files {
 			return $c->redirect_to('list_files');
 		};
 		my $blob = $_->slurp;
-		$c->ipc->send_message(
+		my $res = $c->ipc->send_message(
 			{
 				command => 'write_blob',
 				username => $username,
@@ -199,6 +207,7 @@ sub upload_files {
 				blob => $blob,
 			}
 		);
+		return $c->reply->exception($res->{error}) if $res->{error};
 	}
 	return $c->redirect_to('list_files');
 }
