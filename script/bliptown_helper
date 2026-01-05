@@ -35,8 +35,7 @@ my $sock = IO::Socket::UNIX->new(
 	Listen => 128,
 ) or die "Cannot create socket: $sock_path ($!)";
 
-my $gid = getgrnam('bliptown') or die "Cannot get gid: bliptown ($!)";
-chown(0, $gid, $sock_path) or die "Cannot chown: $sock_path ($!)";
+chown(0, $ENV{BLIPTOWN_GID}, $sock_path) or die "Cannot chown: $sock_path ($!)";
 chmod(0660, $sock_path) or die "Cannot chmod: $sock_path ($!)";
 
 print "Socket created: $sock_path\n";
