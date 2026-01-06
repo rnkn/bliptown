@@ -220,13 +220,20 @@ sub startup {
 			my $c = shift;
 			my $master_logpath =
 				path($c->config->{log_home}, 'master', 'access.log');
+			my $master_logdir = $master_logpath->dirname;
+			$master_logdir->make_path unless -d $master_logdir;
+			$master_logpath->touch unless -f $master_logpath;
+			$master_logpath->chmod(0600);
 			my $master_log = $c->accesslog($master_logpath);
+
 			my $user_log;
 			if (my $req_user = $c->get_req_user) {
 				my $logpath =
 					path($c->config->{log_home}, 'users', $req_user, 'access.log');
 				my $logdir = $logpath->dirname;
-				$logdir->make_path;
+				$logdir->make_path unless -d $logdir;
+				$logpath->touch unless -f $logpath;
+				$logpath->chmod(0600);
 				$user_log = $c->accesslog($logpath);
 			}
 
