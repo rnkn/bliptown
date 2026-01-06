@@ -124,13 +124,13 @@ sub startup {
 			if ($host =~ /\Q$domain\E$/) {
 				my @host_array = split(/\./, $host);
 				$username = @host_array >= 3 ? $host_array[-3] : 'mayor';
-			}
-			unless ($username) {
+			} else {
 				my $user = $c->user->read_user(
 					{ key => 'custom_domain', custom_domain => $host }
 				);
 				$username = $user->{username};
 			}
+			return unless $username;
 			my $dir = path($c->config->{user_home}, $username);
 			return unless -d $dir;
 			return $username;
