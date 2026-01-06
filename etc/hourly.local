@@ -34,7 +34,7 @@ do
 	process_user_stats "$user"
 done
 
-for user in mayor demo staging
+for user in mayor demo
 do
 /bin/cp "${user_home}/${user}/private/stats.html" \
 		"${user_home}/rnkn/private/stats-${user}.html"
