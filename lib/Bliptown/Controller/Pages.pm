@@ -44,16 +44,12 @@ sub render_private {
 sub render_page {
 	my $c = shift;
 	my $user_home = $c->config->{user_home};
-	my $req_user = $c->get_req_user;
+	return $c->reply->not_found unless my $req_user = $c->get_req_user;
 	my $root = path($user_home, $req_user);
 	my $username = $c->session('username');
 
 	my $user_cur = $username && $username eq $req_user;
 	my $slug = $c->stash('catchall');
-
-	unless (-d $root && $root gt $user_home) {
-		return $c->reply->not_found;
-	}
 
 	my $raw = path($root, $slug);
 	my $ext = $raw->extname;

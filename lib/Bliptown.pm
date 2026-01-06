@@ -112,32 +112,35 @@ sub startup {
 			$slug =~ s/^\///;
 			return $slug;
 		});
-	
+
 	$app->helper(
 		get_req_user => sub {
 			my $c = shift;
 			my $host = $c->req->url->to_abs->host;
-			return '' unless $host;
+			return unless $host;
 			$host =~ s/^www\.//;
 			my $domain = $c->config->{domain};
+			my $username;
 			if ($host =~ /\Q$domain\E$/) {
 				my @host_array = split(/\./, $host);
-				my $username =
-					@host_array >= 3 ? $host_array[-3] : 'mayor';
-				return $username if $username;
+				$username = @host_array >= 3 ? $host_array[-3] : 'mayor';
 			}
-			my $user = $c->user->read_user(
-				{ key => 'custom_domain', custom_domain => $host }
-			);
-			my $username = $user->{username};
-			return $username if $username;
-			return '';
+			unless ($username) {
+				my $user = $c->user->read_user(
+					{ key => 'custom_domain', custom_domain => $host }
+				);
+				$username = $user->{username};
+			}
+			my $dir = path($c->config->{user_home}, $username);
+			return unless -d $dir;
+			return $username;
 		});
 
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			my $root = path($c->config->{user_home}, $c->get_req_user)->to_abs;
+			return unless my $req_user = $c->get_req_user;
+			my $root = path($c->config->{user_home}, $req_user)->to_abs;
 			my $file = path($root, $slug)->to_abs;
 			return $file if -f $file;
 			$slug = $1 if $slug =~ /(.+)(\..+)$/;
