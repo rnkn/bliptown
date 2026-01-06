@@ -118,7 +118,9 @@ sub rename_file {
 	my $username = $c->session('username');
 	my $root = path($c->config->{user_home}, $username);
 	my $old_slug = $c->param('catchall');
-	my $filename = $c->get_file($old_slug)->to_abs->to_string;
+	my $file = $c->get_file($old_slug);
+	return $c->reply->not_found unless $file;
+	my $filename = $file->to_abs->to_string;
 	my $rename_to = $c->param('to');
 	my $new_filename = path($root, $rename_to)->to_abs->to_string;
 	my $res = $c->ipc->send_message(

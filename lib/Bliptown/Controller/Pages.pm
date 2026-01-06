@@ -296,8 +296,7 @@ sub save_page {
 sub render_raw {
 	my $c = shift;
 	my $slug = $c->param('catchall');
-	my $file = $c->get_file($slug) || '';
-	return $c->reply->not_found unless -f $file;
+	return $c->reply->txt_not_found unless my $file = $c->get_file($slug);
 	my $chars = $file->slurp('utf-8');
 	return $c->render(text => $chars, format => 'txt');
 }
