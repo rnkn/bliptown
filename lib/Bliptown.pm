@@ -215,12 +215,17 @@ sub startup {
 	$app->hook(
 		after_dispatch => sub {
 			my $c = shift;
-			my $logpath = path($c->config->{log_home}, 'users', $c->get_req_user, 'access.log');
-			my $logdir = $logpath->dirname;
-			$logdir->make_path;
-			my $user_log = $c->accesslog($logpath);
-			my $master_logpath = path($c->config->{log_home}, 'master', 'access.log');
+			my $master_logpath =
+				path($c->config->{log_home}, 'master', 'access.log');
 			my $master_log = $c->accesslog($master_logpath);
+			my $user_log;
+			if (my $req_user = $c->get_req_user) {
+				my $logpath =
+					path($c->config->{log_home}, 'users', $req_user, 'access.log');
+				my $logdir = $logpath->dirname;
+				$logdir->make_path;
+				$user_log = $c->accesslog($logpath);
+			}
 
 			my $tx = $c->tx;
 
@@ -238,8 +243,8 @@ sub startup {
 				$tx->res->headers->content_type		// '',
 			);
 
-			$user_log->info(@data);
 			$master_log->info(@data);
+			$user_log->info(@data) if $user_log;
 		}
 	);
 
