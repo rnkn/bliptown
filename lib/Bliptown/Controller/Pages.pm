@@ -156,7 +156,8 @@ sub backup_page {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $filename = $c->param('catchall');
-	my $file = path($c->config->{user_home}, $c->get_req_user, $filename);
+	my $file = path($c->config->{user_home}, $username, $filename);
+	return $c->reply->not_found unless -f $file;
 	my $redirect = $c->param('back_to') || $c->url_for('list_files');
 	my $res = $c->ipc->send_message(
 		{
@@ -211,10 +212,11 @@ sub new_page {
 
 sub edit_page {
 	my $c = shift;
+	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
-	my $root = path($c->config->{user_home}, $c->get_req_user);
+	my $root = path($c->config->{user_home}, $username);
 	my $file;
 	if (!$slug || $slug =~ /\/$/) {
 		unless ($file = $c->get_file("$slug/index")) {
@@ -263,7 +265,7 @@ sub edit_page {
 sub save_page {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $root = path($c->config->{user_home}, $c->get_req_user)->to_string;
+	my $root = path($c->config->{user_home}, $username)->to_string;
 	my $slug = $c->param('slug');
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
