@@ -21,6 +21,7 @@ process_user_stats() {
 	then
 		zcat -f "$log_file"* | grep -v newsyslog |
 			/usr/local/bin/goaccess -p /etc/goaccess/goaccess.conf \
+									--ignore-crawlers \
 									-o "$html_file" > /dev/null 2>&1
 	fi
 
