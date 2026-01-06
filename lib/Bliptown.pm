@@ -250,6 +250,7 @@ sub startup {
 				$tx->req->headers->referrer			// '',
 				$tx->req->headers->user_agent		// '',
 				$tx->res->code						// '',
+				$tx->res->body_size					// '',
 				$tx->res->headers->content_type		// '',
 			);
 
