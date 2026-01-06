@@ -15,7 +15,7 @@ process_user_stats() {
 	conf_file="${log_home}/${user}/rotate.conf"
 	html_file="${user_home}/${user}/private/stats.html"
 
-	test -f "$log_file" || /usr/bin/install -m 600 /dev/null "$log_file"
+	test -f "$log_file" || /usr/bin/install -m 600 -o bliptown -g bliptown /dev/null "$log_file"
 
 	if [ -s "$log_file" -a -f "$html_file" ]
 	then
