@@ -48,7 +48,7 @@ sub render_page {
 	my $root = path($user_home, $req_user);
 	my $username = $c->session('username');
 
-	my $user_cur = $username && $username eq $req_user;
+	my $is_cur_user = $username && $username eq $req_user;
 	my $slug = $c->stash('catchall');
 
 	my $raw = path($root, $slug);
@@ -84,7 +84,7 @@ sub render_page {
 	}
 
 	if (!$file) {
-		if ($user_cur) {
+		if ($is_cur_user) {
 			return $c->redirect_to('new_page', catchall => $slug);
 		} else {
 			return $c->reply->not_found;
