@@ -18,6 +18,9 @@ use Bliptown::Model::Token;
 sub startup {
 	my $app = shift;
 
+	my $health_file = path($ENV{BLIPTOWN_HEALTH_FILE})->remove->touch;
+	$app->log->info("Creating worker health file \"$health_file\"");
+
 	$app->config(
 		domain => $ENV{BLIPTOWN_DOMAIN},
 		scheme => $app->mode eq 'production' ? 'https' : 'http',
@@ -197,6 +200,18 @@ sub startup {
 	);
 
 	$app->hook(
+		before_server_start => sub {
+			my ($server, $app) = @_;
+			$server->on(
+				heartbeat => sub {
+					my ($prefork, $pid) = @_;
+					path($ENV{BLIPTOWN_HEALTH_FILE})->spew($prefork->healthy);
+				}
+			)
+		}
+	);
+
+	$app->hook(
 		before_routes => sub {
 			my $c = shift;
 			my $req_url = $c->req->url->to_abs;
@@ -334,6 +349,8 @@ sub startup {
 	$protected->get('/snapshots/new')->to(controller => 'Snapshots', action => 'take_snapshot')->name('take_snapshot');
 	$protected->get('/snapshots/download/:hash')->to(controller => 'Snapshots', action => 'download_snapshot')->name('download_snapshot');
 	$protected->get('/snapshots/restore/:hash')->to(controller => 'Snapshots', action => 'restore_snapshot')->name('restore_snapshot');
+
+	$r->get('/health')->to(controller => 'Health', action => 'health_check')->name('health_check');
 
 	$r->get('/raw/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_raw');
 	$r->get('/*catchall')->to(controller => 'Pages', action => 'render_page', catchall => '')->name('render_page');

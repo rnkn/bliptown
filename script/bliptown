@@ -9,6 +9,8 @@ use Mojolicious::Commands;
 
 die "BLIPTOWN_SECRET not defined" unless $ENV{BLIPTOWN_SECRET};
 die "BLIPTOWN_SALT not defined" unless $ENV{BLIPTOWN_SALT};
+die "BLIPTOWN_HEALTH_FILE not defined " unless $ENV{BLIPTOWN_HEALTH_FILE};
+die "BLIPTOWN_HELPER_HEALTH_FILE not defined " unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 die "BLIPTOWN_HELPER_SOCKER not defined " unless $ENV{BLIPTOWN_HELPER_SOCKET};
 
 die "BLIPTOWN_DOMAIN not defined " unless $ENV{BLIPTOWN_DOMAIN};

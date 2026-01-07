@@ -14,6 +14,7 @@ use Sereal::Encoder;
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
 die "BLIPTOWN_HELPER_PREFORK not defined" unless $ENV{BLIPTOWN_HELPER_PREFORK};
+die "BLIPTOWN_HELPER_HEALTH_FILE not defined" unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 
 die "BLIPTOWN_DOMAIN not defined" unless $ENV{BLIPTOWN_DOMAIN};
 die "BLIPTOWN_GID not defined" unless $ENV{BLIPTOWN_GID};
@@ -25,6 +26,10 @@ die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
 my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
 my %children;
 my $needs_reap = 0;
+
+my $health_file = path $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
+$health_file->remove->touch;
+print "Health file created: $health_file\n";
 
 my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
 unlink $sock_path if -e $sock_path;
@@ -335,8 +340,12 @@ while (1) {
 		$needs_reap = 0;
 	}
 
-	while (keys(%children) < $prefork) {
+	while (keys %children < $prefork) {
 		spawn_worker();
 	}
+
+	my $ok = kill 0, keys %children;
+	$health_file->spew($ok);
+
 	pause();
 }
