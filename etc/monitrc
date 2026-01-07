@@ -82,7 +82,7 @@ check file script/bliptown_helper path /usr/local/www/bliptown/script/bliptown_h
 	if failed uid 0 then alert
 	if failed gid 0 then alert
 	if failed perm 0755 then alert
-	if failed md5 checksum expect 34870ef89a750ddb8a6b0cb792f41b2b then alert
+	if failed md5 checksum expect 7dba7edf02e9b16c6c667b5a260140c7 then alert
 
 check file users.db path /var/db/bliptown/users.db
 	if failed uid 1008 then alert
