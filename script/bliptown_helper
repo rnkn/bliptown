@@ -329,10 +329,6 @@ sub reap_children {
 	}
 }
 
-for (1 .. $prefork) {
-	spawn_worker();
-}
-
 while (1) {
 	if ($needs_reap) {
 		reap_children();
