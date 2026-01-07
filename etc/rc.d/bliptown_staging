@@ -14,15 +14,15 @@ rc_reload=NO
 . /etc/rc.d/rc.subr
 
 rc_stop() {
-        rc_exec "kill -QUIT $(cat ${pid_file})"
+	rc_exec "kill -QUIT $(cat ${pid_file})"
 }
 
 rc_configtest() {
-        rc_exec "${daemon} eval"
+	rc_exec "${daemon} eval"
 }
 
 rc_check() {
-        rc_exec "test -f ${pid_file} && kill -0 $(cat ${pid_file})"
+	rc_exec "test -f ${pid_file} && kill -0 $(cat ${pid_file})"
 }
 
 rc_cmd $1
