@@ -361,7 +361,7 @@ while (1) {
 	$health_file->spew($ok);
 
 	last if $shutdown;
-	pause();
+	while (!$needs_reap && !$shutdown) { pause() }
 }
 
 while (%children) {
