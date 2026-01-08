@@ -27,7 +27,8 @@ use constant {
 my $md_flags = MD_FLAG_PERMISSIVEURLAUTOLINKS
 	| MD_FLAG_PERMISSIVEEMAILAUTOLINKS
 	| MD_FLAG_TABLES
-	| MD_FLAG_STRIKETHROUGH;
+	| MD_FLAG_STRIKETHROUGH
+	| MD_FLAG_WIKILINKS;
 
 my $ffi = FFI::Platypus->new(api => 2);
 $ffi->lib(path($ENV{'BLIPTOWN_MD4C_LIB'})->to_string);
@@ -61,6 +62,14 @@ sub walk_dom {
 	my @skip_tags = qw(pre code kbd script);
 
 	return if $node->tag && grep { $node->tag eq $_ } @skip_tags;
+
+	if ($node->tag && $node->tag eq 'x-wikilink') {
+		my $href=$node->attr('data-target');
+		delete $node->attr->{'data-target'};
+		$node->tag('a');
+		$node->attr({ href => $href });
+		return;
+	}
 
     if ($node->type eq 'text') {
 		my $content = $node->content;
@@ -180,9 +189,7 @@ sub read_page {
 
 	unless ($recur) {
 		my $dom = Mojo::DOM->new($html);
-
 		walk_dom($dom);
-
 		$html = $dom->to_string;
 	}
 
