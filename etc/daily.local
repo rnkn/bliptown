@@ -82,3 +82,7 @@ echo "Copying database to staging:"
 staging_db="/var/db/bliptown-staging/users.db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $staging_db"
 echo "Copied: $staging_db"
+echo
+echo "Flushing rate-limited IPs"
+/sbin/pfctl -t rate_limit -T expire 86400
+echo "Done"
