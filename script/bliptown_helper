@@ -11,6 +11,8 @@ use Mojo::Util qw(trim);
 use Sereal::Decoder;
 use Sereal::Encoder;
 
+$0 = $0 . '[master]';
+
 die "$0 must be run as root" unless $> == 0;
 die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
 die "BLIPTOWN_HELPER_PREFORK not defined" unless $ENV{BLIPTOWN_HELPER_PREFORK};
@@ -322,6 +324,7 @@ sub spawn_worker {
 	die "Cannot fork process ($!)" unless defined $pid;
 
 	if ($pid == 0) {
+		$0 =~ s/master/worker/;
 		my $conn = $sock->accept();
 
 		if (!$conn) {

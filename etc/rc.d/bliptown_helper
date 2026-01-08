@@ -7,6 +7,6 @@ rc_reload=NO
 
 . /etc/rc.d/rc.subr
 
-pexp="perl ${daemon}"
+pexp="perl:? ${daemon}\[master\]"
 
 rc_cmd $1
