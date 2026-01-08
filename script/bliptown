@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use POSIX qw(setuid);
 use FindBin qw($Bin);
 use lib "$Bin/../lib", "$Bin/../local/lib/perl5";
 use Mojolicious::Commands;
