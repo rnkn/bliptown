@@ -52,8 +52,9 @@ fetch_cert() {
 }
 
 fetch_cert blip.town
+echo
 fetch_cert bliptown-staging.com
-
+echo
 echo "Renewing user certificates:"
 /usr/bin/grep "^domain" /etc/acme-domains.conf | while read -r line
 do
@@ -61,23 +62,22 @@ do
 	echo "$domain"
 	test -n "$domain" && /usr/sbin/acme-client "$domain"
 done
-
+echo
 echo "Reloading relayd:"
 /usr/sbin/rcctl reload relayd
-
+echo
 echo "Expunging database dead login tokens:"
 now=$(date +%s)
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now"
 echo "Done."
-
+echo
 echo "Creating database backup:"
 date=$(date +%F)
 backup_db="/var/db/bliptown/users-${date}.db"
-
 install -m 0600 -o root -g wheel /dev/null "$backup_db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
 echo "Created backup: $backup_db"
-
+echo
 echo "Copying database to staging:"
 staging_db="/var/db/bliptown-staging/users.db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $staging_db"
