@@ -72,13 +72,13 @@ sub render_page {
 		unless ($file = $c->get_file("$slug/index")) {
 			$slug =~ s/\/$//;
 			if ($file = $c->get_file($slug)) {
-				$c->redirect_to('render_page', catchall => $slug);
+				return $c->redirect_to('render_page', catchall => $slug);
 			}
 		};
 	} else {
 		unless ($file = $c->get_file($slug)) {
 			if ($file = $c->get_file("$slug/index")) {
-				$c->redirect_to('render_page', catchall => "$slug/");
+				return $c->redirect_to('render_page', catchall => "$slug/");
 			}
 		}
 	}
