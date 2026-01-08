@@ -314,10 +314,7 @@ sub handle_conn {
 }
 
 $SIG{CHLD} = sub { $needs_reap = 1 };
-$SIG{TERM} = $SIG{INT} = sub {
-	$shutdown = 1;
-	kill 'TERM', keys %children;
-};
+$SIG{TERM} = $SIG{INT} = sub { $shutdown = 1 };
 
 sub spawn_worker {
 	my $pid = fork();
@@ -353,6 +350,11 @@ while (1) {
 		$needs_reap = 0;
 	}
 
+	if ($shutdown) {
+		kill 'TERM', keys %children;
+		last;
+	}
+
 	while (keys %children < $prefork && !$shutdown) {
 		spawn_worker();
 	}
@@ -360,7 +362,6 @@ while (1) {
 	my $ok = kill 0, keys %children;
 	$health_file->spew($ok);
 
-	last if $shutdown;
 	while (!$needs_reap && !$shutdown) { pause() }
 }
 
