@@ -14,7 +14,7 @@ sub health_check {
 	$c->res->headers->header('X-Bliptown-Server-Workers' => trim $server_workers);
 	$c->res->headers->header('X-Bliptown-Helper-Workers' => trim $helper_workers);
 	$c->res->headers->header('X-Bliptown-Database-OK' => $db_ok);
-	return $c->render(text => 'Health check');
+	return $c->render(text => 'Health check', format => 'txt');
 }
 
 return 1;
