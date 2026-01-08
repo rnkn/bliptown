@@ -25,7 +25,8 @@ die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
 
 my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
 my %children;
-my $needs_reap = 0;
+my $needs_reap;
+my $shutdown;
 
 my $health_file = path $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 $health_file->remove->touch;
@@ -311,6 +312,10 @@ sub handle_conn {
 }
 
 $SIG{CHLD} = sub { $needs_reap = 1 };
+$SIG{TERM} = $SIG{INT} = sub {
+	$shutdown = 1;
+	kill 'TERM', keys %children;
+};
 
 sub spawn_worker {
 	my $pid = fork();
@@ -318,10 +323,15 @@ sub spawn_worker {
 
 	if ($pid == 0) {
 		my $conn = $sock->accept();
-		if ($conn) {
-			handle_conn($conn);
-			close $conn;
+
+		if (!$conn) {
+			next if $!{EINTR} && !$shutdown;
+			print "Worker $$ shutting down gracefully...\n";
+			exit 0;
 		}
+
+		handle_conn($conn);
+		close $conn;
 		exit 0;
 	}
 
@@ -340,12 +350,21 @@ while (1) {
 		$needs_reap = 0;
 	}
 
-	while (keys %children < $prefork) {
+	while (keys %children < $prefork && !$shutdown) {
 		spawn_worker();
 	}
 
 	my $ok = kill 0, keys %children;
 	$health_file->spew($ok);
 
+	last if $shutdown;
 	pause();
 }
+
+while (%children) {
+	reap_children();
+	sleep 1;
+}
+
+print "Helper $$ exiting cleanly...\n";
+exit 0;
