@@ -56,15 +56,15 @@
 						<input type="checkbox" id="create-backups" class="right" name="create_backups" value="1" <%= 'checked' if $create_backups == 1 %>>
 					</li>
 				</label>
+				<hr>
+				<details id="delete-account">
+					<summary class="row">Delete account</summary>
+					<li class="row">
+						<label class="cell name" for="delete-account-confirm">To confirm, enter <code>doas rm -rf <%= $username %></code></label>
+						<input class="cell" type="text" id="delete-account-confirm" name="delete-confirm">
+					</li>
+				</details>
 			</ul>
-			<hr>
-			<details id="delete-account">
-				<summary class="row">Delete account</summary>
-				<div class="row">
-					<label class="cell name" for="delete-account-confirm">To confirm, enter <code>doas rm -rf <%= $username %></code></label>
-					<input class="cell" type="text" id="delete-account-confirm" name="delete-confirm">
-				</div>
-			</details>
 			<hr>
 			<button type="submit">Submit</button>
 		</form>
