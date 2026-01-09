@@ -185,6 +185,7 @@ sub startup {
 	$app->defaults(
 		title => 'Untitled',
 		head => '',
+		scripts => '',
 		username => '',
 		user_style => 0,
 		show_join => 0,

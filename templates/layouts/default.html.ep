@@ -99,5 +99,8 @@
 			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
 			%= content
 		</div>
+		<script>
+			%== $scripts
+		</script>
 	</body>
 </html>

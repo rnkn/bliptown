@@ -131,6 +131,8 @@ sub render_page {
 
 	my $file_head = path($root, "_head.html");
 	my $head = $file_head->slurp('utf-8') if -f $file_head;
+	my $file_scripts = path($root, "_scripts.js");
+	my $scripts = $file_scripts->slurp('utf-8') if -f $file_scripts;
 
 	my $show_join = 1
 		if $ENV{'BLIPTOWN_JOIN_ENABLED'} == 1 && $req_user eq 'mayor';
@@ -139,6 +141,7 @@ sub render_page {
 		template => 'page',
 		title => $title,
 		head => $head || '',
+		scripts => $scripts || '',
 		show_join => $show_join,
 		user_style => 1,
 		show_sidebar => $show_sidebar,
