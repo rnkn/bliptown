@@ -14,8 +14,9 @@ sub yaml_true {
 sub post_skel {
 	my ($html, $slug) = @_;
 	$slug =~ s/^\/?/\//;
+	my $url_path = Mojo::URL->new($slug)->to_string;
 	my $dom = Mojo::DOM->new($html);
-	foreach ($dom->find("a[href=\"$slug\"]")->each) {
+	foreach ($dom->find("a[href=\"$url_path\"]")->each) {
 		my $cur_class = $_->attr('class') // '';
 		my @classes = split /\s+/, $cur_class;
 		push @classes, 'selected';
