@@ -15,7 +15,7 @@ sub post_skel {
 	my ($html, $slug) = @_;
 	$slug =~ s/^\/?/\//;
 	my $dom = Mojo::DOM->new($html);
-	foreach ($dom->find("a[href=$slug]")->each) {
+	foreach ($dom->find("a[href=\"$slug\"]")->each) {
 		my $cur_class = $_->attr('class') // '';
 		my @classes = split /\s+/, $cur_class;
 		push @classes, 'selected';
