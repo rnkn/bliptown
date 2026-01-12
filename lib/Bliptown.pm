@@ -157,6 +157,7 @@ sub startup {
 	);
 
 	my %accesslogs;
+	$SIG{HUP} = sub { undef %accesslogs };
 
 	$app->helper(
 		accesslog => sub {
@@ -179,8 +180,6 @@ sub startup {
 			}
 		}
 	);
-
-	$SIG{HUP} = sub { %accesslogs = () };
 
 	$app->defaults(
 		title => 'Untitled',
