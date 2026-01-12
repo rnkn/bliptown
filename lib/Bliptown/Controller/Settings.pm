@@ -33,12 +33,13 @@ sub save_settings {
 	$c->user->update_user({ username => $username, %$params });
 	my $new_domain = $params->{custom_domain} || '';
 	if ($new_domain && $new_domain ne $cur_domain) {
-		$c->ipc->send_message(
+		my $res = $c->ipc->send_message(
 			{
 				command => 'provision_cert',
 				domain => $new_domain,
-			})
-	};
+			});
+		return $c->reply->exception($res->{error}) if $res->{error};
+	}
 	return $c->redirect_to($c->url_for('render_page'));
 }
 
