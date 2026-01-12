@@ -100,15 +100,6 @@ sub startup {
 		});
 
 	$app->helper(
-		image_cache => sub {
-			my $c = shift;
-			return Bliptown::Model::Cache->new(
-				config => $c->config,
-				ipc => $c->ipc,
-			);
-		});
-
-	$app->helper(
 		get_slug => sub {
 			my $slug = shift->req->url->path->to_string;
 			$slug = url_unescape($slug);
