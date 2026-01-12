@@ -50,7 +50,7 @@ sub render_page {
 	my $username = $c->session('username');
 
 	my $is_cur_user = $username && $username eq $req_user;
-	my $slug = $c->stash('catchall');
+	my $slug = url_unescape $c->stash('catchall');
 
 	my $raw = path($root, $slug);
 	my $ext = $raw->extname;
@@ -65,8 +65,6 @@ sub render_page {
 		return $c->reply->file($fallback) if -f $fallback;
 		return $c->reply->not_found;
 	}
-
-	$slug = url_unescape($slug);
 
 	my $file;
 	if (!$slug || $slug =~ /\/$/) {
