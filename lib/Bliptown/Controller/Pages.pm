@@ -56,7 +56,9 @@ sub render_page {
 	my $ext = $raw->extname;
 	if ($ext) {
 		if (-f $raw) {
-			if ($c->app->mode eq 'production' && $ext =~ /jpe?g|png|webp|gif|tiff?/i) {
+			my @cached_exts = qw(eot ttf woff woff2 css js jpg jpeg png webp gif mp3 mp4 mpeg svg webm);
+			my $cached = grep { $ext } @cached_exts;
+			if ($c->app->mode eq 'production' && $cached) {
 				return $c->redirect_to("https://cdn.blip.town/$req_user/$slug");
 			}
 			return $c->reply->file($raw);
