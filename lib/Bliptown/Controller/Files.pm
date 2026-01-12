@@ -1,8 +1,8 @@
 package Bliptown::Controller::Files;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::File qw(path);
+use Mojo::Util qw(decode);
 use POSIX qw(strftime);
-use Encode;
 
 sub format_human_size {
 	my $size = shift;
