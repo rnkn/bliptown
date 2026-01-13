@@ -60,11 +60,11 @@ sub save_settings {
 	$c->user->update_user({ username => $username, %$params });
 	my $cur_domain = $user->{custom_domain} || '';
 	my $new_domain = $params->{custom_domain} || '';
-	if ($new_domain && $new_domain ne $cur_domain) {
-		$c->provision_cert($new_domain);
-	}
 	if (($new_domain || $cur_domain) && $new_domain ne $cur_domain) {
 		$c->update_domain_list;
+	}
+	if ($new_domain && $new_domain ne $cur_domain) {
+		$c->provision_cert($new_domain);
 	}
 	return $c->redirect_to($c->url_for('render_page'));
 }
