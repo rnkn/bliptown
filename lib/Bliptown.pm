@@ -12,7 +12,6 @@ use Bliptown::Model::File;
 use Bliptown::Model::IPC;
 use Bliptown::Model::TOTP;
 use Bliptown::Model::QRCode;
-use Bliptown::Model::DomainList;
 use Bliptown::Model::Token;
 
 sub startup {
@@ -28,6 +27,7 @@ sub startup {
 		user_home => $ENV{BLIPTOWN_USER_HOME},
 		log_home => $ENV{BLIPTOWN_LOG_HOME},
 	);
+
 	$app->secrets(
 		[ $ENV{BLIPTOWN_SECRET} ]
 	);
@@ -52,7 +52,6 @@ sub startup {
 			return Bliptown::Model::User->new(
 				sqlite => $c->sqlite,
 				totp => $c->totp,
-				domain_list => $c->domain_list,
 			);
 		});
 
@@ -70,15 +69,6 @@ sub startup {
 	$app->helper(
 		file => sub {
 			return Bliptown::Model::File->new;
-		});
-
-	$app->helper(
-		domain_list => sub {
-			my $c = shift;
-			return Bliptown::Model::DomainList->new(
-				sqlite => $c->sqlite,
-				ipc => $c->ipc,
-			);
 		});
 
 	$app->helper(
