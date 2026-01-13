@@ -293,8 +293,8 @@ sub handle_conn {
 		unless ($username eq 'root') {
 			my ($uid, $gid) = get_uid_gid($username);
 
-			setgid($gid) == 0 or die "Cannot set group: $gid ($!)";
-			setuid($uid) == 0 or die "Cannot set user: $uid ($!)";
+			setgid $gid or die "Cannot set group: $gid ($!)";
+			setuid $uid or die "Cannot set user: $uid ($!)";
 		}
 
 		my $func = $allowed_commands{$command} or
