@@ -31,7 +31,7 @@ my $needs_reap;
 my $shutdown;
 
 my $health_file = path $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
-$health_file->remove->touch;
+$health_file->remove->touch or die "Cannot create health file: $health_file\n";
 print "Health file created: $health_file\n";
 
 my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
@@ -48,17 +48,19 @@ chmod(0660, $sock_path) or die "Cannot chmod: $sock_path ($!)";
 
 print "Socket created: $sock_path\n";
 
+my $safe_domain_regex = qr/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
+
 sub provision_cert {
 	my $payload = shift;
 	my $domain = $payload->{domain};
-	return unless $domain;
+	return unless $domain =~ $safe_domain_regex;
 	system('acme-client', $domain);
 	return "Provisioned certificate: $domain";
 }
 
 sub update_domain_list {
 	my $payload = shift;
-	my $all_domains = $payload->{all_domains};
+	my $domains = $payload->{domains};
 	my $keypair_file = path($ENV{BLIPTOWN_KEYPAIR_FILE});
 	$keypair_file->touch unless -f $keypair_file;
 	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
