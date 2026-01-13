@@ -64,13 +64,14 @@ sub update_domain_list {
 	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
 	$acme_file->touch unless -f $acme_file;
 
-	my $keypairs_str;
-	foreach (@$all_domains) {
-		$keypairs_str .= "tls keypair \"$_\"\n";
+	my @safe_domains = grep { /$safe_domain_regex/ } @$domains;
+
+	my $keypairs_str = '';
+	foreach my $domain (@safe_domains) {
+		$keypairs_str .= "tls keypair \"$domain\"\n";
 	}
 
 	my $keypair_file_str = $keypair_file->slurp('utf-8');
-
 	unless ($keypairs_str eq $keypair_file_str) {
 		$keypair_file->spew($keypairs_str, 'utf-8')
 			or die "Cannot write keypair file: $keypair_file ($!)";
@@ -78,20 +79,19 @@ sub update_domain_list {
 		system('rcctl', 'reload', 'relayd');
 	}
 
-	my $acme_domains_str;
-	foreach (@$all_domains) {
+	my $acme_domains_str = '';
+	foreach my $domain (@safe_domains) {
 		$acme_domains_str .= <<"EOF";
-domain $_ {
-	alternative names { www.$_ }
-	domain certificate "/etc/ssl/$_.crt"
-	domain key "/etc/ssl/private/$_.key"
+domain $domain {
+	alternative names { www.$domain }
+	domain certificate "/etc/ssl/$domain.crt"
+	domain key "/etc/ssl/private/$domain.key"
 	sign with "letsencrypt"
 }
 EOF
 	}
 
 	my $acme_file_str = $acme_file->slurp('utf-8');
-
 	unless ($acme_domains_str eq $acme_file_str) {
 		$acme_file->spew($acme_domains_str, 'utf-8');
 	}
@@ -110,9 +110,9 @@ sub delete_empty_dirs {
 	my $username = shift;
 	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
 	$root = $root->realpath;
-	foreach ($root->list_tree({ dir => 1 })->each) {
-		next unless -d $_;
-		rmdir $_;
+	foreach my $dir ($root->list_tree({ dir => 1 })->each) {
+		next unless -d $dir;
+		rmdir $dir;
 	}
 }
 
@@ -191,8 +191,8 @@ sub git_log {
 	my $out = `git log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b%x01" --max-count=50`;
 
 	my @commits;
-	foreach (split /\x01/, $out) {
-		my $commit = trim($_);
+	foreach my $commit (split /\x01/, $out) {
+		my $commit = trim $commit;
 		my ($hash, $subject, $date, $body) = split /\x00/, $commit, 4;
 		push @commits, {
 			hash => $hash,

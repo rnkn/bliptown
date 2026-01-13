@@ -16,13 +16,13 @@ sub post_skel {
 	$slug =~ s/^\/?/\//;
 	my $url_path = Mojo::URL->new($slug)->to_string;
 	my $dom = Mojo::DOM->new($html);
-	foreach ($dom->find("a[href=\"$url_path\"]")->each) {
-		my $cur_class = $_->attr('class') // '';
+	foreach my $link (@{$dom->find("a[href=\"$url_path\"]")}) {
+		my $cur_class = $link->attr('class') // '';
 		my @classes = split /\s+/, $cur_class;
 		push @classes, 'selected';
-		$_->attr(class => join ' ', @classes);
+		$link->attr(class => join ' ', @classes);
 
-		my $ancestor = $_->parent;
+		my $ancestor = $link->parent;
 		while ($ancestor) {
 			if ($ancestor->type eq 'tag' && $ancestor->tag eq 'details') {
 				$ancestor->attr(open => undef);
@@ -102,10 +102,10 @@ sub render_page {
 	my @skel = qw(header sidebar footer);
 	my %skel_html;
 	my $show_sidebar = 0;
-	foreach (@skel) {
-		my $file = path($root, "_$_.md");
+	foreach my $f (@skel) {
+		my $file = path($root, "_$f.md");
 		if (-f $file) {
-			$show_sidebar = 1 if $_ eq 'sidebar';
+			$show_sidebar = 1 if $f eq 'sidebar';
 			my $page = $c->page->read_page(
 				{
 					file => $file,
@@ -113,7 +113,7 @@ sub render_page {
 				}
 			);
 			$page->{html} = post_skel($page->{html}, $slug);
-			$skel_html{$_} = $page->{html};
+			$skel_html{$f} = $page->{html};
 		}
 	}
 
@@ -245,8 +245,8 @@ sub edit_page {
 	if (-f $file) {
 		$content = $c->file->read_file({ file => $file })->{chars};
 		my @lines = split /\n/, $content;
-		foreach (@lines) {
-			if ($_ =~ $partial_re) {
+		foreach my $line (@lines) {
+			if ($line =~ $partial_re) {
 				my $include = $1; $include =~ s/\.[^.]+?$//;
 				push @includes, $include;
 			}

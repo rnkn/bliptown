@@ -51,13 +51,11 @@ sub list_files {
 		return $c->redirect_to($c->url_for('list_files')->query(filter => $replace));
 	}
 
-	my $tree = $root->list_tree;
-
 	my @files;
-	foreach ($tree->each) {
-		my $filename = decode('utf-8', $_);
+	foreach my $file (@{$root->list_tree}) {
+		my $filename = decode('utf-8', $file);
 		my @stats = stat($filename);
-		my $rel_file = $_->to_rel($root)->to_string;
+		my $rel_file = $file->to_rel($root)->to_string;
 		my $rel_filename = decode('utf-8', $rel_file);
 		my $url = $rel_filename; $url =~ s/\.(md|txt|html|css|js)$//;
 
@@ -95,8 +93,8 @@ sub rename_files_regex {
 	my $replace = $args->{replace};
 	my @files = $root->list_tree->each;
 	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
-	foreach (@filenames) {
-		my ($old_filename, $new_filename) = ($_, $_);
+	foreach my $filename (@filenames) {
+		my ($old_filename, $new_filename) = ($filename, $filename);
 		$old_filename = path($root, $old_filename)->to_abs->to_string;
 		$new_filename =~ s/$filter/$replace/g;
 		$new_filename = path($root, $new_filename)->to_abs->to_string;
@@ -146,12 +144,12 @@ sub delete_files_regex {
 	my @files = $root->list_tree->each;
 	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
 	my @filenames_abs = map { path($root, $_)->to_abs->to_string } @filenames;
-	foreach (@filenames_abs) {
+	foreach my $filename (@filenames_abs) {
 		my $res = $c->ipc->send_message(
 			{
 				command => 'delete_file',
 				username => $username,
-				filename => $_,
+				filename => $filename,
 			}
 		);
 		return $c->reply->exception($res->{error}) if $res->{error};
@@ -186,10 +184,10 @@ sub upload_files {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $root = path($c->config->{user_home}, $username);
-	foreach (@{$c->req->uploads}) {
-		my $filename = $_->filename;
+	foreach my $upload (@{$c->req->uploads}) {
+		my $filename = $upload->filename;
 		next unless $filename;
-		if ($_->size > 1024 * 1024 * 50) {
+		if ($upload->size > 1024 * 1024 * 50) {
 			$c->flash(warning => "File too large");
 			$c->res->code(413);
 			return $c->redirect_to('list_files');
@@ -200,7 +198,7 @@ sub upload_files {
 			$c->res->code(409);
 			return $c->redirect_to('list_files');
 		};
-		my $blob = $_->slurp;
+		my $blob = $upload->slurp;
 		my $res = $c->ipc->send_message(
 			{
 				command => 'write_blob',

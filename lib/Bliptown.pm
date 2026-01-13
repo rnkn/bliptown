@@ -139,8 +139,8 @@ sub startup {
 			return $file if -f $file;
 			$slug = $1 if $slug =~ /(.+)(\..+)$/;
 			my @exts = qw(html css js txt md);
-			foreach (@exts) {
-				my $f = path($root, "$slug.$_")->to_abs;
+			foreach my $ext (@exts) {
+				my $f = path($root, "$slug.$ext")->to_abs;
 				return $f if -f $f;
 			}
 			return;
