@@ -19,7 +19,5 @@ die "BLIPTOWN_LOG_HOME not defined" unless $ENV{BLIPTOWN_LOG_HOME};
 
 die "BLIPTOWN_MD4C_LIB not defined" unless $ENV{BLIPTOWN_MD4C_LIB};
 die "BLIPTOWN_MD4C_HTML_LIB not defined" unless $ENV{BLIPTOWN_MD4C_HTML_LIB};
-die "BLIPTOWN_KEYPAIR_FILE not defined "unless $ENV{BLIPTOWN_KEYPAIR_FILE};
-die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
 
 Mojolicious::Commands->start_app('Bliptown');
