@@ -110,7 +110,7 @@ sub delete_empty_dirs {
 	my $username = shift;
 	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
 	$root = $root->realpath;
-	foreach my $dir ($root->list_tree({ dir => 1 })->each) {
+	foreach my $dir (@{$root->list_tree({ dir => 1 })}) {
 		next unless -d $dir;
 		rmdir $dir;
 	}

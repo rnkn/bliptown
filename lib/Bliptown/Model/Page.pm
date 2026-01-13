@@ -60,7 +60,6 @@ sub walk_dom {
 	my $node = shift;
 	
 	my @skip_tags = qw(pre code kbd script);
-
 	return if $node->tag && grep { $node->tag eq $_ } @skip_tags;
 
 	if ($node->tag && $node->tag eq 'x-wikilink') {
@@ -78,7 +77,7 @@ sub walk_dom {
         return;
     }
 
-	foreach my $child ($node->child_nodes->each) {
+	foreach my $child (@{$node->child_nodes}) {
 		walk_dom($child);
 	}
 }
