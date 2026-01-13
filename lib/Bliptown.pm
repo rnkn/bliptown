@@ -38,7 +38,7 @@ sub startup {
 
 	$app->helper(
 		sqlite => sub {
-			my $db = path($ENV{BLIPTOWN_DB_HOME}, 'users.db');
+			my $db = path($ENV{BLIPTOWN_DB});
 			state $sql = Mojo::SQLite->new("sqlite:$db");
 			return $sql;
 		});
