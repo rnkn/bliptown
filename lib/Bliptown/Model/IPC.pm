@@ -27,7 +27,7 @@ sub send_message {
 			blob			=> $args->{blob} // '',
 			hash			=> $args->{hash} // '',
 			domain			=> $args->{domain} // '',
-			all_domains		=> $args->{all_domains} // [],
+			domains			=> $args->{domains} // [],
 		},
 	};
 

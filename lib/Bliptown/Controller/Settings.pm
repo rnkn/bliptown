@@ -22,7 +22,7 @@ sub update_domain_list {
 		{
 			username => 'root',
 			command => 'update_domain_list',
-			all_domains => \@domains
+			domains => \@domains
 		}
 	);
 	return $c->reply->exception($res->{error}) if $res->{error};
