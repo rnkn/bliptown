@@ -5,6 +5,7 @@ sub provision_cert {
 	my ($c, $domain) = @_;
 	my $res = $c->ipc->send_message(
 		{
+			username => 'root',
 			command => 'provision_cert',
 			domain => $domain,
 		});
