@@ -148,7 +148,10 @@ sub startup {
 	);
 
 	my %accesslogs;
-	$SIG{HUP} = sub { undef %accesslogs };
+	$SIG{USR1} = sub {
+		undef %accesslogs;
+		$app->log->info('Logfile handler rotated');
+	};
 
 	$app->helper(
 		accesslog => sub {
@@ -198,7 +201,7 @@ sub startup {
 					my ($prefork, $pid) = @_;
 					path($ENV{BLIPTOWN_HEALTH_FILE})->spew($prefork->healthy);
 				}
-			)
+			);
 		}
 	);
 
