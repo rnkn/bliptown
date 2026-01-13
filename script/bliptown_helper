@@ -14,6 +14,7 @@ use Sereal::Encoder;
 $0 = $0 . '[master]';
 
 die "$0 must be run as root" unless $> == 0;
+
 die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
 die "BLIPTOWN_HELPER_PREFORK not defined" unless $ENV{BLIPTOWN_HELPER_PREFORK};
 die "BLIPTOWN_HELPER_HEALTH_FILE not defined" unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
@@ -30,7 +31,7 @@ my %children;
 my $needs_reap;
 my $shutdown;
 
-my $health_file = path $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
+my $health_file = path($ENV{BLIPTOWN_HELPER_HEALTH_FILE});
 $health_file->remove->touch or die "Cannot create health file: $health_file\n";
 print "Health file created: $health_file\n";
 
@@ -61,8 +62,10 @@ sub provision_cert {
 sub update_domain_list {
 	my $payload = shift;
 	my $domains = $payload->{domains};
+
 	my $keypair_file = path($ENV{BLIPTOWN_KEYPAIR_FILE});
 	$keypair_file->touch unless -f $keypair_file;
+
 	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
 	$acme_file->touch unless -f $acme_file;
 
@@ -122,7 +125,7 @@ sub write_blob {
 	my $payload = shift;
 	my $filename = $payload->{filename};
 	my $blob = $payload->{blob};
-	my $path = path($filename);
+	my $path = path $filename;
 	my $dir = $path->dirname;
 	$dir->make_path or die "Cannot creat path: $dir ($!)";;
 	$path->spew($blob) or die "Cannot write file: $path ($!)";
@@ -132,7 +135,7 @@ sub write_blob {
 sub backup_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
-	my $path = path($filename);
+	my $path = path $filename;
 	$path->copy_to("${filename}~") or die "Cannot backup file: $path ($!)";
 	return "Created backup file: ${filename}~"
 }
@@ -141,11 +144,11 @@ sub update_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
 	my $content = $payload->{content};
-	my $path = path($filename);
+	my $path = path $filename;
 	my $dir = $path->dirname;
 	$dir->make_path or die "Cannot creat path: $dir ($!)";
 	if ($payload->{create_backup} && -e $filename) {
-		backup_file($payload);
+		backup_file $payload;
 	}
 	$path->spew($content, 'utf-8') or die "Cannot write file: $path ($!)";
 	return "Updated file: $filename"
@@ -154,9 +157,9 @@ sub update_file {
 sub rename_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
-	my $path = path($filename);
+	my $path = path $filename;
 	my $new_filename = $payload->{new_filename};
-	my $new_path = path($new_filename);
+	my $new_path = path $new_filename;
 	my $dir = $new_path->dirname;
 	$dir->make_path or die "Cannot creat path: $dir ($!)";
 	$path->move_to($new_path) or die "Cannot move file: $path ($!)";
@@ -166,7 +169,7 @@ sub rename_file {
 sub delete_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
-	my $path = path($filename);
+	my $path = path $filename;
 	$path->remove or die "Cannot delete file: $filename ($!)";
 	return "Deleted file: $filename"
 }
@@ -195,7 +198,7 @@ sub git_log {
 	my @commits;
 	foreach my $commit (split /\x01/, $out) {
 		my $commit = trim $commit;
-		my ($hash, $subject, $date, $body) = split /\x00/, $commit, 4;
+		my ($hash, $subject, $date, $body) = split(/\x00/, $commit, 4);
 		push @commits, {
 			hash => $hash,
 			subject => $subject,
@@ -216,9 +219,9 @@ sub git_commit {
 	system('git add -A') == 0
 		or die "Cannot add files to $repo";
 
-	my $subject = 'Full snapshot on $ENV{BLIPTOWN_DOMAIN}';
+	my $subject = "Full snapshot on $ENV{BLIPTOWN_DOMAIN}";
 	my $body = `git status --porcelain`;
-	die "No changes to commit" unless (length($body));
+	die "No changes to commit" unless length $body;
 
 	system("git commit -m '$subject' -m '$body'") == 0
 		or die "Cannot commit files to repo: $repo ($!)";
@@ -293,8 +296,8 @@ sub handle_conn {
 		unless ($username eq 'root') {
 			my ($uid, $gid) = get_uid_gid($username);
 
-			setgid $gid or die "Cannot set group: $gid ($!)";
-			setuid $uid or die "Cannot set user: $uid ($!)";
+			setgid($gid) or die "Cannot set group: $gid ($!)";
+			setuid($uid) or die "Cannot set user: $uid ($!)";
 		}
 
 		my $func = $allowed_commands{$command} or
@@ -332,7 +335,7 @@ sub spawn_worker {
 			exit 0;
 		}
 
-		handle_conn($conn);
+		handle_conn $conn;
 		close $conn;
 		exit 0;
 	}
@@ -341,7 +344,7 @@ sub spawn_worker {
 }
 
 sub reap_children {
-	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
+	while ((my $pid = waitpid -1, WNOHANG) > 0) {
 		delete $children{$pid};
 	}
 }
@@ -353,15 +356,15 @@ while (1) {
 	}
 
 	if ($shutdown) {
-		kill 'TERM', keys %children;
+		kill('TERM', keys %children);
 		last;
 	}
 
 	while (keys %children < $prefork && !$shutdown) {
-		spawn_worker();
+		spawn_worker;
 	}
 
-	my $ok = kill 0, keys %children;
+	my $ok = kill(0, keys %children);
 	$health_file->spew($ok);
 
 	while (!$needs_reap && !$shutdown) { pause() }
