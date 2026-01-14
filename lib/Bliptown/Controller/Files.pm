@@ -22,6 +22,7 @@ sub list_files {
 	my $filter = $c->param('filter');
 	my $delete = $c->param('delete');
 	my $replace = $c->param('replace');
+	my $sort = $c->param('sort') // 'name';
 	my $username = $c->session('username');
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
@@ -62,17 +63,31 @@ sub list_files {
 		push @files, {
 			filename => $rel_filename,
 			url => $url,
-			size => format_human_size($stats[7]),
-			mtime => strftime('%Y-%m-%d %H:%M %z', localtime($stats[9])),
+			size => $stats[7],
+			mtime => $stats[9],
 		}
 	};
 
 	@files = grep { $_->{filename} =~ /$filter/ } @files if $filter;
 
-	if ($user->{sort_new} == 1) {
-		@files = sort { $b->{mtime} cmp $a->{mtime} } @files;
+	my %sorting = (
+		name => 'filename',
+		size => 'size',
+		date => 'mtime'
+	);
+
+	my $key = $sorting{$sort};
+	if ($key eq 'mtime') {
+		@files = sort { $b->{$key} cmp $a->{$key} } @files;
+	} elsif ($key eq 'size') {
+		@files = sort { $b->{$key} <=> $a->{$key} } @files;
 	} else {
-		@files = sort { $a->{filename} cmp $b->{filename} } @files;
+		@files = sort { $a->{$key} cmp $b->{$key} } @files;
+	}
+
+	foreach my $file (@files) {
+		$file->{size} = format_human_size($file->{size});
+		$file->{mtime} = strftime('%Y-%m-%d %H:%M %z', localtime($file->{mtime}));
 	}
 
 	$c->stash(

@@ -53,16 +53,21 @@
 <main id="files">
 	<section class="one-column">
 		<div id="list" class="table">
+			<div class="row">
+				<a href="<%= url_with->query({ sort => 'name' }) %>" class="cell sort name">&vee;</a>
+				<a href="<%= url_with->query({ sort => 'size' }) %>" class="cell sort size">&vee;</a>
+				<a href="<%= url_with->query({ sort => 'date' }) %>" class="cell sort date">&vee;</a>
+			</div>
 			% foreach (@$files) {
 			<details name="files">
 				<summary class="row">
 					<span class="cell name">
 						%= $_->{filename}
 					</span>
-					<span class="cell stat">
+					<span class="cell size">
 						%= $_->{size}
 					</span>
-					<span class="cell stat">
+					<span class="cell date">
 						%= $_->{mtime}
 					</span>
 				</summary>

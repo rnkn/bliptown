@@ -456,9 +456,23 @@ a.exit:before {
 	overflow: hidden;
 }
 
-#list .date {
-	width: 26ex;
+#list .cell.date {
+	width: 22ex;
 	text-align: right;
+}
+
+#list .cell.size {
+	width: 10ex;
+	text-align: right;
+}
+
+#list .cell.sort {
+	opacity: 0;
+	text-align: center;
+}
+
+#list .cell.sort:hover {
+	opacity: 1;
 }
 
 #list #rename {
@@ -663,6 +677,10 @@ main:has(.cover) footer {
 
 .table a:hover {
 	border-bottom-color: currentcolor;
+}
+
+.table .sort {
+	border: 0;
 }
 
 .table .row {

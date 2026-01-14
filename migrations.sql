@@ -1,3 +1,9 @@
+-- 5 up
+ALTER TABLE users
+	DROP COLUMN sort_new;
+-- 5 down
+ALTER TABLE users
+    ADD COLUMN sort_new INTEGER DEFAULT 0;
 -- 4 up
 CREATE TABLE login_tokens (
     token TEXT,
