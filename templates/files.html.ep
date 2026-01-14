@@ -12,7 +12,7 @@
 		</p>
 		<div id="controls">
 			<form id="filter" method="get" action="<%= url_for('list_files') %>">
-				<input type="text" name="filter" placeholder="regexp" value="<%= param('filter') %>">
+				<input type="text" name="filter" placeholder="glob" value="<%= param('filter') %>">
 			</form>
 			% my $filtered = 'checked' if param('filter');
 			<input type="checkbox" id="additional-controls-toggle" hidden <%= $filtered %>>

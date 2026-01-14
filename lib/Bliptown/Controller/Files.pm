@@ -3,6 +3,9 @@ use Mojo::Base 'Mojolicious::Controller';
 use Mojo::File qw(path);
 use Mojo::Util qw(decode);
 use POSIX qw(strftime);
+use Text::Glob qw(glob_to_regex_string);
+
+$Text::Glob::strict_wildcard_slash = 0;
 
 sub format_human_size {
 	my $size = shift;
@@ -29,24 +32,26 @@ sub list_files {
 	);
 	my $root = path($c->config->{user_home}, $username);
 
-	if ($filter && $delete) {
+	my $filter_re = glob_to_regex_string($filter) if $filter;
+
+	if ($filter_re && $delete) {
 		my $res = delete_files_regex(
 			$c, {
 				username => $username,
 				root => $root,
-				filter => $filter
+				filter => $filter_re
 			});
 		my $message = $res > 1 ? "$res files deleted" : "$res file deleted";
 		$c->flash(info => $message);
 		return $c->redirect_to($c->url_for('list_files')->query(filter => $filter));
 	}
 
-	if ($filter && defined $replace) {
+	if ($filter_re && defined $replace) {
 		rename_files_regex(
 			$c, {
 				username => $username,
 				root => $root,
-				filter => $filter,
+				filter => $filter_re,
 				replace => $replace
 			});
 		return $c->redirect_to($c->url_for('list_files')->query(filter => $replace));
@@ -68,7 +73,7 @@ sub list_files {
 		}
 	};
 
-	@files = grep { $_->{filename} =~ /$filter/ } @files if $filter;
+	@files = grep { $_->{filename} =~ $filter_re } @files if $filter_re;
 
 	my %sorting = (
 		name => 'filename',

@@ -6,3 +6,4 @@ requires 'FFI::Platypus' => 2;
 requires 'YAML::Tiny' => 1;
 requires 'Sereal' => 5;
 requires 'Imager::QRCode' => 0;
+requires 'Text::Glob' => 0;
