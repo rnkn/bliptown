@@ -434,6 +434,10 @@ a.exit:before {
 	margin: 0;
 }
 
+#list pre {
+	margin: 0;
+}
+
 #list details {
 	padding: 2px 4px;
 }
