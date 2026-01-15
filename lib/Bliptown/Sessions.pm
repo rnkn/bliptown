@@ -1,6 +1,5 @@
 package Bliptown::Sessions;
 use Mojo::Base 'Mojolicious::Sessions';
-use Mojo::Util qw(dumper);
 
 sub store {
 	my ($self, $c) = @_;
