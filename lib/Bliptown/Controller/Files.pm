@@ -36,8 +36,8 @@ sub list_files {
 	my $filter_re = glob_to_regex_string($filter) if $filter;
 
 	if ($filter_re && $delete) {
-		my $res = delete_files_regex(
-			$c, {
+		my $res = $c->delete_files_regex(
+			{
 				username => $username,
 				root => $root,
 				filter => $filter_re
@@ -48,8 +48,8 @@ sub list_files {
 	}
 
 	if ($filter_re && defined $replace) {
-		rename_files_regex(
-			$c, {
+		my $res = $c->rename_files_regex(
+			{
 				username => $username,
 				root => $root,
 				filter => $filter_re,
