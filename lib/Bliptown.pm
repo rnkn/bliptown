@@ -298,7 +298,7 @@ sub startup {
 	})->name('my_site');
 
 	my $protected = $r->under(
-		'/' => sub {
+		sub {
 			my $c = shift;
 			my $username = $c->session('username');
 			my $req_user = $c->get_req_user;
