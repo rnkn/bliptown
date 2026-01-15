@@ -1,4 +1,5 @@
 % layout 'default';
+% my $disabled = $locked ? 'disabled' : '';
 <main class="backstage one-column">
 	<h1>Set Up Two-Factor Authentication</h1>
 	<p>
@@ -29,7 +30,7 @@
 	<form method="post" action="<%= url_for('totp_update')%>">
 		<input type="hidden" name="secret" value="<%= $secret %>">
 		<input type="text" placeholder="123456" pattern="[0-9]*" id="totp-check" name="totp" maxlength="6" required>
-		<button type="submit">Submit</button>
+		<button type="submit" <%= $disabled %>>Submit</button>
 		<a href="<%= param('back_to') || '/' %>">Cancel</a>
 	</form>
 </main>

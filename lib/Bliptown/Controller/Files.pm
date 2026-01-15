@@ -27,6 +27,7 @@ sub list_files {
 	my $replace = $c->param('replace');
 	my $sort = $c->param('sort') // 'name';
 	my $username = $c->session('username');
+	my $locked = $username eq 'demo' ? 1 : 0;
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
 	);
@@ -99,6 +100,7 @@ sub list_files {
 		template => 'files',
 		title => 'Files',
 		show_sidebar => 1,
+		locked => $locked,
 		redirect => $c->url_for,
 		files => \@files,
 	);

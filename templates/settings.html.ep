@@ -1,4 +1,5 @@
 % layout 'default';
+% my $disabled = $locked ? 'disabled' : '';
 <nav>
 	<header>
 		<h1><%= $title %></h1>
@@ -19,15 +20,15 @@
 				</li>
 				<li class="row">
 					<label class="cell name" for="email">Email</label>
-					<input class="cell" type="email" id="email" name="email" value="<%= $email %>">
+					<input class="cell" type="email" id="email" name="email" value="<%= $email %>" <%= $disabled %>>
 				</li>
 				<li class="row">
 					<label class="cell name" for="new-password">New password</label>
-					<input class="cell" type="password" id="new-password" name="new_password">
+					<input class="cell" type="password" id="new-password" name="new_password" <%= $disabled %>>
 				</li>
 				<li class="row">
 					<label class="cell name" for="custom-domain">Custom domain <a href="https://blip.town/faq/custom_domain" target="_blank" class="help-q">?</a></label>
-					<input class="cell" type="text" id="custom-domain" name="custom_domain" value="<%= $custom_domain %>" placeholder="example.com">
+					<input class="cell" type="text" id="custom-domain" name="custom_domain" value="<%= $custom_domain %>" placeholder="example.com" <%= $disabled %>>
 				</li>
 				<li class="row">
 					<span>
@@ -50,12 +51,12 @@
 					<summary class="row">Delete account</summary>
 					<li class="row">
 						<label class="cell name" for="delete-account-confirm">To confirm, enter <code>doas rm -rf <%= $username %></code></label>
-						<input class="cell" type="text" id="delete-account-confirm" name="delete-confirm">
+						<input class="cell" type="text" id="delete-account-confirm" name="delete-confirm" <%= $disabled %>>
 					</li>
 				</details>
 			</ul>
 			<hr>
-			<button type="submit">Submit</button>
+			<button type="submit" <%= $disabled %>>Submit</button>
 		</form>
 	</div>
 </main>

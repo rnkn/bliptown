@@ -317,6 +317,21 @@ sub startup {
 		}
 	);
 
+	my $block_demo = sub {
+		my $c = shift;
+		my $username = $c->session('username') // '';
+		if ($username eq 'demo') {
+			$c->render(
+				status => 403,
+				template => 'message',
+				title => '403 Forbidden',
+				content => '403 Forbidden: demo user cannot perform this action.'
+			);
+			return;
+		}
+		return 1;
+	};
+
 	$protected->get('/private/*catchall')->to(controller => 'Pages', action => 'render_private', catchall => '')->name('render_private');
 
 	$protected->get('/new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
@@ -327,12 +342,12 @@ sub startup {
 	$protected->get('/files')->to(controller => 'Files', action => 'list_files')->name('list_files');
 	$protected->get('/rename/*catchall')->to(controller => 'Files', action => 'rename_file', catchall => '')->name('rename_file');
 	$protected->get('/delete/*catchall')->to(controller => 'Files', action => 'delete_file', catchall => '')->name('delete_file');
-	$protected->post('/upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');
+	$protected->under($block_demo)->post('/upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');
 
 	$protected->get('/settings/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
-	$protected->post('/settings/totp')->to(controller => 'TOTP', action => 'totp_update')->name('totp_update');
+	$protected->under($block_demo)->post('/settings/totp')->to(controller => 'TOTP', action => 'totp_update')->name('totp_update');
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
-	$protected->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
+	$protected->under($block_demo)->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
 
 	$protected->get('/snapshots')->to(controller => 'Snapshots', action => 'list_snapshots')->name('list_snapshots');
 	$protected->get('/snapshots/new')->to(controller => 'Snapshots', action => 'take_snapshot')->name('take_snapshot');

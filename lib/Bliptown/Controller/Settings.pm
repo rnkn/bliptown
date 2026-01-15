@@ -34,6 +34,7 @@ sub list_settings {
 	my $c = shift;
 	my $username = $c->session('username');
 	return unless $username;
+	my $locked = $username eq 'demo' ? 1 : 0;
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
 	);
@@ -41,10 +42,10 @@ sub list_settings {
 		title => 'Settings',
 		template => 'settings',
 		show_sidebar => 1,
+		locked => $locked,
 		username => $user->{username},
 		email => $user->{email},
 		custom_domain => $user->{custom_domain},
-		sort_new => $user->{sort_new} // 0,
 		create_backups => $user->{create_backups} // 0,
 	);
 	return $c->render;

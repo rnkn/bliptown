@@ -1,3 +1,5 @@
+% my $username = session('username') // '';
+% my $req_user = get_req_user() // '';
 % my $drawer_toggle_style = param('toggle') ? 'display: block' : '';
 <!DOCTYPE html>
 <html>
@@ -18,8 +20,6 @@
 		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden checked>
 		<input type="checkbox" id="drawer-toggle" hidden>
 		<div id="drawer">
-			% my $username = session('username') // '';
-			% my $req_user = get_req_user() // '';
 			% if ($username) {
 			<div id="user" class="panel">
 				% if ($username && $username eq $req_user) {
@@ -65,9 +65,11 @@
 					<div>
 						<input type="password" placeholder="password" name="password" required>
 					</div>
+					% unless ($req_user eq 'demo') {
 					<div>
 						<input type="text" placeholder="2FA" name="totp" required>
 					</div>
+					% }
 					<input name="redirect-to" value="<%= url_for %>" hidden>
 					<button type="submit">Login</button>
 				</form>

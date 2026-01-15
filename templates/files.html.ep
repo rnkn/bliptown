@@ -1,4 +1,5 @@
 % layout 'default';
+% my $disabled = $locked ? 'disabled' : '';
 <nav>
 	<header>
 		<h1><%= $title %></h1>
@@ -36,8 +37,8 @@
 				</form>
 				% }
 				<form id="upload" method="post" action="<%= url_for('upload_files') %>" enctype="multipart/form-data">
-					<input type="file" accept="text/*,image/*,application/pdf" id="file-uploads" name="file-uploads" multiple>
-					<button type="submit">Upload</button>
+					<input type="file" accept="text/*,image/*,application/pdf" id="file-uploads" name="file-uploads" multiple <%= $disabled %>>
+					<button type="submit" <%= $disabled %>>Upload</button>
 				</form>
 				<form id="snapshot" method="get" action="<%= url_for('take_snapshot') %>">
 					<button type="submit">Take Snapshot</button>
