@@ -55,6 +55,8 @@ sub list_files {
 				filter => $filter_re,
 				replace => $replace
 			});
+		my $message = $res > 1 ? "$res files renamed" : "$res file renamed";
+		$c->flash(info => $message);
 		return $c->redirect_to($c->url_for('list_files')->query(filter => $replace));
 	}
 
