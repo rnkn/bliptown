@@ -267,7 +267,6 @@ sub startup {
 			$c->reply->file("/var/www/acme/$file");
 		})->name('acme_challenge');
 
-	$r->post('/join')->to(controller => 'Users', action => 'user_join')->name('user_join');
 	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('token_auth');
 	$r->post('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
