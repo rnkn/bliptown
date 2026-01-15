@@ -78,7 +78,7 @@ sub token_login {
 	}
 
 	if ($username eq $record->{username}) {
-		$c->stash(custom_domain => $host);
+		$c->stash(custom_session_domain => $host);
 		$c->session(expiration => 2592000, username => $username);
 		$c->token->delete_token({ token => $token });
 		return $c->redirect_to($redirect);
