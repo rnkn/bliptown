@@ -18,9 +18,11 @@
 		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden checked>
 		<input type="checkbox" id="drawer-toggle" hidden>
 		<div id="drawer">
-			% if (session('username')) {
+			% my $username = session('username') // '';
+			% my $req_user = get_req_user() // '';
+			% if ($username) {
 			<div id="user" class="panel">
-				% if (session('username') eq get_req_user) {
+				% if ($username && $username eq $req_user) {
 				<div class="button"><a href="<%= url_for('new_page', catchall => '')->query(back_to => $redirect) %>">New</a></div>
 				% if ($editable) {
 				<div class="button"><a href="<%= url_for('edit_page', catchall => get_slug)->query(back_to => $redirect) %>">Edit</a></div>
