@@ -272,9 +272,6 @@ sub startup {
 	$r->post('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
 
-	$r->get('/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
-	$r->post('/totp')->to(controller => 'TOTP', action => 'totp_update')->name('totp_update');
-
 	$r->get('/mysite' => sub {
 		my $c = shift;
 		my $username = $c->session('username');
@@ -333,6 +330,8 @@ sub startup {
 	$protected->get('/delete/*catchall')->to(controller => 'Files', action => 'delete_file', catchall => '')->name('delete_file');
 	$protected->post('/upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');
 
+	$protected->get('/settings/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
+	$protected->post('/settings/totp')->to(controller => 'TOTP', action => 'totp_update')->name('totp_update');
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 	$protected->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
 
