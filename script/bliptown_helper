@@ -221,7 +221,7 @@ sub git_commit {
 
 	my $subject = "Full snapshot on $ENV{BLIPTOWN_DOMAIN}";
 	my $body = `git status --porcelain`;
-	die "No changes to commit" unless length $body;
+	return unless length $body;
 
 	system("git commit -m '$subject' -m '$body'") == 0
 		or die "Cannot commit files to repo: $repo ($!)";

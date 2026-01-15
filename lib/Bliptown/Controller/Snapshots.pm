@@ -15,7 +15,11 @@ sub take_snapshot {
 	return $c->reply->exception($res->{error}) if $res->{error};
 
 	my $res_hash = $res->{response};
-	$c->flash(info => "Snapshot $res_hash taken");
+	if ($res_hash) {
+		$c->flash(info => "Snapshot $res_hash taken");
+	} else {
+		$c->flash(info => "No changes to snapshot");
+	}
 	return $c->redirect_to('list_snapshots');
 }
 
