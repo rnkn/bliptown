@@ -67,8 +67,6 @@ sub token_login {
 	my $redirect	= $args->{redirect} // '/';
 	my $record		= $c->token->read_token({ token => $args->{token} });
 
-	$c->log->debug('=> token login');
-
 	if (! $record || ! $record->{username} || $record->{expires} <= time) {
 		$c->token->delete_token({ token => $token }) if $record;
 		return $c->render(
