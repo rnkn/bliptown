@@ -1,0 +1,22 @@
+# -*- mode: sh; -*-
+geolite2_endpoint="https://${MAXMIND_ID}:${MAXMIND_KEY}@download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz"
+
+echo "Fetching GeoLite2 database:"
+ok=true
+/usr/bin/ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint" || ok=false
+if [ $ok ]
+then
+	/bin/tar -C /usr/local/share/bliptown -xzf /tmp/geolite2-country.tar.gz
+	mv /usr/local/share/bliptown/GeoLite2-Country_*/*.mmdb \
+	   /usr/local/share/bliptown/geolite2-country-current.mmdb
+	rm -rf /usr/local/share/bliptown/GeoLite2-Country_*
+	echo "Done"
+else
+	echo "Failed"
+fi
+
+if [ $ok ]
+then
+	echo "Restarting Bliptown:"
+	/usr/sbin/rcctl restart bliptown_staging bliptown
+fi
