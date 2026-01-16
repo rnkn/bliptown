@@ -6,6 +6,8 @@ use Mojo::SQLite;
 use lib '.';
 use Bliptown::Sessions;
 
+use Geo::Location::IP::Database::Reader;
+
 use Bliptown::Model::User;
 use Bliptown::Model::Page;
 use Bliptown::Model::File;
@@ -45,6 +47,16 @@ sub startup {
 
 	my $migrations_path = $app->home->child('migrations.sql');
 	$app->sqlite->migrations->from_file($migrations_path)->migrate(5);
+
+	$app->helper(
+		geoip => sub {
+			my $db = path($ENV{BLIPTOWN_GEOIP_DB});
+			state $reader = Geo::Location::IP::Database::Reader->new(
+				file => $db,
+				locales => ['en']
+			);
+			return $reader;
+		});
 
 	$app->helper(
 		user => sub {
@@ -157,7 +169,7 @@ sub startup {
 					sub {
 						my ($time, $level, @lines) = @_;
 						$time = int($time);
-						return join('|', $time, @lines) . "\n";
+						return join("\t", $time, @lines) . "\n";
 					}
 				);
 				$log;
@@ -217,31 +229,17 @@ sub startup {
 	$app->hook(
 		after_dispatch => sub {
 			my $c = shift;
-			my $master_logpath =
-				path($c->config->{log_home}, 'master', 'access.log');
-			my $master_logdir = $master_logpath->dirname;
-			$master_logdir->make_path unless -d $master_logdir;
-			$master_logpath->touch unless -f $master_logpath;
-			$master_logpath->chmod(0600);
-			my $master_log = $c->accesslog($master_logpath);
-
-			my $user_log;
-			if (my $req_user = $c->get_req_user) {
-				my $logpath =
-					path($c->config->{log_home}, 'users', $req_user, 'access.log');
-				my $logdir = $logpath->dirname;
-				$logdir->make_path unless -d $logdir;
-				$logpath->touch unless -f $logpath;
-				$logpath->chmod(0600);
-				$user_log = $c->accesslog($logpath);
-			}
+			my $logpath = path($c->config->{log_home}, 'master', 'access.log');
+			my $logdir = $logpath->dirname;
+			$logdir->make_path unless -d $logdir;
+			$logpath->touch unless -f $logpath;
+			$logpath->chmod(0600);
+			my $log = $c->accesslog($logpath);
 
 			my $tx = $c->tx;
 
 			my @data = (
-				$tx->remote_address					//
-				$tx->req->headers->header('X-Forwarded-For')
-													// '',
+				$tx->remote_address					// '',
 				$tx->req->method					// '',
 				'HTTP/' . $tx->req->version			// '',
 				$tx->req->headers->host				// '',
@@ -253,8 +251,7 @@ sub startup {
 				$tx->res->headers->content_type		// '',
 			);
 
-			$master_log->info(@data);
-			$user_log->info(@data) if $user_log;
+			$log->info(@data);
 		}
 	);
 
@@ -270,6 +267,8 @@ sub startup {
 	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('token_auth');
 	$r->post('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
+
+	$r->get('/track/:rand')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');
 
 	$r->get('/mysite' => sub {
 		my $c = shift;

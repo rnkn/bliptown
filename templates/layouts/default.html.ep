@@ -1,6 +1,7 @@
 % my $username = session('username') // '';
 % my $req_user = get_req_user() // '';
 % my $drawer_toggle_style = param('toggle') ? 'display: block' : '';
+% my $rand = sprintf '%07x', int(rand(16**7));
 <!DOCTYPE html>
 <html>
 	<head>
@@ -13,6 +14,11 @@
 		<link href="/style.css" rel="stylesheet" sandbox>
 		% }
 		<link rel="icon" type="image/png" href="/favicon.png" />
+		<style>
+			body:hover #analytics, body:focus-within #analytics {
+				background-image: url("<%= url_for('track_visit', rand => $rand )->query(ref => $c->req->headers->referrer) %>");
+			}
+		</style>
 		%== $head
 	</head>
 	<body>
@@ -103,6 +109,7 @@
 			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
 			%= content
 		</div>
+		<div id="analytics"></div>
 		<script>
 			%== $scripts
 		</script>
