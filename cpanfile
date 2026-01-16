@@ -8,3 +8,4 @@ requires 'Sereal' => 5;
 requires 'Imager::QRCode' => 0;
 requires 'Text::Glob' => 0;
 requires 'Geo::Location::IP::Database::Reader' => 0;
+requires 'HTTP::BrowserDetect' => 3;
