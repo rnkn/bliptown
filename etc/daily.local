@@ -1,6 +1,6 @@
 # -*- mode: sh; -*-
-
-payload=/etc/ssl/private/porkbun-keys.json
+porkbun_payload=/etc/ssl/private/porkbun-keys.json
+geolite2_endpoint="https://${MAXMIND_ID}:${MAXMIND_KEY}@download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz"
 
 cleanup() {
 	rm -f $tmpfiles
@@ -16,11 +16,11 @@ fetch_cert() {
 	json_tmp=$(mktemp)
 	tmpfiles="$json_tmp $tmpfiles"
 
-	/usr/local/bin/curl -fsS -X POST -d "@$payload" -m 30 "$endpoint" > "$json_tmp"
+	/usr/local/bin/curl -fsS -X POST -d "@$porkbun_payload" -m 30 "$endpoint" > "$json_tmp"
 
 	if [ ! -s "$json_tmp" ]
 	then
-		echo "Certificate fetch failed!"
+		echo "Failed"
 	else
 		cert_chain_tmp=$(mktemp)
 		tmpfiles="$cert_chain_tmp $tmpfiles"
@@ -55,6 +55,7 @@ fetch_cert blip.town
 echo
 fetch_cert bliptown-staging.com
 echo
+
 echo "Renewing user certificates:"
 /usr/bin/grep "^domain" /etc/acme-domains.conf | while read -r line
 do
@@ -63,14 +64,17 @@ do
 	test -n "$domain" && /usr/sbin/acme-client "$domain"
 done
 echo
+
 echo "Reloading relayd:"
 /usr/sbin/rcctl reload relayd
 echo
+
 echo "Expunging database dead login tokens:"
 now=$(date +%s)
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now"
-echo "Done."
+echo "Done"
 echo
+
 echo "Creating database backup:"
 date=$(date +%F)
 backup_db="/var/db/bliptown/users-${date}.db"
@@ -78,11 +82,28 @@ install -m 0600 -o root -g wheel /dev/null "$backup_db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
 echo "Created backup: $backup_db"
 echo
+
 echo "Copying database to staging:"
 staging_db="/var/db/bliptown-staging/users.db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $staging_db"
 echo "Copied: $staging_db"
 echo
+
+echo "Fetching GeoLite2 database:"
+ok=true
+/usr/bin/ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint" || ok=false
+if [ $ok ]
+then
+	/bin/tar -C /usr/local/share/bliptown -xzf /tmp/geolite2-country.tar.gz
+	mv /usr/local/share/bliptown/GeoLite2-Country_*/*.mmdb \
+	   /usr/local/share/bliptown/geolite2-country-current.mmdb
+	rm -rf /usr/local/share/bliptown/GeoLite2-Country_*
+	echo "Done"
+else
+	echo "Failed"
+fi
+echo
+
 echo "Flushing rate-limited IPs"
 /sbin/pfctl -t rate_limit -T expire 86400
 echo "Done"
