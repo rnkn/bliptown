@@ -3,10 +3,18 @@
 log_home=/var/log/bliptown/users
 user_home=/home/bliptown/users
 
-new_conf_file() {
-	cat <<EOF > "$1"
-$2 bliptown:bliptown 600 90 * \$D0 Z
-EOF
+rotate_logs() {
+	conf_file="${log_home}/rotate.conf"
+	rm -f "$conf_file"
+
+	for dir in "$log_home"/*
+	do
+		user=$(basename "$dir")
+		log_file="${log_home}/${user}/access.log"
+		echo "$log_file bliptown:bliptown 600 8 * \$D0 Z" >> "$conf_file"
+	done
+
+	newsyslog -f "$conf_file"
 }
 
 process_user_stats() {
@@ -25,9 +33,6 @@ process_user_stats() {
 			/usr/local/www/bliptown/script/bliptown_analytics > "$stats_file"
 		chown -R "$user:$user" "$private_dir"
 	fi
-
-	new_conf_file "$conf_file" "$log_file"
-	newsyslog -f "$conf_file"
 }
 
 for dir in "$log_home"/*
@@ -35,6 +40,8 @@ do
 	user=$(basename "$dir")
 	process_user_stats "$user"
 done
+
+rotate_logs
 
 for user in mayor demo
 do
