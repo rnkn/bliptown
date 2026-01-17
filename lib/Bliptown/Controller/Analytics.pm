@@ -5,7 +5,10 @@ use Mojo::Util qw(md5_sum);
 
 sub track_visit {
 	my $c = shift;
-	return $c->render(data => '') if $c->session('username');
+	my $username = $c->session('username') // '';
+	if ($username eq $c->get_req_user) {
+		return $c->render(data => '')
+	}
 	my $tx = $c->tx;
 
 	my $ip = $tx->req->headers->header('X-Forwarded-For');
