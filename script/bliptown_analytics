@@ -15,8 +15,10 @@ sub stat_hits_visitors {
 	foreach my $e (@$entries) {
 		my $val = $e->{$key};
 		next unless length $val;
-		$val = 'true' if $val eq 1;
-		$val = 'false' if $val eq 0;
+		if ($key eq 'mobile') {
+			$val = $val eq 1 ? 'Mobile' : 'Desktop';
+		}
+		$val = "<${val}>" if $key eq 'referrer';
 		$stats{$val}{hits}++;
 		$stats{$val}{visitors}{$e->{ip_hash}} = 1;
 	}
@@ -120,7 +122,7 @@ my $tables = {
 		data => @browser_table,
 	},
 	mobile => {
-		name => 'Mobile',
+		name => 'Device',
 		data => @mobile_table,
 	},
 	country => {
@@ -132,7 +134,7 @@ my $tables = {
 my $metadata = <<"EOF";
 ---
 title: Stats
-layout: stats
+layout: wide stats
 ---
 EOF
 print $metadata;
