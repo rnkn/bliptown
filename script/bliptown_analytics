@@ -6,6 +6,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
 use HTTP::BrowserDetect;
 use POSIX qw(strftime);
+use Mojo::Util qw(url_unescape);
 use List::Util qw(max);
 
 sub stat_hits_visitors {
@@ -67,8 +68,8 @@ while (my $line = <STDIN>) {
 		date		=> $date,
 		ip_hash		=> $ip_hash,
 		host		=> $host,
-		path_query	=> $path_query,
-		referrer	=> $referrer,
+		path_query	=> url_unescape($path_query),
+		referrer	=> url_unescape($referrer),
 		os			=> $ua->os_string,
 		browser		=> $ua->browser_string,
 		mobile		=> $ua->mobile,
