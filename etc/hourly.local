@@ -13,16 +13,14 @@ process_user_stats() {
 	user=$1
 	log_file="${log_home}/${user}/access.log"
 	conf_file="${log_home}/${user}/rotate.conf"
-	html_file="${user_home}/${user}/private/stats.html"
+	stats_file="${user_home}/${user}/private/stats.md"
 
 	test -f "$log_file" || /usr/bin/install -m 600 -o bliptown -g bliptown /dev/null "$log_file"
 
-	if [ -s "$log_file" -a -f "$html_file" ]
+	if [ -s "$log_file" ]
 	then
-		zcat -f "$log_file"* | grep -v newsyslog |
-			/usr/local/bin/goaccess - -p /etc/goaccess/goaccess.conf \
-									--ignore-crawlers \
-									-o "$html_file" > /dev/null 2>&1
+		gzcat -f "$log_file"* | grep -v newsyslog |
+			/usr/local/www/bliptown/script/bliptown_analytics > "$stats_file"
 	fi
 
 	new_conf_file "$conf_file" "$log_file"
@@ -37,6 +35,6 @@ done
 
 for user in mayor demo
 do
-/bin/cp "${user_home}/${user}/private/stats.html" \
-		"${user_home}/rnkn/private/stats-${user}.html"
+/bin/cp "${user_home}/${user}/private/stats.md" \
+		"${user_home}/rnkn/private/stats-${user}.md"
 done
