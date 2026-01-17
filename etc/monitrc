@@ -52,7 +52,7 @@ check file login.conf path /etc/login.conf
 	if failed uid 0 then alert
 	if failed gid 0 then alert
 	if failed perm 0600 then alert
-	if failed md5 checksum expect 5f01be75d0b55a89ff3c83dff255f0ee then alert
+	if failed md5 checksum expect 6b1f26c95994a9f216583b30fe5303e1 then alert
 
 check file letsencrypt.pem path /etc/acme/letsencrypt.pem
 	if failed uid 0 then alert
@@ -82,7 +82,7 @@ check file script/bliptown_helper path /usr/local/www/bliptown/script/bliptown_h
 	if failed uid 0 then alert
 	if failed gid 0 then alert
 	if failed perm 0755 then alert
-	if failed md5 checksum expect ba265661197a033f5377ee982c38b2d8 then alert
+	if failed md5 checksum expect b13b146350c8fe3bb934300f5f36f080 then alert
 
 check file users.db path /var/db/bliptown/users.db
 	if failed uid 1008 then alert
