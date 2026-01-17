@@ -2,13 +2,11 @@ package Bliptown::Model::TOTP;
 use Mojo::Base -base;
 use Authen::OATH;
 use MIME::Base32;
-use Mojo::Util qw(secure_compare);
+use Mojo::Util qw(generate_secret secure_compare);
 
 sub create_secret {
 	my $self = shift;
-	my @base64_set = (0 .. 9, 'a' .. 'z', 'A' .. 'Z', '+', '/');
-	my $rand_str = join '', map $base64_set[rand @base64_set], 0 .. 21;
-	my $secret = encode_base32 $rand_str;
+	my $secret = encode_base32(substr(generate_secret, 0, 23));
 	return $secret;
 }
 
