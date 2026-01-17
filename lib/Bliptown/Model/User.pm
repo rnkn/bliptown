@@ -1,5 +1,6 @@
 package Bliptown::Model::User;
 use Mojo::Base -base;
+use Mojo::Util qw(generate_secret);
 use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 
 has 'sqlite';
@@ -8,7 +9,8 @@ has 'domain_list';
 
 sub create_user {
 	my ($self, $args) = @_;
-	my $password_hash = bcrypt($args->{password}, '2b', 12, $ENV{BLIPTOWN_SALT});
+	my $salt = substr(generate_secret, 0, 16);
+	my $password_hash = bcrypt($args->{password}, '2b', 12, $salt);
 	my $totp_secret = $self->totp->create_secret;
 	$self->sqlite->db->insert(
 		'users', {
@@ -56,7 +58,8 @@ sub update_user {
 	};
 	my $new_password = $args->{new_password};
 	if ($new_password) {
-		my $password_hash = bcrypt($new_password, '2b', 12, $ENV{BLIPTOWN_SALT});
+		my $salt = substr(generate_secret, 0, 16);
+		my $password_hash = bcrypt($new_password, '2b', 12, $salt);
 		$values{password_hash} = $password_hash;
 	};
     my $ok = $self->sqlite->db->update(
