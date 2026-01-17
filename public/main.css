@@ -680,6 +680,10 @@ main:has(.cover) footer {
 	background-color: inherit;
 }
 
+.stats table {
+	margin-bottom: 1em;
+}
+
 .stats table tbody tr:hover {
 	background-color: var(--row-hover-color);
 }
