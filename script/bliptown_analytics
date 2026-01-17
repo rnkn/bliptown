@@ -22,7 +22,7 @@ sub stat_hits_visitors {
 }
 
 sub stats_to_table {
-	my $stats = shift;
+	my ($stats, $sort_date) = @_;
 	my @table;
 	foreach my $key (keys %$stats) {
 		push @table, {
@@ -31,8 +31,12 @@ sub stats_to_table {
 			visitors => scalar keys %{ $stats->{$key}->{visitors} },
 		}
 	}
-	@table = sort { $b->{hits} <=> $a->{hits} } @table;
-	@table = @table[0..9] if @table > 10;
+	if ($sort_date) {
+		@table = sort { $b->{key} cmp $a->{key} } @table;
+	} else {
+		@table = sort { $b->{hits} <=> $a->{hits} } @table;
+		@table = @table[0..9] if @table > 10;
+	}
 	return \@table;
 }
 
@@ -64,7 +68,7 @@ while (my $line = <STDIN>) {
 }
 
 my %date_stats = stat_hits_visitors('date', \@entries);
-my @date_table = stats_to_table(\%date_stats);
+my @date_table = stats_to_table(\%date_stats, 1);
 
 my %path_query_stats = stat_hits_visitors('path_query', \@entries);
 my @path_query_table = stats_to_table(\%path_query_stats);
