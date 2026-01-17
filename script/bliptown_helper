@@ -81,7 +81,7 @@ sub update_domain_list {
 		$keypair_file->spew($keypairs_str, 'utf-8')
 			or die "Cannot write keypair file: $keypair_file ($!)";
 
-		system('rcctl', 'reload', 'relayd');
+		system('rcctl', 'restart', 'relayd');
 	}
 
 	my $acme_domains_str = '';
