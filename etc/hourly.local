@@ -13,14 +13,17 @@ process_user_stats() {
 	user=$1
 	log_file="${log_home}/${user}/access.log"
 	conf_file="${log_home}/${user}/rotate.conf"
-	stats_file="${user_home}/${user}/private/stats.md"
+	private_dir="${user_home}/${user}/private"
+	stats_file="${private_dir}/stats.md"
 
 	test -f "$log_file" || /usr/bin/install -m 600 -o bliptown -g bliptown /dev/null "$log_file"
 
 	if [ -s "$log_file" ]
 	then
+		mkdir -p "$private_dir"
 		gzcat -f "$log_file"* | grep -v newsyslog |
 			/usr/local/www/bliptown/script/bliptown_analytics > "$stats_file"
+		chown -R "$user:$user" "$private_dir"
 	fi
 
 	new_conf_file "$conf_file" "$log_file"
