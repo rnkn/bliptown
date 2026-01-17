@@ -41,7 +41,7 @@ sub update_user {
 	my %values;
 	my @keys_null = qw(custom_domain);
 	my @keys_not_null = qw(email totp_secret);
-	my @keys_int = qw(create_backups sort_new);
+	my @keys_int = qw(create_backups);
 	foreach my $key (keys %$args) {
 		if (grep { $key eq $_ } @keys_null) {
 			my $v = $args->{$key} || undef;
