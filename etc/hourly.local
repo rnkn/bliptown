@@ -9,9 +9,12 @@ rotate_logs() {
 
 	for dir in "$log_home"/*
 	do
-		user=$(basename "$dir")
-		log_file="${log_home}/${user}/access.log"
-		echo "$log_file bliptown:bliptown 600 8 * \$D0 Z" >> "$conf_file"
+		if [ -d "$dir" ]
+		then
+			user=$(basename "$dir")
+			log_file="${log_home}/${user}/access.log"
+			echo "$log_file bliptown:bliptown 600 8 * \$D0 Z" >> "$conf_file"
+		fi
 	done
 
 	newsyslog -f "$conf_file"
@@ -37,8 +40,11 @@ process_user_stats() {
 
 for dir in "$log_home"/*
 do
-	user=$(basename "$dir")
-	process_user_stats "$user"
+	if [ -d "$dir" ]
+	then
+		user=$(basename "$dir")
+		process_user_stats "$user"
+	fi
 done
 
 rotate_logs
