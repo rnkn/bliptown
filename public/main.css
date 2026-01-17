@@ -679,6 +679,19 @@ main:has(.cover) footer {
 	background-color: inherit;
 }
 
+.stats table tbody tr:hover {
+	background-color: var(--row-hover-color);
+}
+
+.stats table td {
+	width: 10em;
+}
+
+.stats table td:first-child {
+	width: auto;
+}
+
+
 /* tables */
 
 .table a {
