@@ -6,6 +6,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../local/lib/perl5";
 use HTTP::BrowserDetect;
 use POSIX qw(strftime);
+use List::Util qw(max);
 
 sub stat_hits_visitors {
 	my ($key, $entries) = @_;
@@ -24,6 +25,8 @@ sub stat_hits_visitors {
 sub stats_to_table {
 	my ($stats, $sort_date) = @_;
 	my @table;
+	my $max_hits = max map { $stats->{$_}->{hits} } keys %$stats;
+
 	foreach my $key (keys %$stats) {
 		push @table, {
 			key => $key,
@@ -31,11 +34,17 @@ sub stats_to_table {
 			visitors => scalar keys %{ $stats->{$key}->{visitors} },
 		}
 	}
+
 	if ($sort_date) {
 		@table = sort { $b->{key} cmp $a->{key} } @table;
 	} else {
 		@table = sort { $b->{hits} <=> $a->{hits} } @table;
 		@table = @table[0..9] if @table > 10;
+	}
+
+	foreach my $row (@table) {
+		my $graph_val = $row->{hits} / $max_hits * 10;
+		$row->{graph} = '&#x2588;' x $graph_val;
 	}
 	return \@table;
 }
@@ -132,12 +141,12 @@ foreach my $table (qw(date path_query referrer os browser mobile country)) {
 	my $data = $tables->{$table}->{data};
 	my $md_table_header = <<"EOF";
 
-| $name | Hits | Visitors |
-|-------|------|----------|
+| $name | Hits | Visitors | |
+|-------|------|----------|-|
 EOF
 
 	print $md_table_header;
 	foreach my $row (@$data) {
-		print "| $row->{key} | $row->{hits} | $row->{visitors} |\n"
+		print "| $row->{key} | $row->{hits} | $row->{visitors} | $row->{graph} |\n"
 	}
 }
