@@ -2,6 +2,7 @@
 
 :root {
 	--controls-color: rgba(220,220,220,0.5);
+	--row-hover-color: rgba(220,220,220,0.5);
 	--warning-color: rgba(200,0,0,1.0);
 	--warning-bg-color: rgba(200,0,0,0.2);
 	--info-message-color: white;
