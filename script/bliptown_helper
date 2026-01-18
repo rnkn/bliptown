@@ -19,7 +19,6 @@ die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
 die "BLIPTOWN_HELPER_PREFORK not defined" unless $ENV{BLIPTOWN_HELPER_PREFORK};
 die "BLIPTOWN_HELPER_HEALTH_FILE not defined" unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 
-die "BLIPTOWN_DOMAIN not defined" unless $ENV{BLIPTOWN_DOMAIN};
 die "BLIPTOWN_GID not defined" unless $ENV{BLIPTOWN_GID};
 die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
 
@@ -219,7 +218,7 @@ sub git_commit {
 	system('git add -A') == 0
 		or die "Cannot add files to $repo";
 
-	my $subject = "Full snapshot on $ENV{BLIPTOWN_DOMAIN}";
+	my $subject = "Full snapshot on Bliptown";
 	my $body = `git status --porcelain`;
 	return unless length $body;
 
