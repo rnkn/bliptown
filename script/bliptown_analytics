@@ -136,6 +136,11 @@ my $metadata = <<"EOF";
 title: Stats
 layout: wide stats
 ---
+# Stats
+
+<small>Stats are generated every hour. IP addresses are hashed and
+anonymous in accordance with the
+[GDPR](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation).</small>
 EOF
 print $metadata;
 
