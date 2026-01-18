@@ -1,7 +1,7 @@
 package Bliptown::Controller::Analytics;
 use Mojo::Base 'Mojolicious::Controller';
+use Digest::SHA qw(hmac_sha1_hex);
 use Mojo::File qw(path);
-use Mojo::Util qw(md5_sum);
 
 sub track_visit {
 	my $c = shift;
@@ -14,7 +14,7 @@ sub track_visit {
 	my $ip = $tx->req->headers->header('X-Forwarded-For');
 	my $country_model = eval { $c->geoip->country(ip => $ip) };
 	my $country = $country_model->country->name if $country_model;
-	my $ip_hash = md5_sum $ip;
+	my $ip_hash = hmac_sha1_hex($ip, $c->app->secrets->[0]);
 
 	my $url = Mojo::URL->new($tx->req->headers->referrer);
 	my $host = $url->host;
