@@ -11,7 +11,8 @@ sub track_visit {
 	}
 	my $tx = $c->tx;
 
-	my $ip = $tx->req->headers->header('X-Forwarded-For');
+	my $ip = $tx->req->headers->header('X-Forwarded-For') //
+		$tx->remote_address;
 	my $country_model = eval { $c->geoip->country(ip => $ip) };
 	my $country = $country_model->country->name if $country_model;
 	my $ip_hash = hmac_sha1_hex($ip, $c->app->secrets->[0]);
