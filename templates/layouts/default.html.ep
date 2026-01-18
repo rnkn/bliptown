@@ -35,6 +35,7 @@
 				% }
 				<div class="button"><a href="<%= url_for('list_files') %>">Files</a></div>
 				<div class="button"><a href="/style">Style</a></div>
+				<div class="button"><a href="/private/stats">Stats</a></div>
 				<div class="button"><a href="<%= url_for('list_settings') %>">Settings</a></div>
 				% } else {
 				<div class="button"><a href="<%= url_for('my_site') %>" id="my-site">My Site</a></div>
