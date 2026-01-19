@@ -35,7 +35,7 @@ sub stat_hits_visitors {
 sub stats_to_table {
 	my ($stats, $sort_date) = @_;
 	my @table;
-	my $max_hits = max map { $stats->{$_}->{hits} } keys %$stats;
+	my $max_hits = max(map { $stats->{$_}->{hits} } keys %$stats) || 1;
 
 	foreach my $key (keys %$stats) {
 		push @table, {
