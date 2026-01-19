@@ -12,6 +12,13 @@ use List::Util qw(max);
 sub stat_hits_visitors {
 	my ($key, $entries) = @_;
 	my %stats;
+	if ($key eq 'date') {
+		foreach (0..6) {
+			my $time = time - ($_ * 24 * 60 * 60);
+			my $date = strftime('%Y-%m-%d %a', localtime($time));
+			$stats{$date}{hits} = 0;
+		}
+	}
 	foreach my $e (@$entries) {
 		my $val = $e->{$key};
 		next unless length $val;
