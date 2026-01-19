@@ -186,6 +186,10 @@ main h3 {
 	color: rgba(0,0,0,0.5);
 }
 
+main ul {
+	list-style: circle;
+}
+
 main ul, main ol {
 	padding-left: 2em;
 }
@@ -825,7 +829,6 @@ details[open] > summary::before {
 		--drawer-height: 6rem;
 	}
 }
-
 
 /* Local Variables: */
 /* eval: (outline-minor-mode 1) */
