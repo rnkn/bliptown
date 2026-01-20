@@ -165,17 +165,17 @@ main a:has(img) {
 	border: none;
 }
 
-main h1 {
+h1 {
 	font-size: 1em;
 	margin-bottom: 1rem;
 }
 
-main h2 {
+h2 {
 	font-size: 1em;
 	margin-top: 3rem;
 }
 
-main h3 {
+h3 {
 	font-size: 1em;
 	font-weight: initial;
 	color: rgba(0,0,0,0.5);
