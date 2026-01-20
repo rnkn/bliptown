@@ -93,12 +93,13 @@ sub authenticate_user {
 
 	my $secret = $user->{totp_secret};
 	my $totp = $args->{totp};
-	my $totp_check = $self->totp->read_totp({ totp_secret => $secret });
-	unless ($self->totp->check_totp(
-				{ totp => $totp, totp_check => $totp_check }
-			)) {
-		return;
-	}
+	my $totp_expected = $self->totp->read_totp({ totp_secret => $secret });
+	return unless $self->totp->check_totp(
+		{
+			totp => $totp,
+			totp_expected => $totp_expected
+		}
+	);
 	return 1;
 }
 
