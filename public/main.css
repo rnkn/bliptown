@@ -117,15 +117,10 @@ nav {
 }
 
 nav header {
-	position: sticky;
+	position: relative;
 	top: 0;
-	padding-bottom: 3rem;
 	flex-shrink: 0;
-	height: 2rem;
-}
-
-nav header h1 {
-	font-size: 1em;
+	height: 5rem;
 }
 
 nav footer {
@@ -784,12 +779,18 @@ details[open] > summary::before {
 	nav {
 		position: fixed;
 		width: 100%;
-		height: 5rem;
 		visibility: hidden;
 	}
 	nav header {
+		position: sticky;
 		text-align: center;
 		visibility: visible;
+	}
+	nav header > * {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
 	}
 	main {
 		padding-top: 5rem;
