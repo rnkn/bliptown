@@ -138,7 +138,7 @@ my $tables = {
 	}
 };
 
-my $metadata = <<"EOF";
+print <<"EOF";
 ---
 title: Stats
 layout: wide stats
@@ -148,18 +148,16 @@ layout: wide stats
 <small>Stats are generated every hour. IP addresses are hashed using a
 separately stored secret and deleted after 7 days.</small>
 EOF
-print $metadata;
 
 foreach my $table (qw(date path_query referrer os browser mobile country)) {
 	my $name = $tables->{$table}->{name};
-	my $data = $tables->{$table}->{data};
-	my $md_table_header = <<"EOF";
+	print <<"EOF";
 
 | $name | Hits | Visitors | |
 |-------|------|----------|-|
 EOF
 
-	print $md_table_header;
+	my $data = $tables->{$table}->{data};
 	foreach my $row (@$data) {
 		print "| $row->{key} | $row->{hits} | $row->{visitors} | $row->{graph} |\n"
 	}
