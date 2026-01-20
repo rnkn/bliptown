@@ -66,7 +66,7 @@ while (my $line = <STDIN>) {
 	next unless $line;
 	my ($time, $ip_hash, $host, $path_query, $referrer, $user_agent, $country) =
 		split /\t/, $line;
-	my $week_ago = time - (60 * 60 * 24 * 7);
+	my $week_ago = time - (7 * 24 * 60 * 60);
 	last if $time < $week_ago;
 
 	my $date = strftime('%Y-%m-%d %a', localtime($time));

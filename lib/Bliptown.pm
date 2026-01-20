@@ -34,7 +34,7 @@ sub startup {
 		[ $ENV{BLIPTOWN_SECRET} ]
 	);
 
-	my $sessions = Bliptown::Sessions->new(default_expiration => 2592000);
+	my $sessions = Bliptown::Sessions->new(default_expiration => (30 * 24 * 60 * 60));
 	$app->sessions($sessions);
 	$app->sessions->cookie_domain('.' . $app->config->{domain});
 
