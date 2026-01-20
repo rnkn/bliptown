@@ -1,3 +1,4 @@
+
 package Bliptown::Controller::Files;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::File qw(path);
@@ -9,15 +10,15 @@ $Text::Glob::strict_wildcard_slash = 0;
 
 sub format_human_size {
 	my $size = shift;
-    return $size . 'B' if $size < 1024;
-    my @units = (qw(K M G T));
-    while (@units) {
+	return $size . 'B' if $size < 1024;
+	my @units = (qw(K M G T));
+	while (@units) {
 		my $unit = shift @units;
-        $size /= 1024;
+		$size /= 1024;
 		if ($size < 1024) {
 			return sprintf('%.2f%s', $size, $unit);
 		}
-    }
+	}
 }
 
 sub list_files {

@@ -7,21 +7,21 @@ use Mojo::DOM::HTML;
 use Mojo::Util qw(encode decode);
 
 use constant {
-	MD_FLAG_COLLAPSEWHITESPACE          => 1 << 0,
-	MD_FLAG_PERMISSIVEATXHEADERS        => 1 << 1,
-	MD_FLAG_PERMISSIVEURLAUTOLINKS      => 1 << 2,
-	MD_FLAG_PERMISSIVEEMAILAUTOLINKS    => 1 << 3,
-	MD_FLAG_NOINDENTEDCODEBLOCKS        => 1 << 4,
-	MD_FLAG_NOHTMLBLOCKS                => 1 << 5,
-	MD_FLAG_NOHTMLSPANS                 => 1 << 6,
-	MD_FLAG_TABLES                      => 1 << 8,
-	MD_FLAG_STRIKETHROUGH               => 1 << 9,
-	MD_FLAG_PERMISSIVEWWWAUTOLINKS      => 1 << 10,
-	MD_FLAG_TASKLISTS                   => 1 << 11,
-	MD_FLAG_LATEXMATHSPANS              => 1 << 12,
-	MD_FLAG_WIKILINKS                   => 1 << 13,
-	MD_FLAG_UNDERLINE                   => 1 << 14,
-	MD_FLAG_HARD_SOFT_BREAKS            => 1 << 15,
+	MD_FLAG_COLLAPSEWHITESPACE			=> 1 << 0,
+	MD_FLAG_PERMISSIVEATXHEADERS		=> 1 << 1,
+	MD_FLAG_PERMISSIVEURLAUTOLINKS		=> 1 << 2,
+	MD_FLAG_PERMISSIVEEMAILAUTOLINKS	=> 1 << 3,
+	MD_FLAG_NOINDENTEDCODEBLOCKS		=> 1 << 4,
+	MD_FLAG_NOHTMLBLOCKS				=> 1 << 5,
+	MD_FLAG_NOHTMLSPANS					=> 1 << 6,
+	MD_FLAG_TABLES						=> 1 << 8,
+	MD_FLAG_STRIKETHROUGH				=> 1 << 9,
+	MD_FLAG_PERMISSIVEWWWAUTOLINKS		=> 1 << 10,
+	MD_FLAG_TASKLISTS					=> 1 << 11,
+	MD_FLAG_LATEXMATHSPANS				=> 1 << 12,
+	MD_FLAG_WIKILINKS					=> 1 << 13,
+	MD_FLAG_UNDERLINE					=> 1 << 14,
+	MD_FLAG_HARD_SOFT_BREAKS			=> 1 << 15,
 };
 
 my $md_flags = MD_FLAG_PERMISSIVEURLAUTOLINKS
@@ -70,12 +70,12 @@ sub walk_dom {
 		return;
 	}
 
-    if ($node->type eq 'text') {
+	if ($node->type eq 'text') {
 		my $content = $node->content;
-        my $converted = convert_typography($content);
-        $node->replace($converted);
-        return;
-    }
+		my $converted = convert_typography($content);
+		$node->replace($converted);
+		return;
+	}
 
 	foreach my $child (@{$node->child_nodes}) {
 		walk_dom($child);

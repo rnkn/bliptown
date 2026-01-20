@@ -21,7 +21,7 @@ sub check_totp {
 	my ($self, $args) = @_;
 	unless (secure_compare $args->{totp}, $args->{totp_check}) {
 		return;
-    }
+	}
 	return 1;
 }
 

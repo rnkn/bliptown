@@ -23,7 +23,7 @@ sub create_user {
 }
 
 sub read_user {
-    my ($self, $args) = @_;
+	my ($self, $args) = @_;
 	my $key = $args->{key};
 	return unless $key;
 	my $user = $self->sqlite->db->select(
@@ -62,7 +62,7 @@ sub update_user {
 		my $password_hash = bcrypt($new_password, '2b', 12, $salt);
 		$values{password_hash} = $password_hash;
 	};
-    my $ok = $self->sqlite->db->update(
+	my $ok = $self->sqlite->db->update(
 		'users', \%values, { username => $username }
 	);
 	warn unless $ok;
@@ -72,16 +72,16 @@ sub update_user {
 sub delete_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
-    $self->sqlite->db->delete(
+	$self->sqlite->db->delete(
 		'users', { username => $username }
 	);
 	return 1;
 }
 
 sub authenticate_user {
-    my ($self, $args) = @_;
+	my ($self, $args) = @_;
 	my $username = $args->{username};
-    my $user = $self->read_user(
+	my $user = $self->read_user(
 		{ key => 'username', username => $username }
 	);
 	return unless $user;
@@ -99,7 +99,7 @@ sub authenticate_user {
 			)) {
 		return;
 	}
-    return 1;
+	return 1;
 }
 
 return 1;
