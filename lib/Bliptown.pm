@@ -135,7 +135,8 @@ sub startup {
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			return unless my $req_user = $c->get_req_user;
+			my $req_user = $c->get_req_user;
+			return unless $req_user;
 			my $root = path($c->config->{user_home}, $req_user)->to_abs;
 			my $file = path($root, $slug)->to_abs;
 			return $file if -f $file;

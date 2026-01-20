@@ -6,15 +6,13 @@ use Mojo::File qw(path);
 sub track_visit {
 	my $c = shift;
 	my $username = $c->session('username') // '';
-	if ($username eq $c->get_req_user) {
-		return $c->render(data => '')
-	}
+	return $c->render(data => '') if $username eq $c->get_req_user;
 	my $tx = $c->tx;
 
 	my $ip = $tx->req->headers->header('X-Forwarded-For') //
 		$tx->remote_address;
-	my $country_model = eval { $c->geoip->country(ip => $ip) };
-	my $country = $country_model->country->name if $country_model;
+	my $country_obj = eval { $c->geoip->country(ip => $ip) };
+	my $country = $country_obj->country->name if $country_obj;
 	my $ip_hash = hmac_sha1_hex($ip, $c->app->secrets->[0]);
 
 	my $url = Mojo::URL->new($tx->req->headers->referrer);
@@ -37,7 +35,8 @@ sub track_visit {
 
 sub log_visit {
 	my ($c, $data) = @_;
-	return unless my $req_user = $c->get_req_user;
+	my $req_user = $c->get_req_user;
+	return unless $req_user;
 	my $logpath = path($c->config->{log_home}, 'users', $req_user, 'access.log');
 	my $logdir = $logpath->dirname;
 	$logdir->make_path unless -d $logdir;

@@ -45,7 +45,8 @@ sub render_private {
 sub render_page {
 	my $c = shift;
 	my $user_home = $c->config->{user_home};
-	return $c->reply->not_found unless my $req_user = $c->get_req_user;
+	my $req_user = $c->get_req_user;
+	return $c->reply->not_found unless $req_user;
 	my $root = path($user_home, $req_user);
 	my $username = $c->session('username');
 

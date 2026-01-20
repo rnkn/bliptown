@@ -85,10 +85,9 @@ sub authenticate_user {
 		{ key => 'username', username => $username }
 	);
 	return unless $user;
-    my $hash = $user->{password_hash};
-	unless ($hash && bcrypt_check($args->{password}, $hash)) {
-		return;
-    }
+	my $hash = $user->{password_hash};
+	return unless $hash;
+	return unless bcrypt_check($args->{password}, $hash);
 
 	return 1 if $username eq 'demo';
 

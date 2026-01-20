@@ -115,8 +115,8 @@ sub read_page {
 		}
 
 		if ($yaml) {
-			my $o = YAML::Tiny->new;
-			$metadata = eval { $o->read_string($yaml)->[0] };
+			my $yaml_obj = YAML::Tiny->new;
+			$metadata = eval { $yaml_obj->read_string($yaml)->[0] };
 			$layout = $metadata->{layout} || '';
 		}
 
@@ -164,8 +164,8 @@ sub read_page {
 						html => '<span class="error">Error: exceeded maximum level of recursion</span>',
 					}
 				} else {
-					$page = read_page(
-						$self, {
+					$page = $self->read_page(
+						{
 							root => $root,
 							file => $file,
 							recur => $recur + 1,
