@@ -631,13 +631,28 @@ main:has(.cover) footer {
 	margin: 0;
 }
 
-.gallery-columns {
+.gallery-2-columns {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1em;
+}
+
+.gallery-columns, .gallery-3-columns {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 1em;
 }
 
-.gallery-columns > p {
+.gallery-4-columns {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1em;
+}
+
+.gallery-columns > p,
+.gallery-2-columns > p,
+.gallery-3-columns > p,
+.gallery-4-columns > p {
 	margin: 0;
 }
 
@@ -678,6 +693,8 @@ main:has(.cover) footer {
 	transform: translateZ(0);
 	background-color: inherit;
 }
+
+/* Stats */
 
 .stats table {
 	margin-bottom: 1em;
