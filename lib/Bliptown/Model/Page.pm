@@ -46,7 +46,7 @@ $ffi->attach(
 );
 
 sub convert_typography {
-	my $s = shift;
+	my ($self, $s) = @_;
 	$s =~ s/(?<!\S)'/&lsquo;/g;
 	$s =~ s/'/&rsquo;/g;
 	$s =~ s/(?<!\S)"/&ldquo;/g;
@@ -57,8 +57,8 @@ sub convert_typography {
 }
 
 sub walk_dom {
-	my $node = shift;
-	
+	my ($self, $node) = @_;
+
 	my @skip_tags = qw(pre code kbd script);
 	return if $node->tag && grep { $node->tag eq $_ } @skip_tags;
 
@@ -72,24 +72,133 @@ sub walk_dom {
 
 	if ($node->type eq 'text') {
 		my $content = $node->content;
-		my $converted = convert_typography($content);
+		my $converted = $self->convert_typography($content);
 		$node->replace($converted);
 		return;
 	}
 
 	foreach my $child (@{$node->child_nodes}) {
-		walk_dom($child);
+		$self->walk_dom($child);
 	}
 }
 
-sub read_page {
-	my ($self, $args) = @_;
-	my $file = Mojo::File->new($args->{file});
-	my $chars = $file->slurp('utf-8');
-	my $recur = $args->{recur} // 0;
+sub error_not_found {
+	my ($self, $slug) = @_;
+	my $html = <<"EOF";
+<span class="error">Error 404: "<a href="$slug">$slug</a>" not found</span>
+EOF
+	return {
+		metadata => {
+			title => 'Error 404: File Not Found',
+			status => 404,
+		},
+		html => $html
+	}
+}
 
-	my $metadata;
+sub error_max_recursion {
+	my ($self) = @_;
+	my $html = <<'EOF';
+<span class="error">Error 508: exceeded maximum level of recursion</span>
+EOF
+	return {
+		metadata => {
+			title => 'Error 508: Recursion',
+			status => 508,
+		},
+		html => $html
+	};
+}
+
+sub collect_blog_posts {
+	my ($self, @page_list) = @_;
+	@page_list = grep { defined $_->{metadata}->{date} } @page_list;
+	@page_list = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @page_list;
+	foreach my $page (@page_list) {
+		my $html = <<"EOF";
+
+<div class="blog-post">
+	$page->{html}
+</div>
+
+EOF
+		$page->{html} = $html;
+	}
+	return @page_list;
+}
+
+sub process_partials {
+	my ($self, $html, $args) = @_;
+	my $partial_re = qr/(?:<p>)?\{\{ *(?:>|&gt;) *(.*?) *\}\}(?:<\/p>)?/;
+
+	while ($html =~ $partial_re) {
+		my $slug = $1;
+		my @file_list = $self->glob_path($slug, $args);
+		my @page_list;
+		foreach my $filename (@file_list) {
+			my $page;
+
+			if (!-f $filename) {
+				$page = $self->error_not_found($slug);
+			} elsif ($args->{recur} >= 64) {
+				$page = $self->error_max_recursion;
+			} else {
+				$page = $self->read_page(
+					{
+						root => $args->{root},
+						file => $filename,
+						recur => $args->{recur} + 1,
+					}
+				);
+			}
+
+			push @page_list, $page;
+		}
+		@page_list = $self->collect_blog_posts(@page_list) if scalar @page_list > 1;
+
+		my $frag = join("\n", map { $_->{html} } @page_list);
+		$html =~ s/$partial_re/$frag/;
+	}
+	return $html;
+}
+
+sub glob_path {
+	my ($self, $slug, $args) = @_;
+	my $path = $slug;
+	$path =~ s/(\.md)?$/.md/;
+
+	if ($path =~ /^\//) {
+		$path = path($args->{root}, $path)->to_abs;
+	} else {
+		my $file = Mojo::File->new($args->{file});
+		$path = path($file->dirname, $path)->to_abs;
+	}
+
+	my @file_list = glob $path;
+	return @file_list;
+}
+
+sub split_frontmatter {
+	my ($self, $chars) = @_;
+
+	if ($chars =~ /^(---\n.*?---\n)\s*(.*)$/s) {
+		return ($1, $2);
+	}
+
+	return (undef, $chars);
+}
+
+sub parse_yaml {
+	my ($self, $yaml) = @_;
+
+	my $yaml_obj = YAML::Tiny->new;
+	return eval { $yaml_obj->read_string($yaml)->[0] };
+}
+
+sub markdown_to_html {
+	my ($self, $text) = @_;
 	my $html = '';
+
 	my $html_handler = $ffi->closure(
 		sub {
 			my ($chunk, $size) = @_;
@@ -98,97 +207,66 @@ sub read_page {
 		}
 	);
 
-	if ($file =~ /\.(txt|html|css|js)$/) {
-		if ($1 eq 'html') {
-			$chars =~ s/&/&amp;/g;
-			$chars =~ s/</&lt;/g;
-		}
-		$html = "<section class=\"one-column\">\n<pre>$chars</pre></section>\n";
-	} elsif ($file =~ /\.md$/) {
-		my ($yaml, $text, $layout);
+	my $octets = encode('utf-8', $text);
+	md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
+	return $html;
+}
 
-		if ($chars =~ /^(---\n.*?---\n)\s*(.*)$/s) {
-			$yaml = $1;
-			$text = $2;
-		} else {
-			$text = $chars;
-		}
+sub render_plaintext {
+	my ($self, $chars, $ext) = @_;
 
-		if ($yaml) {
-			my $yaml_obj = YAML::Tiny->new;
-			$metadata = eval { $yaml_obj->read_string($yaml)->[0] };
-			$layout = $metadata->{layout} || '';
-		}
-
-		my $octets = encode('utf-8', $text);
-		md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
-		$html = "<section class=\"$layout\">\n" . $html . "</section>\n" if $layout;
-
-		my $partial_re = qr/(?:<p>)?\{\{ *(?:>|&gt;) *(.*?) *\}\}(?:<\/p>)?/;
-		while ($html =~ /$partial_re/) {
-			my $slug = $1;
-			my $root = $args->{root};
-			my $file_str = $slug;
-			$file_str =~ s/\.md$//; $file_str = "$file_str.md";
-			my $path;
-
-			if ($file_str =~ /^\//) {
-				# Absolute path
-				$path = path($root, $file_str)->to_abs;
-			} else {
-				# Relative path
-				$path = path($file->dirname, $file_str)->to_abs;
-			}
-
-			my @incl_glob_list = glob $path;
-
-			my @page_list;
-			foreach my $filename (@incl_glob_list) {
-				my $file = Mojo::File->new($filename);
-				my $page;
-
-				if (!-f $filename) {
-					$page = {
-						metadata => {
-							title => 'Error: File Not Found',
-							status => 404,
-						},
-						html => "<span class=\"error\">Error: \"<a href=\"$slug\">$slug</a>\" not found</span>",
-					}
-				} elsif ($recur >= 64) {
-					$page = {
-						metadata => {
-							title => 'Error: Recursion',
-							status => 508,
-						},
-						html => '<span class="error">Error: exceeded maximum level of recursion</span>',
-					}
-				} else {
-					$page = $self->read_page(
-						{
-							root => $root,
-							file => $file,
-							recur => $recur + 1,
-						}
-					);
-				}
-				push @page_list, $page;
-			}
-			if (scalar @page_list > 1) {
-				@page_list = grep { defined $_->{metadata}->{date} } @page_list;
-				@page_list = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @page_list;
-				map {
-					$_->{html} = "<div class=\"blog-post\">$_->{html}</div>"; $_
-				} @page_list;
-			}
-			my $frag = join("\n", map { $_->{html} } @page_list);
-			$html =~ s/$partial_re/$frag/;
-		}
+	if ($ext eq 'html') {
+		$chars =~ s/&/&amp;/g;
+		$chars =~ s/</&lt;/g;
+		$chars =~ s/>/&gt;/g;
 	}
 
-	unless ($recur) {
+	my $html = <<"EOF";
+
+<section class="one-column">
+	<pre>$chars</pre>
+</section>
+
+EOF
+	return $html;
+}
+
+sub render_markdown {
+	my ($self, $chars) = @_;
+	my ($yaml, $text) = $self->split_frontmatter($chars);
+	my $metadata = $self->parse_yaml($yaml) if $yaml;
+	my $html = $self->markdown_to_html($text);
+
+	if (my $layout = $metadata->{layout}) {
+		$html = <<"EOF";
+
+<section class="$layout">
+	$html
+</section>
+
+EOF
+	}
+	return ($metadata, $html);
+}
+
+sub read_page {
+	my ($self, $args) = @_;
+	my $file = Mojo::File->new($args->{file});
+	my $chars = $file->slurp('utf-8');
+	$args->{recur} //= 0;
+
+	my ($metadata, $html);
+
+	if ($file =~ /\.(txt|html|css|js)$/) {
+		$html = $self->render_plaintext($chars, $1);
+	} elsif ($file =~ /\.md$/) {
+		($metadata, $html) = $self->render_markdown($chars);
+		$html = $self->process_partials($html, $args) if $html =~ /\{\{/;
+	}
+
+	unless ($args->{recur}) {
 		my $dom = Mojo::DOM->new($html);
-		walk_dom($dom);
+		$self->walk_dom($dom);
 		$html = $dom->to_string;
 	}
 
