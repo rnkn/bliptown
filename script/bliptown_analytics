@@ -56,7 +56,7 @@ sub stats_to_table {
 		my $graph_val = $row->{hits} / $max_hits * 10;
 		$row->{graph} = '&#x2588;' x $graph_val;
 	}
-	return \@table;
+	return @table;
 }
 
 my @entries;
@@ -110,31 +110,31 @@ my @country_table = stats_to_table(\%country_stats);
 my $tables = {
 	date => {
 		name => 'Date',
-		data => @date_table,
+		data => \@date_table,
 	},
 	path_query => {
 		name => 'Requested URLs',
-		data => @path_query_table,
+		data => \@path_query_table,
 	},
 	referrer => {
 		name => 'Referring URLs',
-		data => @referrer_table,
+		data => \@referrer_table,
 	},
 	os => {
 		name => 'Operating System',
-		data => @os_table,
+		data => \@os_table,
 	},
 	browser => {
 		name => 'Browser',
-		data => @browser_table,
+		data => \@browser_table,
 	},
 	mobile => {
 		name => 'Device',
-		data => @mobile_table,
+		data => \@mobile_table,
 	},
 	country => {
 		name => 'Country',
-		data => @country_table,
+		data => \@country_table,
 	}
 };
 
