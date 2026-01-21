@@ -1,3 +1,9 @@
+-- 6 up
+ALTER TABLE users
+	ADD COLUMN date_format INTEGER DEFAULT 0;
+-- 6 down
+ALTER TABLE users
+	DROP COLUMN date_format;
 -- 5 up
 ALTER TABLE users
 	DROP COLUMN sort_new;
