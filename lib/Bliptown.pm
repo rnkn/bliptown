@@ -75,7 +75,11 @@ sub startup {
 
 	$app->helper(
 		page => sub {
-			return Bliptown::Model::Page->new;
+			my $c = shift;
+			return Bliptown::Model::Page->new(
+				user => $c->user,
+				req_user => $c->get_req_user,
+			);
 		});
 
 	$app->helper(

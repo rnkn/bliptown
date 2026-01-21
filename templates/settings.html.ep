@@ -40,6 +40,15 @@
 					<a href="<%= url_for('totp_initiate')->query(back_to => url_for)%>">Reset 2FA</a>
 				</li>
 				<hr>
+				<li class="row">
+					<label class="cell name" for="date-format">Formatted date</label>
+					<select class="cell" id="date-format" name="date_format">
+						<option value="0" <%= 'selected' if $date_format == 0 %>>Day Month Year</option>
+						<option value="1" <%= 'selected' if $date_format == 1 %>>Month Day, Year</option>
+						<option value="2" <%= 'selected' if $date_format == 2 %>>Month Year</option>
+						<option value="3" <%= 'selected' if $date_format == 3 %>>Year</option>
+					</select>
+				</li>
 				<label for="create-backups">
 					<li class="row">
 						<span class="cell name">Automatically create backups</span>

@@ -3,8 +3,12 @@ use Mojo::Base -base;
 use Mojo::File qw(path);
 use FFI::Platypus;
 use YAML::Tiny;
+use POSIX qw(strftime);
 use Mojo::DOM::HTML;
 use Mojo::Util qw(encode decode);
+
+has 'user';
+has 'req_user';
 
 use constant {
 	MD_FLAG_COLLAPSEWHITESPACE			=> 1 << 0,
@@ -127,6 +131,45 @@ EOF
 	return @page_list;
 }
 
+sub process_prettydate {
+	my ($self, $date) = @_;
+	my $req_user = $self->req_user;
+	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
+	$year = $year - 1900;
+	$month--;
+	my %date_formats = (
+		0 => '%e %B %Y',
+		1 => '%B %e, %Y',
+		2 => '%B %Y',
+		3 => '%Y',
+	);
+	my $user = $self->user->read_user(
+		{ key => 'username', username => $req_user }
+	);
+	my $format = $date_formats{$user->{date_format} // 0};
+	return strftime($format, 0, 0, 0, $day, $month, $year) // '';
+}
+
+sub process_variables {
+	my ($self, $html, $args) = @_;
+	my $metadata = $args->{metadata};
+	my $variable_re = qr/\{\{ *([^>]+?) *\}\}/;
+
+	while ($html =~ $variable_re) {
+		my $key = $1;
+		my $val;
+		my $date = $metadata->{date};
+
+		if ($date && $key eq 'prettydate') {
+			$val = $self->process_prettydate($date);
+		} else {
+			$val = $metadata->{$key} // '';
+		}
+		$html =~ s/$variable_re/$val/;
+	}
+	return $html;
+}
+
 sub process_partials {
 	my ($self, $html, $args) = @_;
 	my $partial_re = qr/(?:<p>)?\{\{ *(?:>|&gt;) *(.*?) *\}\}(?:<\/p>)?/;
@@ -148,6 +191,7 @@ sub process_partials {
 						root => $args->{root},
 						file => $filename,
 						recur => $args->{recur} + 1,
+						metadata => $args->{metadata},
 					}
 				);
 			}
@@ -232,12 +276,12 @@ EOF
 }
 
 sub render_markdown {
-	my ($self, $chars) = @_;
-	my ($yaml, $text) = $self->split_frontmatter($chars);
-	my $metadata = $self->parse_yaml($yaml) if $yaml;
+	my ($self, $text, $args) = @_;
+
+	$text = $self->process_variables($text, $args);
 	my $html = $self->markdown_to_html($text);
 
-	if (my $layout = $metadata->{layout}) {
+	if (my $layout = $args->{metadata}->{layout}) {
 		$html = <<"EOF";
 
 <section class="$layout">
@@ -246,22 +290,27 @@ sub render_markdown {
 
 EOF
 	}
-	return ($metadata, $html);
+	return $html;
 }
 
 sub read_page {
 	my ($self, $args) = @_;
 	my $file = Mojo::File->new($args->{file});
 	my $chars = $file->slurp('utf-8');
+
+	$args->{metadata} //= {};
 	$args->{recur} //= 0;
 
-	my ($metadata, $html);
+	my $html;
 
 	if ($file =~ /\.(txt|html|css|js)$/) {
 		$html = $self->render_plaintext($chars, $1);
 	} elsif ($file =~ /\.md$/) {
-		($metadata, $html) = $self->render_markdown($chars);
-		$html = $self->process_partials($html, $args) if $html =~ /\{\{/;
+		my ($yaml, $text) = $self->split_frontmatter($chars);
+		my $metadata = $self->parse_yaml($yaml) if $yaml;
+		%{$args->{metadata}} = (%{$args->{metadata}}, %$metadata) if $metadata;
+		$html = $self->render_markdown($text, $args);
+		$html = $self->process_partials($html, $args);
 	}
 
 	unless ($args->{recur}) {
@@ -271,7 +320,7 @@ sub read_page {
 	}
 
 	return {
-		metadata => $metadata,
+		metadata => $args->{metadata},
 		html => $html,
 	}
 }
