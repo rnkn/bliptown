@@ -238,7 +238,8 @@ sub parse_yaml {
 	my ($self, $yaml) = @_;
 
 	my $yaml_obj = YAML::Tiny->new;
-	return eval { $yaml_obj->read_string($yaml)->[0] };
+	my $metadata = eval { $yaml_obj->read_string($yaml)->[0] };
+	return $metadata;
 }
 
 sub markdown_to_html {
