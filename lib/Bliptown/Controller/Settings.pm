@@ -15,8 +15,8 @@ sub provision_cert {
 
 sub update_domain_list {
 	my $c = shift;
-	my $coll = $c->sqlite->db->select('users', 'custom_domain')->arrays;
-	my @domains = @{$coll->flatten};
+	my $domain_coll = $c->sqlite->db->select('users', 'custom_domain')->arrays;
+	my @domains = @{$domain_coll->flatten};
 	@domains = grep { defined $_ } @domains;
 	@domains = sort @domains;
 	my $res = $c->ipc->send_message(
