@@ -12,7 +12,7 @@ sub create_secret {
 
 sub read_totp {
 	my ($self, $args) = @_;
-	my $secret = decode_base32 $args->{totp_secret};
+	my $secret = decode_base32($args->{totp_secret});
 	my $oath = Authen::OATH->new;
 	return $oath->totp($secret);
 }
