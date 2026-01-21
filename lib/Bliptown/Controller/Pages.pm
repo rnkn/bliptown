@@ -95,8 +95,8 @@ sub render_page {
 
 	my $page = $c->page->read_page(
 		{
-			root => $root,
-			file => $file,
+			root => $root->to_abs->to_string,
+			filename => $file->to_abs->to_string,
 		}
 	);
 
@@ -109,8 +109,8 @@ sub render_page {
 			$show_sidebar = 1 if $f eq 'sidebar';
 			my $page = $c->page->read_page(
 				{
-					file => $file,
-					root => $root,
+					filename => $file->to_abs->to_string,
+					root => $root->to_abs->to_string,
 				}
 			);
 			$page->{html} = post_skel($page->{html}, $slug);

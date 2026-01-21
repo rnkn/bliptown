@@ -186,12 +186,13 @@ sub process_partials {
 			} elsif ($args->{recur} >= 64) {
 				$page = $self->error_max_recursion;
 			} else {
+				my %metadata = %{$args->{metadata} // {}};
 				$page = $self->read_page(
 					{
 						root => $args->{root},
-						file => $filename,
+						filename => $filename,
 						recur => $args->{recur} + 1,
-						metadata => $args->{metadata},
+						metadata => \%metadata,
 					}
 				);
 			}
@@ -214,12 +215,12 @@ sub glob_path {
 	if ($path =~ /^\//) {
 		$path = path($args->{root}, $path)->to_abs;
 	} else {
-		my $file = Mojo::File->new($args->{file});
+		my $file = Mojo::File->new($args->{filename});
 		$path = path($file->dirname, $path)->to_abs;
 	}
 
 	my @file_list = glob $path;
-	@file_list = grep { $_ ne $args->{file} } @file_list;
+	@file_list = grep { $_ ne $args->{filename} } @file_list;
 	return @file_list;
 }
 
@@ -296,7 +297,7 @@ EOF
 
 sub read_page {
 	my ($self, $args) = @_;
-	my $file = Mojo::File->new($args->{file});
+	my $file = Mojo::File->new($args->{filename});
 	my $chars = $file->slurp('utf-8');
 
 	$args->{metadata} //= {};
@@ -308,8 +309,11 @@ sub read_page {
 		$html = $self->render_plaintext($chars, $1);
 	} elsif ($file =~ /\.md$/) {
 		my ($yaml, $text) = $self->split_frontmatter($chars);
-		my $metadata = $self->parse_yaml($yaml) if $yaml;
-		%{$args->{metadata}} = (%{$args->{metadata}}, %$metadata) if $metadata;
+
+		my $parent_metadata = $args->{metadata};
+		my $child_metadata = $self->parse_yaml($yaml) if $yaml;
+		%{$args->{metadata}} = (%$parent_metadata, %$child_metadata) if $child_metadata;
+
 		$html = $self->render_markdown($text, $args);
 		$html = $self->process_partials($html, $args);
 	}
