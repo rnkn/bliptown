@@ -219,6 +219,7 @@ sub glob_path {
 	}
 
 	my @file_list = glob $path;
+	@file_list = grep { $_ ne $args->{file} } @file_list;
 	return @file_list;
 }
 
