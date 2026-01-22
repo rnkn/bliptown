@@ -153,7 +153,7 @@ sub process_prettydate {
 sub process_variables {
 	my ($self, $html, $args) = @_;
 	my $metadata = $args->{metadata};
-	my $variable_re = qr/\{\{ *([^>]+?) *\}\}/;
+	my $variable_re = qr/\{\{ *([^>\xA0]+?) *\}\}/;
 
 	while ($html =~ $variable_re) {
 		my $key = $1;
