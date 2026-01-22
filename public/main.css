@@ -704,10 +704,6 @@ main:has(.cover) footer {
 	margin-bottom: 1em;
 }
 
-.stats table tbody tr:hover {
-	background-color: var(--row-hover-color);
-}
-
 .stats table td {
 	width: 10em;
 	max-width: 10em;
@@ -725,6 +721,10 @@ main:has(.cover) footer {
 }
 
 /* tables */
+
+.row-hover table tbody tr:hover {
+	background-color: var(--row-hover-color);
+}
 
 .table a {
 	border: 1px solid transparent;
