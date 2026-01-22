@@ -29,7 +29,7 @@ process_user_stats() {
 
 	test -f "$log_file" || /usr/bin/install -m 600 -o bliptown -g bliptown /dev/null "$log_file"
 
-	if [ -s "$log_file" ]
+	if [ -s "$log_file" ] && [ -e "$stats_file" ]
 	then
 		mkdir -p "$private_dir"
 		gzcat -f "$log_file"* | grep -v newsyslog |
