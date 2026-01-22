@@ -312,6 +312,7 @@ sub read_page {
 		my ($yaml, $text) = $self->split_frontmatter($chars);
 
 		my $parent_metadata = $args->{metadata};
+		delete $parent_metadata->{layout};
 		my $child_metadata = $self->parse_yaml($yaml) if $yaml;
 		%{$args->{metadata}} = (%$parent_metadata, %$child_metadata) if $child_metadata;
 
