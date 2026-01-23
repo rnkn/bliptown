@@ -23,7 +23,7 @@ sub stat_hits_visitors {
 		my $val = $e->{$key};
 		next unless length $val;
 		if ($key eq 'mobile') {
-			$val = $val eq 1 ? 'Mobile' : 'Desktop';
+			$val = $val == 1 ? 'Mobile' : 'Desktop';
 		}
 		$val = "<${val}>" if $key eq 'referrer';
 		$stats{$val}{hits}++;
