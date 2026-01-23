@@ -115,6 +115,7 @@ nav {
 	overflow-y: scroll;
 	background-color: inherit;
 	transition: top 0.3s ease;
+	scrollbar-width: none;
 }
 
 nav header {
@@ -152,6 +153,7 @@ main {
 	padding: 2rem;
 	padding-right: 4rem;
 	background-color: inherit;
+	scrollbar-width: none;
 }
 
 main p:first-child {
