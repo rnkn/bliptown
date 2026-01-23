@@ -231,35 +231,6 @@ sub startup {
 		}
 	);
 
-	$app->hook(
-		after_dispatch => sub {
-			my $c = shift;
-			my $logpath = path($c->config->{log_home}, 'master', 'access.log');
-			my $logdir = $logpath->dirname;
-			$logdir->make_path unless -d $logdir;
-			$logpath->touch unless -f $logpath;
-			$logpath->chmod(0600);
-			my $log = $c->accesslog($logpath);
-
-			my $tx = $c->tx;
-
-			my @data = (
-				$tx->remote_address					// '',
-				$tx->req->method					// '',
-				'HTTP/' . $tx->req->version			// '',
-				$tx->req->headers->host				// '',
-				$tx->req->url->path_query			// '',
-				$tx->req->headers->referrer			// '',
-				$tx->req->headers->user_agent		// '',
-				$tx->res->code						// '',
-				$tx->res->body_size					// '',
-				$tx->res->headers->content_type		// '',
-			);
-
-			$log->info(@data);
-		}
-	);
-
 	my $r = $app->routes;
 
 	$r->get(
