@@ -47,6 +47,7 @@ sub stats_to_table {
 
 	if ($sort_date) {
 		@table = sort { $b->{key} cmp $a->{key} } @table;
+		@table = @table[0..6];
 	} else {
 		@table = sort { $b->{hits} <=> $a->{hits} } @table;
 		@table = @table[0..9] if @table > 10;
