@@ -11,6 +11,12 @@ use Mojo::Util qw(trim);
 use Sereal::Decoder;
 use Sereal::Encoder;
 
+my $has_unveil = eval {
+	require OpenBSD::Unveil;
+	OpenBSD::Unveil->import();
+	return 1;
+};
+
 $0 = $0 . '[master]';
 
 die "$0 must be run as root" unless $> == 0;
@@ -113,7 +119,6 @@ sub get_uid_gid {
 sub delete_empty_dirs {
 	my $username = shift;
 	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
-	$root = $root->realpath;
 	foreach my $dir (@{$root->list_tree({ dir => 1 })}) {
 		next unless -d $dir;
 		rmdir $dir;
@@ -297,6 +302,13 @@ sub handle_conn {
 
 			setgid($gid) or die "Cannot set group: $gid ($!)";
 			setuid($uid) or die "Cannot set user: $uid ($!)";
+
+			if ($has_unveil) {
+				my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
+				$root = $root->realpath;
+				unveil($root, "rwc");
+				unveil();
+			}
 		}
 
 		my $func = $allowed_commands{$command} or
