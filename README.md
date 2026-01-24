@@ -61,5 +61,5 @@ EOF
 Install optional packages:
 
 ```shell-session
-# pkg_add mosh emacs vim nano sfeed
+# pkg_add mosh rlwrap emacs vim nano sfeed
 ```
