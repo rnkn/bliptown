@@ -304,7 +304,7 @@ sub read_page {
 	$args->{metadata} //= {};
 	$args->{recur} //= 0;
 
-	my $html;
+	my $html = '';
 
 	if ($file =~ /\.(txt|html|css|js)$/) {
 		$html = $self->render_plaintext($chars, $1);
