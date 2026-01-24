@@ -53,6 +53,7 @@ BLIPTOWN_KEYPAIR_FILE=/etc/relayd-keypairs.conf,\
 BLIPTOWN_ACME_FILE=/etc/acme-domains.conf:
 
 EOF
+# sh /etc/weekly.local
 # rcctl enable httpd relayd bliptown_helper bliptown monit
 # rcctl start httpd relayd bliptown_helper bliptown monit
 ```
@@ -60,5 +61,5 @@ EOF
 Install optional packages:
 
 ```shell-session
-# pkg_add mosh goaccess emacs vim nano sfeed
+# pkg_add mosh emacs vim nano sfeed
 ```
