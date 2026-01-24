@@ -6,10 +6,10 @@ ok=true
 /usr/bin/ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint" || ok=false
 if [ $ok ]
 then
-	/bin/tar -C /usr/local/share/bliptown -xzf /tmp/geolite2-country.tar.gz
-	mv /usr/local/share/bliptown/GeoLite2-Country_*/*.mmdb \
-	   /usr/local/share/bliptown/geolite2-country-current.mmdb
-	rm -rf /usr/local/share/bliptown/GeoLite2-Country_*
+	/bin/tar -C /var/db/GeoIP -xzf /tmp/geolite2-country.tar.gz
+	mv /var/db/GeoIP/GeoLite2-Country_*/*.mmdb \
+	   /var/db/GeoIP/geolite2-country-current.mmdb
+	rm -rf /var/db/GeoIP/GeoLite2-Country_*
 	echo "Done"
 else
 	echo "Failed"

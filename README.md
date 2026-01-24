@@ -5,7 +5,8 @@
 Install required packages:
 
 ```shell-session
-# pkg_add sqlite3 libffi md4c libqrencode png git sqlports curl jq monit
+# pkg_add sqlite3 libffi md4c libqrencode png git sqlports libmaxminddb \
+	curl jq monit
 ```
 
 Build and install [Carton](https://metacpan.org/pod/Carton):
@@ -36,7 +37,7 @@ BLIPTOWN_DOMAIN=blip.town,\
 BLIPTOWN_USER_HOME=/home/bliptown/users,\
 BLIPTOWN_DB=/var/db/bliptown/users.db,\
 BLIPTOWN_LOG_HOME=/var/log/bliptown,\
-BLIPTOWN_GEOIP_DB=/usr/local/share/bliptown/geolite2-country-current.mmdb,\
+BLIPTOWN_GEOIP_DB=/var/db/GeoIP/geolite2-country-current.mmdb,\
 BLIPTOWN_MD4C_LIB=/usr/local/lib/libmd4c-html.so.0.0,\
 BLIPTOWN_MD4C_HTML_LIB=/usr/local/lib/libmd4c-html.so.0.0,\
 
