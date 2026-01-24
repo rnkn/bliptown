@@ -52,7 +52,7 @@ check file login.conf path /etc/login.conf
 	if failed uid 0 then alert
 	if failed gid 0 then alert
 	if failed perm 0600 then alert
-	if failed md5 checksum expect c92a8309c3243e3d9aef59e5c56889b6 then alert
+	if failed md5 checksum expect 8081b030da3b3ba2e43890a4b72261d7 then alert
 
 check file letsencrypt.pem path /etc/acme/letsencrypt.pem
 	if failed uid 0 then alert
