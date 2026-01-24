@@ -117,10 +117,10 @@ sub startup {
 		get_req_user => sub {
 			my $c = shift;
 			my $host = $c->req->url->to_abs->host;
-			return unless $host;
+			return '' unless $host;
 			$host =~ s/^www\.//;
 			my $domain = $c->config->{domain};
-			my $username;
+			my $username = '';
 			if ($host =~ /\Q$domain\E$/) {
 				my @host_array = split(/\./, $host);
 				$username = @host_array >= 3 ? $host_array[-3] : 'mayor';
@@ -128,11 +128,12 @@ sub startup {
 				my $user = $c->user->read_user(
 					{ key => 'custom_domain', custom_domain => $host }
 				);
+				return '' unless $user;
 				$username = $user->{username};
 			}
-			return unless $username;
+			return '' unless $username;
 			my $dir = path($c->config->{user_home}, $username);
-			return unless -d $dir;
+			return '' unless -d $dir;
 			return $username;
 		});
 
