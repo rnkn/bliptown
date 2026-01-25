@@ -73,8 +73,8 @@ sub update_domain_list {
 	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
 
 	if ($has_unveil) {
-		unveil($keypair_file, "rwc");
-		unveil($acme_file, "rwc");
+		my @paths = ($keypair_file, $acme_file);
+		unveil(\@paths, "rwc");
 		unveil();
 	}
 
@@ -326,7 +326,8 @@ sub handle_conn {
 			if ($has_unveil) {
 				my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
 				$root = $root->realpath;
-				unveil($root, "rwc");
+				my @paths = ($root);
+				unveil(\@paths, "rwc");
 				unveil();
 			}
 		}
