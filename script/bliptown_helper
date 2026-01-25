@@ -261,15 +261,15 @@ sub git_commit {
 sub git_checkout {
 	my $payload = shift;
 	my $username = $payload->{username};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $dir = path($repo, 'snapshots', $hash);
+	my $dir = path($root, 'snapshots', $hash);
 	$dir->make_path or die "Cannot make path: $dir ($!)";
-	git_init($payload);
-	chdir $repo or die "Cannot change directory: $repo ($!)";
-	system("git archive '$hash' | tar -xf - -C '$dir'") == 0
-		or die "Failed to extract archive from hash: $hash";
+	my $tarball = git_archive($payload);
+	system('tar', '-xf', $tarball, '-C', $dir) == 0
+		or die "Failed to extract files from tarball ($!)";
+	unlink $tarball;
 	return $hash;
 }
 
