@@ -332,8 +332,10 @@ sub handle_conn {
 			if ($has_unveil) {
 				my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
 				$root = $root->realpath;
-				my @paths = ($root);
-				unveil(\@paths, "rwc");
+				my @r_paths = ('/etc/gitignore');
+				my @rwc_paths = ($root);
+				unveil(\@r_paths, "r");
+				unveil(\@rwc_paths, "rwc");
 				unveil();
 			}
 		}
