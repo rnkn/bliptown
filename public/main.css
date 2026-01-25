@@ -417,6 +417,8 @@ a.exit:before {
 	display: block;
 	width: 100%;
 	height: 70vh;
+	font-size: 14px;
+	font-family: monospace;
 }
 
 #edit button {
