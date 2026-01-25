@@ -259,6 +259,7 @@ sub git_checkout {
 	my $username = $payload->{username};
 	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
 	my $hash = $payload->{hash};
+	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $dir = path($repo, 'snapshots', $hash);
 	$dir->make_path or die "Cannot make path: $dir ($!)";
 	git_init($payload);
@@ -273,6 +274,7 @@ sub git_archive {
 	my $username = $payload->{username};
 	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
 	my $hash = $payload->{hash};
+	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $tmpfile = tempfile(UNLINK => 0);
 	chmod(0644, $tmpfile);
 	git_init($payload);
