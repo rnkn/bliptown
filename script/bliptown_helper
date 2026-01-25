@@ -55,6 +55,7 @@ chmod(0660, $sock_path) or die "Cannot chmod: $sock_path ($!)";
 print "Socket created: $sock_path\n";
 
 my $safe_domain_regex = qr/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
+my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;
 
 sub provision_cert {
 	my $payload = shift;
@@ -219,6 +220,18 @@ sub git_log {
 	return \@commits;
 }
 
+sub git_show {
+	my $payload = shift;
+	my $username = $payload->{username};
+	my $hash = $payload->{hash};
+	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	chdir $repo or die "Cannot change directory: $repo ($!)";
+	my $out = `git show $hash`;
+	return unless length $out;
+	return $out;
+}
+
 sub git_commit {
 	my $payload = shift;
 	my $username = $payload->{username};
@@ -277,6 +290,7 @@ my %allowed_commands = (
 	backup_file			=> \&backup_file,
 	git_commit			=> \&git_commit,
 	git_log				=> \&git_log,
+	git_show			=> \&git_show,
 	git_checkout		=> \&git_checkout,
 	git_archive			=> \&git_archive,
 	provision_cert		=> \&provision_cert,

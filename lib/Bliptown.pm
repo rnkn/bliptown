@@ -329,6 +329,7 @@ sub startup {
 	$protected->get('/snapshots/new')->to(controller => 'Snapshots', action => 'take_snapshot')->name('take_snapshot');
 	$protected->get('/snapshots/download/:hash')->to(controller => 'Snapshots', action => 'download_snapshot')->name('download_snapshot');
 	$protected->get('/snapshots/restore/:hash')->to(controller => 'Snapshots', action => 'restore_snapshot')->name('restore_snapshot');
+	$protected->get('/snapshots/diff/:hash')->to(controller => 'Snapshots', action => 'diff_snapshot')->name('diff_snapshot');
 
 	$r->get('/health')->to(controller => 'Health', action => 'health_check')->name('health_check');
 

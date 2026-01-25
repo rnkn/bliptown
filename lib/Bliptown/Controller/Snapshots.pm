@@ -102,4 +102,25 @@ sub download_snapshot {
 	return $c->reply->asset($asset);
 }
 
+sub diff_snapshot {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $hash = $c->param('hash');
+
+	my $res = $c->ipc->send_message(
+		{
+			command => 'git_show',
+			username => $username,
+			hash => $hash,
+		}
+	);
+	return $c->reply->exception($res->{error}) if $res->{error};
+
+	my $diff = $res->{response};
+	return $c->render(
+		text => $diff,
+		format => 'txt',
+	);
+}
+
 return 1;

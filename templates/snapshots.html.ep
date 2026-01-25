@@ -42,6 +42,7 @@
 				<ul class="controls">
 					<li><a href="<%= url_for('restore_snapshot', hash => $_->{hash}) %>">Restore</a></li>
 					<li><a href="<%= url_for('download_snapshot', hash => $_->{hash}) %>">Download</a></li>
+					<li><a href="<%= url_for('diff_snapshot', hash => $_->{hash}) %>">Changes</a></li>
 				</ul>
 			</details>
 			% }
