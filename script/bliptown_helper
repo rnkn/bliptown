@@ -93,7 +93,7 @@ sub update_domain_list {
 		$keypair_file->spew($keypairs_str, 'utf-8')
 			or die "Cannot write keypair file: $keypair_file ($!)";
 
-		system('rcctl', 'restart', 'relayd');
+		system(qw(rcctl restart relayd));
 	}
 
 	my $acme_domains_str = '';
@@ -192,13 +192,13 @@ sub git_init {
 	my $excludes_file = '/etc/gitignore';
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
-	system('git init --quiet') == 0
+	system(qw(git init -q)) == 0
 		or die "Cannot initialize repository: $repo ($!)";
-	system("git config set user.name $username") == 0
+	system('git', 'config', 'set', 'user.name', $username) == 0
 		or die "Cannot configure repository user name ($!)";
-	system("git config set user.email $username\@blip.town") == 0
+	system('git', 'config', 'set', 'user.email', "${username}\@blip.town") == 0
 		or die "Cannot configure repository user email ($!)";
-	system("git config set core.excludesFile $excludes_file") == 0
+	system('git', 'config', 'set', 'core.excludesFile', $excludes_file) == 0
 		or die "Cannot configure repository ignore file ($!)";
 	return "Initialized Git repository: $repo";
 }
@@ -243,14 +243,14 @@ sub git_commit {
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
-	system('git add -A') == 0
+	system(qw(git add -A)) == 0
 		or die "Cannot add files to $repo";
 
 	my $subject = "Full snapshot on Bliptown";
 	my $body = `git status --porcelain`;
 	return unless length $body;
 
-	system("git commit -m '$subject' -m '$body'") == 0
+	system('git', 'commit', '-q', '-m', $subject, '-m', $body) == 0
 		or die "Cannot commit files to repo: $repo ($!)";
 
 	my $commits = git_log($payload);
@@ -283,8 +283,8 @@ sub git_archive {
 	chmod(0644, $tmpfile);
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
-	system("git archive --format=tar.gz '$hash' > $tmpfile") == 0
-		or die "Failed to extract archive from hash: $hash";
+	system('git', 'archive', '--format=tar.gz', '-o', $tmpfile, $hash) == 0
+		or die "Failed to extract archive from hash: $hash ($!)";
 	return $tmpfile->to_string;
 }
 
