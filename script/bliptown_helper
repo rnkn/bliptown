@@ -267,7 +267,7 @@ sub git_checkout {
 	my $dir = path($root, 'snapshots', $hash);
 	$dir->make_path or die "Cannot make path: $dir ($!)";
 	my $tarball = git_archive($payload);
-	system('tar', '-xf', $tarball, '-C', $dir) == 0
+	system('tar', '-xzf', $tarball, '-C', $dir) == 0
 		or die "Failed to extract files from tarball ($!)";
 	unlink $tarball;
 	return $hash;
