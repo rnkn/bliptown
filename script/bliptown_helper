@@ -69,9 +69,15 @@ sub update_domain_list {
 	my $domains = $payload->{domains};
 
 	my $keypair_file = path($ENV{BLIPTOWN_KEYPAIR_FILE});
-	$keypair_file->touch unless -f $keypair_file;
-
 	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
+
+	if ($has_unveil) {
+		unveil($keypair_file, "rwc");
+		unveil($acme_file, "rwc");
+		unveil();
+	}
+
+	$keypair_file->touch unless -f $keypair_file;
 	$acme_file->touch unless -f $acme_file;
 
 	my @safe_domains = grep { /$safe_domain_regex/ } @$domains;
