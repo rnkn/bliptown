@@ -81,6 +81,10 @@ details ul {
 	margin: 0;
 }
 
+button, input, select {
+	font-size: 14px;
+}
+
 button {
 	min-width: 6em;
 }
@@ -745,6 +749,7 @@ main:has(.cover) footer {
 .table .row {
 	display: flex;
 	gap: 1em;
+	align-items: center;
 }
 
 .table .row ul {
