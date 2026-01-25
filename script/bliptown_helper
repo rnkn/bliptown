@@ -194,6 +194,10 @@ sub git_init {
 
 	system('git init --quiet') == 0
 		or die "Cannot initialize repository: $repo ($!)";
+	system("git config set user.name $username") == 0
+		or die "Cannot configure repository user name ($!)";
+	system("git config set user.email $username\@blip.town") == 0
+		or die "Cannot configure repository user email ($!)";
 	system("git config set core.excludesFile $excludes_file") == 0
 		or die "Cannot configure repository ignore file ($!)";
 	return "Initialized Git repository: $repo";
