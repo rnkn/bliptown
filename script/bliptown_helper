@@ -17,6 +17,15 @@ my $has_unveil = eval {
 	return 1;
 };
 
+my $has_pledge = eval {
+	require OpenBSD::Pledge;
+	OpenBSD::Pledge->import();
+	return 1;
+};
+
+pledge(qw(rpath wpath cpath chown fattr unix proc id unveil exec))
+	if $has_pledge;
+
 $0 = $0 . '[master]';
 
 die "$0 must be run as root" unless $> == 0;
