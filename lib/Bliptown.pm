@@ -4,7 +4,6 @@ use Mojo::File qw(path);
 use Mojo::Util qw(url_unescape);
 use Mojo::SQLite;
 use lib '.';
-use Bliptown::Sessions;
 
 use Geo::Location::IP::Database::Reader;
 
@@ -33,10 +32,6 @@ sub startup {
 	$app->secrets(
 		[ $ENV{BLIPTOWN_SECRET} ]
 	);
-
-	my $sessions = Bliptown::Sessions->new(default_expiration => (30 * 24 * 60 * 60));
-	$app->sessions($sessions);
-	$app->sessions->cookie_domain('.' . $app->config->{domain});
 
 	$app->helper(
 		sqlite => sub {
@@ -219,6 +214,7 @@ sub startup {
 			my $req_url = $c->req->url->to_abs;
 			my $host = $req_url->host;
 			return unless $host;
+			$c->app->sessions->cookie_domain($host);
 			my $domain = $c->config->{domain};
 
 			if ($host eq "cdn-origin.$domain") {
