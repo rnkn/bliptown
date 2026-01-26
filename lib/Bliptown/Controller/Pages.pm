@@ -1,5 +1,6 @@
 package Bliptown::Controller::Pages;
 use Mojo::Base 'Mojolicious::Controller';
+use YAML::Tiny;
 use Mojo::DOM;
 use Mojo::File qw(path);
 use Mojo::Util qw(url_unescape sha1_sum);
@@ -9,6 +10,17 @@ sub yaml_true {
 	if ($p && $p =~ /^(true|y(es)?|1)$/) {
 		return 1;
 	}
+}
+
+sub process_redirects {
+	my ($file, $slug) = @_;
+	$slug =~ s/^(\/)?/\//;
+	$slug =~ s/(\/)?$//;
+	my $chars = $file->slurp('utf-8');
+	my $yaml_obj = YAML::Tiny->new;
+	my $redirects = eval { $yaml_obj->read_string($chars)->[0] };
+	my $url = $redirects->{$slug};
+	return $url if $url;
 }
 
 sub post_skel {
@@ -52,6 +64,11 @@ sub render_page {
 
 	my $is_cur_user = $username && $username eq $req_user;
 	my $slug = url_unescape $c->stash('catchall');
+
+	my $redirects_file = path($root, '_redirects.txt');
+	my $redirect_url = process_redirects($redirects_file, $slug)
+		if -f $redirects_file;
+	return $c->redirect_to($redirect_url) if $redirect_url;
 
 	my $raw = path($root, $slug);
 	my $ext = $raw->extname;
