@@ -36,6 +36,8 @@ sub startup {
 	$app->sessions->cookie_name('bliptown');
 	$app->sessions->default_expiration(30 * 24 * 60 * 60);
 
+	delete $app->static->extra->{'favicon.ico'};
+
 	$app->helper(
 		sqlite => sub {
 			my $db = path($ENV{BLIPTOWN_DB});
