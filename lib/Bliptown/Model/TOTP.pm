@@ -14,12 +14,18 @@ sub read_totp {
 	my ($self, $args) = @_;
 	my $secret = decode_base32($args->{totp_secret});
 	my $oath = Authen::OATH->new;
-	return $oath->totp($secret);
+	my $totp = $oath->totp($secret);
+	my $totp_old = $oath->totp($secret, time - 30);
+	return ($totp, $totp_old);
 }
 
 sub check_totp {
 	my ($self, $args) = @_;
-	unless (secure_compare $args->{totp}, $args->{totp_expected}) {
+	my $totp = $args->{totp};
+	my $totp_expected = ${$args->{totp_expected_pair}}[0];
+	my $totp_expected_old = ${$args->{totp_expected_pair}}[1];
+	unless (secure_compare($totp, $totp_expected)
+			|| secure_compare($totp, $totp_expected_old)) {
 		return;
 	}
 	return 1;
