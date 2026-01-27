@@ -855,9 +855,15 @@ details[open] > summary::before {
 
 /* small screens portrait */
 
-@media (max-width: 420px) {
+@media (max-width: 480px) {
 	:root {
-		--drawer-height: 6rem;
+		--drawer-height: 11rem;
+	}
+	#login form {
+		flex-direction: column;
+	}
+	#login form input {
+		width: 100%;
 	}
 }
 
