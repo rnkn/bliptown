@@ -1,6 +1,7 @@
 #!/bin/ksh
 
 daemon="/usr/local/www/bliptown/script/block_php"
+daemon_logger="daemon.info"
 
 rc_bg=YES
 rc_reload=NO
