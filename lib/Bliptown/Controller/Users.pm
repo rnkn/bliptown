@@ -93,6 +93,7 @@ sub login_our_domain {
 	my $username	= $args->{username};
 	my $password	= $args->{password};
 	my $totp		= $args->{totp};
+	my $redirect	= $args->{redirect};
 	my $url			= Mojo::URL->new;
 	my $path		= $c->url_for('user_login')->path->to_string;
 
@@ -106,6 +107,7 @@ sub login_our_domain {
 		username => $username,
 		password => $password,
 		totp => $totp,
+		redirect => $redirect,
 	);
 }
 
@@ -135,7 +137,8 @@ sub user_login {
 		{
 			username	=> $username,
 			password	=> $password,
-			totp		=> $totp
+			totp		=> $totp,
+			redirect	=> $redirect
 		}
 	) if $host !~ /$our_domain$/;
 
@@ -157,7 +160,8 @@ sub user_login {
 			my $path = $c->url_for('user_login')->path->to_string;
 			$url->host($custom_domain)->path($path)->query(
 				username => $username,
-				token => $token
+				token => $token,
+				back_to => $redirect
 			);
 			$url->scheme($c->config->{scheme});
 			$url->port($c->config->{port});
