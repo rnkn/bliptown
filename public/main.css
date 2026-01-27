@@ -224,7 +224,7 @@ main textarea {
 	right: 0;
 	height: 0;
 	background-color: white;
-	box-shadow: inset 0 0 25px rgba(0,0,0,0.1);
+	box-shadow: inset 0 -25px 25px rgba(0,0,0,0.05);
 	transition: height 0.3s ease, visibility 0.3s ease;
 }
 
@@ -320,7 +320,7 @@ label#nav-toggle:before {
 	display: flex;
 	min-width: 100%;
 	height: var(--drawer-height);
-	padding: 1em 2em;
+	padding: 1em;
 	flex-direction: column;
 	flex-wrap: wrap;
 	align-content: flex-end;
