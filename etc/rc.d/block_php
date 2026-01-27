@@ -1,11 +1,12 @@
 #!/bin/ksh
 
-daemon="/bin/sh"
-daemon_flags="/usr/local/www/bliptown/etc/block_php"
+daemon="/usr/local/www/bliptown/script/block_php"
 
 rc_bg=YES
 rc_reload=NO
 
 . /etc/rc.d/rc.subr
+
+pexp="perl:? $daemon"
 
 rc_cmd $1
