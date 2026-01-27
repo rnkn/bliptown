@@ -238,8 +238,9 @@ sub startup {
 	$r->get(
 		'/.well-known/acme-challenge/:file' => sub {
 			my $c = shift;
-			my $file = $c->param('file');
-			$c->reply->file("/var/www/acme/$file");
+			my $file = path('/var/www/acme/', $c->param('file'));
+			return $c->reply->file("$file") if -f $file;
+			return $c->reply->not_found;
 		})->name('acme_challenge');
 
 	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('token_auth');
