@@ -1,0 +1,11 @@
+#!/bin/ksh
+
+daemon="/bin/sh"
+daemon_flags="/usr/local/www/bliptown/etc/block_php"
+
+rc_bg=YES
+rc_reload=NO
+
+. /etc/rc.d/rc.subr
+
+rc_cmd $1
