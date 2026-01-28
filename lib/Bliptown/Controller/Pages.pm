@@ -5,13 +5,6 @@ use Mojo::DOM;
 use Mojo::File qw(path);
 use Mojo::Util qw(url_unescape sha1_sum);
 
-sub yaml_true {
-	my $p = shift;
-	if ($p && $p =~ /^(true|y(es)?|1)$/) {
-		return 1;
-	}
-}
-
 sub process_redirects {
 	my ($file, $slug) = @_;
 	$slug =~ s/^(\/)?/\//;
