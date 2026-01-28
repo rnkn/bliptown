@@ -146,7 +146,7 @@ sub render_page {
 	my $page_title = $page->{metadata}->{title};
 	$title = "$title – $page_title" if $page_title;
 
-	my $date = $page->{metadata}{date};
+	my $date = $page->{metadata}->{date};
 
 	my $file_head = path($root, "_head.html");
 	my $head = $file_head->slurp('utf-8') if -f $file_head;
