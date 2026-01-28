@@ -137,7 +137,7 @@ sub render_page {
 
 	my $title_file = path($root, "_title.txt");
 	my $title = "Untitled";
-	if (-f $title_file) {
+	if (-s $title_file) {
 		open(my $fh, '<', $title_file);
 		$title = <$fh>;
 		close($fh);
