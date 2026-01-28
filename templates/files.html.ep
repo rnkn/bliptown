@@ -7,32 +7,32 @@
 	<menu>
 		<p>
 			<small>
-				Filter by filename to rename/delete multiple files at
+				Search by filename to rename/delete multiple files at
 				once. Deleting a file will remove it immediately.
 			</small>
 		</p>
 		<div id="controls">
-			<form id="filter" method="get" action="<%= url_for('list_files') %>">
-				<input type="text" name="filter" placeholder="glob" value="<%= param('filter') %>">
+			<form id="search" method="get" action="<%= url_for('list_files') %>">
+				<input type="text" name="search" placeholder="glob" value="<%= param('search') %>">
 			</form>
-			% my $filtered = 'checked' if param('filter');
-			<input type="checkbox" id="additional-controls-toggle" hidden <%= $filtered %>>
-			<fieldset id="filter-controls">
-				<button type="submit" form="filter">Filter</button>
-				% if (param('filter')) {
+			% my $search_results = 'checked' if param('search');
+			<input type="checkbox" id="additional-controls-toggle" hidden <%= $search_results %>>
+			<fieldset id="search-controls">
+				<button type="submit" form="search">Search</button>
+				% if (param('search')) {
 				<a href="<%= url_for('list_files') %>">Reset</a>
 				% }
 				<label id="additional-controls-toggle" class="button" for="additional-controls-toggle">+ more</label>
 			</fieldset>
 			<div id="additional-controls">
-				% if (param('filter')) {
+				% if (param('search')) {
 				<form id="replace" method="get" action="<%= url_for('list_files')%>">
-					<input type="hidden" name="filter" value="<%= param('filter') %>">
+					<input type="hidden" name="search" value="<%= param('search') %>">
 					<input type="text" name="replace" placeholder="string" value="<%= param('replace') %>">
 					<button type="submit">Replace Match in Filenames</button>
 				</form>
 				<form id="delete" method="get" action="<%= url_for('list_files')%>">
-					<input type="hidden" name="filter" value="<%= param('filter') %>">
+					<input type="hidden" name="search" value="<%= param('search') %>">
 					<button type="submit" name="delete" value="1">Delete Matching Files</button>
 				</form>
 				% }

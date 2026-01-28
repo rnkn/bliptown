@@ -518,12 +518,12 @@ nav #controls fieldset {
 	margin: 4px 0;
 }
 
-nav #controls fieldset#filter-controls {
+nav #controls fieldset#search-controls {
 	display: flex;
 	gap: 8px;
 }
 
-nav #controls #filter-controls label#additional-controls-toggle {
+nav #controls #search-controls label#additional-controls-toggle {
 	margin-left: auto;
 }
 

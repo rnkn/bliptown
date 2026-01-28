@@ -20,7 +20,7 @@ sub format_human_size {
 
 sub list_files {
 	my $c = shift;
-	my $filter = $c->param('filter');
+	my $search = $c->param('search');
 	my $delete = $c->param('delete');
 	my $replace = $c->param('replace');
 	my $sort = $c->param('sort') // 'name';
@@ -31,31 +31,31 @@ sub list_files {
 	);
 	my $root = path($c->config->{user_home}, $username);
 
-	my $filter_re = glob_to_regex_string($filter) if $filter;
+	my $search_re = glob_to_regex_string($search) if $search;
 
-	if ($filter_re && $delete) {
+	if ($search_re && $delete) {
 		my $res = $c->delete_files_regex(
 			{
 				username => $username,
 				root => $root,
-				filter => $filter_re
+				search => $search_re,
 			});
 		my $message = $res > 1 ? "$res files deleted" : "$res file deleted";
 		$c->flash(info => $message);
-		return $c->redirect_to($c->url_for('list_files')->query(filter => $filter));
+		return $c->redirect_to($c->url_for('list_files')->query(search => $search));
 	}
 
-	if ($filter_re && defined $replace) {
+	if ($search_re && defined $replace) {
 		my $res = $c->rename_files_regex(
 			{
 				username => $username,
 				root => $root,
-				filter => $filter_re,
+				search => $search_re,
 				replace => $replace
 			});
 		my $message = $res > 1 ? "$res files renamed" : "$res file renamed";
 		$c->flash(info => $message);
-		return $c->redirect_to($c->url_for('list_files')->query(filter => $replace));
+		return $c->redirect_to($c->url_for('list_files')->query(search => $replace));
 	}
 
 	my @files;
@@ -74,7 +74,7 @@ sub list_files {
 		}
 	};
 
-	@files = grep { $_->{filename} =~ $filter_re } @files if $filter_re;
+	@files = grep { $_->{filename} =~ $search_re } @files if $search_re;
 
 	my %sorting = (
 		name => 'filename',
@@ -111,14 +111,14 @@ sub rename_files_regex {
 	my ($c, $args) = @_;
 	my $username = $args->{username};
 	my $root =$args->{root};
-	my $filter = $args->{filter};
+	my $search = $args->{search};
 	my $replace = $args->{replace};
 	my @files = $root->list_tree->each;
-	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
+	my @filenames = grep { /$search/ } map { $_->to_rel($root)->to_string } @files;
 	foreach my $filename (@filenames) {
 		my ($old_filename, $new_filename) = ($filename, $filename);
 		$old_filename = path($root, $old_filename)->to_abs->to_string;
-		$new_filename =~ s/$filter/$replace/g;
+		$new_filename =~ s/$search/$replace/g;
 		$new_filename = path($root, $new_filename)->to_abs->to_string;
 		my $res = $c->ipc->send_message(
 			{
@@ -162,9 +162,9 @@ sub delete_files_regex {
 	my ($c, $args) = @_;
 	my $username = $args->{username};
 	my $root =$args->{root};
-	my $filter = $args->{filter};
+	my $search = $args->{search};
 	my @files = $root->list_tree->each;
-	my @filenames = grep { /$filter/ } map { $_->to_rel($root)->to_string } @files;
+	my @filenames = grep { /$search/ } map { $_->to_rel($root)->to_string } @files;
 	my @filenames_abs = map { path($root, $_)->to_abs->to_string } @filenames;
 	foreach my $filename (@filenames_abs) {
 		my $res = $c->ipc->send_message(
