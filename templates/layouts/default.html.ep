@@ -28,20 +28,22 @@
 		<div id="drawer">
 			% if ($username) {
 			<div id="user" class="panel">
-				% if ($username && $username eq $req_user) {
-				<div class="button"><a href="<%= url_for('new_page', catchall => '')->query(back_to => $redirect) %>">New</a></div>
-				% if ($editable) {
-				<div class="button"><a href="<%= url_for('edit_page', catchall => get_slug)->query(back_to => $redirect) %>">Edit</a></div>
-				% }
-				<div class="button"><a href="<%= url_for('list_files') %>">Files</a></div>
-				<div class="button"><a href="/style">Style</a></div>
-				<div class="button"><a href="/private/stats">Stats</a></div>
-				<div class="button"><a href="<%= url_for('list_settings') %>">Settings</a></div>
-				% } else {
-				<div class="button"><a href="<%= url_for('my_site') %>" id="my-site">My Site</a></div>
-				% }
-				<div class="button"><a href="https://blip.town/faq">Help</a></div>
-				<div class="button"><a href="<%= url_for('user_logout') %>">Log Out</a></div>
+				<ul>
+					% if ($username && $username eq $req_user) {
+					<li><a href="<%= url_for('new_page', catchall => '')->query(back_to => $redirect) %>">New</a></li>
+					% if ($editable) {
+					<li><a href="<%= url_for('edit_page', catchall => get_slug)->query(back_to => $redirect) %>">Edit</a></li>
+					% }
+					<li><a href="<%= url_for('list_files') %>">Files</a></li>
+					<li><a href="/style">Style</a></li>
+					<li><a href="/private/stats">Stats</a></li>
+					<li><a href="<%= url_for('list_settings') %>">Settings</a></li>
+					% } else {
+					<li><a href="<%= url_for('my_site') %>" id="my-site">My Site</a></li>
+					% }
+					<li><a href="https://blip.town/faq">Help</a></li>
+					<li><a href="<%= url_for('user_logout') %>">Log Out</a></li>
+				</ul>
 			</div>
 			% } else {
 			<div id="join" class="panel">
