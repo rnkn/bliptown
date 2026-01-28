@@ -279,7 +279,11 @@ input#drawer-toggle:checked ~ #viewport #drawer-toggle {
 	gap: 1em;
 }
 
-#drawer .extras {
+#drawer #join .extras {
+	margin-left: auto;
+}
+
+#drawer #login form {
 	margin-left: auto;
 }
 
@@ -323,7 +327,6 @@ label#nav-toggle:before {
 	padding: 1em;
 	flex-direction: column;
 	flex-wrap: wrap;
-	align-content: flex-end;
 	gap: 1em;
 	font-size: initial;
 	font-family: sans-serif;
@@ -336,7 +339,7 @@ label#nav-toggle:before {
 
 #drawer #join,
 #drawer #login {
-	transition: transform 0.5s ease;
+	transition: transform 0.3s ease;
 }
 
 input#drawer-switch-login:checked ~ #drawer #join,
@@ -344,7 +347,7 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	transform: translateX(-100%);
 }
 
-#drawer > a, #drawer > label {
+#drawer > a {
 	font-size: 0.9em;
 	color: rgba(0,0,0,0.5);
 }
@@ -859,10 +862,10 @@ details[open] > summary::before {
 	:root {
 		--drawer-height: 11rem;
 	}
-	#login form {
+	#drawer form {
 		flex-direction: column;
 	}
-	#login form input {
+	#drawer form input {
 		width: 100%;
 	}
 }

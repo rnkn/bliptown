@@ -22,8 +22,8 @@
 		%== $head
 	</head>
 	<body>
-		<input type="radio" id="drawer-switch-login" name="drawer-switch" hidden>
-		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden checked>
+		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden>
+		<input type="radio" id="drawer-switch-login" name="drawer-switch" hidden checked>
 		<input type="checkbox" id="drawer-toggle" hidden>
 		<div id="drawer">
 			% if ($username) {
@@ -44,27 +44,28 @@
 				<div class="button"><a href="<%= url_for('user_logout') %>">Log Out</a></div>
 			</div>
 			% } else {
-			% if ($show_join) {
 			<div id="join" class="panel">
 				<form method="POST" action="<%= url_for('user_join') %>">
 					<div class="input">
-						<input type="text" placeholder="username" pattern="[a-zA-Z][a-zA-Z0-9_\-]*" name="username" maxlength="31" required>
+						<input type="text" placeholder="username" pattern="[a-zA-Z][a-zA-Z0-9_\-]*" name="username" maxlength="31" required disabled>
 					</div>
 					<div class="input">
-						<input type="email" placeholder="email" name="email" maxlength="254" required>
+						<input type="email" placeholder="email" name="email" maxlength="254" required disabled>
 					</div>
 					<div class="input">
-						<input type="password" placeholder="password" name="password" minlength="8" maxlength="256" required>
+						<input type="password" placeholder="password" name="password" minlength="8" maxlength="256" required disabled>
 					</div>
 					<input name="back_to" value="<%= url_for %>" hidden>
-					<button type="submit">Join</button>
+					<button type="submit" disabled>Join</button>
 				</form>
 				<div class="extras">
 					<label id="drawer-switch-login" class="switch" for="drawer-switch-login">Login</label>
 				</div>
 			</div>
-			% }
 			<div id="login" class="panel">
+				<div class="extras">
+					<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
+				</div>
 				<form action="<%= url_for('user_login') %>" method="POST">
 					<div>
 						<input type="text" placeholder="username" name="username" value="<%= $username %>" required>
@@ -80,11 +81,6 @@
 					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit">Login</button>
 				</form>
-				<div class="extras">
-					% if ($show_join) {
-					<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
-					% }
-				</div>
 			</div>
 			% }
 		</div>
