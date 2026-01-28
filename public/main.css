@@ -340,6 +340,7 @@ input#drawer-switch-login:checked ~ #drawer #login {
 #drawer #user.panel ul {
 	margin: 0;
 	margin-left: auto;
+	margin-right: 1em;
 	display: flex;
 	flex-direction: column;
 	flex-wrap: wrap;
