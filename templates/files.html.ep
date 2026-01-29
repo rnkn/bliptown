@@ -75,7 +75,7 @@
 				<ul class="controls">
 					<li>
 						<form id="rename" method="get" action="<%= url_for('rename_file', catchall => $file->{filename} ) %>">
-							<input type="text" name="to" value="<%= $file->{filename} %>">
+							<input type="text" name="name" value="<%= $file->{filename} %>">
 							<button type="submit">Rename</button>
 						</form>
 					</li>

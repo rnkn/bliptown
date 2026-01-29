@@ -141,7 +141,7 @@ sub rename_file {
 	my $file = $c->get_file($old_slug);
 	return $c->reply->not_found unless $file;
 	my $filename = $file->to_abs->to_string;
-	my $rename_to = $c->param('to');
+	my $rename_to = $c->param('name');
 	my $new_filename = path($root, $rename_to)->to_abs->to_string;
 	my $res = $c->ipc->send_message(
 		{
