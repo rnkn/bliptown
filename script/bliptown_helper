@@ -185,6 +185,14 @@ sub delete_file {
 	return "Deleted file: $filename"
 }
 
+sub make_directory {
+	my $payload = shift;
+	my $dirname = $payload->{filename};
+	my $path = path $dirname;
+	$path->make_path or die "Cannot create directory: $dirname ($!)";
+	return "Created directory: $dirname";
+}
+
 sub git_init {
 	my $payload = shift;
 	my $username = $payload->{username};
@@ -294,6 +302,7 @@ my %allowed_commands = (
 	rename_file			=> \&rename_file,
 	delete_file			=> \&delete_file,
 	backup_file			=> \&backup_file,
+	make_directory		=> \&make_directory,
 	git_commit			=> \&git_commit,
 	git_log				=> \&git_log,
 	git_show			=> \&git_show,
