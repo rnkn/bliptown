@@ -132,15 +132,6 @@ sub get_uid_gid {
 	return ($uid, $gid);
 }
 
-sub delete_empty_dirs {
-	my $username = shift;
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
-	foreach my $dir (@{$root->list_tree({ dir => 1 })}) {
-		next unless -d $dir;
-		rmdir $dir;
-	}
-}
-
 sub write_blob {
 	my $payload = shift;
 	my $filename = $payload->{filename};
@@ -353,7 +344,6 @@ sub handle_conn {
 			die "Command not permitted: $command";
 
 		$res = $func->($payload);
-		delete_empty_dirs($username);
 	};
 	$err = $@;
 
