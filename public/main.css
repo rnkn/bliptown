@@ -398,7 +398,7 @@ input#message-close:checked ~ label#message-close {
 
 a.exit {
 	font-size: 0.9em;
-	border-bottom: none;
+	border: 0;
 }
 
 a.exit:before {
@@ -506,6 +506,14 @@ a.exit:before {
 
 /* Files controls  */
 
+#files a {
+	border-bottom-color: transparent;
+}
+
+#files a:hover {
+	border-bottom-color: currentcolor;
+}
+
 nav #controls {
 	margin: 1em 0;
 }
@@ -558,6 +566,14 @@ input#create-directory-toggle:checked ~ #create-directory-controls {
 }
 
 /* Settings */
+
+#settings a {
+	border-bottom-color: transparent;
+}
+
+#settings a:hover {
+	border-bottom-color: currentcolor;
+}
 
 #settings form ul {
 	padding: 0;
@@ -737,14 +753,6 @@ main:has(.cover) footer {
 
 .row-hover table tbody tr:hover {
 	background-color: var(--row-hover-color);
-}
-
-.table a {
-	border: 1px solid transparent;
-}
-
-.table a:hover {
-	border-bottom-color: currentcolor;
 }
 
 .table .sort {
