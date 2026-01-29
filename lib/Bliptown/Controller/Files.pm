@@ -202,6 +202,26 @@ sub delete_file {
 	return $c->redirect_to('list_files');
 }
 
+sub backup_file {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $filename = $c->param('catchall');
+	my $file = path($c->config->{user_home}, $username, $filename);
+	return $c->reply->not_found unless -f $file;
+	my $redirect = $c->param('back_to') // $c->url_for('list_files');
+	my $res = $c->ipc->send_message(
+		{
+			command => 'backup_file',
+			username => $username,
+			filename => $file->to_string
+		});
+
+	return $c->reply->exception($res->{error}) if $res->{error};
+
+	$c->flash(info => "${filename}~ created");
+	return $c->redirect_to($redirect);
+}
+
 sub upload_files {
 	my $c = shift;
 	my $username = $c->session('username');
