@@ -183,9 +183,12 @@ sub rename_file {
 sub delete_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
-	my $path = path $filename;
-	$path->remove or die "Cannot delete file: $filename ($!)";
-	return "Deleted file: $filename"
+	if (-d $filename) {
+		rmdir $filename or die "Cannot delete directory: $filename ($!)";;
+	} else {
+		unlink $filename or die "Cannot delete file: $filename ($!)";
+	}
+	return "Deleted: $filename"
 }
 
 sub make_directory {
