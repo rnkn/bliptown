@@ -24,12 +24,15 @@ sub list_files {
 	my $delete = $c->param('delete');
 	my $replace = $c->param('replace');
 	my $sort = $c->param('sort') // 'name';
+	my $slug = $c->param('catchall');
 	my $username = $c->session('username');
 	my $locked = $username eq 'demo' ? 1 : 0;
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
 	);
 	my $root = path($c->config->{user_home}, $username);
+	my $dir = $slug ? path($root, $slug) : $root;
+	return $c->reply->not_found unless -d $dir;
 
 	my $search_re = glob_to_regex_string($search) if $search;
 
@@ -59,25 +62,30 @@ sub list_files {
 	}
 
 	my @files;
-	foreach my $file (@{$root->list_tree}) {
+	my $max_depth = $search_re ? undef : 1;
+	my $tree = $dir->list_tree({ dir => 1, max_depth => $max_depth });
+	foreach my $file (@$tree) {
 		my $filename = decode('utf-8', $file);
 		my @stats = stat($filename);
-		my $rel_file = $file->to_rel($root)->to_string;
-		my $rel_filename = decode('utf-8', $rel_file);
-		my $url = $rel_filename; $url =~ s/\.(md|txt|html|css|js)$//;
+		my $rel_root_filename = decode('utf-8', $file->to_rel($root)->to_string);
+		my $rel_dir_filename = decode('utf-8', $file->to_rel($dir)->to_string);
+		my $is_dir = -d $filename;
+		my $url = $rel_root_filename =~ s/\.(md|txt|html|css|js)$//r;
 
 		push @files, {
-			filename => $rel_filename,
+			abs_filename => $rel_root_filename,
+			rel_filename => $rel_dir_filename,
+			is_dir => $is_dir,
 			url => $url,
 			size => $stats[7],
 			mtime => $stats[9],
 		}
 	};
 
-	@files = grep { $_->{filename} =~ $search_re } @files if $search_re;
+	@files = grep { $_->{rel_filename} =~ $search_re } @files if $search_re;
 
 	my %sorting = (
-		name => 'filename',
+		name => 'rel_filename',
 		size => 'size',
 		date => 'mtime'
 	);
@@ -96,15 +104,63 @@ sub list_files {
 		$file->{mtime} = strftime('%Y-%m-%d %H:%M %z', localtime($file->{mtime}));
 	}
 
+	my @breadcrumbs;
+	unless ($dir eq $root) {
+		my @breadcrumb_dirs = @{$dir->to_rel($root)};
+
+		while (@breadcrumb_dirs) {
+			my $path = join '/', @breadcrumb_dirs;
+			my $name = pop @breadcrumb_dirs;
+			my %crumb = (
+				name => $name,
+				path => $path,
+			);
+			push @breadcrumbs, \%crumb;
+		}
+		@breadcrumbs = reverse @breadcrumbs;
+	}
+
 	$c->stash(
 		template => 'files',
 		title => 'Files',
 		show_sidebar => 1,
 		locked => $locked,
 		redirect => $c->url_for,
+		breadcrumbs => \@breadcrumbs,
 		files => \@files,
 	);
 	return $c->render;
+}
+
+sub file_action {
+	my $c = shift;
+	my $action = $c->param('action');
+
+	if ($action eq 'new_directory') {
+		my $name = $c->param('name');
+		return $c->new_directory($name);
+	}
+}
+
+sub new_directory {
+	my ($c, $name) = @_;
+	my $username = $c->session('username');
+	my $dir = path($c->config->{user_home}, $username, $name);
+	my $redirect = $c->url_for('list_files', catchall => $name);
+	return $c->redirect_to($redirect) if -d $dir;
+
+	my $res = $c->ipc->send_message(
+		{
+			command => 'make_directory',
+			username => $username,
+			filename => $dir->to_string,
+		}
+	);
+
+	return $c->reply->exception($res->{error}) if $res->{error};
+
+	$c->flash(info => "Created directory $name");
+	return $c->redirect_to($redirect);
 }
 
 sub rename_files_regex {
@@ -136,6 +192,8 @@ sub rename_files_regex {
 sub rename_file {
 	my $c = shift;
 	my $username = $c->session('username');
+	my $redirect = $c->param('back_to')
+		// $c->url_for('list_files', catchall => '');
 	my $root = path($c->config->{user_home}, $username);
 	my $old_slug = $c->param('catchall');
 	my $file = $c->get_file($old_slug);
@@ -155,7 +213,7 @@ sub rename_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 
 	$c->flash(info => "$old_slug renamed to $rename_to");
-	return $c->redirect_to('list_files');
+	return $c->redirect_to($redirect);
 }
 
 sub delete_files_regex {
@@ -183,11 +241,9 @@ sub delete_file {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
-	my $filename = path(
-		$c->config->{user_home},
-		$username,
-		$slug
-	)->to_abs->to_string;
+	my $redirect = $c->param('back_to')
+		// $c->url_for('list_files', catchall => '');
+	my $filename = path($c->config->{user_home}, $username, $slug)->to_abs->to_string;
 	my $res = $c->ipc->send_message(
 		{
 			command => 'delete_file',
@@ -199,7 +255,7 @@ sub delete_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 
 	$c->flash(info => "$slug deleted");
-	return $c->redirect_to('list_files');
+	return $c->redirect_to($redirect);
 }
 
 sub backup_file {
@@ -224,8 +280,12 @@ sub backup_file {
 
 sub upload_files {
 	my $c = shift;
+	my $slug = $c->param('catchall');
+	my $redirect = $c->param('back_to')
+		// $c->url_for('list_files', catchall => '');
 	my $username = $c->session('username');
 	my $root = path($c->config->{user_home}, $username);
+	my $dir = $slug ? path($root, $slug) : $root;
 	foreach my $upload (@{$c->req->uploads}) {
 		my $filename = $upload->filename;
 		next unless $filename;
@@ -234,7 +294,7 @@ sub upload_files {
 			$c->res->code(413);
 			return $c->redirect_to('list_files');
 		}
-		my $path = path($root, $filename);
+		my $path = path($dir, $filename);
 		if (-f $path) {
 			$c->flash(warning => "$filename already exists!");
 			$c->res->code(409);

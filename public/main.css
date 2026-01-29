@@ -528,7 +528,8 @@ nav #controls #search-controls label#additional-controls-toggle {
 	margin-left: auto;
 }
 
-nav #controls #additional-controls {
+nav #controls #additional-controls,
+#breadcrumbs #create-directory-controls {
 	display: none;
 	background-color: var(--controls-color);
 	margin: 8px 0;
@@ -550,6 +551,10 @@ nav #additional-controls hr {
 
 nav #additional-controls a:hover {
 	border-bottom: 1px solid;
+}
+
+input#create-directory-toggle:checked ~ #create-directory-controls {
+	display: block;
 }
 
 /* Settings */

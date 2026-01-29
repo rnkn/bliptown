@@ -53,6 +53,20 @@
 </nav>
 <main id="files">
 	<section class="one-column">
+		<div id="breadcrumbs">
+			<input type="checkbox" id="create-directory-toggle" hidden>
+			<a href="<%= url_for('list_files', catchall => '') %>">home</a> /
+			% foreach my $crumb (@$breadcrumbs) {
+			<a href="<%= url_for('list_files', catchall => $crumb->{path}) %>"><%= $crumb->{name} %></a> /
+			% }
+			<label id="create-directory-toggle" for="create-directory-toggle">+</label>
+			<div id="create-directory-controls">
+				<form id="create-directory" method="post" action="<%= url_for('file_action')->query(action => 'new_directory') %>">
+					<input placeholder="directory" name="name">
+					<button type="submit">Create</button>
+				</form>
+			</div>
+		</div>
 		<div id="list" class="table">
 			<div class="row">
 				<a href="<%= url_with->query({ sort => 'name' }) %>" class="cell sort name">&vee;</a>
@@ -63,7 +77,11 @@
 			<details name="files">
 				<summary class="row">
 					<span class="cell name">
-						%= $file->{filename}
+						% if ($file->{is_dir}) {
+						<a href="<%= url_for('list_files', catchall => $file->{abs_filename}) %>"><%= $file->{rel_filename} %></a>/
+						% } else {
+						<a href="<%= url_for('render_page', catchall => $file->{url}) %>"><%= $file->{rel_filename} %></a>
+						% }
 					</span>
 					<span class="cell size">
 						%= $file->{size}
@@ -74,22 +92,20 @@
 				</summary>
 				<ul class="controls">
 					<li>
-						<form id="rename" method="get" action="<%= url_for('rename_file', catchall => $file->{filename} ) %>">
-							<input type="text" name="name" value="<%= $file->{filename} %>">
+						<form id="rename" method="get" action="<%= url_for('rename_file', catchall => $file->{abs_filename}) %>">
+							<input type="text" name="name" value="<%= $file->{abs_filename} %>">
+							<input type="text" name="back_to" value="<%= url_for %>" hidden>
 							<button type="submit">Rename</button>
 						</form>
 					</li>
-					% unless ($file->{filename} =~ /^_|~$/) {
-					<li><a href="<%= $file->{url} %>">View</a></li>
+					% if ($file->{rel_filename} =~ /\.(md|txt|html|css|js)$/) {
+					<li><a href="<%= url_for('edit_page', catchall => $file->{url} )->query(back_to => url_for) %>">Edit</a></li>
+					<li><a href="<%= url_for('backup_file', catchall => $file->{abs_filename} )->query(back_to => url_for) %>">Backup</a></li>
 					% }
-					% if ($file->{filename} =~ /\.(md|txt|html|css|js)$/) {
-					<li><a href="<%= url_for('edit_page', catchall => $file->{url} )->query([back_to => url_for]) %>">Edit</a></li>
-					<li><a href="<%= url_for('backup_page', catchall => $file->{filename} )->query([back_to => url_for]) %>">Backup</a></li>
-					% }
-					% if ($file->{filename} =~ /\.(md|txt|html|css|js)~?$/) {
+					% if ($file->{rel_filename} =~ /\.(md|txt|html|css|js)~?$/) {
 					<li><a href="<%= url_for('render_raw', catchall => $file->{url} ) %>">Raw</a></li>
 					% }
-					<li><a class="warning" href="<%= url_for('delete_file', catchall => $file->{filename} )->query([back_to => url_for])%>">Delete</a></li>
+					<li><a class="warning" href="<%= url_for('delete_file', catchall => $file->{abs_filename} )->query(back_to => url_for)%>">Delete</a></li>
 				</ul>
 			</details>
 			% }
