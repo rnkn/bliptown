@@ -13,7 +13,7 @@
 			</small>
 		</p>
 		<ul>
-			<li><a href="<%= url_for('list_files') %>" class="exit">Files</a>
+			<li><a href="<%= url_for('list_files', catchall => '') %>" class="exit">Files</a>
 		</ul>
 	</menu>
 </nav>
