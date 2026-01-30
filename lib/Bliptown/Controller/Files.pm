@@ -158,6 +158,7 @@ sub new_directory {
 	);
 
 	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
 	$c->flash(info => "Created directory $name");
 	return $c->redirect_to($redirect);
@@ -185,6 +186,7 @@ sub rename_files_regex {
 			}
 		);
 		return $c->reply->exception($res->{error}) if $res->{error};
+		$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 	}
 	return @filenames;
 }
@@ -211,6 +213,7 @@ sub rename_file {
 	);
 
 	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
 	$c->flash(info => "$old_slug renamed to $rename_to");
 	return $c->redirect_to($redirect);
@@ -233,6 +236,7 @@ sub delete_files_regex {
 			}
 		);
 		return $c->reply->exception($res->{error}) if $res->{error};
+		$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 	}
 	return @filenames_abs;
 }
@@ -253,6 +257,7 @@ sub delete_file {
 	);
 
 	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
 	$c->flash(info => "$slug deleted");
 	return $c->redirect_to($redirect);
@@ -273,6 +278,7 @@ sub backup_file {
 		});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
 	$c->flash(info => "${filename}~ created");
 	return $c->redirect_to($redirect);
@@ -310,6 +316,7 @@ sub upload_files {
 			}
 		);
 		return $c->reply->exception($res->{error}) if $res->{error};
+		$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 	}
 	return $c->redirect_to('list_files');
 }
