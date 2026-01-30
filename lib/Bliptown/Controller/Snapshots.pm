@@ -62,7 +62,7 @@ sub restore_snapshot {
 
 	my $res_hash = $res->{response};
 	$c->flash(info => "Snapshot $res_hash restored");
-	return $c->redirect_to($c->url_for('list_files')->query(filter => "snapshots/$res_hash"));
+	return $c->redirect_to($c->url_for('list_files')->query(search => "snapshots/$res_hash"));
 }
 
 sub download_snapshot {
