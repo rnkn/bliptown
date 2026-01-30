@@ -517,6 +517,10 @@ a.exit:before {
 	border-bottom-color: currentcolor;
 }
 
+#files #breadcrumbs {
+	border-bottom: 1px solid;
+}
+
 nav #controls {
 	margin: 1em 0;
 }
