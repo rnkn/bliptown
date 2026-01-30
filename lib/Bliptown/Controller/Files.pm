@@ -146,7 +146,7 @@ sub file_action {
 sub new_directory {
 	my ($c, $slug, $name) = @_;
 	my $username = $c->session('username');
-	my $rel_dir = join '/', ($slug, $name);
+	my $rel_dir = $slug ? join '/', ($slug, $name) : $name;
 	my $dir = path($c->config->{user_home}, $username, $rel_dir);
 	my $redirect = $c->url_for('list_files', catchall => $rel_dir);
 	return $c->redirect_to($redirect) if -d $dir;
