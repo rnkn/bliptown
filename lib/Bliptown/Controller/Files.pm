@@ -248,12 +248,16 @@ sub delete_file {
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
-	my $filename = path($c->config->{user_home}, $username, $slug)->to_abs->to_string;
+	my $file = path($c->config->{user_home}, $username, $slug)->to_abs;
+	if (-d $file && @{$file->list({ dir => 1 })} > 0) {
+		$c->flash(info => "Directory $slug not empty!");
+		return $c->redirect_to($redirect);
+	}
 	my $res = $c->ipc->send_message(
 		{
 			command => 'delete_file',
 			username => $username,
-			filename => $filename,
+			filename => $file->to_string,
 		}
 	);
 
