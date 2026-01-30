@@ -200,10 +200,17 @@ sub rename_file {
 		// $c->url_for('list_files', catchall => '');
 	my $root = path($c->config->{user_home}, $username);
 	my $slug = $c->param('catchall');
-	my $filename = path($root, $slug)->to_abs->to_string;
-	return $c->reply->not_found unless -e $filename;
+	my $file = path($root, $slug);
+	my $filename = $file->to_abs->to_string;
+	return $c->reply->not_found unless -e $file;
 	my $rename_to = $c->param('name');
 	my $new_filename = path($root, $rename_to)->to_abs->to_string;
+
+	if (-d $filename && $new_filename =~ /^$filename(\/|$)/) {
+		$c->flash(info => "Cannot move $slug into itself!");
+		return $c->redirect_to($redirect);
+	}
+
 	my $res = $c->ipc->send_message(
 		{
 			command => 'rename_file',
