@@ -223,7 +223,13 @@ sub rename_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
-	$c->flash(info => "File $slug renamed to $rename_to");
+	my $message;
+	if (-d $filename) {
+		$message = "Directory $slug renamed to $rename_to";
+	} else {
+		$message = "File $slug renamed to $rename_to"
+	}
+	$c->flash(info => $message);
 	return $c->redirect_to($redirect);
 }
 
