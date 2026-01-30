@@ -495,12 +495,14 @@ a.exit:before {
 	opacity: 1;
 }
 
+#create-directory,
 #list #rename {
 	width: 20rem;
 	display: flex;
 	gap: 8px;
 }
 
+#create-directory input,
 #list #rename input {
 	width: 100%;
 }
