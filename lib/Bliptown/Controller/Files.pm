@@ -216,7 +216,7 @@ sub rename_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
-	$c->flash(info => "$slug renamed to $rename_to");
+	$c->flash(info => "File $slug renamed to $rename_to");
 	return $c->redirect_to($redirect);
 }
 
@@ -265,7 +265,7 @@ sub delete_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
-	$c->flash(info => "$slug deleted");
+	$c->flash(info => "File $slug deleted");
 	return $c->redirect_to($redirect);
 }
 
@@ -286,7 +286,7 @@ sub backup_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
-	$c->flash(info => "${filename}~ created");
+	$c->flash(info => "File ${filename}~ created");
 	return $c->redirect_to($redirect);
 }
 
@@ -308,7 +308,7 @@ sub upload_files {
 		}
 		my $path = path($dir, $filename);
 		if (-f $path) {
-			$c->flash(warning => "$filename already exists!");
+			$c->flash(warning => "File $filename exists!");
 			$c->res->code(409);
 			return $c->redirect_to('list_files');
 		};
