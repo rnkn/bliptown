@@ -68,11 +68,13 @@
 			</div>
 		</div>
 		<div id="list" class="table">
+			% if (scalar @$files) {
 			<div class="row">
 				<a href="<%= url_with->query({ sort => 'name' }) %>" class="cell sort name">&vee;</a>
 				<a href="<%= url_with->query({ sort => 'size' }) %>" class="cell sort size">&vee;</a>
 				<a href="<%= url_with->query({ sort => 'date' }) %>" class="cell sort date">&vee;</a>
 			</div>
+			% }
 			% foreach my $file (@$files) {
 			<details name="files">
 				<summary class="row">
