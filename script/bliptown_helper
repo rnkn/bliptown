@@ -184,6 +184,7 @@ sub delete_file {
 	my $payload = shift;
 	my $filename = $payload->{filename};
 	if (-d $filename) {
+		unlink glob("$filename/.*");
 		rmdir $filename or die "Cannot delete directory: $filename ($!)";;
 	} else {
 		unlink $filename or die "Cannot delete file: $filename ($!)";
