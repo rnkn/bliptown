@@ -171,10 +171,13 @@ sub rename_file {
 	my $path = path $filename;
 	my $new_filename = $payload->{new_filename};
 	my $new_path = path $new_filename;
+	if (-d $new_path && $new_path->list > 0) {
+		return "Skipping nonempty directory: $new_path";
+	}
 	my $dir = $new_path->dirname;
-	$dir->make_path or die "Cannot creat path: $dir ($!)";
+	$dir->make_path or die "Cannot create path: $dir ($!)";
 	$path->move_to($new_path) or die "Cannot move file: $path ($!)";
-	return "Renamed file: $filename -> $new_filename"
+	return "Renamed file: $filename -> $new_filename";
 }
 
 sub delete_file {
