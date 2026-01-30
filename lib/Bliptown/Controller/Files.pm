@@ -228,6 +228,7 @@ sub delete_files_regex {
 	my @files = $dir->list_tree({ dir => 1 })->each;
 	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @files;
 	my @filenames_abs = map { path($dir, $_)->to_abs->to_string } @filenames;
+	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
 	foreach my $filename (@filenames_abs) {
 		my $res = $c->ipc->send_message(
 			{
