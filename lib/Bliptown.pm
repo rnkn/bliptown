@@ -316,7 +316,7 @@ sub startup {
 	$protected->get('/edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');
 	$protected->post('/edit/*catchall')->to(controller => 'Pages', action => 'save_page', catchall => '')->name('save_page');
 
-	$protected->post('/files')->to(controller => 'Files', action => 'file_action')->name('file_action');
+	$protected->post('/files/*catchall')->to(controller => 'Files', action => 'file_action')->name('file_action');
 	$protected->get('/files/*catchall')->to(controller => 'Files', action => 'list_files', catchall => '')->name('list_files');
 	$protected->get('/rename/*catchall')->to(controller => 'Files', action => 'rename_file', catchall => '')->name('rename_file');
 	$protected->get('/delete/*catchall')->to(controller => 'Files', action => 'delete_file', catchall => '')->name('delete_file');

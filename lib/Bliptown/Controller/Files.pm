@@ -134,19 +134,21 @@ sub list_files {
 
 sub file_action {
 	my $c = shift;
+	my $slug = $c->param('catchall');
 	my $action = $c->param('action');
 
 	if ($action eq 'new_directory') {
 		my $name = $c->param('name');
-		return $c->new_directory($name);
+		return $c->new_directory($slug, $name);
 	}
 }
 
 sub new_directory {
-	my ($c, $name) = @_;
+	my ($c, $slug, $name) = @_;
 	my $username = $c->session('username');
-	my $dir = path($c->config->{user_home}, $username, $name);
-	my $redirect = $c->url_for('list_files', catchall => $name);
+	my $rel_dir = join '/', ($slug, $name);
+	my $dir = path($c->config->{user_home}, $username, $rel_dir);
+	my $redirect = $c->url_for('list_files', catchall => $rel_dir);
 	return $c->redirect_to($redirect) if -d $dir;
 
 	my $res = $c->ipc->send_message(

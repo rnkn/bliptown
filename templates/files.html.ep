@@ -61,7 +61,7 @@
 			% }
 			<label id="create-directory-toggle" for="create-directory-toggle">+</label>
 			<div id="create-directory-controls">
-				<form id="create-directory" method="post" action="<%= url_for('file_action')->query(action => 'new_directory') %>">
+				<form id="create-directory" method="post" action="<%= url_for->query(action => 'new_directory') %>">
 					<input placeholder="directory" name="name">
 					<button type="submit">Create</button>
 				</form>
