@@ -199,10 +199,9 @@ sub rename_file {
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
 	my $root = path($c->config->{user_home}, $username);
-	my $old_slug = $c->param('catchall');
-	my $file = $c->get_file($old_slug);
-	return $c->reply->not_found unless $file;
-	my $filename = $file->to_abs->to_string;
+	my $slug = $c->param('catchall');
+	my $filename = path($root, $slug)->to_abs->to_string;
+	return $c->reply->not_found unless -e $filename;
 	my $rename_to = $c->param('name');
 	my $new_filename = path($root, $rename_to)->to_abs->to_string;
 	my $res = $c->ipc->send_message(
@@ -217,7 +216,7 @@ sub rename_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
 
-	$c->flash(info => "$old_slug renamed to $rename_to");
+	$c->flash(info => "$slug renamed to $rename_to");
 	return $c->redirect_to($redirect);
 }
 
