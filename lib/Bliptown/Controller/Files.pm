@@ -40,7 +40,7 @@ sub list_files {
 		my $res = $c->delete_files_regex(
 			{
 				username => $username,
-				root => $root,
+				dir => $dir,
 				search => $search_re,
 			});
 		my $message = $res > 1 ? "$res files deleted" : "$res file deleted";
@@ -52,7 +52,7 @@ sub list_files {
 		my $res = $c->rename_files_regex(
 			{
 				username => $username,
-				root => $root,
+				dir => $dir,
 				search => $search_re,
 				replace => $replace
 			});
@@ -166,16 +166,16 @@ sub new_directory {
 sub rename_files_regex {
 	my ($c, $args) = @_;
 	my $username = $args->{username};
-	my $root =$args->{root};
+	my $dir = $args->{dir};
 	my $search = $args->{search};
 	my $replace = $args->{replace};
-	my @files = $root->list_tree->each;
-	my @filenames = grep { /$search/ } map { $_->to_rel($root)->to_string } @files;
+	my @files = $dir->list_tree({ dir => 1 })->each;
+	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @files;
 	foreach my $filename (@filenames) {
 		my ($old_filename, $new_filename) = ($filename, $filename);
-		$old_filename = path($root, $old_filename)->to_abs->to_string;
+		$old_filename = path($dir, $old_filename)->to_abs->to_string;
 		$new_filename =~ s/$search/$replace/g;
-		$new_filename = path($root, $new_filename)->to_abs->to_string;
+		$new_filename = path($dir, $new_filename)->to_abs->to_string;
 		my $res = $c->ipc->send_message(
 			{
 				command => 'rename_file',
@@ -219,11 +219,11 @@ sub rename_file {
 sub delete_files_regex {
 	my ($c, $args) = @_;
 	my $username = $args->{username};
-	my $root =$args->{root};
+	my $dir =$args->{dir};
 	my $search = $args->{search};
-	my @files = $root->list_tree->each;
-	my @filenames = grep { /$search/ } map { $_->to_rel($root)->to_string } @files;
-	my @filenames_abs = map { path($root, $_)->to_abs->to_string } @filenames;
+	my @files = $dir->list_tree({ dir => 1 })->each;
+	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @files;
+	my @filenames_abs = map { path($dir, $_)->to_abs->to_string } @filenames;
 	foreach my $filename (@filenames_abs) {
 		my $res = $c->ipc->send_message(
 			{
