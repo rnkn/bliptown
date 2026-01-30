@@ -435,8 +435,8 @@ a.exit:before {
 
 /* Lists (Files, Snapshots)  */
 
-#list {
-	margin: 1em 0;
+#snapshots #clone {
+	margin-bottom: 1em;
 }
 
 #list .row .controls {
