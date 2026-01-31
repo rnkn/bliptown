@@ -11,6 +11,7 @@ sub track_visit {
 
 	my $ip = $tx->req->headers->header('X-Forwarded-For') //
 		$tx->remote_address;
+	my $vhost = $tx->req->headers->host;
 	my $country_obj = eval { $c->geoip->country(ip => $ip) };
 	my $country = $country_obj->country->name if $country_obj;
 	my $ip_hash = hmac_sha1_hex($ip, $c->app->secrets->[0]);
@@ -26,6 +27,7 @@ sub track_visit {
 		$c->param('ref')				// '',
 		$tx->req->headers->user_agent	// '',
 		$country						// '',
+		$vhost							// '',
 	);
 
 	$c->log_visit(\@data);
