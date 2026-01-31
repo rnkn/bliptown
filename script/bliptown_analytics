@@ -26,7 +26,7 @@ sub stat_hits_visitors {
 			$val = $val == 1 ? 'Mobile' : 'Desktop';
 		}
 		if ($key eq 'referrer' && $val) {
-			my $vhost = $e->{vhost};
+			my $vhost = $e->{vhost} // '';
 			next if $val =~ m{^https?://\Q$vhost\E(?:[:/]|$)};
 		}
 		$val = "[$val]($val)" if $key eq 'path_query' or $key eq 'referrer';
