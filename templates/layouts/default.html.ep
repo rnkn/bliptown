@@ -13,7 +13,8 @@
 		% if ($user_style) {
 		<link href="/style.css" rel="stylesheet" sandbox>
 		% }
-		<link rel="icon" type="image/png" href="/favicon.png" />
+		<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png" />
+		<link rel="icon" type="image/x-icon" sizes="32x32" href="/favicon.ico" />
 		<style>
 			body:hover #analytics, body:focus-within #analytics {
 				background-image: url("<%= url_for('track_visit', rand => $rand )->query(ref => $c->req->headers->referrer) %>");
