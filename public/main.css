@@ -674,19 +674,23 @@ main:has(.cover) footer {
 	margin: 0;
 }
 
-.gallery-2-columns {
+.gallery-2-columns,
+.gallery-two-columns {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	gap: 1em;
 }
 
-.gallery-columns, .gallery-3-columns {
+.gallery-columns,
+.gallery-3-columns,
+.gallery-three-columns {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 1em;
 }
 
-.gallery-4-columns {
+.gallery-4-columns,
+.gallery-four-columns {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 	gap: 1em;
@@ -695,7 +699,10 @@ main:has(.cover) footer {
 .gallery-columns > p,
 .gallery-2-columns > p,
 .gallery-3-columns > p,
-.gallery-4-columns > p {
+.gallery-4-columns > p,
+.gallery-two-columns > p,
+.gallery-three-columns > p,
+.gallery-four-columns > p {
 	margin: 0;
 }
 
