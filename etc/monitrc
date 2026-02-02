@@ -21,7 +21,9 @@ check host rnkn.xyz with address rnkn.xyz
 	if failed port 443 protocol https for 3 cycles then alert
 
 check process bliptown pidfile /tmp/bliptown.pid
+	start program = "/usr/sbin/rcctl start bliptown"
 	if not exist for 3 cycles then alert
+	if not exist for 3 cycles then start
 
 check process bliptown_helper matching "perl:? /usr/local/www/bliptown/script/bliptown_helper\[master\]"
 	start program = "/usr/sbin/rcctl start bliptown_helper"
@@ -29,13 +31,19 @@ check process bliptown_helper matching "perl:? /usr/local/www/bliptown/script/bl
 	if not exist for 3 cycles then start
 
 check process sshd pidfile /var/run/sshd.pid
+	start program = "/usr/sbin/rcctl start sshd"
 	if not exist for 3 cycles then alert
+	if not exist for 3 cycles then start
 
 check process relayd matching "/usr/sbin/relayd"
+	start program = "/usr/sbin/rcctl start relayd"
 	if not exist for 3 cycles then alert
+	if not exist for 3 cycles then start
 
 check process httpd matching "/usr/sbin/httpd"
+	start program = "/usr/sbin/rcctl start httpd"
 	if not exist for 3 cycles then alert
+	if not exist for 3 cycles then start
 
 check file doas.conf path /etc/doas.conf
 	if failed uid 0 then alert
