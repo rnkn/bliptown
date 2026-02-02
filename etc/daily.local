@@ -88,6 +88,11 @@ staging_db="/var/db/bliptown-staging/users.db"
 echo "Copied: $staging_db"
 echo
 
-echo "Flushing rate-limited IPs"
+echo "Creating /software.txt:"
+/usr/sbin/pkg_info -m > /home/bliptown/users/mayor/software.txt
+echo "Done"
+echo
+
+echo "Flushing rate-limited IPs:"
 /sbin/pfctl -t rate_limit -T expire 86400
 echo "Done"
