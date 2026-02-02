@@ -641,6 +641,11 @@ main:has(.cover) footer {
 	max-width: 46em;
 }
 
+.two-columns {
+	column-count: 2;
+	column-gap: 1em;
+}
+
 .wide {
 	max-width: 100%;
 }
