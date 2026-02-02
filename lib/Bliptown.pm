@@ -156,10 +156,7 @@ sub startup {
 	);
 
 	my %accesslogs;
-	$SIG{USR1} = sub {
-		undef %accesslogs;
-		$app->log->info('Logfile handler rotated');
-	};
+	$SIG{USR1} = sub { undef %accesslogs };
 
 	$app->helper(
 		accesslog => sub {
