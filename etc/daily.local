@@ -64,8 +64,8 @@ do
 done
 echo
 
-echo "Reloading relayd:"
-/usr/sbin/rcctl reload relayd
+echo "Restarting relayd:"
+/usr/sbin/rcctl restart relayd
 echo
 
 echo "Expunging database dead login tokens:"
