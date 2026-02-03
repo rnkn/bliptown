@@ -7,8 +7,14 @@ sub totp_update {
 	my $totp = $c->param('totp');
 	my $redirect = $c->param('back_to') // '/';
 	my $username = $c->session('username');
-	my $totp_check = $c->totp->read_totp({ totp_secret => $secret });
-	unless ($c->totp->check_totp({ totp => $totp, totp_check => $totp_check})) {
+	my @totp_expected_pair = $c->totp->read_totp({ totp_secret => $secret });
+	unless ($c->totp->check_totp(
+				{
+					totp => $totp,
+					totp_expected_pair => \@totp_expected_pair
+				}
+			))
+	{
 		$c->flash(warning => 'TOTP incorrent');
 		return $c->redirect_to('totp_initiate');
 	}
