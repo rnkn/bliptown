@@ -109,7 +109,7 @@ sub startup {
 		get_slug => sub {
 			my $slug = shift->req->url->path->to_string;
 			$slug = url_unescape($slug);
-			$slug =~ s/^\///;
+			$slug =~ s{^/}{};
 			return $slug;
 		});
 

@@ -7,8 +7,8 @@ use Mojo::Util qw(url_unescape sha1_sum);
 
 sub process_redirects {
 	my ($file, $slug) = @_;
-	$slug =~ s/^(\/)?/\//;
-	$slug =~ s/(\/)?$//;
+	$slug =~ s{^/?}{/};
+	$slug =~ s{/?$}{};
 	my $chars = $file->slurp('utf-8');
 	my $yaml_obj = YAML::Tiny->new;
 	my $redirects = eval { $yaml_obj->read_string($chars)->[0] };
@@ -18,7 +18,7 @@ sub process_redirects {
 
 sub post_skel {
 	my ($html, $slug) = @_;
-	$slug =~ s/^\/?/\//;
+	$slug =~ s{^/?}{/};
 	my $url_path = Mojo::URL->new($slug)->to_string;
 	my $dom = Mojo::DOM->new($html);
 	foreach my $link (@{$dom->find("a[href=\"$url_path\"]")}) {
@@ -80,9 +80,9 @@ sub render_page {
 	}
 
 	my $file;
-	if (!$slug || $slug =~ /\/$/) {
+	if (!$slug || $slug =~ m{/$}) {
 		unless ($file = $c->get_file("$slug/index")) {
-			$slug =~ s/\/$//;
+			$slug =~ s{/$}{};
 			if ($file = $c->get_file($slug)) {
 				return $c->redirect_to('render_page', catchall => $slug);
 			}
@@ -179,9 +179,9 @@ sub new_page {
 		return $c->reply->not_found unless grep { $ext eq $_} @allowed_exts;
 	}
 	my $file;
-	if (!$slug || $slug =~ /\/$/) {
+	if (!$slug || $slug =~ m{/$}) {
 		unless ($c->get_file("$slug/index")) {
-			$slug =~ s/\/$//;
+			$slug =~ s{/$}{};
 			if ($c->get_file($slug)) {
 				return $c->redirect_to('edit_page', catchall => $slug);
 			}
@@ -210,12 +210,12 @@ sub edit_page {
 	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
-	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
+	my $partial_re = qr/^\Q{{\E *> *(.*?) *\Q}}\E$/;
 	my $root = path($c->config->{user_home}, $username);
 	my $file;
-	if (!$slug || $slug =~ /\/$/) {
+	if (!$slug || $slug =~ m{/$}) {
 		unless ($file = $c->get_file("$slug/index")) {
-			$slug =~ s/\/$//;
+			$slug =~ s{/$}{};
 			if ($file = $c->get_file($slug)) {
 				return $c->redirect_to('edit_page', catchall => $slug);
 			}

@@ -206,7 +206,7 @@ sub rename_file {
 	my $rename_to = $c->param('name');
 	my $new_filename = path($root, $rename_to)->to_abs->to_string;
 
-	if (-d $filename && $new_filename =~ /^$filename(\/|$)/) {
+	if (-d $filename && $new_filename =~ m{^$filename(/|$)}) {
 		$c->flash(info => "Cannot move $slug into itself!");
 		return $c->redirect_to($redirect);
 	}

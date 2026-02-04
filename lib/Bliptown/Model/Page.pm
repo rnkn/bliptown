@@ -153,7 +153,7 @@ sub process_prettydate {
 sub process_variables {
 	my ($self, $html, $args) = @_;
 	my $metadata = $args->{metadata};
-	my $variable_re = qr/\{\{ *([^>\xA0]+?) *\}\}/;
+	my $variable_re = qr/\Q{{\E *([^>\xA0]+?) *\Q}}\E/;
 
 	while ($html =~ $variable_re) {
 		my $key = $1;
@@ -172,7 +172,7 @@ sub process_variables {
 
 sub process_partials {
 	my ($self, $html, $args) = @_;
-	my $partial_re = qr/(?:<p>)?\{\{ *(?:>|&gt;) *(.*?) *\}\}(?:<\/p>)?/;
+	my $partial_re = qr{(?:<p>)?\Q{{\E *(?:>|&gt;) *(.*?) *\Q}}\E(?:</p>)?};
 
 	while ($html =~ $partial_re) {
 		my $slug = $1;
@@ -212,7 +212,7 @@ sub glob_path {
 	my $path = $slug;
 	$path =~ s/(\.md)?$/.md/;
 
-	if ($path =~ /^\//) {
+	if ($path =~ m{^/}) {
 		$path = path($args->{root}, $path)->to_abs;
 	} else {
 		my $file = Mojo::File->new($args->{filename});
