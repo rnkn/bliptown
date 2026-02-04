@@ -238,7 +238,10 @@ sub edit_page {
 		my @lines = split /\n/, $content;
 		foreach my $line (@lines) {
 			if ($line =~ $partial_re) {
-				my $include = $1; $include =~ s/\.[^.]+?$//;
+				my $include = $1;
+				$include =~ s{\.[^.]+?$}{};
+				my $abs_url = Mojo::URL->new('/' . $slug);
+				$include = Mojo::URL->new($include)->to_abs($abs_url)->to_string;
 				push @includes, $include;
 			}
 		}
