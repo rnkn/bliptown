@@ -66,9 +66,11 @@
 				</div>
 			</div>
 			<div id="login" class="panel">
+				% if ($req_user eq 'mayor') {
 				<div class="extras">
 					<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
 				</div>
+				% }
 				<form action="<%= url_for('user_login') %>" method="POST">
 					<div>
 						<input type="text" placeholder="username" name="username" value="<%= $username %>" required>
