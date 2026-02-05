@@ -12,4 +12,16 @@ sub read_file {
 	};
 }
 
+sub purge_cdn_file {
+	my ($self, $args) = @_;
+	my $url = Mojo::URL->new;
+	$url->host($ENV{BLIPTOWN_CDN_API_HOST});
+	$url->scheme('https');
+	$url->path('/purge');
+	$url->query(url => $args->{url});
+
+	my $ua = Mojo::UserAgent->new;
+	return $ua->post($url => { 'AccessKey' => $ENV{BLIPTOWN_CDN_API_KEY} })->result;
+}
+
 return 1;

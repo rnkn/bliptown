@@ -336,6 +336,12 @@ sub upload_files {
 		);
 		return $c->reply->exception($res->{error}) if $res->{error};
 		$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+
+		if ($c->app->mode eq 'production') {
+			my $cdn_url = "https://cdn.blip.town/$username/$slug/$filename";
+			my $res = $c->file->purge_cdn_file({ url => $cdn_url });
+			$c->log->error("CDN Purge failed: $cdn_url") unless $res->code == 200;
+		}
 	}
 	return $c->redirect_to('list_files');
 }
