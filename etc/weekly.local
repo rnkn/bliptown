@@ -1,5 +1,7 @@
 # -*- mode: sh; -*-
 geolite2_endpoint="https://${MAXMIND_ID}:${MAXMIND_KEY}@download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz"
+bunnycdn_endpoint="https://bunnycdn.com/api/system/edgeserverlist/plain"
+bunnycdn_ipv6_endpoint="https://bunnycdn.com/api/system/edgeserverlist/IPv6/plain"
 
 echo "Fetching GeoLite2 database:"
 ok=true
@@ -19,4 +21,19 @@ if [ $ok ]
 then
 	echo "Restarting Bliptown:"
 	/usr/sbin/rcctl restart bliptown_staging bliptown
+fi
+echo
+
+echo "Fetching Bunny CDN IPs:"
+ok=true
+/usr/bin/ftp -Vo /etc/bunnycdn.txt "$bunnycdn_endpoint" || ok=false
+/usr/bin/ftp -Vo /etc/bunnycdn-ipv6.txt "$bunnycdn_ipv6_endpoint" || ok=false
+if [ $ok ]
+then
+	echo "Done"
+	echo "Reloading pf:"
+	/sbin/pfctl -f /etc/pf.conf
+	echo "Done"
+else
+	echo "Failed"
 fi
