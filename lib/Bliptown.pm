@@ -224,7 +224,13 @@ sub startup {
 				my $path = join '/', @{$req_url->path->parts};
 				my $user_home = $c->config->{user_home};
 				my $file = path($user_home, $req_user, $path);
-				return $c->reply->file($file) if -f $file;
+				if (-f $file) {
+					my @stats = stat $file;
+					my $mtime = $stats[9];
+					my $etag = sprintf('"%x"', $mtime);
+					$c->res->headers->etag($etag);
+					return $c->reply->file($file);
+				}
 			}
 			return;
 		}
