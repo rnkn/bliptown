@@ -104,7 +104,7 @@ sub provision_cert {
 	my $payload = shift;
 	my $domain = $payload->{domain};
 	return unless $domain =~ $safe_domain_regex;
-	system('acme-client', $domain)
+	system('acme-client', $domain) == 0
 		or die "Cannot provision certificate: $domain ($!)";
 	return "Provisioned certificate: $domain";
 }
@@ -135,7 +135,7 @@ sub update_relayd_keypairs {
 		$keypair_file->spew($keypairs_str, 'utf-8')
 			or die "Cannot write keypair file: $keypair_file ($!)";
 
-		system('rcctl reload relayd') or die "Cannot reload relayd ($!)";
+		system('rcctl reload relayd') == 0 or die "Cannot reload relayd ($!)";
 	}
 	return "relayd keypairs up-to-date";
 }
