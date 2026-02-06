@@ -66,45 +66,20 @@ print "Socket created: $sock_path\n";
 my $safe_domain_regex = qr/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
 my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;
 
-sub provision_cert {
-	my $payload = shift;
-	my $domain = $payload->{domain};
-	return unless $domain =~ $safe_domain_regex;
-	system('acme-client', $domain);
-	return "Provisioned certificate: $domain";
-}
-
-sub update_domain_list {
+sub update_acme_domains {
 	my $payload = shift;
 	my $domains = $payload->{domains};
 
-	my $keypair_file = path($ENV{BLIPTOWN_KEYPAIR_FILE});
 	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
 
 	if ($has_unveil) {
-		unveil($keypair_file, "rwc");
 		unveil($acme_file, "rwc");
 		unveil();
 	}
 
-	$keypair_file->touch unless -f $keypair_file;
 	$acme_file->touch unless -f $acme_file;
 
 	my @safe_domains = grep { /$safe_domain_regex/ } @$domains;
-
-	my $keypairs_str = '';
-	foreach my $domain (@safe_domains) {
-		next unless -f path('/etc/ssl', "$domain.crt");
-		$keypairs_str .= "tls keypair \"$domain\"\n";
-	}
-
-	my $keypair_file_str = $keypair_file->slurp('utf-8');
-	unless ($keypairs_str eq $keypair_file_str) {
-		$keypair_file->spew($keypairs_str, 'utf-8')
-			or die "Cannot write keypair file: $keypair_file ($!)";
-
-		system('rcctl reload relayd');
-	}
 
 	my $acme_domains_str = '';
 	foreach my $domain (@safe_domains) {
@@ -122,7 +97,46 @@ EOF
 	unless ($acme_domains_str eq $acme_file_str) {
 		$acme_file->spew($acme_domains_str, 'utf-8');
 	}
-	return "Domain list up-to-date";
+	return "ACME domain list up-to-date";
+}
+
+sub provision_cert {
+	my $payload = shift;
+	my $domain = $payload->{domain};
+	return unless $domain =~ $safe_domain_regex;
+	system('acme-client', $domain);
+	return "Provisioned certificate: $domain";
+}
+
+sub update_relayd_keypairs {
+	my $payload = shift;
+	my $domains = $payload->{domains};
+
+	my $keypair_file = path($ENV{BLIPTOWN_KEYPAIR_FILE});
+
+	if ($has_unveil) {
+		unveil($keypair_file, "rwc");
+		unveil();
+	}
+
+	$keypair_file->touch unless -f $keypair_file;
+
+	my @safe_domains = grep { /$safe_domain_regex/ } @$domains;
+
+	my $keypairs_str = '';
+	foreach my $domain (@safe_domains) {
+		next unless -f path('/etc/ssl', "$domain.crt");
+		$keypairs_str .= "tls keypair \"$domain\"\n";
+	}
+
+	my $keypair_file_str = $keypair_file->slurp('utf-8');
+	unless ($keypairs_str eq $keypair_file_str) {
+		$keypair_file->spew($keypairs_str, 'utf-8')
+			or die "Cannot write keypair file: $keypair_file ($!)";
+
+		system('rcctl reload relayd');
+	}
+	return "relayd keypairs up-to-date";
 }
 
 sub get_uid_gid {
@@ -305,19 +319,20 @@ sub git_archive {
 }
 
 my %allowed_commands = (
-	write_blob			=> \&write_blob,
-	update_file			=> \&update_file,
-	rename_file			=> \&rename_file,
-	delete_file			=> \&delete_file,
-	backup_file			=> \&backup_file,
-	make_directory		=> \&make_directory,
-	git_commit			=> \&git_commit,
-	git_log				=> \&git_log,
-	git_show			=> \&git_show,
-	git_checkout		=> \&git_checkout,
-	git_archive			=> \&git_archive,
-	provision_cert		=> \&provision_cert,
-	update_domain_list	=> \&update_domain_list,
+	write_blob				=> \&write_blob,
+	update_file				=> \&update_file,
+	rename_file				=> \&rename_file,
+	delete_file				=> \&delete_file,
+	backup_file				=> \&backup_file,
+	make_directory			=> \&make_directory,
+	git_commit				=> \&git_commit,
+	git_log					=> \&git_log,
+	git_show				=> \&git_show,
+	git_checkout			=> \&git_checkout,
+	git_archive				=> \&git_archive,
+	provision_cert			=> \&provision_cert,
+	update_acme_domains		=> \&update_acme_domains,
+	update_relayd_keypairs	=> \&update_relayd_keypairs,
 );
 
 my $decoder = Sereal::Decoder->new;
