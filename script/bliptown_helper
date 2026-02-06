@@ -94,6 +94,7 @@ sub update_domain_list {
 
 	my $keypairs_str = '';
 	foreach my $domain (@safe_domains) {
+		next unless -f path('/etc/ssl', "$domain.crt");
 		$keypairs_str .= "tls keypair \"$domain\"\n";
 	}
 
