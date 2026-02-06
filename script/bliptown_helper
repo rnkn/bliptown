@@ -104,9 +104,11 @@ sub provision_cert {
 	my $payload = shift;
 	my $domain = $payload->{domain};
 	return unless $domain =~ $safe_domain_regex;
-	system('acme-client', $domain) == 0
-		or die "Cannot provision certificate: $domain ($!)";
-	return "Provisioned certificate: $domain";
+	system('acme-client', $domain);
+	my $exit = $? >> 8;
+	return "Provisioned certificate: $domain" if $exit == 0;
+	return "Certificate already current: $domain" if $exit == 2;
+	die "Cannot provision certificate: $domain ($!)";
 }
 
 sub update_relayd_keypairs {
