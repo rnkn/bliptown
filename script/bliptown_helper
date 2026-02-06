@@ -336,6 +336,13 @@ sub handle_conn {
 
 	my ($res, $err);
 
+	if ($has_unveil) {
+		my @paths = split ':', $ENV{PATH};
+		map { unveil($_, 'x') or die "Cannot unveil path: $_ ($!)" } @paths;
+		unveil('/etc', 'r') or die "Cannot unveil path: /etc ($!)";
+		unveil('/tmp', 'rwc') or die "Cannot unveil path: /tmp ($!)";
+	}
+
 	eval {
 		my $username = $payload->{username};
 
@@ -347,9 +354,7 @@ sub handle_conn {
 
 			if ($has_unveil) {
 				my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
-				$root = $root->realpath;
-				unveil('/etc/gitignore', "r");
-				unveil($root, "rwc");
+				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
 				unveil();
 			}
 		}
