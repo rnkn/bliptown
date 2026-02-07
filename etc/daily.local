@@ -1,5 +1,7 @@
 # -*- mode: sh; -*-
 porkbun_payload=/etc/ssl/private/porkbun-keys.json
+expected_a_record=91.98.65.46
+expected_aaaa_record=2a01:4f8:1c1a:8cdb::f
 
 cleanup() {
 	rm -f $tmpfiles
@@ -28,22 +30,24 @@ fetch_cert() {
 
 		ok=true
 		/usr/local/bin/jq -r .certificatechain < "$json_tmp" > "$cert_chain_tmp" || ok=false
-		/usr/local/bin/jq -r .privatekey < "$json_tmp" > "$cert_key_tmp" || ok=false
+		/usr/local/bin/jq -r .privatekey       < "$json_tmp" > "$cert_key_tmp"   || ok=false
 	fi
 
-	if [ $ok ]
+	if ! $ok
 	then
+		echo "Malformed JSON response"
+	else
 		cert_hash=$(/usr/bin/openssl x509 -in "$cert_chain_tmp" -pubkey \
 						| /usr/bin/openssl pkey -pubin | /bin/md5)
 		key_hash=$(/usr/bin/openssl pkey -in "$cert_key_tmp" -pubout | /bin/md5)
 
-		echo "Matching certificate with key:"
+		echo -n "Matching certificate with key..."
 		if [ "X$cert_hash" != "X$key_hash" ]
 		then
-			echo "Certificate chain and key do not match!"
+			echo "failed"
 		else
-			echo "Certificate chain and key match."
-			echo "Installing certificate:"
+			echo "succeeded"
+			echo "Installing certificates:"
 			install -m 0644 -o root -g wheel "$cert_chain_tmp" "$cert_chain" && echo "$cert_chain installed."
 			install -m 0600 -o root -g wheel "$cert_key_tmp" "$cert_key" && echo "$cert_key installed."
 		fi
@@ -56,11 +60,24 @@ fetch_cert bliptown-staging.com
 echo
 
 echo "Renewing user certificates:"
-/usr/bin/grep "^domain" /etc/acme-domains.conf | while read -r line
+/usr/bin/grep "^domain" /etc/acme-domains.conf | /usr/bin/cut -d' ' -f2 | while read -r domain
 do
-	domain=$(echo "$line" | /usr/bin/cut -d' ' -f2)
-	echo "$domain"
-	test -n "$domain" && /usr/sbin/acme-client "$domain"
+	echo -n "$domain..."
+	ok=true
+	test -n "$domain" || ok=false
+	$ok && test "$(dig "$domain" A    +short)" == "$expected_a_record"    || ok=false
+	$ok && test "$(dig "$domain" AAAA +short)" == "$expected_aaaa_record" || ok=false
+	if ! $ok
+	then
+		echo "failed"
+	else
+		/usr/sbin/acme-client "$domain"
+		case $? in
+			(0)		echo "revoked/renewed" ;;
+			(1)		echo "failed" ;;
+			(2)		echo "up-to-date" ;;
+		esac
+	fi
 done
 echo
 
