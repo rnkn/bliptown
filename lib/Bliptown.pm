@@ -227,6 +227,8 @@ sub startup {
 					my @stats = stat $file;
 					my $mtime = $stats[9];
 					my $etag = sprintf('"%x"', $mtime);
+					my $max_age = 24 * 60 * 60;
+					$c->res->headers->cache_control('public, must-revalidate, max-age=' . $max_age);
 					$c->res->headers->etag($etag);
 					return $c->reply->file($file);
 				}
