@@ -37,7 +37,8 @@
 				</form>
 				% }
 				<form id="upload" method="post" action="<%= url_for('upload_files') %>" enctype="multipart/form-data">
-					<input type="file" accept="text/*,image/*,application/pdf" id="file-uploads" name="file-uploads" multiple <%= $disabled %>>
+					<input type="file" accept="text/*,image/*,audio/*,video/*,font/*,application/pdf,application/zip,application/gzip"
+						   id="file-uploads" name="file-uploads" multiple <%= $disabled %>>
 					<button type="submit" <%= $disabled %>>Upload</button>
 				</form>
 				<form id="snapshot" method="get" action="<%= url_for('take_snapshot') %>">
