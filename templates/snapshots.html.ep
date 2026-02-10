@@ -17,7 +17,7 @@
 		</ul>
 	</menu>
 </nav>
-<main id="snapshots">
+<main id="snapshots" class="backstage">
 	<section class="one-column">
 		% if (@$snapshots) {
 		<details id="clone">

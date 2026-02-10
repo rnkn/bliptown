@@ -398,6 +398,14 @@ input#message-close:checked ~ label#message-close {
 
 /* backstage */
 
+main.backstage a {
+	border-bottom: 1px solid transparent;
+}
+
+main.backstage a:hover {
+	border-bottom-color: currentcolor;
+}
+
 a.exit {
 	font-size: 0.9em;
 	border: 0;
@@ -510,14 +518,6 @@ a.exit:before {
 
 /* Files controls  */
 
-#files a {
-	border-bottom-color: transparent;
-}
-
-#files a:hover {
-	border-bottom-color: currentcolor;
-}
-
 #files #breadcrumbs {
 	border-bottom: 1px solid;
 }
@@ -574,14 +574,6 @@ input#create-directory-toggle:checked ~ #create-directory-controls {
 }
 
 /* Settings */
-
-#settings a {
-	border-bottom-color: transparent;
-}
-
-#settings a:hover {
-	border-bottom-color: currentcolor;
-}
 
 #settings form ul {
 	padding: 0;

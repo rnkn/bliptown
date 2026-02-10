@@ -52,7 +52,7 @@
 		</ul>
 	</menu>
 </nav>
-<main id="files">
+<main id="files" class="backstage">
 	<section class="one-column">
 		<div id="breadcrumbs">
 			<input type="checkbox" id="create-directory-toggle" hidden>

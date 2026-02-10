@@ -10,7 +10,7 @@
 		</ul>
 	</menu>
 </nav>
-<main id="settings">
+<main id="settings" class="backstage">
 	<div class="one-column">
 		<form action="<%= url_for('settings') %>" method="post">
 			<ul class="table">
