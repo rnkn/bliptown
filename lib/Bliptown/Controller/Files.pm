@@ -160,7 +160,7 @@ sub new_directory {
 	);
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	$c->flash(info => "Created directory $name");
 	return $c->redirect_to($redirect);
@@ -188,7 +188,7 @@ sub rename_files_regex {
 			}
 		);
 		return $c->reply->exception($res->{error}) if $res->{error};
-		$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 	}
 	return @filenames;
 }
@@ -221,7 +221,7 @@ sub rename_file {
 	);
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	my $message;
 	if (-d $filename) {
@@ -251,7 +251,7 @@ sub delete_files_regex {
 			}
 		);
 		return $c->reply->exception($res->{error}) if $res->{error};
-		$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 	}
 	return @filenames_abs;
 }
@@ -276,7 +276,7 @@ sub delete_file {
 	);
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	$c->flash(info => "File $slug deleted");
 	return $c->redirect_to($redirect);
@@ -297,7 +297,7 @@ sub backup_file {
 		});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	$c->flash(info => "File ${filename}~ created");
 	return $c->redirect_to($redirect);
@@ -335,7 +335,7 @@ sub upload_files {
 			}
 		);
 		return $c->reply->exception($res->{error}) if $res->{error};
-		$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 		if ($c->app->mode eq 'production') {
 			my $cdn_url = "https://cdn.blip.town/$username/$slug/$filename";

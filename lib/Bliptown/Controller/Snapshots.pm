@@ -13,9 +13,9 @@ sub take_snapshot {
 		});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
-	my $res_hash = $res->{response};
+	my $res_hash = $res->{info};
 	if ($res_hash) {
 		$c->flash(info => "Snapshot $res_hash taken");
 	} else {
@@ -35,9 +35,9 @@ sub list_snapshots {
 		});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
-	my $snapshots = $res->{response};
+	my $snapshots = $res->{info};
 	$c->stash(
 		template => 'snapshots',
 		title => 'Snapshots',
@@ -61,9 +61,9 @@ sub restore_snapshot {
 		});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
-	my $res_hash = $res->{response};
+	my $res_hash = $res->{info};
 	$c->flash(info => "Snapshot $res_hash restored");
 	return $c->redirect_to($c->url_for('list_files')->query(search => "snapshots/$res_hash"));
 }
@@ -81,9 +81,9 @@ sub download_snapshot {
 		});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
-	my $filename = $res->{response};
+	my $filename = $res->{info};
 	my $asset = Mojo::Asset::File->new(path => $filename);
 
 	$c->res->headers->content_type('application/gzip');
@@ -119,9 +119,9 @@ sub diff_snapshot {
 		}
 	);
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
-	my $diff = $res->{response};
+	my $diff = $res->{info};
 	return $c->render(
 		text => $diff,
 		format => 'txt',

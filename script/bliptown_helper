@@ -387,7 +387,7 @@ sub handle_conn {
 
 	my $res_blob = $encoder->encode(
 		{
-			response => $res,
+			info => $res,
 			error => $err,
 		});
 

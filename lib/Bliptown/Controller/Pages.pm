@@ -279,7 +279,7 @@ sub save_page {
 		});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{response}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	if ($action eq 'save') {
 		return $c->redirect_to($c->url_for('edit_page', catchall => $slug));
