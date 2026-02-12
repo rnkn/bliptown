@@ -418,9 +418,9 @@ a.exit:before {
 /* Edit */
 
 #edit #filename {
-	width: 20rem;
+	max-width: 20rem;
 	display: flex;
-	gap: 8px;
+	gap: 1em;
 }
 
 #edit #filename input {
