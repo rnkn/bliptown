@@ -443,6 +443,12 @@ a.exit:before {
 	margin: 1em 0;
 }
 
+#edit #controls {
+	display: flex;
+	gap: 1em;
+	align-items: baseline;
+}
+
 /* Lists (Files, Snapshots)  */
 
 #snapshots #clone {
