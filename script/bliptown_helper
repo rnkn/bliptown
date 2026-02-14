@@ -86,7 +86,7 @@ sub update_acme_domains {
 		$acme_domains_str .= <<"EOF";
 domain $domain {
 	alternative names { www.$domain }
-	domain certificate "/etc/ssl/$domain.crt"
+	domain full chain certificate "/etc/ssl/$domain.crt"
 	domain key "/etc/ssl/private/$domain.key"
 	sign with "letsencrypt"
 }
