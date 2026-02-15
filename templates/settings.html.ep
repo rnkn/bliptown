@@ -51,7 +51,7 @@
 				</li>
 				<label for="create-backups">
 					<li class="row">
-						<span class="cell name">Automatically create backups</span>
+						<span class="cell name">Automatically create backups (e.g. <code>file.md~</code>)</span>
 						<input type="checkbox" id="create-backups" class="right" name="create_backups" value="1" <%= 'checked' if $create_backups == 1 %>>
 					</li>
 				</label>
