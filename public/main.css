@@ -806,7 +806,7 @@ main:has(.cover) footer {
 }
 
 .help-q {
-	margin-left: 1em;
+	margin-left: 0.5em;
 }
 
 .help-q:before {
