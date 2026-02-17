@@ -10,3 +10,6 @@ requires 'Text::Glob' => 0;
 requires 'IO::Socket::SSL' => 2;
 requires 'Geo::Location::IP::Database::Reader' => 0;
 requires 'HTTP::BrowserDetect' => 3;
+
+# Optional: for email verification
+recommends 'Mojo::SMTP::Client' => 0;

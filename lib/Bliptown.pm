@@ -268,6 +268,7 @@ sub startup {
 	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('token_auth');
 	$r->post('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
+	$r->get('/join')->to(controller => 'Users', action => 'user_join_form')->name('user_join_form');
 	$r->post('/join')->to(controller => 'Users', action => 'user_join')->name('user_join');
 	$r->get('/verify-email')->to(controller => 'Users', action => 'verify_email')->name('verify_email');
 	$r->get('/subscribe')->to(controller => 'Subscription', action => 'subscribe_page')->name('subscribe_page');

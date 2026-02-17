@@ -27,6 +27,14 @@ sub check_duplicate_email {
 	);
 }
 
+sub user_join_form {
+	my $c = shift;
+	return $c->render(
+		template => 'join',
+		title => 'Join Bliptown',
+	);
+}
+
 sub user_join {
 	my $c = shift;
 	my $email = $c->param('email') || '';

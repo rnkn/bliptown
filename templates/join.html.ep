@@ -1,0 +1,26 @@
+% layout 'default';
+<main>
+	<h1>Join Bliptown</h1>
+	<p>Create your account and start building your personal site.</p>
+	<form action="/join" method="post">
+		<ul class="table">
+			<li class="row">
+				<label class="cell name" for="username">Username</label>
+				<input class="cell" type="text" id="username" name="username" required minlength="1" maxlength="31" pattern="[a-zA-Z][a-zA-Z0-9_-]*">
+			</li>
+			<li class="row">
+				<label class="cell name" for="email">Email</label>
+				<input class="cell" type="email" id="email" name="email" required maxlength="254">
+			</li>
+			<li class="row">
+				<label class="cell name" for="password">Password</label>
+				<input class="cell" type="password" id="password" name="password" required minlength="8" maxlength="256">
+			</li>
+		</ul>
+		<hr>
+		<button type="submit">Create Account</button>
+		<input type="hidden" name="back_to" value="/">
+	</form>
+	<p><small>Already have an account? <a href="/login">Log in</a></small></p>
+	<p><small>By creating an account, you agree to our <a href="/terms">Terms of Service</a>.</small></p>
+</main>
