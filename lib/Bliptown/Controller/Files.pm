@@ -174,6 +174,8 @@ sub rename_files_regex {
 	my $replace = $args->{replace};
 	my @files = $dir->list_tree({ dir => 1 })->each;
 	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @files;
+	my @filenames_abs = map { path($dir, $_)->to_abs->to_string } @filenames;
+	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
 	foreach my $filename (@filenames) {
 		my ($old_filename, $new_filename) = ($filename, $filename);
 		$old_filename = path($dir, $old_filename)->to_abs->to_string;
