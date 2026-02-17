@@ -94,12 +94,13 @@ sub send_verification_email {
 
 	my $verification_url = "$protocol://$hostname$port_str/verify-email?token=$token";
 
-	my $date = POSIX::strftime("%a, %d %b %Y %H:%M:%S %z", localtime);
+	my $date = strftime("%a, %d %b %Y %H:%M:%S %z", localtime);
+	my $message_id = time() . '.' . $$ . '@' . $hostname;
 	my $email_text = <<"EOF";
 From: mayor\@$hostname
 To: $email
 Date: $date
-Message-ID: $token\@$hostname
+Message-ID: <$message_id>
 Subject: Please verify your email address
 
 Hello $username,
@@ -124,31 +125,35 @@ EOF
 
 	# If SMTP is configured, send the email
 	if ($ENV{BLIPTOWN_SMTP_ADDR}) {
-		require Mojo::SMTP::Client;
-		my $smtp = Mojo::SMTP::Client->new(
-			address => $ENV{BLIPTOWN_SMTP_ADDR},
-			port => $ENV{BLIPTOWN_SMTP_PORT},
-			tls => 1,
-			autodie => 0
-		);
-		$smtp->send(
-			auth => {
-				login => $ENV{BLIPTOWN_SMTP_LOGIN},
-				password => $ENV{BLIPTOWN_SMTP_PASS},
-			},
-			from => "noreply\@$hostname",
-			to => $email,
-			data => $email_text,
-			quit => 1,
-			sub {
-				my ($smtp, $res) = @_;
-				if ($res->error) {
-					$c->app->log->error('Failed to send verification email: ' . $res->error);
-				} else {
-					$c->app->log->info("Verification email sent to $email");
+		state $smtp_loaded = eval { require Mojo::SMTP::Client; 1; };
+		if ($smtp_loaded) {
+			my $smtp = Mojo::SMTP::Client->new(
+				address => $ENV{BLIPTOWN_SMTP_ADDR},
+				port => $ENV{BLIPTOWN_SMTP_PORT},
+				tls => 1,
+				autodie => 0
+			);
+			$smtp->send(
+				auth => {
+					login => $ENV{BLIPTOWN_SMTP_LOGIN},
+					password => $ENV{BLIPTOWN_SMTP_PASS},
+				},
+				from => "noreply\@$hostname",
+				to => $email,
+				data => $email_text,
+				quit => 1,
+				sub {
+					my ($smtp, $res) = @_;
+					if ($res->error) {
+						$c->app->log->error('Failed to send verification email: ' . $res->error);
+					} else {
+						$c->app->log->info("Verification email sent to $email");
+					}
 				}
-			}
-		);
+			);
+		} else {
+			$c->app->log->warn('Mojo::SMTP::Client not available, verification email not sent');
+		}
 	}
 }
 

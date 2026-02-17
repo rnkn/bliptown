@@ -42,6 +42,10 @@ subtest 'User registration flow' => sub {
 		back_to => '/'
 	})->status_is(302);
 
+	# Verify user was NOT created for invalid input
+	my $invalid_user = $t->app->user->read_user({ key => 'username', username => 'a' });
+	ok(!$invalid_user, 'Invalid user was not created');
+
 	# Test duplicate username
 	$t->post_ok('/join' => form => {
 		username => $username,

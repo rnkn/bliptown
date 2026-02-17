@@ -4,7 +4,9 @@ CREATE TABLE payment_tokens (
 	username TEXT,
 	created INTEGER
 );
+CREATE INDEX payment_tokens_token_index ON payment_tokens(token);
 -- 8 down
+DROP INDEX IF EXISTS payment_tokens_token_index;
 DROP TABLE payment_tokens;
 -- 7 up
 CREATE TABLE email_verification_tokens (
@@ -12,9 +14,11 @@ CREATE TABLE email_verification_tokens (
 	username TEXT,
 	expires INTEGER
 );
+CREATE INDEX email_verification_tokens_token_index ON email_verification_tokens(token);
 ALTER TABLE users
 	ADD COLUMN email_verified INTEGER DEFAULT 0;
 -- 7 down
+DROP INDEX IF EXISTS email_verification_tokens_token_index;
 DROP TABLE email_verification_tokens;
 ALTER TABLE users
 	DROP COLUMN email_verified;
