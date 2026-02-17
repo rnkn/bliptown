@@ -2,6 +2,7 @@ package Bliptown::Controller::Users;
 use Mojo::Base 'Mojolicious::Controller';
 use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 use Mojo::Util qw(secure_compare);
+use POSIX qw(strftime);
 
 sub validate_user {
 	my ($c, $args) = @_;
@@ -54,9 +55,127 @@ sub user_join {
 			username => $username,
 			email => $email,
 			password => $password,
+			email_verified => 0,
 		}
 	);
+
+	# Create email verification token
+	my $token = $c->email_verification->create_token({ username => $username });
+
+	# Send verification email
+	$c->send_verification_email({
+		email => $email,
+		username => $username,
+		token => $token,
+	});
+
+	$c->flash(info => 'Account created! Please check your email to verify your account.');
 	return $c->redirect_to($redirect);
+}
+
+sub send_verification_email {
+	my ($c, $args) = @_;
+	my $email = $args->{email};
+	my $username = $args->{username};
+	my $token = $args->{token};
+
+	my $protocol = $c->config->{scheme};
+	my $hostname = $c->config->{domain};
+	my $port = $c->config->{port};
+	my $port_str = $port ? ":$port" : '';
+
+	my $verification_url = "$protocol://$hostname$port_str/verify-email?token=$token";
+
+	my $date = POSIX::strftime("%a, %d %b %Y %H:%M:%S %z", localtime);
+	my $email_text = <<"EOF";
+From: mayor\@$hostname
+To: $email
+Date: $date
+Message-ID: $token\@$hostname
+Subject: Please verify your email address
+
+Hello $username,
+
+Thank you for joining Bliptown! Please verify your email address by clicking the link below:
+
+$verification_url
+
+This link will expire in 24 hours.
+
+If you did not create an account, please ignore this email.
+
+Sincerely,
+
+--
+Bliptown
+$protocol://$hostname
+EOF
+	$email_text =~ s/\r?\n/\r\n/g;
+
+	$c->app->log->info("Verification email for $username: $verification_url");
+
+	# If SMTP is configured, send the email
+	if ($ENV{BLIPTOWN_SMTP_ADDR}) {
+		require Mojo::SMTP::Client;
+		my $smtp = Mojo::SMTP::Client->new(
+			address => $ENV{BLIPTOWN_SMTP_ADDR},
+			port => $ENV{BLIPTOWN_SMTP_PORT},
+			tls => 1,
+			autodie => 0
+		);
+		$smtp->send(
+			auth => {
+				login => $ENV{BLIPTOWN_SMTP_LOGIN},
+				password => $ENV{BLIPTOWN_SMTP_PASS},
+			},
+			from => "noreply\@$hostname",
+			to => $email,
+			data => $email_text,
+			quit => 1,
+			sub {
+				my ($smtp, $res) = @_;
+				if ($res->error) {
+					$c->app->log->error('Failed to send verification email: ' . $res->error);
+				} else {
+					$c->app->log->info("Verification email sent to $email");
+				}
+			}
+		);
+	}
+}
+
+sub verify_email {
+	my $c = shift;
+	my $token = $c->param('token') || '';
+
+	my $record = $c->email_verification->read_token({ token => $token });
+
+	if (!$record || !$record->{username} || $record->{expires} <= time) {
+		$c->email_verification->delete_token({ token => $token }) if $record;
+		return $c->render(
+			status => 403,
+			template => 'message',
+			title => '403 Forbidden',
+			content => '403 Forbidden: invalid or expired verification token',
+		);
+	}
+
+	my $username = $record->{username};
+
+	# Mark email as verified
+	$c->user->update_user({
+		username => $username,
+		email_verified => 1,
+	});
+
+	# Delete the verification token
+	$c->email_verification->delete_token({ token => $token });
+
+	# Create payment token for Stripe
+	my $payment_token = $c->payment_token->create_token({ username => $username });
+
+	# Redirect to subscription page
+	return $c->redirect_to("/subscribe?token=$payment_token");
 }
 
 sub token_login {

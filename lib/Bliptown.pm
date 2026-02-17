@@ -14,6 +14,8 @@ use Bliptown::Model::IPC;
 use Bliptown::Model::TOTP;
 use Bliptown::Model::QRCode;
 use Bliptown::Model::Token;
+use Bliptown::Model::EmailVerification;
+use Bliptown::Model::PaymentToken;
 
 sub startup {
 	my $app = shift;
@@ -46,7 +48,7 @@ sub startup {
 		});
 
 	my $migrations_path = $app->home->child('migrations.sql');
-	$app->sqlite->migrations->from_file($migrations_path)->migrate(6);
+	$app->sqlite->migrations->from_file($migrations_path)->migrate(8);
 
 	$app->helper(
 		geoip => sub {
@@ -101,6 +103,22 @@ sub startup {
 		token => sub {
 			my $c = shift;
 			return Bliptown::Model::Token->new(
+				sqlite => $c->sqlite
+			);
+		});
+
+	$app->helper(
+		email_verification => sub {
+			my $c = shift;
+			return Bliptown::Model::EmailVerification->new(
+				sqlite => $c->sqlite
+			);
+		});
+
+	$app->helper(
+		payment_token => sub {
+			my $c = shift;
+			return Bliptown::Model::PaymentToken->new(
 				sqlite => $c->sqlite
 			);
 		});
@@ -250,6 +268,9 @@ sub startup {
 	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('token_auth');
 	$r->post('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
+	$r->post('/join')->to(controller => 'Users', action => 'user_join')->name('user_join');
+	$r->get('/verify-email')->to(controller => 'Users', action => 'verify_email')->name('verify_email');
+	$r->get('/subscribe')->to(controller => 'Subscription', action => 'subscribe_page')->name('subscribe_page');
 
 	$r->get('/track/:rand')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');
 

@@ -1,3 +1,23 @@
+-- 8 up
+CREATE TABLE payment_tokens (
+	token TEXT,
+	username TEXT,
+	created INTEGER
+);
+-- 8 down
+DROP TABLE payment_tokens;
+-- 7 up
+CREATE TABLE email_verification_tokens (
+	token TEXT,
+	username TEXT,
+	expires INTEGER
+);
+ALTER TABLE users
+	ADD COLUMN email_verified INTEGER DEFAULT 0;
+-- 7 down
+DROP TABLE email_verification_tokens;
+ALTER TABLE users
+	DROP COLUMN email_verified;
 -- 6 up
 ALTER TABLE users
 	ADD COLUMN date_format INTEGER DEFAULT 0;

@@ -1,0 +1,9 @@
+% layout 'default';
+<main>
+	<h1>Subscribe to Bliptown</h1>
+	<p>Welcome, <%= $username %>! Your email has been verified successfully.</p>
+	<p>To complete your registration and activate your account, please subscribe to Bliptown for 12 months.</p>
+	<p><a href="<%= $stripe_url %>" class="button">Subscribe Now (12 Month Subscription)</a></p>
+	<p>You will be redirected to Stripe to complete your payment securely.</p>
+	<p><a href="/">Return to Home</a></p>
+</main>

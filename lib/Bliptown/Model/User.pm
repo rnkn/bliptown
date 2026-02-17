@@ -12,12 +12,14 @@ sub create_user {
 	my $salt = substr(generate_secret, 0, 16);
 	my $password_hash = bcrypt($args->{password}, '2b', 12, $salt);
 	my $totp_secret = $self->totp->create_secret;
+	my $email_verified = $args->{email_verified} // 0;
 	$self->sqlite->db->insert(
 		'users', {
 			username => $args->{username},
 			email => $args->{email},
 			password_hash => $password_hash,
 			totp_secret => $totp_secret,
+			email_verified => $email_verified,
 		}
 	);
 }
@@ -41,7 +43,7 @@ sub update_user {
 	my %values;
 	my @keys_null = qw(custom_domain);
 	my @keys_not_null = qw(email totp_secret);
-	my @keys_int = qw(date_format create_backups);
+	my @keys_int = qw(date_format create_backups email_verified);
 	foreach my $key (keys %$args) {
 		if (grep { $key eq $_ } @keys_null) {
 			my $v = $args->{$key} || undef;
