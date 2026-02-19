@@ -5,7 +5,6 @@ use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 
 has 'sqlite';
 has 'totp';
-has 'domain_list';
 
 sub create_user {
 	my ($self, $args) = @_;
