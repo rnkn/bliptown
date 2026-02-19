@@ -17,7 +17,6 @@ die "BLIPTOWN_DB not defined" unless $ENV{BLIPTOWN_DB};
 die "BLIPTOWN_LOG_HOME not defined" unless $ENV{BLIPTOWN_LOG_HOME};
 die "BLIPTOWN_GEOIP_DB not defined" unless $ENV{BLIPTOWN_GEOIP_DB};
 
-die "BLIPTOWN_MD4C_LIB not defined" unless $ENV{BLIPTOWN_MD4C_LIB};
 die "BLIPTOWN_MD4C_HTML_LIB not defined" unless $ENV{BLIPTOWN_MD4C_HTML_LIB};
 
 die "BLIPTOWN_CDN_API_HOST not defined" unless $ENV{BLIPTOWN_CDN_API_HOST};

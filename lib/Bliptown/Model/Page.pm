@@ -35,7 +35,6 @@ my $md_flags = MD_FLAG_PERMISSIVEURLAUTOLINKS
 	| MD_FLAG_WIKILINKS;
 
 my $ffi = FFI::Platypus->new(api => 2);
-$ffi->lib(path($ENV{'BLIPTOWN_MD4C_LIB'})->to_string);
 $ffi->lib(path($ENV{'BLIPTOWN_MD4C_HTML_LIB'})->to_string);
 $ffi->type('(string, int, opaque)->void' => 'callback');
 $ffi->attach(
