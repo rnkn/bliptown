@@ -1,3 +1,13 @@
+-- 7 up
+ALTER TABLE users
+	ADD COLUMN email_verified INTEGER DEFAULT 0;
+ALTER TABLE users
+	ADD COLUMN customer_id TEXT DEFAULT NULL;
+-- 7 down
+ALTER TABLE users
+	DROP COLUMN email_verified;
+ALTER TABLE users
+	DROP COLUMN customer_id;
 -- 6 up
 ALTER TABLE users
 	ADD COLUMN date_format INTEGER DEFAULT 0;
