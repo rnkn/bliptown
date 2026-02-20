@@ -166,7 +166,7 @@ sub new_page {
 	my $c = shift;
 	my $slug = $c->param('catchall');
 	my $ext = '';
-	if ($slug =~ /(.+)(\..+)$/) {
+	if ($slug =~ /(.+)\.([^.]+)$/) {
 		 $slug = $1;
 		 $ext = $2;
 	};
