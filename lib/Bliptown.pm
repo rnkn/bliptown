@@ -145,7 +145,6 @@ sub startup {
 			my $root = path($c->config->{user_home}, $req_user)->to_abs;
 			my $file = path($root, $slug)->to_abs;
 			return $file if -f $file;
-			$slug = $1 if $slug =~ /(.+)(\..+)$/;
 			my @exts = qw(html css js txt md);
 			foreach my $ext (@exts) {
 				my $f = path($root, "$slug.$ext")->to_abs;
