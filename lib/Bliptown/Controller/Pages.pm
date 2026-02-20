@@ -16,7 +16,7 @@ sub process_redirects {
 	return $url if $url;
 }
 
-sub post_skel {
+sub postprocess_skel {
 	my ($html, $slug) = @_;
 	$slug =~ s{^/?}{/};
 	my $url_path = Mojo::URL->new($slug)->to_string;
@@ -123,7 +123,7 @@ sub render_page {
 					root => $root->to_abs->to_string,
 				}
 			);
-			$page->{html} = post_skel($page->{html}, $slug);
+			$page->{html} = postprocess_skel($page->{html}, $slug);
 			$skel_html{$f} = $page->{html};
 		}
 	}
