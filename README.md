@@ -35,6 +35,15 @@ inet alias **.***.**.*** 255.255.255.255
 # quotacheck -a
 # quotaon /home /tmp
 # ln -s /usr/bin/openrsync rsync
+# crontab -l | head -2
+MAXMIND_ID=*******
+MAXMIND_KEY=************************************_mmk
+# geolite2_endpoint="https://${MAXMIND_ID}:${MAXMIND_KEY}@download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz"
+# ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint"
+# tar -C /var/db/GeoIP -xzf /tmp/geolite2-country.tar.gz
+# mv /var/db/GeoIP/GeoLite2-Country_*/*.mmdb \
+	/var/db/GeoIP/geolite2-country-current.mmdb
+# rm -rf /var/db/GeoIP/GeoLite2-Country_*
 ```
 
 ## Installation
@@ -109,5 +118,5 @@ EOF
 Install optional packages:
 
 ```shell-session
-# pkg_add mosh rlwrap emacs vim nano sfeed
+# pkg_add rlwrap emacs vim nano sfeed stagit
 ```
