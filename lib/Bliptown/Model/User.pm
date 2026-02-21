@@ -35,32 +35,39 @@ sub read_user {
 }
 
 sub update_user {
-	my ($self, $args) = @_;
-	my $username = $args->{username};
+	my ($self, $args)	= @_;
+	my $username		= $args->{username};
+	my $user			= $self->read_user(
+		{ key => 'username', username => $username }
+	);
+
 	my %values;
-	my @keys_null = qw(custom_domain);
-	my @keys_not_null = qw(email totp_secret);
-	my @keys_int = qw(date_format create_backups);
+	my %keys_null		= map { $_ => 1 } qw(custom_domain);
+	my %keys_not_null	= map { $_ => 1 } qw(email totp_secret);
+	my %keys_int		= map { $_ => 1 } qw(date_format create_backups);
+
 	foreach my $key (keys %$args) {
-		if (grep { $key eq $_ } @keys_null) {
+		if ($keys_null{$key}) {
 			my $v = $args->{$key} || undef;
 			$values{$key} = $v;
 		}
-		if (grep { $key eq $_ } @keys_not_null) {
+		elsif ($keys_not_null{$key}) {
 			my $v = $args->{$key};
 			$values{$key} = $v if $v;
 		}
-		if (grep { $key eq $_ } @keys_int) {
+		elsif ($keys_int{$key}) {
 			my $v = $args->{$key} // 0;
 			$values{$key} = $v;
 		}
 	};
+
 	my $new_password = $args->{new_password};
 	if ($new_password) {
 		my $salt = substr(generate_secret, 0, 16);
 		my $password_hash = bcrypt($new_password, '2b', 12, $salt);
 		$values{password_hash} = $password_hash;
 	};
+
 	my $ok = $self->sqlite->db->update(
 		'users', \%values, { username => $username }
 	);
