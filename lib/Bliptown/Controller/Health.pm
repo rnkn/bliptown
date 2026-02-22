@@ -1,7 +1,6 @@
 package Bliptown::Controller::Health;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::File qw(path);
-use Mojo::Util qw(trim);
 
 sub health_check {
 	my $c = shift;
@@ -11,10 +10,20 @@ sub health_check {
 
 	my $db_ok = $c->sqlite->db->query('SELECT 1')->hash->{1};
 
-	$c->res->headers->header('X-Bliptown-Server-Workers' => trim $server_workers);
-	$c->res->headers->header('X-Bliptown-Helper-Workers' => trim $helper_workers);
+	$server_workers = int $server_workers;
+	$helper_workers = int $helper_workers;
+
+	$c->res->headers->header('X-Bliptown-Server-Workers' => $server_workers);
+	$c->res->headers->header('X-Bliptown-Helper-Workers' => $helper_workers);
 	$c->res->headers->header('X-Bliptown-Database-OK' => $db_ok);
-	return $c->render(text => 'Health check', format => 'txt');
+
+	my %json = (
+		'BliptownServerWorkers' => $server_workers,
+		'BliptownHelperWorkers' => $helper_workers,
+		'BliptownDatabaseOK' => $db_ok
+	);
+
+	return $c->render(json => \%json);
 }
 
 return 1;
