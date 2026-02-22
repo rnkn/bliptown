@@ -154,7 +154,6 @@ nav details summary::before {
 
 main {
 	width: 100%;
-	overflow: scroll;
 	padding: 2rem;
 	padding-right: 4rem;
 	background-color: inherit;
@@ -525,6 +524,9 @@ a.exit:before {
 /* Files controls  */
 
 #files #breadcrumbs {
+	position: sticky;
+	top: 0;
+	background-color: inherit;
 	border-bottom: 1px solid;
 }
 
@@ -608,6 +610,7 @@ input#create-directory-toggle:checked ~ #create-directory-controls {
 /* layouts */
 
 section {
+	background-color: inherit;
 	margin-bottom: 1em;
 }
 
