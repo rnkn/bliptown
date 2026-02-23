@@ -116,7 +116,7 @@ sub save_settings {
 			}
 			$c->provision_cert($new_domain);
 		}
-		$c->update_domain_list('relayd');
+		$c->on(finish => sub { $c->update_domain_list('relayd') });
 	}
 
 
