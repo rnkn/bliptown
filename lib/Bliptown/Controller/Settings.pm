@@ -1,5 +1,38 @@
 package Bliptown::Controller::Settings;
 use Mojo::Base 'Mojolicious::Controller';
+use Net::DNS;
+
+sub check_domain_dns {
+	my ($c, $username, $domain) = @_;
+	my $txt_cname		= "_bliptown.$domain";
+	my $expected_ipv4	= $ENV{BLIPTOWN_IPV4};
+	my $expected_ipv6	= $ENV{BLIPTOWN_IPV6};
+	my $expected_txt	= "$username.blip.town";
+	my $resolver		= Net::DNS::Resolver->new;
+	my @answer_A		= $resolver->query($domain, 'A')->answer or return;
+	my @answer_AAAA		= $resolver->query($domain, 'AAAA')->answer or return;
+	my @answer_TXT		= $resolver->query($txt_cname, 'TXT')->answer or return;
+
+	my ($record_A, $record_AAAA, $record_TXT);
+
+	foreach my $record (@answer_A) {
+		next unless $record->type eq 'A';
+		$record_A = $record->address;
+	}
+	foreach my $record (@answer_AAAA) {
+		next unless $record->type eq 'AAAA';
+		$record_AAAA = $record->address;
+	}
+	foreach my $record (@answer_TXT) {
+		next unless $record->type eq 'TXT';
+		$record_TXT = $record->txtdata;
+	}
+
+	return unless ($record_A	== $expected_ipv4 &&
+				   $record_AAAA	== $expected_ipv6 &&
+				   $record_TXT	eq $expected_txt);
+	return 1;
+}
 
 sub provision_cert {
 	my ($c, $domain) = @_;
@@ -67,14 +100,26 @@ sub save_settings {
 		{ key => 'username', username => $username }
 	);
 	my $params = $c->req->params->to_hash;
-	$c->user->update_user({ username => $username, %$params });
-	my $cur_domain = $user->{custom_domain} // '';
+
 	my $new_domain = $params->{custom_domain} // '';
+	my $cur_domain = $user->{custom_domain} // '';
+
+	$c->user->update_user({ username => $username, %$params });
+
 	if ($new_domain ne $cur_domain) {
 		$c->update_domain_list('acme');
-		$c->provision_cert($new_domain) if $new_domain;
+		if ($new_domain) {
+			unless ($c->check_domain_dns($username, $new_domain)) {
+				$c->user->update_user({ username => $username, domain => '' });
+				$c->flash(info => "Domain $new_domain DNS not set");
+				return $c->redirect_to(url_for('list_settings'));
+			}
+			$c->provision_cert($new_domain);
+		}
 		$c->update_domain_list('relayd');
 	}
+
+
 	return $c->redirect_to($c->url_for('render_page'));
 }
 
