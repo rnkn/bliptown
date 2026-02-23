@@ -20,6 +20,7 @@ sub postprocess_skel {
 	my ($html, $slug) = @_;
 	$slug =~ s{^/?}{/};
 	my $url_path = Mojo::URL->new($slug)->to_string;
+	$url_path =~ s{/$}{};
 	my $dom = Mojo::DOM->new($html);
 	foreach my $link (@{$dom->find("a[href=\"$url_path\"]")}) {
 		my $cur_class = $link->attr('class') // '';
