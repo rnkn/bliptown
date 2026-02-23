@@ -94,19 +94,13 @@
 			% if ($show_sidebar) {
 			<label id="nav-toggle" class="button" for="nav-toggle"></label>
 			% }
-			% my $message = begin
-			% my $type = shift;
-			<input type="checkbox" id="message-close" hidden checked>
-			<label id="message-close" class="button" for="message-close">
-				<div id="message" class="<%= $type %>">
-					<p><%= flash("$type") %></p>
+			% if (flash('info')) {
+			<input type="checkbox" id="toast-close" hidden checked>
+			<label id="toast-close" class="button" for="toast-close">
+				<div id="toast">
+					<p><%= flash('info') %></p>
 				</div>
 			</label>
-			% end
-			% if (flash('warning')) {
-			%= $message->('warning')
-			% } elsif (flash('info')) {
-			%= $message->('info')
 			% }
 			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
 			%= content

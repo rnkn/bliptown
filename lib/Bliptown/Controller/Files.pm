@@ -317,13 +317,13 @@ sub upload_files {
 		my $filename = $upload->filename;
 		next unless $filename;
 		if ($upload->size > 1024 * 1024 * 50) {
-			$c->flash(warning => "File too large");
+			$c->flash(info => "File too large!");
 			$c->res->code(413);
 			return $c->redirect_to('list_files');
 		}
 		my $path = path($dir, $filename);
 		if (-f $path) {
-			$c->flash(warning => "File $filename exists!");
+			$c->flash(info => "File $filename exists!");
 			$c->res->code(409);
 			return $c->redirect_to('list_files');
 		};

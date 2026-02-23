@@ -15,7 +15,7 @@ sub totp_update {
 				}
 			))
 	{
-		$c->flash(warning => 'TOTP incorrent');
+		$c->flash(info => 'TOTP incorrent');
 		return $c->redirect_to('totp_initiate');
 	}
 	$c->user->update_user(

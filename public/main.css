@@ -350,43 +350,34 @@ input#drawer-switch-login:checked ~ #drawer #login {
 	gap: 1em;
 }
 
-/** messages */
+/** toast */
 
-#message {
+#toast {
 	position: absolute;
 	z-index: 100;
-	top: 1rem;
+	bottom: 2rem;
 	right: 2rem;
 	padding: 1em 2em;
+	background: white;
+	border: 1px solid black;
 	animation: delay-fade-out 1s 2.5s forwards;
 }
 
-#message p {
+#toast p {
 	margin: 0;
 }
 
-label#message-close {
+label#toast-close {
 	display: none;
 }
 
-input#message-close:checked ~ label#message-close {
+input#toast-close:checked ~ label#toast-close {
 	display: block;
 }
 
 @keyframes delay-fade-out {
 	from { opacity: 1; }
 	to { opacity: 0; visibility: hidden; }
-}
-
-#message.info {
-	background: var(--info-message-color);
-	border: 1px solid black;
-}
-
-#message.warning {
-	color: rgba(100,0,0,1.0);
-	background: var(--warning-message-color);
-	border: 1px solid;
 }
 
 /** 2FA  */
