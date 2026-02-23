@@ -261,6 +261,7 @@ sub save_page {
 	my $username = $c->session('username');
 	my $root = path($c->config->{user_home}, $username)->to_string;
 	my $slug = $c->param('slug');
+	$slug =~ s{^/}{};
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
 	my $filename = "$slug.$ext";
