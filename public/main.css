@@ -96,7 +96,8 @@ iframe {
 
 hr {
 	margin: 1em 0;
-	color: rgba(0,0,0,0.5);
+	border: none;
+	border-top: 1px solid currentcolor;
 }
 
 input::placeholder {
