@@ -19,8 +19,8 @@ sub send_message {
 	my $data = {
 		command => $args->{command},
 		payload => {
-			username		=> $args->{username},
-			filename		=> $args->{filename},
+			username		=> $args->{username} // '',
+			filename		=> $args->{filename} // '',
 			new_filename	=> $args->{new_filename} // '',
 			create_backup	=> $args->{create_backup} // 0,
 			content			=> $args->{content} // '',

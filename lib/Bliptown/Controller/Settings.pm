@@ -95,9 +95,9 @@ sub list_settings {
 		template => 'settings',
 		show_sidebar => 1,
 		locked => $locked,
-		username => $user->{username},
-		email => $user->{email},
-		custom_domain => $user->{custom_domain},
+		username => $user->{username} // '',
+		email => $user->{email} // '',
+		custom_domain => $user->{custom_domain} // '',
 		date_format => $user->{date_format} // 0,
 		create_backups => $user->{create_backups} // 0,
 	);
