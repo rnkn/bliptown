@@ -112,6 +112,7 @@ sub save_settings {
 		{ key => 'username', username => $username }
 	);
 	my $params = $c->req->params->to_hash;
+	$params->{create_backups} //= 0;
 
 	my $new_domain = $params->{custom_domain} // '';
 	my $cur_domain = $user->{custom_domain} // '';
