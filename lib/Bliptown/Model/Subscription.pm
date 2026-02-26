@@ -3,10 +3,6 @@ use Mojo::Base -base;
 use Mojo::UserAgent;
 
 my $ua = Mojo::UserAgent->new;
-my $stripe_url = Mojo::URL->new;
-$stripe_url->scheme('https');
-$stripe_url->host('api.stripe.com');
-$stripe_url->userinfo($ENV{BLIPTOWN_STRIPE_API_KEY} . ':');
 
 sub create_stripe_url {
 	my ($self, $path) = @_;
@@ -23,9 +19,9 @@ sub create_subscription { }
 sub read_subscription {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
-	$stripe_url->path("v1/customers/$customer_id");
+	my $url = $self->create_stripe_url("v1/customers/$customer_id");
 
-	my $tx = $ua->get($stripe_url);
+	my $tx = $ua->get($url);
 	my $res = $tx->res->json;
 	return $res;
 }
@@ -33,7 +29,7 @@ sub read_subscription {
 sub update_subscription {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
-	$stripe_url->path("v1/customers/$customer_id");
+	my $url = $self->create_stripe_url("v1/customers/$customer_id");
 
 	my %data;
 	my %allowed_keys = map { $_ => 1 } qw(email);
@@ -44,7 +40,7 @@ sub update_subscription {
 		}
 	}
 
-	my $tx = $ua->post($stripe_url, form => { %data });
+	my $tx = $ua->post($url, form => { %data });
 	my $res = $tx->res->json;
 	return $res;
 }
@@ -52,9 +48,9 @@ sub update_subscription {
 sub delete_subscription {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
-	$stripe_url->path("v1/customers/$customer_id");
+	my $url = $self->create_stripe_url("v1/customers/$customer_id");
 
-	my $tx = $ua->delete($stripe_url);
+	my $tx = $ua->delete($url);
 	my $res = $tx->res->json;
 	return $res;
 }
