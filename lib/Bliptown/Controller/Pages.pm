@@ -103,6 +103,10 @@ sub render_page {
 		}
 	}
 
+	if ($$file[-1] eq 'index.html') {
+		return $c->reply->file($file);
+	}
+
 	my $page = $c->page->read_page(
 		{
 			root => $root->to_abs->to_string,
