@@ -23,5 +23,6 @@ die "BLIPTOWN_MD4C_HTML_LIB not defined" unless $ENV{BLIPTOWN_MD4C_HTML_LIB};
 
 die "BLIPTOWN_CDN_API_HOST not defined" unless $ENV{BLIPTOWN_CDN_API_HOST};
 die "BLIPTOWN_CDN_API_KEY not defined" unless $ENV{BLIPTOWN_CDN_API_KEY};
+die "BLIPTOWN_STRIPE_API_KEY not defined" unless $ENV{BLIPTOWN_STRIPE_API_KEY};
 
 Mojolicious::Commands->start_app('Bliptown');
