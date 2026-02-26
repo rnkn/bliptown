@@ -56,6 +56,9 @@
 					</li>
 				</label>
 				<hr>
+				<li class="row">
+					<a href="<%= $billing_portal_url %>" target="_blank">Manage subscription and payment details</a>
+				</li>
 				<details id="delete-account">
 					<summary class="row">Delete account</summary>
 					<li class="row">

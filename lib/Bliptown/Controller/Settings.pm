@@ -90,6 +90,15 @@ sub list_settings {
 	my $user = $c->user->read_user(
 		{ key => 'username', username => $username }
 	);
+
+	my $customer_id = $user->{customer_id};
+	return $c->reply->exception("User $username customer_id not found")
+		unless $customer_id;
+	my $billing_session = $c->subscription->create_billing_session(
+		{ customer_id => $customer_id }
+	);
+	my $billing_portal_url = $billing_session->{url};
+
 	$c->stash(
 		title => 'Settings',
 		template => 'settings',
@@ -100,6 +109,7 @@ sub list_settings {
 		custom_domain => $user->{custom_domain} // '',
 		date_format => $user->{date_format} // 0,
 		create_backups => $user->{create_backups} // 0,
+		billing_portal_url => $billing_portal_url // ''
 	);
 	return $c->render;
 }
