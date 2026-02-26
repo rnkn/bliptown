@@ -8,6 +8,7 @@ use lib '.';
 use Geo::Location::IP::Database::Reader;
 
 use Bliptown::Model::User;
+use Bliptown::Model::Subscription;
 use Bliptown::Model::Page;
 use Bliptown::Model::File;
 use Bliptown::Model::IPC;
@@ -63,8 +64,14 @@ sub startup {
 			my $c = shift;
 			return Bliptown::Model::User->new(
 				sqlite => $c->sqlite,
+				subscriptions => $c->subscription,
 				totp => $c->totp,
 			);
+		});
+
+	$app->helper(
+		subscription => sub {
+			return Bliptown::Model::Subscription->new;
 		});
 
 	$app->helper(
