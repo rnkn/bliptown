@@ -28,6 +28,7 @@ sub startup {
 		port => $app->mode eq 'production' ? '' : '3000',
 		user_home => $ENV{BLIPTOWN_USER_HOME},
 		log_home => $ENV{BLIPTOWN_LOG_HOME},
+		allowed_exts => [ qw(md html css js txt patch) ]
 	);
 
 	$app->secrets(
@@ -152,8 +153,7 @@ sub startup {
 			my $root = path($c->config->{user_home}, $req_user)->to_abs;
 			my $file = path($root, $slug)->to_abs;
 			return $file if -f $file;
-			my @exts = qw(html css js txt md);
-			foreach my $ext (@exts) {
+			foreach my $ext (@{$c->config->{allowed_exts}}) {
 				my $f = path($root, "$slug.$ext")->to_abs;
 				return $f if -f $f;
 			}

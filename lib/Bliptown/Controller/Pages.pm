@@ -39,8 +39,6 @@ sub postprocess_skel {
 	return $dom->to_string;
 }
 
-my @allowed_exts = qw(html css js txt md);
-
 sub render_private {
 	my $c = shift;
 	my $catchall = $c->param('catchall') || '';
@@ -176,7 +174,7 @@ sub new_page {
 		 $ext = $2;
 	};
 	if ($ext) {
-		return $c->reply->not_found unless grep { $ext eq $_} @allowed_exts;
+		return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{allowed_exts}};
 	}
 	my $file;
 	if (!$slug || $slug =~ m{/$}) {
@@ -229,7 +227,7 @@ sub edit_page {
 	}
 	return $c->redirect_to('new_page', catchall => $slug) unless $file;
 	my $ext = $c->param('ext') || $file->extname || 'md';
-	return $c->reply->not_found unless grep { $ext eq $_} @allowed_exts;
+	return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{allowed_exts}};
 	my $rel_file = $file->to_rel($root); $rel_file =~ s/\.[^.]+?$//;
 	my $content;
 	my @includes;

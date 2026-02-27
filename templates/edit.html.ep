@@ -27,11 +27,9 @@
 			<div id="filename">
 				<input type="text" name="slug" value="<%= $slug %>" required>
 				<select id="ext" name="ext">
-					<option value="md" <%= 'selected' if $ext eq 'md' %>>.md</option>
-					<option value="txt" <%= 'selected' if $ext eq 'txt' %>>.txt</option>
-					<option value="html" <%= 'selected' if $ext eq 'html' %>>.html</option>
-					<option value="css" <%= 'selected' if $ext eq 'css' %>>.css</option>
-					<option value="js" <%= 'selected' if $ext eq 'js' %>>.js</option>
+					% foreach my $allowed_ext (@{$c->config->{allowed_exts}}) {
+					<option value="<%= $allowed_ext %>" <%= 'selected' if $ext eq $allowed_ext %>><%= ".$allowed_ext" %></option>
+					% }
 				</select>
 			</div>
 			<textarea name="content"><%= $content %></textarea>
