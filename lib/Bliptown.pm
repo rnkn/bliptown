@@ -238,6 +238,8 @@ sub startup {
 					$c->res->headers->etag($etag);
 					return $c->reply->file($file);
 				}
+			} else {
+				$c->res->headers->cache_control('no-cache');
 			}
 			return;
 		}
