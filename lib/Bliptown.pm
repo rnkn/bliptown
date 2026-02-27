@@ -230,12 +230,8 @@ sub startup {
 				my $user_home = $c->config->{user_home};
 				my $file = path($user_home, $req_user, $path);
 				if (-f $file) {
-					my @stats = stat $file;
-					my $mtime = $stats[9];
-					my $etag = sprintf('"%x"', $mtime);
 					my $max_age = 24 * 60 * 60;
-					$c->res->headers->cache_control('public, must-revalidate, max-age=' . $max_age);
-					$c->res->headers->etag($etag);
+					$c->res->headers->cache_control("public, must-revalidate, max-age=$max_age");
 					return $c->reply->file($file);
 				}
 			} else {
