@@ -28,7 +28,7 @@ sub startup {
 		port => $app->mode eq 'production' ? '' : '3000',
 		user_home => $ENV{BLIPTOWN_USER_HOME},
 		log_home => $ENV{BLIPTOWN_LOG_HOME},
-		allowed_exts => [ qw(md html css js txt patch) ]
+		allowed_exts => [ qw(md html css js txt) ]
 	);
 
 	$app->secrets(
