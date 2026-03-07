@@ -7,14 +7,14 @@ use lib "$Bin/../lib", "$Bin/../local/lib/perl5";
 use Mojolicious::Commands;
 
 die "BLIPTOWN_SECRET not defined" unless $ENV{BLIPTOWN_SECRET};
-die "BLIPTOWN_HEALTH_FILE not defined " unless $ENV{BLIPTOWN_HEALTH_FILE};
-die "BLIPTOWN_HELPER_HEALTH_FILE not defined " unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
-die "BLIPTOWN_HELPER_SOCKER not defined " unless $ENV{BLIPTOWN_HELPER_SOCKET};
+die "BLIPTOWN_HEALTH_FILE not defined" unless $ENV{BLIPTOWN_HEALTH_FILE};
+die "BLIPTOWN_HELPER_HEALTH_FILE not defined" unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
+die "BLIPTOWN_HELPER_SOCKER not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
 
-die "BLIPTOWN_DOMAIN not defined " unless $ENV{BLIPTOWN_DOMAIN};
-die "BLIPTOWN_IPV4 not defined " unless $ENV{BLIPTOWN_IPV4};
-die "BLIPTOWN_IPV6 not defined " unless $ENV{BLIPTOWN_IPV6};
-die "BLIPTOWN_USER_HOME not defined " unless $ENV{BLIPTOWN_USER_HOME};
+die "BLIPTOWN_DOMAIN not defined" unless $ENV{BLIPTOWN_DOMAIN};
+die "BLIPTOWN_IPV4 not defined" unless $ENV{BLIPTOWN_IPV4};
+die "BLIPTOWN_IPV6 not defined" unless $ENV{BLIPTOWN_IPV6};
+die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
 die "BLIPTOWN_DB not defined" unless $ENV{BLIPTOWN_DB};
 die "BLIPTOWN_LOG_HOME not defined" unless $ENV{BLIPTOWN_LOG_HOME};
 die "BLIPTOWN_GEOIP_DB not defined" unless $ENV{BLIPTOWN_GEOIP_DB};
