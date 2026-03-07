@@ -106,10 +106,45 @@ sub download_snapshot {
 	return $c->reply->asset($asset);
 }
 
-sub diff_snapshot {
+sub diff_to_html {
+	my $chars = shift;
+	my $html = '';
+	$chars =~ s/&/&amp;/g;
+	$chars =~ s/</&lt;/g;
+	$chars =~ s/>/&gt;/g;
+
+	for my $line (split /\n/, $chars) {
+        if ($line =~ /^( |--[- ]$)/) {
+			$html .= "$line\n";
+		}
+        elsif ($line =~ /^@@/) {
+            $html .= qq{<span class="hunk-header">$line</span>\n};
+        }
+		elsif ($line =~ /^\+/) {
+            $html .= qq{<span class="addition">$line</span>\n};
+        }
+		elsif ($line =~ /^-/) {
+            $html .= qq{<span class="deletion">$line</span>\n};
+        }
+		else {
+            $html .= qq{<span class="meta">$line</span>\n};
+        }
+    }
+
+	$html = <<"EOF";
+
+<section class="wide">
+	<pre class="diff">$html</pre>
+</section>
+
+EOF
+	return $html;
+}
+
+sub render_diff {
 	my $c = shift;
-	my $username = $c->session('username');
 	my $hash = $c->param('hash');
+	my $username = $c->session('username');
 
 	my $res = $c->ipc->send_message(
 		{
@@ -122,10 +157,15 @@ sub diff_snapshot {
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	my $diff = $res->{info};
-	return $c->render(
-		text => $diff,
-		format => 'txt',
+
+	my $html = diff_to_html($diff);
+
+	$c->stash(
+		template => 'diff',
+		title => "Snapshot $hash",
+		content => $html
 	);
+	return $c->render;
 }
 
 return 1;

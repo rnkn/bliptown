@@ -1,0 +1,17 @@
+% layout 'default';
+<nav>
+	<header>
+		<h1><%= $title %></h1>
+	</header>
+	<menu>
+		<ul>
+			<li><a href="<%= url_for('list_snapshots') %>" class="exit">Snapshots</a>
+			<li><a href="/" class="exit">View Site</a>
+		</ul>
+	</menu>
+</nav>
+<main id="diff" class="backstage">
+	<section class="wide">
+		%== $content
+	</section>
+</main>

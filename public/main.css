@@ -599,6 +599,22 @@ input#create-directory-toggle:checked ~ #create-directory-controls {
 	background-color: var(--warning-bg-color);
 }
 
+/* Patches */
+
+.diff .hunk-header {
+	font-weight: bold;
+}
+
+.diff .addition {
+	color: #22863a;
+	background: #f0fff4;
+}
+
+.diff .deletion {
+	color: #b31d28;
+	background: #ffeef0;
+}
+
 /* layouts */
 
 section {
