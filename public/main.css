@@ -226,7 +226,7 @@ main textarea {
 	inset: 0;
 	height: 0;
 	background-color: white;
-	box-shadow: inset 0 -25px 25px rgba(0,0,0,0.05);
+	box-shadow: inset 0 -10px 10px rgba(0,0,0,0.03);
 	transition: height 0.3s ease, visibility 0.3s ease;
 }
 
