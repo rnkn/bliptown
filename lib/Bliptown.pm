@@ -226,6 +226,7 @@ sub startup {
 
 			if ($host eq "cdn-origin.$domain") {
 				my $req_user = shift @{$req_url->path->parts};
+				return unless $req_user;
 				my $path = join '/', @{$req_url->path->parts};
 				my $user_home = $c->config->{user_home};
 				my $file = path($user_home, $req_user, $path);
