@@ -8,13 +8,16 @@ use lib '.';
 use Geo::Location::IP::Database::Reader;
 
 use Bliptown::Model::User;
-use Bliptown::Model::Subscription;
-use Bliptown::Model::Page;
 use Bliptown::Model::File;
+use Bliptown::Model::Page;
+use Bliptown::Model::Metadata;
+use Bliptown::Model::Mustache;
+use Bliptown::Model::Subscription;
 use Bliptown::Model::IPC;
 use Bliptown::Model::TOTP;
 use Bliptown::Model::QRCode;
 use Bliptown::Model::Token;
+use Bliptown::Model::Util;
 
 sub startup {
 	my $app = shift;
@@ -85,8 +88,26 @@ sub startup {
 		page => sub {
 			my $c = shift;
 			return Bliptown::Model::Page->new(
-				user => $c->user,
 				req_user => $c->get_req_user,
+				user => $c->user,
+				metadata => $c->metadata,
+				mustache => $c->mustache,
+				util => $c->util
+			);
+		});
+
+	$app->helper(
+		metadata => sub {
+			return Bliptown::Model::Metadata->new;
+		});
+
+	$app->helper(
+		mustache => sub {
+			my $c = shift;
+			return Bliptown::Model::Mustache->new(
+				user => $c->user,
+				metadata => $c->metadata,
+				util => $c->util
 			);
 		});
 
@@ -114,6 +135,16 @@ sub startup {
 		});
 
 	$app->helper(
+		util => sub {
+			my $c = shift;
+			return Bliptown::Model::Util->new(
+				req_user => $c->get_req_user,
+				user => $c->user
+			);
+		}
+	);
+
+	$app->helper(
 		get_slug => sub {
 			my $slug = shift->req->url->path->to_string;
 			$slug = url_unescape($slug);
@@ -125,7 +156,7 @@ sub startup {
 		get_req_user => sub {
 			my $c = shift;
 			my $host = $c->req->url->to_abs->host;
-			return '' unless $host;
+			return unless $host;
 			$host =~ s/^www\.//;
 			my $domain = $c->config->{domain};
 			my $username = '';
