@@ -6,6 +6,7 @@ use YAML::Tiny;
 use POSIX qw(strftime);
 use Mojo::DOM::HTML;
 use Mojo::Util qw(encode decode);
+use Bliptown::Model::Mustache;
 
 has 'user';
 has 'req_user';
@@ -113,23 +114,6 @@ EOF
 	};
 }
 
-sub collect_blog_posts {
-	my ($self, @page_list) = @_;
-	@page_list = grep { defined $_->{metadata}->{date} } @page_list;
-	@page_list = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @page_list;
-	foreach my $page (@page_list) {
-		my $html = <<"EOF";
-
-<div class="blog-post">
-	$page->{html}
-</div>
-
-EOF
-		$page->{html} = $html;
-	}
-	return @page_list;
-}
-
 sub process_prettydate {
 	my ($self, $date) = @_;
 	my $req_user = $self->req_user;
@@ -149,63 +133,6 @@ sub process_prettydate {
 	return strftime($format, 0, 0, 0, $day, $month, $year) // '';
 }
 
-sub process_variables {
-	my ($self, $html, $args) = @_;
-	my $metadata = $args->{metadata};
-	my $variable_re = qr/\Q{{\E *([^>\xA0]+?) *\Q}}\E/;
-
-	while ($html =~ $variable_re) {
-		my $key = $1;
-		my $val;
-		my $date = $metadata->{date};
-
-		if ($date && $key eq 'prettydate') {
-			$val = $self->process_prettydate($date);
-		} else {
-			$val = $metadata->{$key} // '';
-		}
-		$html =~ s/$variable_re/$val/;
-	}
-	return $html;
-}
-
-sub process_partials {
-	my ($self, $html, $args) = @_;
-	my $partial_re = qr{(?:<p>)?\Q{{\E *(?:>|&gt;) *(.*?) *\Q}}\E(?:</p>)?};
-
-	while ($html =~ $partial_re) {
-		my $slug = $1;
-		my @file_list = $self->glob_path($slug, $args);
-		my @page_list;
-		foreach my $filename (@file_list) {
-			my $page;
-
-			if (!-f $filename) {
-				$page = $self->error_not_found($slug);
-			} elsif ($args->{recur} >= 64) {
-				$page = $self->error_max_recursion;
-			} else {
-				my %metadata = %{$args->{metadata} // {}};
-				$page = $self->read_page(
-					{
-						root => $args->{root},
-						filename => $filename,
-						recur => $args->{recur} + 1,
-						metadata => \%metadata,
-					}
-				);
-			}
-
-			push @page_list, $page;
-		}
-		@page_list = $self->collect_blog_posts(@page_list) if scalar @page_list > 1;
-
-		my $frag = join("\n", map { $_->{html} } @page_list);
-		$html =~ s/$partial_re/$frag/;
-	}
-	return $html;
-}
-
 sub glob_path {
 	my ($self, $slug, $args) = @_;
 	my $path = $slug;
@@ -221,6 +148,14 @@ sub glob_path {
 	my @file_list = glob $path;
 	@file_list = grep { $_ ne $args->{filename} } @file_list;
 	return @file_list;
+}
+
+sub file_to_slug {
+	my ($self, $filename, $args) = @_;
+	my $root = $args->{root};
+	my $rel = Mojo::File->new($filename)->to_rel($root)->to_string;
+	$rel =~ s/\.md$//;
+	return "/$rel";
 }
 
 sub split_frontmatter {
@@ -280,7 +215,6 @@ EOF
 sub render_markdown {
 	my ($self, $text, $args) = @_;
 
-	$text = $self->process_variables($text, $args);
 	my $html = $self->markdown_to_html($text);
 
 	if (my $layout = $args->{metadata}->{layout}) {
@@ -315,8 +249,9 @@ sub read_page {
 		my $child_metadata = $self->parse_yaml($yaml) if $yaml;
 		%{$args->{metadata}} = (%$parent_metadata, %$child_metadata) if $child_metadata;
 
+		my $mustache = Bliptown::Model::Mustache->new(page => $self);
+		$text = $mustache->process($text, $args);
 		$html = $self->render_markdown($text, $args);
-		$html = $self->process_partials($html, $args);
 	}
 
 	unless ($args->{recur}) {
