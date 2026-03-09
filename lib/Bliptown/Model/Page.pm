@@ -139,7 +139,8 @@ sub glob_path {
 	$path =~ s/(\.md)?$/.md/;
 
 	if ($path =~ m{^/}) {
-		$path = path($args->{root}, $path)->to_abs;
+		$path =~ s{^/}{};
+		$path = path($args->{root}, $path)->to_string;
 	} else {
 		my $file = Mojo::File->new($args->{filename});
 		$path = path($file->dirname, $path)->to_abs;
