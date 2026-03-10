@@ -53,16 +53,20 @@ fetch_cert() {
 	fi
 }
 
-backup_old="/home/bliptown/backups/old.tar.gz"
-backup_cur="/home/bliptown/backups/current.tar.gz"
-
-ok=true
 echo -n "Making backups... "
-test -f "$backup_old" || install -m 0600 -o root -g wheel "$backup_old"
-test -f "$backup_cur" || install -m 0600 -o root -g wheel "$backup_cur"
-cp "$backup_cur" "$backup_old" || ok=false
-find /home/bliptown/users -type f -name '*.md' -print0 |
-	xargs -0 tar -czf "$backup_cur" 2> /dev/null || ok=false
+backup_dir=/home/bliptown/backups
+mkdir -p "$backup_dir"
+cd "$backup_dir" && {
+	rm -f backup.7.tar.gz
+	for i in $(seq 6 1)
+	do
+		j=$(( i + 1 ))
+		test -f "backup.$i.tar.gz" && mv "backup.$i.tar.gz" "backup.$j.tar.gz"
+	done
+	install -m 0600 -o root -g wheel /dev/null "backup.1.tar.gz"
+	find /home/bliptown/users -type f -name '*.md' -print0 |
+		xargs -0 tar -czf "backup.1.tar.gz" 2> /dev/null || ok=false
+}
 $ok && echo "done" || echo "failed"
 echo
 
