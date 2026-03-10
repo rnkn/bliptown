@@ -37,11 +37,10 @@ fetch_cert() {
 	then
 		echo "Malformed JSON response"
 	else
-		cert_hash=$(/usr/bin/openssl x509 -in "$cert_chain_tmp" -pubkey \
-						| /usr/bin/openssl pkey -pubin | /bin/md5)
-		key_hash=$(/usr/bin/openssl pkey -in "$cert_key_tmp" -pubout | /bin/md5)
+		cert_hash=$(openssl x509 -in "$cert_chain_tmp" -pubkey | openssl pkey -pubin | md5)
+		key_hash=$(openssl pkey -in "$cert_key_tmp" -pubout | md5)
 
-		echo -n "Matching certificate with key..."
+		echo -n "Matching certificate with key... "
 		if [ "X$cert_hash" != "X$key_hash" ]
 		then
 			echo "failed"
@@ -60,7 +59,7 @@ fetch_cert bliptown-staging.com
 echo
 
 echo "Renewing user certificates:"
-/usr/bin/grep "^domain" /etc/acme-domains.conf | /usr/bin/cut -d' ' -f2 | while read -r domain
+grep "^domain" /etc/acme-domains.conf | cut -d' ' -f2 | while read -r domain
 do
 	echo -n "$domain..."
 	ok=true
@@ -71,7 +70,7 @@ do
 	then
 		echo "failed"
 	else
-		/usr/sbin/acme-client "$domain"
+		acme-client "$domain"
 		case $? in
 			(0)		echo "revoked/renewed" ;;
 			(1)		echo "failed" ;;
@@ -82,7 +81,7 @@ done
 echo
 
 echo "Restarting relayd:"
-/usr/sbin/rcctl restart relayd
+rcctl restart relayd
 echo
 
 echo "Expunging database dead login tokens:"
@@ -106,10 +105,10 @@ echo "Copied: $staging_db"
 echo
 
 echo "Creating /software.txt:"
-/usr/sbin/pkg_info -m > /home/bliptown/users/mayor/software.txt
+pkg_info -m > /home/bliptown/users/mayor/software.txt
 echo "Done"
 echo
 
 echo "Flushing rate-limited IPs:"
-/sbin/pfctl -t rate_limit -T expire 86400
+pfctl -t rate_limit -T expire 86400
 echo "Done"
