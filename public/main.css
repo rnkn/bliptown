@@ -46,6 +46,10 @@ pre, code {
 	white-space: pre;
 }
 
+pre code {
+	font-size: 1em;
+}
+
 img {
 	display: block;
 	max-width: 100%;
