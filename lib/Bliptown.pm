@@ -304,6 +304,14 @@ sub startup {
 		}
 	);
 
+	my $private = $protected->under(
+		sub {
+			my $c = shift;
+			$c->stash(subdir => 'private');
+			return 1;
+		}
+	);
+
 	my $block_demo = sub {
 		my $c = shift;
 		my $username = $c->session('username') // '';
@@ -319,7 +327,8 @@ sub startup {
 		return 1;
 	};
 
-	$protected->get('/private/*catchall')->to(controller => 'Pages', action => 'render_private', catchall => '')->name('render_private');
+	$private->get('/raw/private/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_private_raw');
+	$private->get('/private/*catchall')->to(controller => 'Pages', action => 'render_page', catchall => '')->name('render_private_page');
 
 	$protected->get('/new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
 	$protected->get('/edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');

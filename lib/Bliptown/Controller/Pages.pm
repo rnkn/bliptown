@@ -39,13 +39,6 @@ sub postprocess_skel {
 	return $dom->to_string;
 }
 
-sub render_private {
-	my $c = shift;
-	my $catchall = $c->param('catchall') || '';
-	$c->stash(catchall => 'private/' . $catchall);
-	$c->render_page;
-}
-
 sub render_page {
 	my $c = shift;
 	my $user_home = $c->config->{user_home};
@@ -55,7 +48,10 @@ sub render_page {
 	my $username = $c->session('username');
 
 	my $is_cur_user = $username && $username eq $req_user;
-	my $slug = url_unescape $c->stash('catchall');
+
+	my $slug = url_unescape $c->param('catchall');
+	my $subdir = $c->stash('subdir');
+	$slug = "$subdir/" . $slug if $subdir;
 
 	my $redirects_file = path($root, '_redirects.txt');
 	my $redirect_url = process_redirects($redirects_file, $slug)
@@ -293,7 +289,10 @@ sub save_page {
 
 sub render_raw {
 	my $c = shift;
-	my $slug = $c->param('catchall');
+	my $slug = url_unescape $c->param('catchall');
+	my $subdir = $c->stash('subdir');
+	$slug = "$subdir/" . $slug if $subdir;
+
 	return $c->reply->txt_not_found unless my $file = $c->get_file($slug);
 	my $chars = $file->slurp('utf-8');
 	return $c->render(text => $chars, format => 'txt');
