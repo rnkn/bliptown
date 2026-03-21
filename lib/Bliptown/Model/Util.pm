@@ -14,8 +14,11 @@ sub split_frontmatter {
 	return (undef, $chars);
 }
 
-sub get_user_prettydate_format {
-	my ($self) = @_;
+sub process_prettydate {
+	my ($self, $date) = @_;
+	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
+	$year = $year - 1900;
+	$month--;
 	my $req_user = $self->req_user;
 	my $user = $self->user->read_user(
 		{ key => 'username', username => $req_user }
@@ -27,15 +30,7 @@ sub get_user_prettydate_format {
 		3 => '%Y',
 		4 => '%F'
 	);
-	return $date_formats{$user->{date_format} // 0};
-}
-
-sub process_prettydate {
-	my ($self, $date) = @_;
-	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
-	$year = $year - 1900;
-	$month--;
-	my $format = $self->get_user_prettydate_format;
+	my $format = $date_formats{$user->{date_format} // 0};
 	return strftime($format, 0, 0, 0, $day, $month, $year) // '';
 }
 
