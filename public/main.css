@@ -74,8 +74,11 @@ blockquote {
 }
 
 table {
-	width: 100%;
 	text-align: left;
+}
+
+table td {
+	padding: 2px;
 }
 
 details summary:hover {
@@ -763,6 +766,7 @@ main:has(.cover) footer {
 /* Stats */
 
 .stats table {
+	width: 100%;
 	margin-bottom: 1em;
 }
 
@@ -784,7 +788,7 @@ main:has(.cover) footer {
 
 /* tables */
 
-.row-hover table tbody tr:hover {
+.table-hover table tbody tr:hover {
 	background-color: var(--row-hover-color);
 }
 
