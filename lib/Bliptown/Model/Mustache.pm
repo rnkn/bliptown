@@ -93,17 +93,21 @@ sub process_partials {
 		my @partial_list;
 		foreach my $filename (@file_list) {
 			if (!-f $filename) {
-				$partial = $self->error_not_found($slug)->{html};
+				$partial = $self->error_not_found($slug);
 			} elsif (($args->{recur} // 0) >= 64) {
-				$partial = $self->error_max_recursion()->{html};
+				$partial = $self->error_max_recursion();
 			} else {
 				$partial = $self->read_partial($filename, $args);
 			}
-			push @partial_list, $partial;
+			push @partial_list, $partial if defined $partial;
 		}
 
-		@partial_list = $self->collect_partials(\@partial_list) if scalar @partial_list > 1;
-		$partial = join '\n', @partial_list;
+		if (scalar @partial_list > 1) {
+			@partial_list = @{$self->collect_partials(\@partial_list)};
+			$partial = join "\n", @partial_list;
+		} elsif (@partial_list) {
+			$partial = $partial_list[0]->{html} // '';
+		}
 		$text =~ s/$partial_re/$partial/;
 	}
 	return $text;
@@ -116,7 +120,7 @@ sub collect_partials {
 	@$partial_list = map { <<"EOF"
 <div class="blog-post">
 
-$_
+$_->{html}
 
 </div>
 EOF
@@ -171,7 +175,10 @@ sub read_partial {
 		metadata => \%metadata,
 	};
 
-	return $self->process($text, $child_args);
+	return {
+		html     => $self->process($text, $child_args),
+		metadata => \%metadata,
+	};
 }
 
 return 1;

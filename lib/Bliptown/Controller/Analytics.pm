@@ -16,7 +16,7 @@ sub track_visit {
 	my $country = $country_obj->country->name if $country_obj;
 	my $ip_hash = hmac_sha1_hex($ip, $c->app->secrets->[0]);
 
-	my $url = Mojo::URL->new($tx->req->headers->referrer);
+	my $url = Mojo::URL->new($tx->req->headers->referrer // '');
 	my $host = $url->host;
 	my $path_query = $url->path_query;
 
