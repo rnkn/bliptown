@@ -147,7 +147,7 @@ my $tables = {
 print <<"EOF";
 ---
 title: Stats
-layout: wide stats row-hover
+layout: wide stats table-hover
 ---
 # Stats
 
