@@ -40,8 +40,7 @@ sub process_prettydate {
 }
 
 sub glob_path {
-	my ($self, $slug, $args) = @_;
-	my $path = $slug;
+	my ($self, $path, $args) = @_;
 	$path =~ s/(\.md)?$/.md/;
 
 	if ($path =~ m{^/}) {
@@ -52,9 +51,9 @@ sub glob_path {
 		$path = path($file->dirname, $path)->to_abs;
 	}
 
-	my @file_list = glob $path;
-	@file_list = grep { $_ ne $args->{filename} } @file_list;
-	return @file_list;
+	my @filenames = glob $path;
+	@filenames = grep { $_ ne $args->{filename} } @filenames;
+	return @filenames;
 }
 
 sub file_to_slug {

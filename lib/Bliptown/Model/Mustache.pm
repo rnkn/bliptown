@@ -53,21 +53,21 @@ sub process_sections {
 
 	while ($text =~ $section_re) {
 		my ($glob, $template) = ($1, $2);
-		my @file_list = $self->util->glob_path($glob, $args);
+		my @filenames = $self->util->glob_path($glob, $args);
 
 		my @items;
-		foreach my $filename (@file_list) {
+		foreach my $filename (@filenames) {
 			next unless -f $filename;
 			my $chars = Mojo::File->new($filename)->slurp('utf-8');
-			my ($yaml, $text) = $self->util->split_frontmatter($chars);
-			my $metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
-			next unless $metadata && $metadata->{date};
+			my ($yaml, undef) = $self->util->split_frontmatter($chars);
+			my $item_metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
+			next unless $item_metadata && $item_metadata->{date};
 
-			my %parent_metadata = %{$args->{metadata} // {}};
-			my %child_metadata = (%parent_metadata, %$metadata);
-			$child_metadata{url} = $self->util->file_to_slug($filename, $args);
+			my %parent_metadata = %{$args->{metadata} // {} };
+			%$item_metadata = (%parent_metadata, %$item_metadata);
+			$$item_metadata{url} = $self->util->file_to_slug($filename, $args);
 
-			push @items, \%child_metadata;
+			push @items, $item_metadata;
 		}
 
 		@items = sort { $b->{date} cmp $a->{date} } @items;
@@ -87,45 +87,42 @@ sub process_partials {
 
 	while ($text =~ $partial_re) {
 		my $slug = $1;
-		my @file_list = $self->util->glob_path($slug, $args);
+		my @filenames = $self->util->glob_path($slug, $args);
 
 		my $partial = '';
-		my @partial_list;
-		foreach my $filename (@file_list) {
+		my @partials;
+		foreach my $filename (@filenames) {
 			if (!-f $filename) {
 				$partial = $self->error_not_found($slug);
 			} elsif (($args->{recur} // 0) >= 64) {
-				$partial = $self->error_max_recursion();
+				$partial = $self->error_max_recursion;
 			} else {
 				$partial = $self->read_partial($filename, $args);
 			}
-			push @partial_list, $partial if defined $partial;
+			push @partials, $partial if $partial;
 		}
 
-		if (scalar @partial_list > 1) {
-			@partial_list = @{$self->collect_partials(\@partial_list)};
-			$partial = join "\n", @partial_list;
-		} elsif (@partial_list) {
-			$partial = $partial_list[0]->{html} // '';
-		}
+		@partials = @{$self->collect_partials(\@partials)} if scalar @partials > 1;
+		$partial = join "\n", map { $_->{text} } @partials;
 		$text =~ s/$partial_re/$partial/;
 	}
 	return $text;
 }
 
 sub collect_partials {
-	my ($self, $partial_list) = @_;
-	@$partial_list = grep { defined $_->{metadata}->{date} } @$partial_list;
-	@$partial_list = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @$partial_list;
-	@$partial_list = map { <<"EOF"
+	my ($self, $partial_list_ref) = @_;
+	my @partials = @$partial_list_ref;
+	@partials = grep { defined $_->{metadata}->{date} } @partials;
+	@partials = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @partials;
+	map { $_->{text} = <<"EOF"
 <div class="blog-post">
 
-$_->{html}
+$_->{text}
 
 </div>
 EOF
-	} @$partial_list;
-	return $partial_list;
+	} @partials;
+	return \@partials;
 }
 
 sub error_not_found {
@@ -138,7 +135,7 @@ EOF
 			title => 'Error 404: File Not Found',
 			status => 404,
 		},
-		html => $html
+		text => $html
 	}
 }
 
@@ -152,7 +149,7 @@ EOF
 			title => 'Error 508: Recursion',
 			status => 508,
 		},
-		html => $html
+		text => $html
 	};
 }
 
@@ -175,10 +172,10 @@ sub read_partial {
 		metadata => \%metadata,
 	};
 
-	return {
-		html     => $self->process($text, $child_args),
-		metadata => \%metadata,
-	};
+	return  {
+		text => $self->process($text, $child_args),
+		metadata => \%metadata
+	}
 }
 
 return 1;

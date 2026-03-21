@@ -320,7 +320,7 @@ sub startup {
 			my $c = shift;
 			my $username = $c->session('username');
 			my $req_user = $c->get_req_user;
-			if ($username && $username eq $req_user) {
+			if ($username && $username eq ($req_user // '')) {
 				return 1;
 			} else {
 				$c->flash(info => 'Login required');

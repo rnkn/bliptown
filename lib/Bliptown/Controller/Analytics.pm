@@ -6,7 +6,7 @@ use Mojo::File qw(path);
 sub track_visit {
 	my $c = shift;
 	my $username = $c->session('username') // '';
-	return $c->render(data => '') if $username eq $c->get_req_user;
+	return $c->render(data => '') if $username eq ($c->get_req_user // '');
 	my $tx = $c->tx;
 
 	my $ip = $tx->req->headers->header('X-Forwarded-For') //

@@ -47,7 +47,7 @@ sub render_page {
 	my $root = path($user_home, $req_user);
 	my $username = $c->session('username');
 
-	my $is_cur_user = $username && $username eq $req_user;
+	my $is_cur_user = $username && $username eq ($req_user // '');
 
 	my $slug = url_unescape $c->param('catchall');
 	my $subdir = $c->stash('subdir');
