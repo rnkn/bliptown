@@ -30,7 +30,7 @@ EOF
 sub process_variables {
 	my ($self, $text, $args) = @_;
 	my $metadata = $args->{metadata};
-	my $variable_re = qr/\{\{\s*([[:alnum:]\s_-]+?)\s*\}\}/;
+	my $variable_re = qr/\{\{\ *([[:alnum:]\ _-]+?)\ *\}\}/;
 
 	while ($text =~ $variable_re) {
 		my $key = $1;
@@ -49,7 +49,7 @@ sub process_variables {
 
 sub process_sections {
 	my ($self, $text, $args) = @_;
-	my $section_re = qr/\{\{\s*#\s*([^\n]+?)\s*\}\}\n(.*?)\n?\{\{\s*\/\s*\}\}/s;
+	my $section_re = qr/\{\{\ *#\ *([^\n]+?)\ *\}\}\n(.*?)\n?\{\{\ *\/\ *\}\}/s;
 
 	while ($text =~ $section_re) {
 		my ($glob, $template) = ($1, $2);
@@ -83,7 +83,7 @@ sub process_sections {
 
 sub process_partials {
 	my ($self, $text, $args) = @_;
-	my $partial_re = qr/\{\{\s*>\s*(.+?)\s*\}\}/;
+	my $partial_re = qr/\{\{\ *>\ *(.+?)\ *\}\}/;
 
 	while ($text =~ $partial_re) {
 		my $slug = $1;
