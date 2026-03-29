@@ -1,6 +1,7 @@
 package Bliptown::Model::Page;
 use Mojo::Base -base;
 use Mojo::File qw(path);
+use Mojo::DOM;
 use FFI::Platypus;
 use Mojo::DOM::HTML;
 use Mojo::Util qw(encode decode);
