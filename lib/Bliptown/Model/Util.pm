@@ -20,6 +20,7 @@ sub process_prettydate {
 	$year = $year - 1900;
 	$month--;
 	my $req_user = $self->req_user;
+	return unless $req_user;
 	my $user = $self->user->read_user(
 		{ key => 'username', username => $req_user }
 	);
