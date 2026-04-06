@@ -75,6 +75,7 @@ blockquote {
 
 table {
 	text-align: left;
+	margin-bottom: 1em;
 }
 
 table td {
@@ -666,6 +667,10 @@ main:has(.cover) footer {
 	max-width: 100%;
 }
 
+.wide-table table {
+	width: 100%;
+}
+
 .gallery-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(18em, max-content));
@@ -767,7 +772,6 @@ main:has(.cover) footer {
 
 .stats table {
 	width: 100%;
-	margin-bottom: 1em;
 }
 
 .stats table td {
