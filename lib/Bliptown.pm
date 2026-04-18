@@ -392,3 +392,16 @@ sub startup {
 }
 
 return 1;
+
+=head1 NAME
+
+Bliptown - A portfolio platform for artists and creatives.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2025-2026, Paul W. Rankin
+
+This program is free software, you can redistribute it and/or modify
+it under the terms of the Artistic License version 2.0.
+
+=cut
