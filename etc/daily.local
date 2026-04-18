@@ -88,6 +88,7 @@ do
 	test -n "$domain" || ok=false
 	$ok && test "$(dig "$domain" A    +short)" == "$expected_a_record"    || ok=false
 	$ok && test "$(dig "$domain" AAAA +short)" == "$expected_aaaa_record" || ok=false
+	$ok && $(dig "$domain" CAA +short)                                    || ok=false
 	if ! $ok
 	then
 		echo "failed"
