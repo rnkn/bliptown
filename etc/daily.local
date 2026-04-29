@@ -9,72 +9,94 @@ cleanup() {
 trap cleanup EXIT
 
 fetch_cert() {
+	ok=true
 	domain=$1
 	endpoint="https://api.porkbun.com/api/json/v3/ssl/retrieve/${domain}"
-	echo "Fetching certificate: $domain"
 	cert_chain="/etc/ssl/${domain}.crt"
 	cert_key="/etc/ssl/private/${domain}.key"
 	json_tmp=$(mktemp)
 	tmpfiles="$json_tmp $tmpfiles"
 
-	/usr/local/bin/curl -fsS -X POST -d "@$porkbun_payload" -m 30 "$endpoint" > "$json_tmp"
+	echo "Fetching certificate: $domain"
+	/usr/local/bin/curl -fsS -X POST -d "@$porkbun_payload" -m 30 "$endpoint" > "$json_tmp" || ok=false
+	$ok || { echo "Fetch failed" >&2; return 1; }
 
-	if [ ! -s "$json_tmp" ]
-	then
-		echo "Failed"
-	else
-		cert_chain_tmp=$(mktemp)
-		tmpfiles="$cert_chain_tmp $tmpfiles"
-		cert_key_tmp=$(mktemp)
-		tmpfiles="$cert_key_tmp $tmpfiles"
+	cert_chain_tmp=$(mktemp)
+	tmpfiles="$cert_chain_tmp $tmpfiles"
+	cert_key_tmp=$(mktemp)
+	tmpfiles="$cert_key_tmp $tmpfiles"
 
-		ok=true
-		/usr/local/bin/jq -r .certificatechain < "$json_tmp" > "$cert_chain_tmp" || ok=false
-		/usr/local/bin/jq -r .privatekey       < "$json_tmp" > "$cert_key_tmp"   || ok=false
-	fi
+	/usr/local/bin/jq -r .certificatechain < "$json_tmp" > "$cert_chain_tmp" || ok=false
+	/usr/local/bin/jq -r .privatekey       < "$json_tmp" > "$cert_key_tmp"   || ok=false
+	$ok || { echo "Malformed JSON response" >&2; return 1; }
 
-	if ! $ok
-	then
-		echo "Malformed JSON response"
-	else
-		cert_hash=$(openssl x509 -in "$cert_chain_tmp" -pubkey | openssl pkey -pubin | md5)
-		key_hash=$(openssl pkey -in "$cert_key_tmp" -pubout | md5)
+	cert_hash=$(openssl x509 -in "$cert_chain_tmp" -pubkey | openssl pkey -pubin | md5)
+	key_hash=$(openssl pkey -in "$cert_key_tmp" -pubout | md5)
 
-		echo -n "Matching certificate with key... "
-		if [ "X$cert_hash" != "X$key_hash" ]
-		then
-			echo "failed"
-		else
-			echo "succeeded"
-			echo "Installing certificates:"
-			install -m 0644 -o root -g wheel "$cert_chain_tmp" "$cert_chain" && echo "$cert_chain installed."
-			install -m 0600 -o root -g wheel "$cert_key_tmp" "$cert_key" && echo "$cert_key installed."
-		fi
-	fi
+	echo -n "Matching certificate with key... "
+	[ "X$cert_hash" == "X$key_hash" ] || ok=false
+	$ok || { echo "failed" >&2; return 1; }
+	echo "succeeded"
+	echo
+	echo "Installing certificates:"
+
+	install -m 0644 -o root -g wheel "$cert_chain_tmp" "$cert_chain" && echo "$cert_chain installed" || ok=false
+	$ok || { echo "$cert_chain failed" >&2; return 1; }
+
+	install -m 0600 -o root -g wheel "$cert_key_tmp" "$cert_key" && echo "$cert_key installed" || ok=false
+	$ok || { echo "$cert_key failed" >&2; return 1; }
 }
 
-echo -n "Making backups... "
-backup_dir=/home/bliptown/backups
-mkdir -p "$backup_dir"
-cd "$backup_dir" && {
-	rm -f backup.7.tar.gz
-	for i in $(seq 6 1)
-	do
-		j=$(( i + 1 ))
-		test -f "backup.$i.tar.gz" && mv "backup.$i.tar.gz" "backup.$j.tar.gz"
-	done
-	install -m 0600 -o root -g wheel /dev/null "backup.1.tar.gz"
-	find /home/bliptown/users -type f \
-		 \(		-name '*.md' \
-		 -or	-name '*.txt' \
-		 -or	-name '*.css' \
-		 -or	-name '*.html' \
-		 -or	-name '*.js' \) -print0 |
-			 xargs -0 tar -czf "backup.1.tar.gz" 2> /dev/null || ok=false
+renew_cert() {
+	domain=$1
+	test -n "$domain" || { echo "failed" >&2; return 1; }
+
+	echo -n "$domain... "
+	$ok && test "$(dig "$domain" A    +short)" == "$expected_a_record"    || ok=false
+	$ok && test "$(dig "$domain" AAAA +short)" == "$expected_aaaa_record" || ok=false
+	$ok && $(dig "$domain" CAA +short)                                    || ok=false
+	$ok || { echo "failed" >&2; return 1; }
+
+	acme-client "$domain"
+	case $? in
+		(0)		echo "revoked/renewed" ;;
+		(1)		echo "failed" ;;
+		(2)		echo "up-to-date" ;;
+	esac
 }
-$ok && echo "done" || echo "failed"
+
+backup() {
+	ok=true
+	backup_dir=/home/bliptown/backups
+
+	echo -n "Making backups... "
+	mkdir -p "$backup_dir"
+	cd "$backup_dir" && {
+		rm -f backup.7.tar.gz
+		for i in $(seq 6 1)
+		do
+			j=$(( i + 1 ))
+			test -f "backup.$i.tar.gz" && mv "backup.$i.tar.gz" "backup.$j.tar.gz" || ok=false
+			$ok || { echo "failed" >&2; return 1; }
+		done
+
+		install -m 0600 -o root -g wheel /dev/null "backup.1.tar.gz" || ok=false
+		$ok || { echo "failed" >&2; return 1; }
+
+		find /home/bliptown/users -type f \
+			 \(	-name '*.md' \
+			 -or	-name '*.txt' \
+			 -or	-name '*.css' \
+			 -or	-name '*.html' \
+			 -or	-name '*.js' \) -print0 |
+			xargs -0 tar -czf "backup.1.tar.gz" 2> /dev/null || ok=false
+		$ok || { echo "failed" >&2; return 1; }
+	}
+	echo "done"
+}
+
+backup
 echo
-
 fetch_cert blip.town
 echo
 fetch_cert bliptown-staging.com
@@ -83,23 +105,7 @@ echo
 echo "Renewing user certificates:"
 grep "^domain" /etc/acme-domains.conf | cut -d' ' -f2 | while read -r domain
 do
-	echo -n "$domain..."
-	ok=true
-	test -n "$domain" || ok=false
-	$ok && test "$(dig "$domain" A    +short)" == "$expected_a_record"    || ok=false
-	$ok && test "$(dig "$domain" AAAA +short)" == "$expected_aaaa_record" || ok=false
-	$ok && $(dig "$domain" CAA +short)                                    || ok=false
-	if ! $ok
-	then
-		echo "failed"
-	else
-		acme-client "$domain"
-		case $? in
-			(0)		echo "revoked/renewed" ;;
-			(1)		echo "failed" ;;
-			(2)		echo "up-to-date" ;;
-		esac
-	fi
+	renew_cert $domain
 done
 echo
 
@@ -107,31 +113,36 @@ echo "Restarting relayd:"
 rcctl restart relayd
 echo
 
-echo "Expunging database dead login tokens:"
+echo -n "Expunging database dead login tokens... "
+ok=true
 now=$(date +%s)
-/usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now"
-echo "Done"
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now" || ok=false
+$ok && echo "done" || echo "failed"
 echo
 
-echo "Creating database backup:"
+echo -n "Creating database backup... "
+ok=true
 date=$(date +%F)
 backup_db="/var/db/bliptown/users-${date}.db"
 install -m 0600 -o root -g wheel /dev/null "$backup_db"
-/usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db"
-echo "Created backup: $backup_db"
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db" || ok=false
+$ok && echo "done" || echo "failed"
 echo
 
-echo "Copying database to staging:"
+echo -n "Copying database to staging... "
+ok=true
 staging_db="/var/db/bliptown-staging/users.db"
-/usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $staging_db"
-echo "Copied: $staging_db"
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $staging_db" || ok=false
+$ok && echo "done" || echo "failed"
 echo
 
-echo "Creating /software.txt:"
-pkg_info -m > /home/bliptown/users/mayor/software.txt
-echo "Done"
+echo -n "Creating /software.txt... "
+ok=true
+pkg_info -m > /home/bliptown/users/mayor/software.txt || ok=false
+$ok && echo "done" || echo "failed"
 echo
 
-echo "Flushing rate-limited IPs:"
-pfctl -t rate_limit -T expire 86400
-echo "Done"
+echo -n "Flushing rate-limited IPs... "
+ok=true
+pfctl -q -t rate_limit -T expire 86400 || ok=false
+$ok && echo "done" || echo "failed"
