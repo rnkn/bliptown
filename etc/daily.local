@@ -1,7 +1,7 @@
 # -*- mode: sh; -*-
 porkbun_payload=/etc/ssl/private/porkbun-keys.json
-expected_a_record=95.217.242.101
-expected_aaaa_record=2a01:4f9:c01f:e0cb::1
+expected_a_record=89.167.48.186
+expected_aaaa_record=2a01:4f9:c014:ebe2::1
 
 cleanup() {
 	rm -f $tmpfiles
