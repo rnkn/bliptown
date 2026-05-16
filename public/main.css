@@ -691,7 +691,7 @@ main:has(.cover) footer {
 .gallery-horizontal > p {
 	flex-grow: 0;
 	flex-shrink: 0;
-	width: 90%;
+	max-width: 90%;
 	margin: 0;
 }
 
