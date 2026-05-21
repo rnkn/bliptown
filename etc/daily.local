@@ -33,10 +33,10 @@ fetch_cert() {
 	cert_hash=$(openssl x509 -in "$cert_chain_tmp" -pubkey | openssl pkey -pubin | md5)
 	key_hash=$(openssl pkey -in "$cert_key_tmp" -pubout | md5)
 
-	echo -n "Matching certificate with key... "
+	echo "Matching certificate with key:"
 	[ "X$cert_hash" == "X$key_hash" ] || ok=false
 	$ok || { echo "failed" >&2; return 1; }
-	echo "succeeded"
+	echo "Succeeded"
 	echo
 	echo "Installing certificates:"
 
@@ -69,7 +69,7 @@ backup() {
 	ok=true
 	backup_dir=/home/bliptown/backups
 
-	echo -n "Making backups... "
+	echo "Making backups:"
 	mkdir -p "$backup_dir"
 	cd "$backup_dir" && {
 		rm -f backup.7.tar.gz
@@ -92,7 +92,7 @@ backup() {
 			xargs -0 tar -czf "backup.1.tar.gz" 2> /dev/null || ok=false
 		$ok || { echo "failed" >&2; return 1; }
 	}
-	echo "done"
+	echo "Done"
 }
 
 backup
@@ -113,36 +113,36 @@ echo "Restarting relayd:"
 rcctl restart relayd
 echo
 
-echo -n "Expunging database dead login tokens... "
+echo "Expunging database dead login tokens:"
 ok=true
 now=$(date +%s)
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now" || ok=false
-$ok && echo "done" || echo "failed"
+$ok && echo "Done" || echo "Failed"
 echo
 
-echo -n "Creating database backup... "
+echo "Creating database backup:"
 ok=true
 date=$(date +%F)
 backup_db="/var/db/bliptown/users-${date}.db"
 install -m 0600 -o root -g wheel /dev/null "$backup_db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db" || ok=false
-$ok && echo "done" || echo "failed"
+$ok && echo "Done" || echo "Failed"
 echo
 
-echo -n "Copying database to staging... "
+echo "Copying database to staging:"
 ok=true
 staging_db="/var/db/bliptown-staging/users.db"
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db ".backup $staging_db" || ok=false
-$ok && echo "done" || echo "failed"
+$ok && echo "Done" || echo "Failed"
 echo
 
-echo -n "Creating /software.txt... "
+echo "Creating /software.txt:"
 ok=true
 pkg_info -m > /home/bliptown/users/mayor/software.txt || ok=false
-$ok && echo "done" || echo "failed"
+$ok && echo "Done" || echo "Failed"
 echo
 
-echo -n "Flushing rate-limited IPs... "
+echo "Flushing rate-limited IPs:"
 ok=true
 pfctl -q -t rate_limit -T expire 86400 || ok=false
-$ok && echo "done" || echo "failed"
+$ok && echo "Done" || echo "Failed"
