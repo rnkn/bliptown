@@ -1,8 +1,4 @@
 # -*- mode: sh; -*-
-porkbun_payload=/etc/ssl/private/porkbun-keys.json
-expected_a_record=89.167.48.186
-expected_aaaa_record=2a01:4f9:c014:ebe2::1
-
 cleanup() {
 	rm -f $tmpfiles
 }
@@ -10,6 +6,9 @@ trap cleanup EXIT
 
 fetch_cert() {
 	ok=true
+	porkbun_payload=/etc/ssl/private/porkbun-keys.json
+	expected_a_record=89.167.48.186
+	expected_aaaa_record=2a01:4f9:c014:ebe2::1
 	domain=$1
 	endpoint="https://api.porkbun.com/api/json/v3/ssl/retrieve/${domain}"
 	cert_chain="/etc/ssl/${domain}.crt"
@@ -35,7 +34,7 @@ fetch_cert() {
 
 	echo "Matching certificate with key:"
 	[ "X$cert_hash" == "X$key_hash" ] || ok=false
-	$ok || { echo "failed" >&2; return 1; }
+	$ok || { echo "Failed" >&2; return 1; }
 	echo "Succeeded"
 	echo
 	echo "Installing certificates:"
@@ -81,7 +80,7 @@ backup() {
 		done
 
 		install -m 0600 -o root -g wheel /dev/null "backup.1.tar.gz" || ok=false
-		$ok || { echo "failed" >&2; return 1; }
+		$ok || { echo "Failed" >&2; return 1; }
 
 		find /home/bliptown/users -type f \
 			 \(	-name '*.md' \
@@ -90,8 +89,26 @@ backup() {
 			 -or	-name '*.html' \
 			 -or	-name '*.js' \) -print0 |
 			xargs -0 tar -czf "backup.1.tar.gz" 2> /dev/null || ok=false
-		$ok || { echo "failed" >&2; return 1; }
+		$ok || { echo "Failed" >&2; return 1; }
 	}
+
+	ok=true
+	dump_dir=/mnt/beastie-box/dump
+	storage_box=u597578@u597578.your-storagebox.de
+
+	if [ ! -d "$dump_dir" ]
+	then
+		/usr/local/bin/sshfs "${storage_box}:" "$dump_dir" -p 23 || ok=false
+		$ok || { echo "SSHFS mount failed" >&2; return 1; }
+	fi
+
+	weekday=$(date +%u)
+	[ $weekday == 7 ] && n=0 || n=1
+	for f in home var
+	do
+		dump -${n}uaf "${dump_dir}/${f}.dump.${weekday}" "/$f" > /dev/null || ok=false
+		$ok || { echo "Dumping $f failed" >&2; return 1; }
+	done
 	echo "Done"
 }
 
