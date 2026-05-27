@@ -49,6 +49,7 @@ sub startup {
 		sqlite => sub {
 			my $db = path($ENV{BLIPTOWN_DB});
 			state $sql = Mojo::SQLite->new("sqlite:$db");
+			$sql->db->query("PRAGMA busy_timeout = 10000");
 			return $sql;
 		});
 
