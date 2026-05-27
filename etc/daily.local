@@ -138,6 +138,10 @@ now=$(date +%s)
 $ok && echo "Done" || echo "Failed"
 echo
 
+echo "Checking database integrity:"
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db "PRAGMA integrity_check"
+echo
+
 echo "Creating database backup:"
 ok=true
 date=$(date +%F)
