@@ -10,8 +10,8 @@ sub health_check {
 
 	my $db_ok = $c->sqlite->db->query('SELECT 1')->hash->{1};
 
-	$server_workers = int $server_workers;
-	$helper_workers = int $helper_workers;
+	$server_workers = $server_workers ? int $server_workers : 0;
+	$helper_workers = $helper_workers ? int $helper_workers : 0;
 
 	$c->res->headers->header('X-Bliptown-Server-Workers' => $server_workers);
 	$c->res->headers->header('X-Bliptown-Helper-Workers' => $helper_workers);
