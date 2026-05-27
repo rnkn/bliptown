@@ -93,12 +93,13 @@ backup() {
 	}
 
 	ok=true
-	dump_dir=/mnt/beastie-box/dump
+	mnt=/mnt/beastie-box
+	dump_dir=${mnt}/dump
 	storage_box=u597578@u597578.your-storagebox.de
 
 	if [ ! -d "$dump_dir" ]
 	then
-		/usr/local/bin/sshfs "${storage_box}:" "$dump_dir" -p 23 || ok=false
+		/usr/local/bin/sshfs "${storage_box}:" "$mnt" -p 23 || ok=false
 		$ok || { echo "SSHFS mount failed" >&2; return 1; }
 	fi
 
