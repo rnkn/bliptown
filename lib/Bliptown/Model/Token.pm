@@ -2,14 +2,14 @@ package Bliptown::Model::Token;
 use Mojo::Base -base;
 use Mojo::Util qw(generate_secret);
 
-has 'sqlite';
+has 'db';
 
 sub create_token {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
 	my $token = generate_secret;
 	my $expires = time + 30;
-	$self->sqlite->db->insert(
+	$self->db->insert(
 		'login_tokens', {
 			username => $username,
 			token => $token,
@@ -22,7 +22,7 @@ sub create_token {
 sub read_token {
 	my ($self, $args) = @_;
 	my $token = $args->{token} or return;
-	my $record = $self->sqlite->db->select(
+	my $record = $self->db->select(
 		'login_tokens', undef, { token => $token }
 	)->hash;
 	return $record if $record;
@@ -32,7 +32,7 @@ sub read_token {
 sub delete_token {
 	my ($self, $args) = @_;
 	my $token = $args->{token} or return;
-	$self->sqlite->db->delete(
+	$self->db->delete(
 		'login_tokens', { token => $token }
 	);
 	return 1;

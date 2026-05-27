@@ -61,7 +61,7 @@ sub provision_cert {
 sub update_domain_list {
 	my ($c, $context) = @_;
 	return unless $context;
-	my $domain_coll = $c->sqlite->db->select('users', 'custom_domain')->arrays;
+	my $domain_coll = $c->db->select('users', 'custom_domain')->arrays;
 	my @domains = @{$domain_coll->flatten};
 	@domains = grep { defined $_ } @domains;
 	@domains = sort @domains;

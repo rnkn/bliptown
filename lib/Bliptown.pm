@@ -49,12 +49,19 @@ sub startup {
 		sqlite => sub {
 			my $db = path($ENV{BLIPTOWN_DB});
 			state $sql = Mojo::SQLite->new("sqlite:$db");
-			$sql->db->query("PRAGMA busy_timeout = 10000");
 			return $sql;
 		});
 
 	my $migrations_path = $app->home->child('migrations.sql');
 	$app->sqlite->migrations->from_file($migrations_path)->migrate(7);
+
+	$app->helper(
+		db => sub {
+			my $c = shift;
+			state $db = $c->sqlite->db;
+			$db->query("PRAGMA busy_timeout = 10000");
+			return $db;
+		});
 
 	$app->helper(
 		geoip => sub {
@@ -70,7 +77,7 @@ sub startup {
 		user => sub {
 			my $c = shift;
 			return Bliptown::Model::User->new(
-				sqlite => $c->sqlite,
+				db => $c->db,
 				subscriptions => $c->subscription,
 				totp => $c->totp,
 			);
@@ -133,7 +140,7 @@ sub startup {
 		token => sub {
 			my $c = shift;
 			return Bliptown::Model::Token->new(
-				sqlite => $c->sqlite
+				db => $c->db
 			);
 		});
 

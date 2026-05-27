@@ -8,7 +8,7 @@ sub health_check {
 	my $server_workers = path($ENV{BLIPTOWN_HEALTH_FILE})->slurp;
 	my $helper_workers = path($ENV{BLIPTOWN_HELPER_HEALTH_FILE})->slurp;
 
-	my $db_ok = $c->sqlite->db->query('SELECT 1')->hash->{1};
+	my $db_ok = $c->db->query('SELECT 1')->hash->{1};
 
 	$server_workers = $server_workers ? int $server_workers : 0;
 	$helper_workers = $helper_workers ? int $helper_workers : 0;

@@ -3,7 +3,7 @@ use Mojo::Base -base;
 use Mojo::Util qw(generate_secret);
 use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 
-has 'sqlite';
+has 'db';
 has 'totp';
 
 sub create_user {
@@ -11,7 +11,7 @@ sub create_user {
 	my $salt = substr(generate_secret, 0, 16);
 	my $password_hash = bcrypt($args->{password}, '2b', 12, $salt);
 	my $totp_secret = $self->totp->create_secret;
-	$self->sqlite->db->insert(
+	$self->db->insert(
 		'users', {
 			username => $args->{username},
 			email => $args->{email},
@@ -25,7 +25,7 @@ sub read_user {
 	my ($self, $args) = @_;
 	my $key = $args->{key};
 	return unless $key;
-	my $user = $self->sqlite->db->select(
+	my $user = $self->db->select(
 		'users', undef, { $key => $args->{$key} }
 	)->hash;
 	$user->{custom_domain} = '' if $user->{custom_domain} &&
@@ -68,7 +68,7 @@ sub update_user {
 		$values{password_hash} = $password_hash;
 	};
 
-	my $ok = $self->sqlite->db->update(
+	my $ok = $self->db->update(
 		'users', \%values, { username => $username }
 	);
 	warn unless $ok;
@@ -78,7 +78,7 @@ sub update_user {
 sub delete_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
-	$self->sqlite->db->delete(
+	$self->db->delete(
 		'users', { username => $username }
 	);
 	return 1;
