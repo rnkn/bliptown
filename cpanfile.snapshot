@@ -1,16 +1,9 @@
 # carton snapshot format: version 1.0
 DISTRIBUTIONS
-  Algorithm-Diff-1.201
-    pathname: R/RJ/RJBS/Algorithm-Diff-1.201.tar.gz
+  Alien-libmaxminddb-2.003
+    pathname: V/VO/VOEGELAS/Alien-libmaxminddb-2.003.tar.gz
     provides:
-      Algorithm::Diff 1.201
-      Algorithm::Diff::_impl 1.201
-    requirements:
-      ExtUtils::MakeMaker 0
-  Alien-libmaxminddb-2.001
-    pathname: V/VO/VOEGELAS/Alien-libmaxminddb-2.001.tar.gz
-    provides:
-      Alien::libmaxminddb 2.001
+      Alien::libmaxminddb 2.003
     requirements:
       ExtUtils::CBuilder 0
       ExtUtils::MakeMaker 0
@@ -494,10 +487,10 @@ DISTRIBUTIONS
       perl 5.014
       utf8 0
       warnings 0
-  Imager-1.029
-    pathname: T/TO/TONYC/Imager-1.029.tar.gz
+  Imager-1.031
+    pathname: T/TO/TONYC/Imager-1.031.tar.gz
     provides:
-      Imager 1.029
+      Imager 1.031
       Imager::Color 1.015
       Imager::Color::Float 1.008
       Imager::Color::Table 1.004
@@ -507,7 +500,7 @@ DISTRIBUTIONS
       Imager::Expr::Infix 1.008
       Imager::Expr::Postfix 1.008
       Imager::ExtUtils 1.003
-      Imager::FORMATS 1.029
+      Imager::FORMATS 1.031
       Imager::File::CUR 1.000
       Imager::File::ICO 0.08
       Imager::File::SGI 0.05
@@ -524,7 +517,7 @@ DISTRIBUTIONS
       Imager::Font::Type1 1.013
       Imager::Font::Wrap 1.005
       Imager::Fountain 1.009
-      Imager::IO 1.029
+      Imager::IO 1.031
       Imager::Matrix2d 1.013
       Imager::Preprocess 1.003
       Imager::Probe 1.011
@@ -610,10 +603,10 @@ DISTRIBUTIONS
       Text::ParseWords 0
       perl 5.006001
       version 0.87
-  Module-Build-Tiny-0.052
-    pathname: L/LE/LEONT/Module-Build-Tiny-0.052.tar.gz
+  Module-Build-Tiny-0.053
+    pathname: L/LE/LEONT/Module-Build-Tiny-0.053.tar.gz
     provides:
-      Module::Build::Tiny 0.052
+      Module::Build::Tiny 0.053
     requirements:
       CPAN::Meta 0
       DynaLoader 0
@@ -635,15 +628,15 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
-  Mojo-SQLite-3.009
-    pathname: D/DB/DBOOK/Mojo-SQLite-3.009.tar.gz
+  Mojo-SQLite-v4.0.0
+    pathname: D/DB/DBOOK/Mojo-SQLite-v4.0.0.tar.gz
     provides:
-      Mojo::SQLite 3.009
-      Mojo::SQLite::Database 3.009
-      Mojo::SQLite::Migrations 3.009
-      Mojo::SQLite::PubSub 3.009
-      Mojo::SQLite::Results 3.009
-      Mojo::SQLite::Transaction 3.009
+      Mojo::SQLite v4.0.0
+      Mojo::SQLite::Database v4.0.0
+      Mojo::SQLite::Migrations v4.0.0
+      Mojo::SQLite::PubSub v4.0.0
+      Mojo::SQLite::Results v4.0.0
+      Mojo::SQLite::Transaction v4.0.0
     requirements:
       Carp 0
       DBD::SQLite 1.68
@@ -658,8 +651,8 @@ DISTRIBUTIONS
       URI::db 0.15
       URI::file 4.21
       perl 5.010001
-  Mojolicious-9.42
-    pathname: S/SR/SRI/Mojolicious-9.42.tar.gz
+  Mojolicious-9.45
+    pathname: S/SR/SRI/Mojolicious-9.45.tar.gz
     provides:
       Mojo undef
       Mojo::Asset undef
@@ -729,7 +722,7 @@ DISTRIBUTIONS
       Mojo::UserAgent::Transactor undef
       Mojo::Util undef
       Mojo::WebSocket undef
-      Mojolicious 9.42
+      Mojolicious 9.45
       Mojolicious::Command undef
       Mojolicious::Command::Author::cpanify undef
       Mojolicious::Command::Author::generate undef
@@ -944,11 +937,11 @@ DISTRIBUTIONS
       perl 5.008009
       strict 1.03
       warnings 1.0501
-  Net-SSLeay-1.94
-    pathname: C/CH/CHRISN/Net-SSLeay-1.94.tar.gz
+  Net-SSLeay-1.96
+    pathname: C/CH/CHRISN/Net-SSLeay-1.96.tar.gz
     provides:
-      Net::SSLeay 1.94
-      Net::SSLeay::Handle 1.94
+      Net::SSLeay 1.96
+      Net::SSLeay::Handle 1.96
     requirements:
       English 0
       ExtUtils::MakeMaker 0
@@ -957,16 +950,16 @@ DISTRIBUTIONS
       Text::Wrap 0
       constant 0
       perl 5.008001
-  Object-Pad-0.823
-    pathname: P/PE/PEVANS/Object-Pad-0.823.tar.gz
+  Object-Pad-0.825
+    pathname: P/PE/PEVANS/Object-Pad-0.825.tar.gz
     provides:
-      Object::Pad 0.823
-      Object::Pad::ExtensionBuilder 0.823
-      Object::Pad::MOP::Class 0.823
-      Object::Pad::MOP::Field 0.823
-      Object::Pad::MOP::FieldAttr 0.823
-      Object::Pad::MOP::Method 0.823
-      Object::Pad::MetaFunctions 0.823
+      Object::Pad 0.825
+      Object::Pad::ExtensionBuilder 0.825
+      Object::Pad::MOP::Class 0.825
+      Object::Pad::MOP::Field 0.825
+      Object::Pad::MOP::FieldAttr 0.825
+      Object::Pad::MOP::Method 0.825
+      Object::Pad::MetaFunctions 0.825
     requirements:
       ExtUtils::CBuilder 0
       File::ShareDir 1.00
@@ -975,14 +968,14 @@ DISTRIBUTIONS
       XS::Parse::Keyword::Builder 0.48
       XS::Parse::Sublike 0.35
       XS::Parse::Sublike::Builder 0.35
-      perl 5.018
-  Role-Tiny-2.002004
-    pathname: H/HA/HAARG/Role-Tiny-2.002004.tar.gz
+      perl 5.022
+  Role-Tiny-2.002005
+    pathname: H/HA/HAARG/Role-Tiny-2.002005.tar.gz
     provides:
-      Role::Tiny 2.002004
-      Role::Tiny::With 2.002004
+      Role::Tiny 2.002005
+      Role::Tiny::With 2.002005
     requirements:
-      Exporter 5.57
+      Exporter 0
       perl 5.006
   SQL-Abstract-2.000001
     pathname: M/MS/MSTROUT/SQL-Abstract-2.000001.tar.gz
@@ -1019,58 +1012,37 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       SQL::Abstract 2.0
       perl 5.016
-  Sereal-5.004
-    pathname: Y/YV/YVES/Sereal-5.004.tar.gz
+  Sereal-5.006
+    pathname: Y/YV/YVES/Sereal-5.006.tar.gz
     provides:
-      Sereal 5.004
+      Sereal 5.006
     requirements:
       ExtUtils::MakeMaker 0
-      Sereal::Decoder 5.004
-      Sereal::Encoder 5.004
+      Sereal::Decoder 5.006
+      Sereal::Encoder 5.006
       perl 5.008
-  Sereal-Decoder-5.004
-    pathname: Y/YV/YVES/Sereal-Decoder-5.004.tar.gz
+  Sereal-Decoder-5.006
+    pathname: Y/YV/YVES/Sereal-Decoder-5.006.tar.gz
     provides:
-      Sereal::Decoder 5.004
-      Sereal::Decoder::Constants 5.004
+      Sereal::Decoder 5.006
+      Sereal::Decoder::Constants 5.006
       Sereal::Performance undef
     requirements:
-      Data::Dumper 0
       Devel::CheckLib 1.16
       ExtUtils::MakeMaker 7.0
       ExtUtils::ParseXS 2.21
-      File::Find 0
-      File::Path 0
-      File::Spec 0
-      Scalar::Util 0
-      Test::Deep 0
-      Test::Differences 0
-      Test::LongString 0
-      Test::More 0.88
-      Test::Warn 0
       XSLoader 0
       perl 5.008
-  Sereal-Encoder-5.004
-    pathname: Y/YV/YVES/Sereal-Encoder-5.004.tar.gz
+  Sereal-Encoder-5.006
+    pathname: Y/YV/YVES/Sereal-Encoder-5.006.tar.gz
     provides:
-      Sereal::Encoder 5.004
-      Sereal::Encoder::Constants 5.004
+      Sereal::Encoder 5.006
+      Sereal::Encoder::Constants 5.006
     requirements:
-      Data::Dumper 0
       Devel::CheckLib 1.16
       ExtUtils::MakeMaker 7.0
       ExtUtils::ParseXS 2.21
-      File::Find 0
-      File::Path 0
-      File::Spec 0
-      Hash::Util 0
-      Scalar::Util 0
-      Sereal::Decoder 5.004
-      Test::Deep 0
-      Test::Differences 0
-      Test::LongString 0
-      Test::More 0.88
-      Test::Warn 0
+      Sereal::Decoder 5.006
       XSLoader 0
       perl 5.008
   Sub-Quote-2.006009
@@ -1082,17 +1054,6 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Scalar::Util 0
       perl 5.006
-  Sub-Uplevel-0.2800
-    pathname: D/DA/DAGOLDEN/Sub-Uplevel-0.2800.tar.gz
-    provides:
-      Sub::Uplevel 0.2800
-    requirements:
-      Carp 0
-      ExtUtils::MakeMaker 6.17
-      constant 0
-      perl 5.006
-      strict 0
-      warnings 0
   Test-Deep-1.205
     pathname: R/RJ/RJBS/Test-Deep-1.205.tar.gz
     provides:
@@ -1154,47 +1115,6 @@ DISTRIBUTIONS
       Test::Builder 0
       Test::More 0.96
       perl 5.012
-  Test-Differences-0.72
-    pathname: D/DC/DCANTRELL/Test-Differences-0.72.tar.gz
-    provides:
-      Test::Differences 0.72
-    requirements:
-      Capture::Tiny 0.24
-      Data::Dumper 2.126
-      ExtUtils::MakeMaker 0
-      Test::More 0.88
-      Text::Diff 1.43
-  Test-LongString-0.17
-    pathname: R/RG/RGARCIA/Test-LongString-0.17.tar.gz
-    provides:
-      Test::LongString 0.17
-    requirements:
-      ExtUtils::MakeMaker 0
-      Test::Builder 0.12
-      Test::Builder::Tester 1.04
-  Test-Warn-0.37
-    pathname: B/BI/BIGJ/Test-Warn-0.37.tar.gz
-    provides:
-      Test::Warn 0.37
-    requirements:
-      Carp 1.22
-      ExtUtils::MakeMaker 0
-      Sub::Uplevel 0.12
-      Test::Builder 0.13
-      Test::Builder::Tester 1.02
-      perl 5.006
-  Text-Diff-1.45
-    pathname: N/NE/NEILB/Text-Diff-1.45.tar.gz
-    provides:
-      Text::Diff 1.45
-      Text::Diff::Base 1.45
-      Text::Diff::Config 1.44
-      Text::Diff::Table 1.44
-    requirements:
-      Algorithm::Diff 1.19
-      Exporter 0
-      ExtUtils::MakeMaker 0
-      perl 5.006
   Text-Glob-0.11
     pathname: R/RC/RCLAMP/Text-Glob-0.11.tar.gz
     provides:
