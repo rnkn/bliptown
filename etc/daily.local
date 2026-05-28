@@ -107,7 +107,7 @@ backup() {
 	[ $weekday == 7 ] && n=0 || n=1
 	for f in home var
 	do
-		dump -${n}uaf "${dump_dir}/${f}.dump.${weekday}" "/$f" > /dev/null || ok=false
+		dump -${n}uaf "${dump_dir}/${f}.dump.${weekday}" "/$f" 2> /dev/null || ok=false
 		$ok || { echo "Dumping $f failed" >&2; return 1; }
 	done
 	echo "Done"
