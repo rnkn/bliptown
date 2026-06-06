@@ -5,10 +5,10 @@ bunnycdn_ipv6_endpoint="https://bunnycdn.com/api/system/edgeserverlist/IPv6/plai
 
 echo "Fetching GeoLite2 database:"
 ok=true
-/usr/bin/ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint" || ok=false
+ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint" || ok=false
 if [ $ok ]
 then
-	/bin/tar -C /var/db/GeoIP -xzf /tmp/geolite2-country.tar.gz
+	tar -C /var/db/GeoIP -xzf /tmp/geolite2-country.tar.gz
 	mv /var/db/GeoIP/GeoLite2-Country_*/*.mmdb \
 	   /var/db/GeoIP/geolite2-country-current.mmdb
 	rm -rf /var/db/GeoIP/GeoLite2-Country_*
@@ -20,19 +20,19 @@ fi
 if [ $ok ]
 then
 	echo "Restarting Bliptown:"
-	/usr/sbin/rcctl restart bliptown_staging bliptown
+	rcctl restart bliptown_staging bliptown
 fi
 echo
 
 echo "Fetching Bunny CDN IPs:"
 ok=true
-/usr/bin/ftp -Vo /etc/bunnycdn.txt "$bunnycdn_endpoint" || ok=false
-/usr/bin/ftp -Vo /etc/bunnycdn-ipv6.txt "$bunnycdn_ipv6_endpoint" || ok=false
+ftp -Vo /etc/bunnycdn.txt "$bunnycdn_endpoint" || ok=false
+ftp -Vo /etc/bunnycdn-ipv6.txt "$bunnycdn_ipv6_endpoint" || ok=false
 if [ $ok ]
 then
 	echo "Done"
 	echo "Reloading pf:"
-	/sbin/pfctl -f /etc/pf.conf
+	pfctl -f /etc/pf.conf
 	echo "Done"
 else
 	echo "Failed"
