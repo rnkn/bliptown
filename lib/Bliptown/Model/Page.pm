@@ -2,7 +2,7 @@ package Bliptown::Model::Page;
 use Mojo::Base -base;
 use Mojo::File qw(path);
 use FFI::Platypus;
-use Mojo::DOM::HTML;
+use Mojo::DOM;
 use Mojo::Util qw(encode decode);
 
 has 'req_user';
