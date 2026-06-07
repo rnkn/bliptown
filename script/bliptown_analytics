@@ -2,8 +2,10 @@
 
 use strict;
 use warnings;
-use FindBin qw($Bin);
-use lib "$Bin/../local/lib/perl5";
+use File::Basename;
+use constant CWD => dirname(__FILE__);
+use lib CWD . "/../lib", CWD . "/../local/lib/perl5";
+
 use HTTP::BrowserDetect;
 use POSIX qw(strftime);
 use Mojo::Util qw(url_unescape);

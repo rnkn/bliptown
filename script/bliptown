@@ -2,8 +2,10 @@
 
 use strict;
 use warnings;
-use FindBin qw($Bin);
-use lib "$Bin/../lib", "$Bin/../local/lib/perl5";
+use File::Basename;
+use constant DIR => dirname(__FILE__);
+use lib DIR . '/../lib', DIR . '/../local/lib/perl5';
+
 use Mojolicious::Commands;
 
 die 'BLIPTOWN_SECRET not defined' unless $ENV{BLIPTOWN_SECRET};
