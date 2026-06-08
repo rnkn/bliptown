@@ -30,15 +30,15 @@ $0 = $0 . '[master]';
 
 die "$0 must be run as root" unless $> == 0;
 
-die "BLIPTOWN_HELPER_SOCKET not defined" unless $ENV{BLIPTOWN_HELPER_SOCKET};
-die "BLIPTOWN_HELPER_PREFORK not defined" unless $ENV{BLIPTOWN_HELPER_PREFORK};
-die "BLIPTOWN_HELPER_HEALTH_FILE not defined" unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
+die 'BLIPTOWN_HELPER_SOCKET not defined' unless $ENV{BLIPTOWN_HELPER_SOCKET};
+die 'BLIPTOWN_HELPER_PREFORK not defined' unless $ENV{BLIPTOWN_HELPER_PREFORK};
+die 'BLIPTOWN_HELPER_HEALTH_FILE not defined' unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 
-die "BLIPTOWN_GID not defined" unless $ENV{BLIPTOWN_GID};
-die "BLIPTOWN_USER_HOME not defined" unless $ENV{BLIPTOWN_USER_HOME};
+die 'BLIPTOWN_GID not defined' unless $ENV{BLIPTOWN_GID};
+die 'BLIPTOWN_USER_HOME not defined' unless $ENV{BLIPTOWN_USER_HOME};
 
-die "BLIPTOWN_KEYPAIR_FILE not defined "unless $ENV{BLIPTOWN_KEYPAIR_FILE};
-die "BLIPTOWN_ACME_FILE not defined" unless $ENV{BLIPTOWN_ACME_FILE};
+die 'BLIPTOWN_KEYPAIR_FILE not defined 'unless $ENV{BLIPTOWN_KEYPAIR_FILE};
+die 'BLIPTOWN_ACME_FILE not defined' unless $ENV{BLIPTOWN_ACME_FILE};
 
 my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
 my %children;
@@ -73,7 +73,7 @@ sub update_acme_domains {
 	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
 
 	if ($has_unveil) {
-		unveil($acme_file, "rwc");
+		unveil($acme_file, 'rwc');
 		unveil();
 	}
 
@@ -97,7 +97,7 @@ EOF
 	unless ($acme_domains_str eq $acme_file_str) {
 		$acme_file->spew($acme_domains_str, 'utf-8');
 	}
-	return "ACME domain list up-to-date";
+	return 'ACME domain list up-to-date';
 }
 
 sub provision_cert {
@@ -139,7 +139,7 @@ sub update_relayd_keypairs {
 
 		system('rcctl reload relayd') == 0 or die "Cannot reload relayd ($!)";
 	}
-	return "relayd keypairs up-to-date";
+	return 'relayd keypairs up-to-date';
 }
 
 sub get_uid_gid {
@@ -279,7 +279,7 @@ sub git_commit {
 	system(qw(git add -A)) == 0
 		or die "Cannot add files to $repo";
 
-	my $subject = "Full snapshot on Bliptown";
+	my $subject = 'Full snapshot on Bliptown';
 	my $body = `git status --porcelain`;
 	return unless length $body;
 
