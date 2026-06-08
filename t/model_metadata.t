@@ -9,7 +9,7 @@ use Bliptown::Model::Metadata;
 my $metadata = Bliptown::Model::Metadata->new;
 
 subtest 'read_metadata parses keys' => sub {
-	my $yaml = <<EOF;
+	my $yaml = <<'EOF';
 ---
 title: My Post
 date: 2999-12-31
@@ -23,7 +23,7 @@ EOF
 };
 
 subtest 'read_metadata returns hashref for empty YAML' => sub {
-	my $yaml = <<EOF;
+	my $yaml = <<'EOF';
 ---
 ---
 EOF
@@ -32,7 +32,7 @@ EOF
 };
 
 subtest 'read_metadata returns hashref for invalid YAML' => sub {
-	my $yaml = <<EOF;
+	my $yaml = <<'EOF';
 zzz
 EOF
 	my $data = $metadata->read_metadata($yaml);

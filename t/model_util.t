@@ -9,7 +9,7 @@ use Bliptown::Model::Util;
 my $util = Bliptown::Model::Util->new;
 
 subtest 'split_frontmatter with valid frontmatter' => sub {
-	my $content = <<EOF;
+	my $content = <<'EOF';
 ---
 title: Test
 ---
@@ -22,7 +22,7 @@ EOF
 };
 
 subtest 'split_frontmatter without frontmatter' => sub {
-	my $content = <<EOF;
+	my $content = <<'EOF';
 Just plain content
 without YAML frontmatter.
 EOF
@@ -32,7 +32,7 @@ EOF
 };
 
 subtest 'split_frontmatter with empty frontmatter block' => sub {
-	my $content = <<EOF;
+	my $content = <<'EOF';
 ---
 ---
 Hello world!
