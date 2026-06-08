@@ -13,6 +13,7 @@ sub split_frontmatter {
 
 sub process_prettydate {
 	my ($self, $date, $format) = @_;
+	$format //= 0;
 	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
 	$year = $year - 1900;
 	$month--;
