@@ -3,9 +3,6 @@ use Mojo::Base -base;
 use Mojo::File qw(path);
 use POSIX qw(strftime);
 
-has 'req_user';
-has 'user';
-
 sub split_frontmatter {
 	my ($self, $chars) = @_;
 	if ($chars =~ /^(---\n.*?---\n)\s*(.*)$/s) {
@@ -15,15 +12,10 @@ sub split_frontmatter {
 }
 
 sub process_prettydate {
-	my ($self, $date) = @_;
+	my ($self, $date, $format) = @_;
 	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
 	$year = $year - 1900;
 	$month--;
-	my $req_user = $self->req_user;
-	return unless $req_user;
-	my $user = $self->user->read_user(
-		{ key => 'username', username => $req_user }
-	);
 	my %date_formats = (
 		0 => '%e %B %Y',
 		1 => '%B %e, %Y',
@@ -31,8 +23,7 @@ sub process_prettydate {
 		3 => '%Y',
 		4 => '%F'
 	);
-	my $format = $date_formats{$user->{date_format} // 0};
-	return strftime($format, 0, 0, 0, $day, $month, $year) // '';
+	return strftime($date_formats{$format}, 0, 0, 0, $day, $month, $year) // '';
 }
 
 sub glob_path {

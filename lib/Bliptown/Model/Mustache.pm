@@ -2,6 +2,7 @@ package Bliptown::Model::Mustache;
 use Mojo::Base -base;
 use Mojo::File;
 
+has 'req_user';
 has 'user';
 has 'metadata';
 has 'util';
@@ -38,7 +39,13 @@ sub process_variables {
 		my $date = $metadata->{date};
 
 		if ($date && $key eq 'prettydate') {
-			$val = $self->util->process_prettydate($date);
+			my $req_user = $self->req_user;
+			return unless $req_user;
+			my $user = $self->user->read_user(
+				{ key => 'username', username => $req_user }
+			);
+			my $format = $user->{date_format} // 0;
+			$val = $self->util->process_prettydate($date, $format);
 		} else {
 			$val = $metadata->{$key} // '';
 		}
