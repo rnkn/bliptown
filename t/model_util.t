@@ -1,7 +1,8 @@
 use Mojo::Base -strict;
 use File::Basename;
-use constant DIR => dirname(__FILE__);
-use lib DIR . '/../lib';
+use constant CWD => dirname(__FILE__);
+use lib CWD . '/../lib';
+use Mojo::File qw(path tempdir);
 use Test::More;
 
 use Bliptown::Model::Util;
@@ -59,6 +60,32 @@ subtest 'file_to_slug strips root and .md extension' => sub {
 	my $filename = "$root/about.md";
 	my $slug = $util->file_to_slug($filename, { root => $root });
 	is $slug, '/about', 'slug returned';
+};
+
+subtest 'glob_path absolute pattern' => sub {
+	my $root = tempdir(DIR => CWD);
+
+	my $a = path($root, 'a.md')->touch->to_abs->to_string;
+	my $b = path($root, 'b.md')->touch->to_abs->to_string;
+	my $c = path($root, 'c.md')->touch->to_abs->to_string;
+	my $ignore = path($root, 'ignore.md')->touch->to_abs->to_string;
+
+	my @got = $util->glob_path('/*.md', { root => $root->to_abs->to_string, filename => $ignore });
+	my @expected = ($a, $b, $c);
+	is_deeply [sort @got], [sort @expected], 'correctly matched absolute files';
+};
+
+subtest 'glob_path relative pattern' => sub {
+	my $root = tempdir(DIR => CWD);
+
+	my $a = path($root, 'a.md')->touch->to_abs->to_string;
+	my $b = path($root, 'b.md')->touch->to_abs->to_string;
+	my $c = path($root, 'c.md')->touch->to_abs->to_string;
+	my $ignore = path($root, 'ignore.md')->touch->to_abs->to_string;
+
+	my @got = $util->glob_path('*.md', { filename => $ignore });
+	my @expected = ($a, $b, $c);
+	is_deeply [sort @got], [sort @expected], 'correctly matched relative files';
 };
 
 done_testing;
