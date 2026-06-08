@@ -115,6 +115,7 @@ sub startup {
 		mustache => sub {
 			my $c = shift;
 			return Bliptown::Model::Mustache->new(
+				req_user => $c->get_req_user,
 				user => $c->user,
 				metadata => $c->metadata,
 				util => $c->util
@@ -147,10 +148,7 @@ sub startup {
 	$app->helper(
 		util => sub {
 			my $c = shift;
-			return Bliptown::Model::Util->new(
-				req_user => $c->get_req_user,
-				user => $c->user
-			);
+			return Bliptown::Model::Util->new;
 		}
 	);
 
