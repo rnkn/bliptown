@@ -1,8 +1,7 @@
 use Mojo::Base -strict;
-use File::Basename;
-use constant CWD => dirname(__FILE__);
-use lib CWD . '/../lib';
-use Mojo::File qw(path tempdir);
+use Mojo::File qw(path curfile tempdir);
+use constant THIS_DIR => curfile->dirname;
+use lib path(THIS_DIR, '../lib');
 use Test::More;
 
 use Bliptown::Model::Util;
@@ -63,7 +62,7 @@ subtest 'file_to_slug strips root and .md extension' => sub {
 };
 
 subtest 'glob_path absolute pattern' => sub {
-	my $root = tempdir(DIR => CWD);
+	my $root = tempdir(DIR => THIS_DIR);
 
 	my $a = path($root, 'a.md')->touch->to_abs->to_string;
 	my $b = path($root, 'b.md')->touch->to_abs->to_string;
@@ -76,7 +75,7 @@ subtest 'glob_path absolute pattern' => sub {
 };
 
 subtest 'glob_path relative pattern' => sub {
-	my $root = tempdir(DIR => CWD);
+	my $root = tempdir(DIR => THIS_DIR);
 
 	my $a = path($root, 'a.md')->touch->to_abs->to_string;
 	my $b = path($root, 'b.md')->touch->to_abs->to_string;

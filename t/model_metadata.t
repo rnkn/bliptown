@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
-use File::Basename;
-use constant CWD => dirname(__FILE__);
-use lib CWD . '/../lib';
+use Mojo::File qw(path curfile);
+use constant THIS_DIR => curfile->dirname;
+use lib path(THIS_DIR, '../lib');
 use Test::More;
 
 use Bliptown::Model::Metadata;
