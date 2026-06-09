@@ -28,7 +28,7 @@ subtest 'read_metadata returns hashref for empty YAML' => sub {
 ---
 EOF
 	my $data = $metadata->read_metadata($yaml);
-	ok ref($data) eq 'HASH', 'returned a hashref';
+	isa_ok $data, 'HASH', 'returned a hashref';
 };
 
 subtest 'read_metadata returns hashref for invalid YAML' => sub {
@@ -36,7 +36,7 @@ subtest 'read_metadata returns hashref for invalid YAML' => sub {
 zzz
 EOF
 	my $data = $metadata->read_metadata($yaml);
-	ok ref($data) eq 'HASH', 'returned a hashref';
+	isa_ok $data, 'HASH', 'returned a hashref';
 };
 
 done_testing;
