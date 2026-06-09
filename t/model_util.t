@@ -64,10 +64,10 @@ subtest 'file_to_slug strips root and .md extension' => sub {
 subtest 'glob_path absolute pattern' => sub {
 	my $root = tempdir(DIR => THIS_DIR);
 
-	my $a = path($root, 'a.md')->touch->to_abs->to_string;
-	my $b = path($root, 'b.md')->touch->to_abs->to_string;
-	my $c = path($root, 'c.md')->touch->to_abs->to_string;
-	my $ignore = path($root, 'ignore.md')->touch->to_abs->to_string;
+	my $a = $root->child('a.md')->touch->to_abs->to_string;
+	my $b = $root->child('b.md')->touch->to_abs->to_string;
+	my $c = $root->child('c.md')->touch->to_abs->to_string;
+	my $ignore = $root->child('ignored.md')->touch->to_abs->to_string;
 
 	my @got = $util->glob_path('/*.md', { root => $root->to_abs->to_string, filename => $ignore });
 	my @expected = ($a, $b, $c);
@@ -77,10 +77,10 @@ subtest 'glob_path absolute pattern' => sub {
 subtest 'glob_path relative pattern' => sub {
 	my $root = tempdir(DIR => THIS_DIR);
 
-	my $a = path($root, 'a.md')->touch->to_abs->to_string;
-	my $b = path($root, 'b.md')->touch->to_abs->to_string;
-	my $c = path($root, 'c.md')->touch->to_abs->to_string;
-	my $ignore = path($root, 'ignore.md')->touch->to_abs->to_string;
+	my $a = $root->child('a.md')->touch->to_abs->to_string;
+	my $b = $root->child('b.md')->touch->to_abs->to_string;
+	my $c = $root->child('c.md')->touch->to_abs->to_string;
+	my $ignore = $root->child('ignored.md')->touch->to_abs->to_string;
 
 	my @got = $util->glob_path('*.md', { filename => $ignore });
 	my @expected = ($a, $b, $c);
