@@ -5,7 +5,8 @@ use lib path(THIS_DIR, '../lib'), path(THIS_DIR, 'lib');
 use Test::More;
 
 use BliptownTest qw(create_db);
-use Bliptown::Model::Token;
+
+use_ok qw(Bliptown::Model::Token);
 
 my $db = create_db;
 my $token = Bliptown::Model::Token->new(db => $db);

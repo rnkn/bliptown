@@ -4,7 +4,7 @@ use constant THIS_DIR => curfile->dirname;
 use lib path(THIS_DIR, '../lib');
 use Test::More;
 
-use Bliptown::Model::Metadata;
+use_ok qw(Bliptown::Model::Metadata);
 
 my $metadata = Bliptown::Model::Metadata->new;
 

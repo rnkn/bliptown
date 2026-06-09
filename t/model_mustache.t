@@ -4,10 +4,11 @@ use constant THIS_DIR => curfile->dirname;
 use lib path(THIS_DIR, '../lib');
 use Test::More;
 
-use Bliptown::Model::Mustache;
 use Bliptown::Model::User;
 use Bliptown::Model::Metadata;
 use Bliptown::Model::Util;
+
+use_ok qw(Bliptown::Model::Mustache);
 
 my $user		= Bliptown::Model::User->new;
 my $metadata	= Bliptown::Model::Metadata->new;
