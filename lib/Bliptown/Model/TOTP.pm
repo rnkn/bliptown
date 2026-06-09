@@ -12,18 +12,23 @@ sub create_secret {
 
 sub read_totp {
 	my ($self, $args) = @_;
-	my $secret = decode_base32($args->{totp_secret});
+	my $encoded_secret = $args->{totp_secret};
+	return unless $encoded_secret;
+	my $secret = decode_base32($encoded_secret);
+	my $time = $args->{time} // time;
 	my $oath = Authen::OATH->new;
-	my $totp = $oath->totp($secret);
-	my $totp_old = $oath->totp($secret, time - 30);
+	my $totp = $oath->totp($secret, $time);
+	my $totp_old = $oath->totp($secret, $time - 30);
 	return ($totp, $totp_old);
 }
 
 sub check_totp {
 	my ($self, $args) = @_;
 	my $totp = $args->{totp};
-	my $totp_expected = ${$args->{totp_expected_pair}}[0];
-	my $totp_expected_old = ${$args->{totp_expected_pair}}[1];
+	return unless $args->{totp_expected_pair};
+	my @expected_totp_pair = @{$args->{totp_expected_pair}};
+	my $totp_expected = $expected_totp_pair[0];
+	my $totp_expected_old = $expected_totp_pair[1];
 	unless (secure_compare($totp, $totp_expected)
 			|| secure_compare($totp, $totp_expected_old)) {
 		return;
