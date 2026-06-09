@@ -10,10 +10,12 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(create_db);
 
 sub create_db {
-	my $sql = Mojo::SQLite->new(":memory:");
+	state $sql = Mojo::SQLite->new(":memory:");
 	my $migrations_path = path(THIS_DIR, '../../migrations.sql');
 	$sql->migrations->from_file($migrations_path)->migrate($ENV{BLIPTOWN_DB_MIGRATION});
-	return $sql->db;
+	state $db = $sql->db;
+	$db->query("PRAGMA busy_timeout = 10000");
+	return $db;
 }
 
 return 1;
