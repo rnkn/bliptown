@@ -21,33 +21,33 @@ my $mustache	= Bliptown::Model::Mustache->new(
     util		=> $util,
 );
 
-subtest 'process_variables replaces known keys' => sub {
+subtest 'process_variables known keys' => sub {
     my $text = <<EOF;
 Hello {{ name }}, welcome to {{ place }}.
 EOF
     my $args = { metadata => { name => 'Alice', place => 'Earth' } };
     my $out = $mustache->process_variables($text, $args);
-    is $out, "Hello Alice, welcome to Earth.\n", 'variables replaced';
+    is $out, "Hello Alice, welcome to Earth.\n", 'process_variables replaces variables';
 };
 
-subtest 'process_variables replaces unknown keys as empty string' => sub {
+subtest 'process_variables unknown keys' => sub {
     my $text = 'Hello {{ unknown }}.';
     my $args = { metadata => {} };
     my $out = $mustache->process_variables($text, $args);
-    is $out, 'Hello .', 'unknown key replaced with empty string';
+    is $out, 'Hello .', 'process_variables replaces unknown key with empty string';
 };
 
-subtest 'apply_layout wraps content in section' => sub {
+subtest 'apply_layout' => sub {
     my $text = 'Hello world!';
     my $args = { metadata => { layout => 'two-column' } };
     my $out  = $mustache->apply_layout($text, $args);
-    like $out, qr/<section class="two-column">/, 'section tag opened';
-    like $out, qr/<\/section>/, 'section tag closed';
-    like $out, qr/Hello world!/, 'content present';
+    like $out, qr/<section class="two-column">/, 'apply_layout opens section tag';
+    like $out, qr/<\/section>/, 'apply_layout closes section tag';
+    like $out, qr/Hello world!/, 'apply_layout returns body text';
 };
 
 # --- process_sections ---
-subtest 'process_sections of matched files' => sub {
+subtest 'process_sections matching files' => sub {
 	my $root = tempdir;
 	my $content_1 = <<EOF;
 ---
@@ -83,14 +83,13 @@ EOF
     };
     my $out = $mustache->process_sections($text, $args);
 
-    like $out, qr/Post 1/, 'content 1 title found';
-    like $out, qr/Post 2/, 'content 2 title found';
-
-	unlike $out, qr/Ignored/, 'ignored title ignored';
-    ok index($out, 'Post 1') > index($out, 'Post 2'), 'posts are in reverse chronological order';
+	like $out, qr/Post 1/, 'process_sections returns content 1 title';
+	like $out, qr/Post 2/, 'process_sections returns content 2 title';
+	unlike $out, qr/Ignored/, 'process_sections ignores ignored file';
+	ok index($out, 'Post 1') > index($out, 'Post 2'), 'process_sections returns posts in reverse chronological order';
 };
 
-subtest 'process_partials includes partial content' => sub {
+subtest 'process_partials partials' => sub {
     my $root = tempdir;
 	$root->child('partial.md')->spew("Partial content.\n");
 
@@ -106,10 +105,10 @@ EOF
         recur		=> 0,
     };
     my $out = $mustache->process_partials($text, $args);
-    like $out, qr/Partial content\./, 'partial content included';
+    like $out, qr/Partial content\./, 'process_partials returns partial content';
 };
 
-subtest 'process_partials error for nonexistent file' => sub {
+subtest 'process_partials nonexistent file' => sub {
 	my $root = tempdir;
     my $text = "{{ > nonexistent.md }}\n";
     my $args = {
@@ -119,10 +118,10 @@ subtest 'process_partials error for nonexistent file' => sub {
         recur		=> 0,
     };
     my $out = $mustache->process_partials($text, $args);
-    like $out, qr/Error 404/, '404 error for missing partial';
+    like $out, qr/Error 404/, 'process_partials returns 404 for missing partial';
 };
 
-subtest 'process_partials error for excessive recursion' => sub {
+subtest 'process_partials excessive recursion' => sub {
 	my $root = tempdir;
     my $text_1 = "{{ > recursion-2.md }}\n";
     my $text_2 = "{{ > recursion-1.md }}\n";
@@ -136,7 +135,7 @@ subtest 'process_partials error for excessive recursion' => sub {
         recur		=> 60,
     };
     my $out = $mustache->process_partials($text_1, $args);
-    like $out, qr/Error 508/, '508 error for max recursion';
+    like $out, qr/Error 508/, 'process_partials returns 508 for max recursion';
 };
 
 done_testing;

@@ -8,7 +8,7 @@ use_ok qw(Bliptown::Model::Util);
 
 my $util = Bliptown::Model::Util->new;
 
-subtest 'split_frontmatter with valid frontmatter' => sub {
+subtest 'split_frontmatter valid frontmatter' => sub {
 	my $content = <<'EOF';
 ---
 title: Test
@@ -16,49 +16,49 @@ title: Test
 Hello world!
 EOF
 	my ($yaml, $text) = $util->split_frontmatter($content);
-	ok defined $yaml, 'YAML extracted';
-	like $yaml, qr/title: Test/, 'YAML contains title';
-	is $text, "Hello world!\n", 'content correct';
+	ok defined $yaml, 'split_frontmatter extracts YAML';
+	like $yaml, qr/title: Test/, 'split_frontmatter parses title';
+	is $text, "Hello world!\n", 'split_frontmatter returns body text';
 };
 
-subtest 'split_frontmatter without frontmatter' => sub {
+subtest 'split_frontmatter no frontmatter' => sub {
 	my $content = <<'EOF';
 Just plain content
 without YAML frontmatter.
 EOF
 	my ($yaml, $text) = $util->split_frontmatter($content);
-	ok !defined $yaml, 'no YAML extracted';
-	is $text, $content, 'content returned';
+	ok !defined $yaml, 'split_frontmatter omits YAML';
+	is $text, $content, 'split_frontmatter returns body text';
 };
 
-subtest 'split_frontmatter with empty frontmatter block' => sub {
+subtest 'split_frontmatter empty frontmatter' => sub {
 	my $content = <<'EOF';
 ---
 ---
 Hello world!
 EOF
 	my ($yaml, $text) = $util->split_frontmatter($content);
-	ok defined $yaml, 'yaml extracted (even if empty)';
-	is $text, "Hello world!\n", 'content returned';
+	ok defined $yaml, 'split_frontmatter extracts empty YAML';
+	is $text, "Hello world!\n", 'split_frontmatter returns body text';
 };
 
 subtest 'process_prettydate with DAY MONTH YEAR format' => sub {
 	my $result = $util->process_prettydate('2999-12-31');
-	like $result, qr/31/, 'day appears in output';
-	like $result, qr/December/, 'month name appears in output';
-	like $result, qr/2999/, 'year appears in output';
+	like $result, qr/31/, 'process_prettydate returns day';
+	like $result, qr/December/, 'process_prettydate returns month';
+	like $result, qr/2999/, 'process_prettydate returns year';
 };
 
-subtest 'process_prettydate with ISO format (YYY-MM-DD)' => sub {
+subtest 'process_prettydate ISO format (YYY-MM-DD)' => sub {
 	my $result = $util->process_prettydate('2999-12-31', 4);
-	is $result, '2999-12-31', 'ISO format returns YYYY-MM-DD';
+	is $result, '2999-12-31', 'process_prettydate returns YYYY-MM-DD';
 };
 
-subtest 'file_to_slug strips root and .md extension' => sub {
+subtest 'file_to_slug strip' => sub {
 	my $root = '/path/to/file';
 	my $filename = "$root/about.md";
 	my $slug = $util->file_to_slug($filename, { root => $root });
-	is $slug, '/about', 'slug returned';
+	is $slug, '/about', 'file_to_slug returns slug';
 };
 
 subtest 'glob_path absolute pattern' => sub {
@@ -71,7 +71,7 @@ subtest 'glob_path absolute pattern' => sub {
 
 	my @got = $util->glob_path('/*.md', { root => $root->to_abs->to_string, filename => $ignore });
 	my @expected = ($a, $b, $c);
-	is_deeply [sort @got], [sort @expected], 'correctly matched absolute files';
+	is_deeply [sort @got], [sort @expected], 'glob_path returns correct files';
 };
 
 subtest 'glob_path relative pattern' => sub {
@@ -84,7 +84,7 @@ subtest 'glob_path relative pattern' => sub {
 
 	my @got = $util->glob_path('*.md', { filename => $ignore });
 	my @expected = ($a, $b, $c);
-	is_deeply [sort @got], [sort @expected], 'correctly matched relative files';
+	is_deeply [sort @got], [sort @expected], 'glob_path returns correct files';
 };
 
 done_testing;
