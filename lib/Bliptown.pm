@@ -53,7 +53,7 @@ sub startup {
 		});
 
 	my $migrations_path = $app->home->child('migrations.sql');
-	$app->sqlite->migrations->from_file($migrations_path)->migrate(7);
+	$app->sqlite->migrations->from_file($migrations_path)->migrate($ENV{BLIPTOWN_DB_SCHEMA});
 
 	$app->helper(
 		db => sub {
