@@ -5,10 +5,6 @@ use lib path(THIS_DIR, '../lib'), path(THIS_DIR, 'lib');
 use Test::More;
 use Test::Mojo;
 
-use Bliptown::Model::User;
-use Bliptown::Model::TOTP;
-
-use BliptownTest qw(create_db);
 use FakeIPC;
 
 use_ok qw(Bliptown::Controller::Files);
@@ -27,19 +23,12 @@ $app->helper(
 
 my $tempbase	= tempdir;
 my $user_home	= $tempbase->child('users')->make_path;
+my $username	= 'testuser';
 
 $app->config->{user_home} = $user_home;
 
-my $db			= create_db;
-my $totp		= Bliptown::Model::TOTP->new;
-my $user		= Bliptown::Model::User->new(db => $db, totp => $totp);
-my $username	= 'testuser';
-
-$user->create_user({
-    username	=> "$username",
-    email		=> 'test@example.com',
-    password	=> 'password123',
-});
+my $user_dir = $user_home->child($username)->make_path;
+my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 $t->app->hook(before_dispatch => sub {
 	my $c = shift;
@@ -66,9 +55,6 @@ subtest 'format_human_size' => sub {
     is $fhs->($one_tb), '1.00T',  '1T';
 };
 
-my $user_dir = $user_home->child($username)->make_path;
-my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
-
 $t->post_ok('/files' => { Host => $user_domain } => form => {
 	action		=> 'new_directory',
 	name		=> 'fakedir',
@@ -93,7 +79,7 @@ $t->get_ok(Mojo::URL->new('/files')->query(search => 'foo') => { Host => $user_d
 	->content_like(qr{<a href="/foo">foo.md</a>})
 	->content_unlike(qr{<a href="/bar">bar.md</a>});
 
-$t->get_ok(Mojo::URL->new('/delete/foo.md') => { Host => $user_domain })->status_is(302);
+$t->get_ok('/delete/foo.md' => { Host => $user_domain })->status_is(302);
 like $debug_messages, qr{Deleted: $user_dir/foo.md};
 
 $t->get_ok(Mojo::URL->new('/files')->query(search => 'ba', delete => 1) => { Host => $user_domain })->status_is(302);
@@ -107,7 +93,7 @@ $t->get_ok(Mojo::URL->new('/files')->query(search => 'ba', replace => 'qu') => {
 like $debug_messages, qr{Renamed file: $user_dir/bar.md -> $user_dir/qur.md};
 like $debug_messages, qr{Renamed file: $user_dir/subdir/baz.md -> $user_dir/subdir/quz.md};
 
-$t->get_ok(Mojo::URL->new('/backup/foo.md') => { Host => $user_domain })->status_is(302);
+$t->get_ok('/backup/foo.md' => { Host => $user_domain })->status_is(302);
 like $debug_messages, qr{Created backup file: $user_dir/foo.md~};
 
 done_testing;
