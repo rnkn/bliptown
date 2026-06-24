@@ -55,7 +55,7 @@ and credentials. The server runs OpenBSD.
 
 EOF
 
-find -f lib/ script/ t/ -type f | while read -r file
+find -f lib/ script/ t/ -type f ! -name '*~' ! -name '*_' | while read -r file
 do
 	echo "## File: $file ##"
 	echo
