@@ -20,11 +20,11 @@ sub apply_layout {
 	my ($self, $text, $args) = @_;
 	my $layout = $args->{metadata}->{layout};
 	return <<"EOF";
-
 <section class="$layout">
-$text
-</section>
 
+$text
+
+</section>
 EOF
 }
 
