@@ -5,20 +5,35 @@ use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 
 has 'db';
 has 'totp';
+has 'customer';
+has 'ipc';
 
 sub create_user {
 	my ($self, $args) = @_;
+	my $username = $args->{username};
+	my $email = $args->{email};
+
 	my $salt = substr(generate_secret, 0, 16);
 	my $password_hash = bcrypt($args->{password}, '2b', 12, $salt);
 	my $totp_secret = $self->totp->create_secret;
-	$self->db->insert(
+
+	my $customer = $self->customer->create_customer({
+		username => $username,
+		email => $email,
+	});
+	my $customer_id = $customer->{id};
+
+	my $ok = $self->db->insert(
 		'users', {
-			username => $args->{username},
-			email => $args->{email},
+			username => $username,
+			email => $email,
 			password_hash => $password_hash,
 			totp_secret => $totp_secret,
+			customer_id => $customer_id,
 		}
 	);
+	warn unless $ok;
+	return $ok;
 }
 
 sub read_user {
@@ -77,6 +92,16 @@ sub update_user {
 sub delete_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
+	my $user = $self->read_user({
+		key => 'username',
+		username => $username,
+	});
+	my $customer_id = $user->{customer_id};
+
+	$self->customer->delete_customer({
+		customer_id => $customer_id,
+	});
+
 	$self->db->delete('users', { username => $username });
 	return 1;
 }

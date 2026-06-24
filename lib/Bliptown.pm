@@ -101,7 +101,7 @@ sub startup {
 			my $c = shift;
 			return Bliptown::Model::User->new(
 				db => $c->db,
-				subscription => $c->subscription,
+				customer => $c->customer,
 				totp => $c->totp,
 				ipc => $c->ipc,
 			);
