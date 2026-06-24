@@ -3,6 +3,16 @@ use Mojo::Base -base;
 use Mojo::File qw(path);
 use POSIX qw(strftime);
 
+sub create_stripe_url {
+	my ($self, $path) = @_;
+	my $url = Mojo::URL->new;
+	$url->scheme('https');
+	$url->host('api.stripe.com');
+	$url->path($path);
+	$url->userinfo($ENV{BLIPTOWN_STRIPE_API_KEY} . ':');
+	return $url;
+}
+
 sub split_frontmatter {
 	my ($self, $chars) = @_;
 	if ($chars =~ /^(---\n.*?---\n)\s*(.*)$/s) {

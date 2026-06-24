@@ -2,6 +2,8 @@ package Bliptown::Model::Subscription;
 use Mojo::Base -base;
 use Mojo::UserAgent;
 
+has 'util';
+
 my $ua = Mojo::UserAgent->new;
 
 sub create_stripe_url {
@@ -19,7 +21,8 @@ sub create_subscription { }
 sub read_subscription {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
-	my $url = $self->create_stripe_url("v1/customers/$customer_id");
+	return unless $customer_id;
+	my $url = $self->util->create_stripe_url("v1/customers/$customer_id");
 
 	my $tx = $ua->get($url);
 	my $res = $tx->res->json;
@@ -29,7 +32,8 @@ sub read_subscription {
 sub update_subscription {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
-	my $url = $self->create_stripe_url("v1/customers/$customer_id");
+	return unless $customer_id;
+	my $url = $self->util->create_stripe_url("v1/customers/$customer_id");
 
 	my %data;
 	my %allowed_keys = map { $_ => 1 } qw(email);
@@ -48,7 +52,8 @@ sub update_subscription {
 sub delete_subscription {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
-	my $url = $self->create_stripe_url("v1/customers/$customer_id");
+	return unless $customer_id;
+	my $url = $self->util->create_stripe_url("v1/customers/$customer_id");
 
 	my $tx = $ua->delete($url);
 	my $res = $tx->res->json;
@@ -59,7 +64,7 @@ sub create_billing_session {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
 	return unless $customer_id;
-	my $url = $self->create_stripe_url("v1/billing_portal/sessions");
+	my $url = $self->util->create_stripe_url("v1/billing_portal/sessions");
 
 	my $tx = $ua->post($url => form => { customer => $customer_id });
 	my $res = $tx->res->json;
