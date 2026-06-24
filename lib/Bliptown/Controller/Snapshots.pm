@@ -6,11 +6,10 @@ sub take_snapshot {
 	my $c = shift;
 	my $username = $c->session('username');
 
-	my $res = $c->ipc->send_message(
-		{
-			command => 'git_commit',
-			username => $username,
-		});
+	my $res = $c->ipc->send_message({
+		command => 'git_commit',
+		username => $username,
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
@@ -28,11 +27,10 @@ sub list_snapshots {
 	my $c = shift;
 	my $username = $c->session('username');
 
-	my $res = $c->ipc->send_message(
-		{
-			command => 'git_log',
-			username => $username,
-		});
+	my $res = $c->ipc->send_message({
+		command => 'git_log',
+		username => $username,
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
@@ -53,12 +51,11 @@ sub restore_snapshot {
 	my $username = $c->session('username');
 	my $hash = $c->param('hash');
 
-	my $res = $c->ipc->send_message(
-		{
-			command => 'git_checkout',
-			username => $username,
-			hash => $hash,
-		});
+	my $res = $c->ipc->send_message({
+		command => 'git_checkout',
+		username => $username,
+		hash => $hash,
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
@@ -73,12 +70,11 @@ sub download_snapshot {
 	my $username = $c->session('username');
 	my $hash = $c->param('hash');
 
-	my $res = $c->ipc->send_message(
-		{
-			command => 'git_archive',
-			username => $username,
-			hash => $hash,
-		});
+	my $res = $c->ipc->send_message({
+		command => 'git_archive',
+		username => $username,
+		hash => $hash,
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
@@ -93,13 +89,11 @@ sub download_snapshot {
 
 	$c->on(
 		finish => sub {
-			my $res = $c->ipc->send_message(
-				{
-					command => 'delete_file',
-					username => $username,
-					filename => $filename,
-				}
-			);
+			my $res = $c->ipc->send_message({
+				command => 'delete_file',
+				username => $username,
+				filename => $filename,
+			});
 			return $c->log->error($res->{error}) if $res->{error};
 		});
 
@@ -117,7 +111,7 @@ sub diff_to_html {
         if ($line =~ /^( |--[- ]$)/) {
 			$html .= "$line\n";
 		}
-        elsif ($line =~ /^@@/) {
+		elsif ($line =~ /^@@/) {
             $html .= qq{<span class="hunk-header">$line</span>\n};
         }
 		elsif ($line =~ /^\+/) {
@@ -146,13 +140,11 @@ sub render_diff {
 	my $hash = $c->param('hash');
 	my $username = $c->session('username');
 
-	my $res = $c->ipc->send_message(
-		{
-			command => 'git_show',
-			username => $username,
-			hash => $hash,
-		}
-	);
+	my $res = $c->ipc->send_message({
+		command => 'git_show',
+		username => $username,
+		hash => $hash,
+	});
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 

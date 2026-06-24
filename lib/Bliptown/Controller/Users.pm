@@ -14,16 +14,18 @@ sub validate_user {
 
 sub check_duplicate_user {
 	my ($c, $args) = @_;
-	return $c->user->read_user(
-		{ key => 'username', username => $args->{username} }
-	);
+	return $c->user->read_user({
+		key => 'username',
+		username => $args->{username}
+	});
 }
 
 sub check_duplicate_email {
 	my ($c, $args) = @_;
-	return $c->user->read_user(
-		{ key => 'email', email => $args->{email} }
-	);
+	return $c->user->read_user({
+		key => 'email',
+		email => $args->{email}
+	});
 }
 
 sub user_join {
@@ -33,29 +35,31 @@ sub user_join {
 	my $password = $c->param('password') || '';
 	my $redirect = $c->param('back_to') || '/';
 
-	my $creds = { email => $email, username => $username, password => $password };
-	unless (validate_user($c, $creds)) {
+	my %creds = (
+		email => $email,
+		username => $username,
+		password => $password
+	);
+	unless ($c->validate_user(\%creds)) {
 		$c->flash(info => 'Invalid credentials');
 		return $c->redirect_to($redirect);
 	}
 
-	if (check_duplicate_user($c, { username => $username })) {
+	if ($c->check_duplicate_user({ username => $username })) {
 		$c->flash(info => 'Username already in use');
 		return $c->redirect_to($redirect);
 	}
 
-	if (check_duplicate_email($c, { email => $email })) {
+	if ($c->check_duplicate_email({ email => $email })) {
 		$c->flash(info => 'Account with that email already exists');
 		return $c->redirect_to($redirect);
 	}
 
-	$c->user->create_user(
-		{
-			username => $username,
-			email => $email,
-			password => $password,
-		}
-	);
+	$c->user->create_user({
+		username => $username,
+		email => $email,
+		password => $password,
+	});
 	return $c->redirect_to($redirect);
 }
 
@@ -124,34 +128,33 @@ sub user_login {
 	return unless $host;
 	$host =~ s/^www\.//;
 
-	return $c->token_login(
-		{
-			host		=> $host,
-			username	=> $username,
-			token		=> $token,
-			redirect	=> $redirect
-		}
-	) if $token;
+	return $c->token_login({
+		host		=> $host,
+		username	=> $username,
+		token		=> $token,
+		redirect	=> $redirect
+	}) if $token;
 
-	return $c->login_our_domain(
-		{
-			username	=> $username,
-			password	=> $password,
-			totp		=> $totp,
-			redirect	=> $redirect
-		}
-	) if $host !~ /$our_domain$/;
+	return $c->login_our_domain({
+		username	=> $username,
+		password	=> $password,
+		totp		=> $totp,
+		redirect	=> $redirect
+	}) if $host !~ /$our_domain$/;
 
-	my $creds = {
+	my %creds = (
 		username => $username,
 		password => $password,
 		totp => $totp
-	};
+	);
 
-	if ($c->user->authenticate_user($creds)) {
+	if ($c->user->authenticate_user(\%creds)) {
 		$c->session(username => $username);
 
-		my $user = $c->user->read_user({ key => 'username', username => $username});
+		my $user = $c->user->read_user({
+			key => 'username',
+			username => $username
+		});
 		my $custom_domain = $user->{custom_domain};
 
 		if ($custom_domain) {

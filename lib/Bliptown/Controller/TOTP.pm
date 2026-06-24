@@ -8,21 +8,17 @@ sub totp_update {
 	my $redirect = $c->param('back_to') // '/';
 	my $username = $c->session('username');
 	my @totp_expected_pair = $c->totp->read_totp({ totp_secret => $secret });
-	unless ($c->totp->check_totp(
-				{
-					totp => $totp,
-					totp_expected_pair => \@totp_expected_pair
-				}
-			))
-	{
+	unless ($c->totp->check_totp({
+		totp => $totp,
+		totp_expected_pair => \@totp_expected_pair
+	})) {
 		$c->flash(info => 'TOTP incorrent');
 		return $c->redirect_to('totp_initiate');
 	}
-	$c->user->update_user(
-		{
-			username => $username,
-			totp_secret => $secret
-		});
+	$c->user->update_user({
+		username => $username,
+		totp_secret => $secret
+	});
 	return $c->redirect_to($redirect);
 }
 
@@ -31,12 +27,10 @@ sub totp_initiate {
 	my $username = $c->session('username');
 	my $secret = $c->totp->create_secret;
 	my $locked = $username eq 'demo' ? 1 : 0;
-	my $data_url = $c->qrcode->create_qrcode(
-		{
-			username => $username,
-			secret => $secret,
-		}
-	);
+	my $data_url = $c->qrcode->create_qrcode({
+		username => $username,
+		secret => $secret,
+	});
 	$c->stash(
 		template => 'totp',
 		title => 'Bliptown Two-Factor Authentication',

@@ -35,11 +35,12 @@ sub read_user {
 }
 
 sub update_user {
-	my ($self, $args)	= @_;
-	my $username		= $args->{username};
-	my $user			= $self->read_user(
-		{ key => 'username', username => $username }
-	);
+	my ($self, $args) = @_;
+	my $username = $args->{username};
+	my $user = $self->read_user({
+		key => 'username',
+		username => $username,
+	});
 
 	my %values;
 	my %keys_null		= map { $_ => 1 } qw(custom_domain);
@@ -68,9 +69,7 @@ sub update_user {
 		$values{password_hash} = $password_hash;
 	};
 
-	my $ok = $self->db->update(
-		'users', \%values, { username => $username }
-	);
+	my $ok = $self->db->update('users', \%values, { username => $username });
 	warn unless $ok;
 	return 1;
 }
@@ -78,18 +77,17 @@ sub update_user {
 sub delete_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
-	$self->db->delete(
-		'users', { username => $username }
-	);
+	$self->db->delete('users', { username => $username });
 	return 1;
 }
 
 sub authenticate_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username};
-	my $user = $self->read_user(
-		{ key => 'username', username => $username }
-	);
+	my $user = $self->read_user({
+		key => 'username',
+		username => $username,
+	});
 	return unless $user;
 	my $hash = $user->{password_hash};
 	return unless $hash;
@@ -100,12 +98,10 @@ sub authenticate_user {
 	my $secret = $user->{totp_secret};
 	my $totp = $args->{totp};
 	my @totp_expected_pair = $self->totp->read_totp({ totp_secret => $secret });
-	return unless $self->totp->check_totp(
-		{
-			totp => $totp,
-			totp_expected_pair => \@totp_expected_pair
-		}
-	);
+	return unless $self->totp->check_totp({
+		totp => $totp,
+		totp_expected_pair => \@totp_expected_pair
+	});
 	return 1;
 }
 

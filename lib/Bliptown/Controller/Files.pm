@@ -27,9 +27,10 @@ sub list_files {
 	my $slug = $c->param('catchall');
 	my $username = $c->session('username');
 	my $locked = $username eq 'demo' ? 1 : 0;
-	my $user = $c->user->read_user(
-		{ key => 'username', username => $username }
-	);
+	my $user = $c->user->read_user({
+		key => 'username',
+		username => $username
+	});
 	my $root = path($c->config->{user_home}, $username);
 	my $dir = $slug ? path($root, $slug) : $root;
 	return $c->reply->not_found unless -d $dir;
@@ -37,25 +38,23 @@ sub list_files {
 	my $search_re = glob_to_regex_string($search) if $search;
 
 	if ($search_re && $delete) {
-		my $res = $c->delete_files_regex(
-			{
-				username => $username,
-				dir => $dir,
-				search => $search_re,
-			});
+		my $res = $c->delete_files_regex({
+			username => $username,
+			dir => $dir,
+			search => $search_re,
+		});
 		my $message = $res > 1 ? "$res files deleted" : "$res file deleted";
 		$c->flash(info => $message);
 		return $c->redirect_to($c->url_for('list_files')->query(search => $search));
 	}
 
 	if ($search_re && defined $replace) {
-		my $res = $c->rename_files_regex(
-			{
-				username => $username,
-				dir => $dir,
-				search => $search_re,
-				replace => $replace
-			});
+		my $res = $c->rename_files_regex({
+			username => $username,
+			dir => $dir,
+			search => $search_re,
+			replace => $replace
+		});
 		my $message = $res > 1 ? "$res files renamed" : "$res file renamed";
 		$c->flash(info => $message);
 		return $c->redirect_to($c->url_for('list_files')->query(search => $replace));
@@ -152,13 +151,11 @@ sub new_directory {
 	my $redirect = $c->url_for('list_files', catchall => $rel_dir);
 	return $c->redirect_to($redirect) if -d $dir;
 
-	my $res = $c->ipc->send_message(
-		{
-			command => 'make_directory',
-			username => $username,
-			filename => $dir->to_string,
-		}
-	);
+	my $res = $c->ipc->send_message({
+		command => 'make_directory',
+		username => $username,
+		filename => $dir->to_string,
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
@@ -182,14 +179,12 @@ sub rename_files_regex {
 		$old_filename = path($dir, $old_filename)->to_abs->to_string;
 		$new_filename =~ s/$search/$replace/g;
 		$new_filename = path($dir, $new_filename)->to_abs->to_string;
-		my $res = $c->ipc->send_message(
-			{
-				command => 'rename_file',
-				username => $username,
-				filename => $old_filename,
-				new_filename => $new_filename,
-			}
-		);
+		my $res = $c->ipc->send_message({
+			command => 'rename_file',
+			username => $username,
+			filename => $old_filename,
+			new_filename => $new_filename,
+		});
 		return $c->reply->exception($res->{error}) if $res->{error};
 		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 	}
@@ -214,14 +209,12 @@ sub rename_file {
 		return $c->redirect_to($redirect);
 	}
 
-	my $res = $c->ipc->send_message(
-		{
-			command => 'rename_file',
-			username => $username,
-			filename => $filename,
-			new_filename => $new_filename,
-		}
-	);
+	my $res = $c->ipc->send_message({
+		command => 'rename_file',
+		username => $username,
+		filename => $filename,
+		new_filename => $new_filename,
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
@@ -246,13 +239,11 @@ sub delete_files_regex {
 	my @filenames_abs = map { path($dir, $_)->to_abs->to_string } @filenames;
 	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
 	foreach my $filename (@filenames_abs) {
-		my $res = $c->ipc->send_message(
-			{
-				command => 'delete_file',
-				username => $username,
-				filename => $filename,
-			}
-		);
+		my $res = $c->ipc->send_message({
+			command => 'delete_file',
+			username => $username,
+			filename => $filename,
+		});
 		return $c->reply->exception($res->{error}) if $res->{error};
 		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 	}
@@ -270,13 +261,11 @@ sub delete_file {
 		$c->flash(info => "Directory $slug not empty!");
 		return $c->redirect_to($redirect);
 	}
-	my $res = $c->ipc->send_message(
-		{
-			command => 'delete_file',
-			username => $username,
-			filename => $file->to_string,
-		}
-	);
+	my $res = $c->ipc->send_message({
+		command => 'delete_file',
+		username => $username,
+		filename => $file->to_string,
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
@@ -292,12 +281,11 @@ sub backup_file {
 	my $file = path($c->config->{user_home}, $username, $filename);
 	return $c->reply->not_found unless -f $file;
 	my $redirect = $c->param('back_to') // $c->url_for('list_files');
-	my $res = $c->ipc->send_message(
-		{
-			command => 'backup_file',
-			username => $username,
-			filename => $file->to_string
-		});
+	my $res = $c->ipc->send_message({
+		command => 'backup_file',
+		username => $username,
+		filename => $file->to_string
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
@@ -329,14 +317,12 @@ sub upload_files {
 			return $c->redirect_to('list_files');
 		};
 		my $blob = $upload->slurp;
-		my $res = $c->ipc->send_message(
-			{
-				command => 'write_blob',
-				username => $username,
-				filename => $path->to_abs->to_string,
-				blob => $blob,
-			}
-		);
+		my $res = $c->ipc->send_message({
+			command => 'write_blob',
+			username => $username,
+			filename => $path->to_abs->to_string,
+			blob => $blob,
+		});
 		return $c->reply->exception($res->{error}) if $res->{error};
 		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 

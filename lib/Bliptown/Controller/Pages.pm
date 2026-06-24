@@ -101,12 +101,10 @@ sub render_page {
 		return $c->reply->file($file);
 	}
 
-	my $page = $c->page->read_page(
-		{
-			root => $root->to_abs->to_string,
-			filename => $file->to_abs->to_string,
-		}
-	);
+	my $page = $c->page->read_page({
+		root => $root->to_abs->to_string,
+		filename => $file->to_abs->to_string,
+	});
 
 	my @skel = qw(header sidebar footer);
 	my %skel_html;
@@ -115,12 +113,10 @@ sub render_page {
 		my $file = path($root, "_$f.md");
 		if (-f $file) {
 			$show_sidebar = 1 if $f eq 'sidebar';
-			my $page = $c->page->read_page(
-				{
-					filename => $file->to_abs->to_string,
-					root => $root->to_abs->to_string,
-				}
-			);
+			my $page = $c->page->read_page({
+				filename => $file->to_abs->to_string,
+				root => $root->to_abs->to_string,
+			});
 			$page->{html} = postprocess_skel($page->{html}, $slug);
 			$skel_html{$f} = $page->{html};
 		}
@@ -179,11 +175,12 @@ sub new_page {
 			if ($c->get_file($slug)) {
 				return $c->redirect_to('edit_page', catchall => $slug);
 			}
-		};
+		}
 	} else {
 		if ($c->get_file($slug)) {
 			return $c->redirect_to('edit_page', catchall => "$slug");
-		} elsif ($c->get_file("$slug/index")) {
+		}
+		elsif ($c->get_file("$slug/index")) {
 			return $c->redirect_to('edit_page', catchall => "$slug/");
 		}
 	}
@@ -268,21 +265,21 @@ sub save_page {
 	$content =~ s/\r\n/\n/g;
 	my $user = $c->user->read_user({ key => 'username', username => $username });
 	my $backup = $user->{create_backups} // 0;
-	my $res = $c->ipc->send_message(
-		{
-			command => 'update_file',
-			username => $username,
-			filename => $filename,
-			content => $content,
-			create_backup => $backup,
-		});
+	my $res = $c->ipc->send_message({
+		command => 'update_file',
+		username => $username,
+		filename => $filename,
+		content => $content,
+		create_backup => $backup,
+	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	if ($action eq 'save') {
 		return $c->redirect_to($c->url_for('edit_page', catchall => $slug));
-	} elsif ($action eq 'save-exit') {
+	}
+	elsif ($action eq 'save-exit') {
 		return $c->redirect_to($c->url_for('render_page', catchall => $slug));
 	}
 }

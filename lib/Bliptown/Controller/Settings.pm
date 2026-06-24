@@ -48,12 +48,11 @@ sub check_domain_dns {
 
 sub provision_cert {
 	my ($c, $domain) = @_;
-	my $res = $c->ipc->send_message(
-		{
-			username => 'root',
-			command => 'provision_cert',
-			domain => $domain,
-		});
+	my $res = $c->ipc->send_message({
+		username => 'root',
+		command => 'provision_cert',
+		domain => $domain,
+	});
 	return $c->reply->exception($res->{error}) if $res->{error};
 	return 1;
 }
@@ -71,13 +70,11 @@ sub update_domain_list {
 	);
 	my $command = $commands{$context};
 	return unless $command;
-	my $res = $c->ipc->send_message(
-		{
-			username => 'root',
-			command => $command,
-			domains => \@domains
-		}
-	);
+	my $res = $c->ipc->send_message({
+		username => 'root',
+		command => $command,
+		domains => \@domains
+	});
 	return $c->reply->exception($res->{error}) if $res->{error};
 	return 1;
 }
@@ -87,16 +84,17 @@ sub list_settings {
 	my $username = $c->session('username');
 	return unless $username;
 	my $locked = $username eq 'demo' ? 1 : 0;
-	my $user = $c->user->read_user(
-		{ key => 'username', username => $username }
-	);
+	my $user = $c->user->read_user({
+		key => 'username',
+		username => $username
+	});
 
 	my $customer_id = $user->{customer_id};
 	return $c->reply->exception("User $username customer_id not found")
 		unless $customer_id;
-	my $billing_session = $c->subscription->create_billing_session(
-		{ customer_id => $customer_id }
-	);
+	my $billing_session = $c->subscription->create_billing_session({
+		customer_id => $customer_id
+	});
 	return $c->reply->exception("Cannot create billing sessions for customer_id $customer_id")
 		unless $billing_session;
 	my $billing_portal_url = $billing_session->{url};
@@ -120,9 +118,10 @@ sub save_settings {
 	my $c = shift;
 	my $username = $c->session('username');
 	return unless $username;
-	my $user = $c->user->read_user(
-		{ key => 'username', username => $username }
-	);
+	my $user = $c->user->read_user({
+		key => 'username',
+		username => $username
+	});
 	my $params = $c->req->params->to_hash;
 	$params->{create_backups} //= 0;
 

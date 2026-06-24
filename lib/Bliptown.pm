@@ -35,9 +35,9 @@ sub startup {
 		allowed_exts => [ qw(md html css js txt) ]
 	);
 
-	$app->secrets(
-		[ $ENV{BLIPTOWN_SECRET} ]
-	);
+	$app->secrets([
+		$ENV{BLIPTOWN_SECRET}
+	]);
 
 	$app->sessions->cookie_name('bliptown');
 	$app->sessions->default_expiration(30 * 24 * 60 * 60);
@@ -185,9 +185,10 @@ sub startup {
 				my @host_array = split(/\./, $host);
 				$username = @host_array >= 3 ? $host_array[-3] : 'mayor';
 			} else {
-				my $user = $c->user->read_user(
-					{ key => 'custom_domain', custom_domain => $host }
-				);
+				my $user = $c->user->read_user({
+					key => 'custom_domain',
+					custom_domain => $host,
+				});
 				return '' unless $user;
 				$username = $user->{username};
 			}
@@ -287,7 +288,8 @@ sub startup {
 					$c->res->headers->cache_control("public, must-revalidate, max-age=$max_age");
 					return $c->reply->file($file);
 				}
-			} else {
+			}
+			else {
 				$c->res->headers->cache_control('no-cache');
 			}
 			return;
@@ -323,14 +325,16 @@ sub startup {
 		$url->scheme($c->config->{scheme});
 		$url->port($c->config->{port});
 
-		my $user = $c->user->read_user(
-			{ key => 'username', username => $username }
-		);
+		my $user = $c->user->read_user({
+			key => 'username',
+			username => $username,
+		});
 		my $domain = $c->config->{domain};
 		my $custom_domain = $user->{custom_domain};
 		if ($custom_domain) {
 			$url->host($custom_domain);
-		} else {
+		}
+		else {
 			$url->host("$username.$domain");
 		}
 		$c->redirect_to($url)
@@ -343,7 +347,8 @@ sub startup {
 			my $req_user = $c->get_req_user // '';
 			if ($username && $username eq $req_user) {
 				return 1;
-			} else {
+			}
+			else {
 				$c->flash(info => 'Login required');
 				$c->render(
 					status => 403,

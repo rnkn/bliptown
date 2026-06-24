@@ -7,9 +7,7 @@ sub read_file {
 	my $file = Mojo::File->new($args->{file});
 	return unless -r $file;
 	my $chars = $file->slurp('utf-8');
-	return {
-		chars => $chars,
-	};
+	return { chars => $chars };
 }
 
 sub purge_cdn_file {
@@ -21,7 +19,8 @@ sub purge_cdn_file {
 	$url->query(url => $args->{url});
 
 	my $ua = Mojo::UserAgent->new;
-	return $ua->post($url => { 'AccessKey' => $ENV{BLIPTOWN_CDN_API_KEY} })->result;
+	my $res = $ua->post($url => { 'AccessKey' => $ENV{BLIPTOWN_CDN_API_KEY} })->result;
+	return $res;
 }
 
 return 1;

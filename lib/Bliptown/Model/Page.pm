@@ -134,7 +134,8 @@ sub read_page {
 
 	if ($file =~ /\.(txt|html|css|js)$/) {
 		$html = $self->render_plaintext($chars, $1);
-	} elsif ($file =~ /\.md$/) {
+	}
+	elsif ($file =~ /\.md$/) {
 		my ($yaml, $text) = $self->util->split_frontmatter($chars);
 		my $parent_metadata = $args->{metadata};
 		delete $parent_metadata->{layout};

@@ -20,11 +20,11 @@ sub apply_layout {
 	my ($self, $text, $args) = @_;
 	my $layout = $args->{metadata}->{layout};
 	return <<"EOF";
+
 <section class="$layout">
-
 $text
-
 </section>
+
 EOF
 }
 
@@ -41,12 +41,14 @@ sub process_variables {
 		if ($date && $key eq 'prettydate') {
 			my $req_user = $self->req_user;
 			return unless $req_user;
-			my $user = $self->user->read_user(
-				{ key => 'username', username => $req_user }
-			);
+			my $user = $self->user->read_user({
+				key => 'username',
+				username => $req_user,
+			});
 			my $format = $user->{date_format} // 0;
 			$val = $self->util->process_prettydate($date, $format);
-		} else {
+		}
+		else {
 			$val = $metadata->{$key} // '';
 		}
 		$text =~ s/$variable_re/$val/;
@@ -101,9 +103,11 @@ sub process_partials {
 		foreach my $filename (@filenames) {
 			if (!-f $filename) {
 				$partial = $self->error_not_found($slug);
-			} elsif (($args->{recur} // 0) >= 64) {
+			}
+			elsif (($args->{recur} // 0) >= 64) {
 				$partial = $self->error_max_recursion;
-			} else {
+			}
+			else {
 				$partial = $self->read_partial($filename, $args);
 			}
 			push @partials, $partial if $partial;
@@ -179,7 +183,7 @@ sub read_partial {
 		metadata => \%metadata,
 	};
 
-	return  {
+	return {
 		text => $self->process($text, $child_args),
 		metadata => \%metadata
 	}

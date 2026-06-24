@@ -34,7 +34,8 @@ sub glob_path {
 	if ($path =~ m{^/}) {
 		$path =~ s{^/}{};
 		$path = path($args->{root}, $path)->to_string;
-	} else {
+	}
+	else {
 		my $file = Mojo::File->new($args->{filename});
 		$path = path($file->dirname, $path)->to_abs;
 	}
