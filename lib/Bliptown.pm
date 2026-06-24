@@ -12,6 +12,7 @@ use Bliptown::Model::File;
 use Bliptown::Model::Page;
 use Bliptown::Model::Metadata;
 use Bliptown::Model::Mustache;
+use Bliptown::Model::Customer;
 use Bliptown::Model::Subscription;
 use Bliptown::Model::IPC;
 use Bliptown::Model::TOTP;
@@ -74,24 +75,36 @@ sub startup {
 		});
 
 	$app->helper(
-		user => sub {
+		ipc => sub {
+			state $ipc = Bliptown::Model::IPC->new;
+			return $ipc;
+		});
+
+	$app->helper(
+		customer => sub {
 			my $c = shift;
-			return Bliptown::Model::User->new(
-				db => $c->db,
-				subscriptions => $c->subscription,
-				totp => $c->totp,
+			return Bliptown::Model::Customer->new(
+				util => $c->util,
 			);
 		});
 
 	$app->helper(
 		subscription => sub {
-			return Bliptown::Model::Subscription->new;
+			my $c = shift;
+			return Bliptown::Model::Subscription->new(
+				util => $c->util,
+			);
 		});
 
 	$app->helper(
-		ipc => sub {
-			state $ipc = Bliptown::Model::IPC->new;
-			return $ipc;
+		user => sub {
+			my $c = shift;
+			return Bliptown::Model::User->new(
+				db => $c->db,
+				subscription => $c->subscription,
+				totp => $c->totp,
+				ipc => $c->ipc,
+			);
 		});
 
 	$app->helper(
