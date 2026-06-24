@@ -1,6 +1,6 @@
+*_
 /TAGS
 /.envrc
 /local
 /*.db
-/*.db-shm
-/*.db-wal
+
