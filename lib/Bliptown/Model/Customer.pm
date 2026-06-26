@@ -25,7 +25,7 @@ sub read_customer {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
 	return unless $customer_id;
-	my $url = $self->create_stripe_url("v1/customers/$customer_id");
+	my $url = $self->util->create_stripe_url("v1/customers/$customer_id");
 
 	my $tx = $ua->get($url);
 	my $res = $tx->res->json;
@@ -36,7 +36,7 @@ sub update_customer {
 	my ($self, $args) = @_;
 	my $customer_id = $args->{customer_id};
 	return unless $customer_id;
-	my $url = $self->create_stripe_url("v1/customers/$customer_id");
+	my $url = $self->util->create_stripe_url("v1/customers/$customer_id");
 
 	my %data;
 	my %allowed_keys = map { $_ => 1 } qw(email);
