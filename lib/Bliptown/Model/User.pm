@@ -6,7 +6,6 @@ use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 has 'db';
 has 'totp';
 has 'customer';
-has 'ipc';
 
 sub create_user {
 	my ($self, $args) = @_;

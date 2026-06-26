@@ -103,7 +103,6 @@ sub startup {
 				db => $c->db,
 				customer => $c->customer,
 				totp => $c->totp,
-				ipc => $c->ipc,
 			);
 		});
 
