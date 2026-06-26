@@ -83,8 +83,10 @@ sub update_user {
 		$values{password_hash} = $password_hash;
 	};
 
-	my $ok = $self->db->update('users', \%values, { username => $username });
-	warn unless $ok;
+	if (%values) {
+		my $ok = $self->db->update('users', \%values, { username => $username });
+		warn unless $ok;
+	}
 	return 1;
 }
 
