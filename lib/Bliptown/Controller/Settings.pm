@@ -92,7 +92,7 @@ sub list_settings {
 	my $customer_id = $user->{customer_id};
 	return $c->reply->exception("User $username customer_id not found")
 		unless $customer_id;
-	my $billing_session = $c->subscription->create_billing_session({
+	my $billing_session = $c->customer->create_billing_session({
 		customer_id => $customer_id
 	});
 	return $c->reply->exception("Cannot create billing sessions for customer_id $customer_id")

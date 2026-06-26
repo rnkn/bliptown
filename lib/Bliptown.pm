@@ -13,7 +13,7 @@ use Bliptown::Model::Page;
 use Bliptown::Model::Metadata;
 use Bliptown::Model::Mustache;
 use Bliptown::Model::Customer;
-use Bliptown::Model::Subscription;
+use Bliptown::Model::Checkout;
 use Bliptown::Model::IPC;
 use Bliptown::Model::TOTP;
 use Bliptown::Model::QRCode;
@@ -89,9 +89,9 @@ sub startup {
 		});
 
 	$app->helper(
-		subscription => sub {
+		checkout => sub {
 			my $c = shift;
-			return Bliptown::Model::Subscription->new(
+			return Bliptown::Model::Checkout->new(
 				util => $c->util,
 			);
 		});
