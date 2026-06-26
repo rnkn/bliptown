@@ -15,10 +15,10 @@ my $debug_messages = $log->capture('debug');
 my $app = $t->app;
 $app->log($log);
 
+my $ipc = FakeIPC->new;
+
 $app->helper(
-	ipc => sub {
-		return FakeIPC->new;
-	}
+	ipc => sub { return $ipc }
 );
 
 my $tempbase	= tempdir;
