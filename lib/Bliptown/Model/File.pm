@@ -1,6 +1,8 @@
 package Bliptown::Model::File;
 use Mojo::Base -base;
 use Mojo::File;
+use Mojo::URL;
+use Mojo::UserAgent;
 
 sub read_file {
 	my ($self, $args) = @_;
