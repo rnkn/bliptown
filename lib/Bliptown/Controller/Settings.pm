@@ -134,9 +134,9 @@ sub save_settings {
 		$c->update_domain_list('acme');
 		if ($new_domain) {
 			unless ($c->check_domain_dns($username, $new_domain)) {
-				$c->user->update_user({ username => $username, domain => '' });
+				$c->user->update_user({ username => $username, custom_domain => '' });
 				$c->flash(info => "Domain $new_domain DNS not set");
-				return $c->redirect_to(url_for('list_settings'));
+				return $c->redirect_to($c->url_for('list_settings'));
 			}
 			$c->provision_cert($new_domain);
 		}
