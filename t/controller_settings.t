@@ -96,7 +96,7 @@ $t->get_ok('/settings/totp' => { Host => $user_domain })->status_is(200)
 	->attr_is('input#totp-check', 'value', '');
 
 $t->post_ok('/settings/totp' => { Host => $user_domain } => form => {
-	secret => 'MJRTGYRSMI2WMMRRGE2TMNJUGA3GMNRXGM4DA',
+	secret => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 	totp => '000000',
 })->status_is(302);
 
