@@ -16,19 +16,19 @@
 			<ul class="table">
 				<li class="row">
 					<label class="cell name" for="username">Username (cannot be changed)</label>
-					<input class="cell" type="text" name="username" value="<%= $username %>" disabled>
+					<input class="cell" id="username" type="text" name="username" value="<%= $username %>" disabled>
 				</li>
 				<li class="row">
 					<label class="cell name" for="email">Email</label>
-					<input class="cell" type="email" id="email" name="email" value="<%= $email %>" <%= $disabled %>>
+					<input class="cell" id="email" type="email" name="email" value="<%= $email %>" <%= $disabled %>>
 				</li>
 				<li class="row">
 					<label class="cell name" for="new-password">New password</label>
-					<input class="cell" type="password" id="new-password" name="new_password" <%= $disabled %>>
+					<input class="cell" id="new-password" type="password" name="new_password" <%= $disabled %>>
 				</li>
 				<li class="row">
 					<label class="cell name" for="custom-domain">Custom domain <a href="https://blip.town/faq/custom_domain" target="_blank" class="help-q">?</a></label>
-					<input class="cell" type="text" id="custom-domain" name="custom_domain" value="<%= $custom_domain %>" placeholder="example.com" <%= $disabled %>>
+					<input class="cell" id="custom-domain" type="text" name="custom_domain" value="<%= $custom_domain %>" placeholder="example.com" <%= $disabled %>>
 				</li>
 				<li class="row">
 					<span>
@@ -52,7 +52,7 @@
 				<label for="create-backups">
 					<li class="row">
 						<span class="cell name">Automatically create backups (e.g. <code>file.md~</code>)</span>
-						<input type="checkbox" id="create-backups" class="right" name="create_backups" value="1" <%= 'checked' if $create_backups == 1 %>>
+						<input type="checkbox" class="right" id="create-backups" name="create_backups" value="1" <%= 'checked' if $create_backups == 1 %>>
 					</li>
 				</label>
 				<hr>
