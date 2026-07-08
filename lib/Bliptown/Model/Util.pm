@@ -23,21 +23,21 @@ sub check_domain_dns {
 	my $expected_ipv6	= $ENV{BLIPTOWN_IPV6};
 	my $expected_txt	= "$username.blip.town";
 	my $resolver		= Net::DNS::Resolver->new;
-	my @answer_A		= $resolver->query($domain, 'A')->answer or return;
-	my @answer_AAAA		= $resolver->query($domain, 'AAAA')->answer or return;
-	my @answer_TXT		= $resolver->query($txt_cname, 'TXT')->answer or return;
+	my $query_A			= $resolver->query($domain, 'A') or return;
+	my $query_AAAA		= $resolver->query($domain, 'AAAA') or return;
+	my $query_TXT		= $resolver->query($txt_cname, 'TXT') or return;
 
 	my ($record_A, $record_AAAA, $record_TXT);
 
-	foreach my $record (@answer_A) {
+	foreach my $record ($query_A->answer) {
 		next unless $record->type eq 'A';
 		$record_A = $record->address;
 	}
-	foreach my $record (@answer_AAAA) {
+	foreach my $record ($query_AAAA->answer) {
 		next unless $record->type eq 'AAAA';
 		$record_AAAA = $record->address;
 	}
-	foreach my $record (@answer_TXT) {
+	foreach my $record ($query_TXT->answer) {
 		next unless $record->type eq 'TXT';
 		$record_TXT = $record->txtdata;
 	}
