@@ -26,6 +26,16 @@ subtest 'check_domain_dns' => sub {
 	ok ! $util->check_domain_dns('nonexistent', $domain), 'check_domain_dns invalid usernam';
 };
 
+subtest 'create_stripe_url' => sub {
+	my $path = 'test/path';
+	my $emptypath;
+	my $url = $util->create_stripe_url($path);
+	my $userinfo = $url->userinfo;
+	is $url, "https://api.stripe.com/test/path", 'create_stripe_url creates URL';
+	is $userinfo, $ENV{BLIPTOWN_STRIPE_API_KEY} . ':', 'create_stripe_url returns correct userinfo';
+	ok ! $util->create_stripe_url($emptypath), 'create_stripe_url fails with empty path';
+};
+
 subtest 'split_frontmatter valid frontmatter' => sub {
 	my $content = <<'EOF';
 ---
