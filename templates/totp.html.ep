@@ -19,7 +19,8 @@
 	<p>
 		<strong>Verification Key:</strong>
 		<br>
-		<code><%= $secret %></code></p>
+		<code id="secret"><%= $secret %></code>
+	</p>
 	<p>
 		For security this verification key will be shown only once.
 	</p>
