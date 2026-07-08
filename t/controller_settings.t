@@ -10,6 +10,8 @@ use Bliptown::Model::Customer;
 use Bliptown::Model::TOTP;
 use Bliptown::Model::Util;
 
+use FakeIPC;
+
 use BliptownTest qw(create_db);
 
 use_ok qw(Bliptown::Controller::Settings);
@@ -17,9 +19,14 @@ use_ok qw(Bliptown::Controller::Settings);
 my $t			= Test::Mojo->new('Bliptown');
 my $app			= $t->app;
 my $db			= create_db;
+my $ipc			= FakeIPC->new;
 
 $app->helper(
 	db => sub { return $db }
+);
+
+$app->helper(
+	ipc => sub { return $ipc }
 );
 
 my $util		= Bliptown::Model::Util->new;
