@@ -32,7 +32,7 @@
 					% }
 				</select>
 			</div>
-			<textarea name="content"><%= $content %></textarea>
+			<textarea id="content" name="content"><%= $content %></textarea>
 			% if (@$includes) {
 			<div id="includes">
 				<strong>Includes:</strong>
