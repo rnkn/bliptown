@@ -13,10 +13,6 @@ sub health_check {
 	$server_workers = $server_workers ? int $server_workers : 0;
 	$helper_workers = $helper_workers ? int $helper_workers : 0;
 
-	$c->res->headers->header('X-Bliptown-Server-Workers' => $server_workers);
-	$c->res->headers->header('X-Bliptown-Helper-Workers' => $helper_workers);
-	$c->res->headers->header('X-Bliptown-Database-OK' => $db_ok);
-
 	my %json = (
 		'BliptownServerWorkers' => $server_workers,
 		'BliptownHelperWorkers' => $helper_workers,
