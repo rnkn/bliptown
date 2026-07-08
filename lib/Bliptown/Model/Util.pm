@@ -1,5 +1,6 @@
 package Bliptown::Model::Util;
 use Mojo::Base -base;
+use Mojo::URL;
 use Mojo::File qw(path);
 use POSIX qw(strftime);
 use Socket qw(AF_INET6 inet_pton);
@@ -52,6 +53,7 @@ sub check_domain_dns {
 
 sub create_stripe_url {
 	my ($self, $path) = @_;
+	return unless $path;
 	my $url = Mojo::URL->new;
 	$url->scheme('https');
 	$url->host('api.stripe.com');
