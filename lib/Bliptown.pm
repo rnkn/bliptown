@@ -158,8 +158,13 @@ sub startup {
 		});
 
 	$app->helper(
+		dns => sub {
+			return Bliptown::Model::DNS->new;
+		}
+	);
+
+	$app->helper(
 		util => sub {
-			my $c = shift;
 			return Bliptown::Model::Util->new;
 		}
 	);

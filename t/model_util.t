@@ -8,24 +8,6 @@ use_ok qw(Bliptown::Model::Util);
 
 my $util = Bliptown::Model::Util->new;
 
-subtest 'ipv6_equal' => sub {
-	my $ipv6_1	= '2001:0db8:0000:0000:0000:0000:0000:0001';
-	my $ipv6_2	= '2001:db8::1';
-	my $ipv6_3	= '2001:db8::2';
-	ok $util->ipv6_equal($ipv6_1, $ipv6_2), 'ipv6_equal validates compressed IPv6 address';
-	ok ! $util->ipv6_equal($ipv6_1, 'invalid'), 'ipv6_equal invalid IPv6 address';
-	ok ! $util->ipv6_equal($ipv6_1, $ipv6_3), 'ipv6_equal different IPv6 address';
-};
-
-subtest 'check_domain_dns' => sub {
-	my $username	= 'rnkn';
-	my $domain		= 'rnkn.xyz';
-	ok $util->check_domain_dns($username, $domain), 'check_domain_dns validates rnkn.xyz';
-	ok ! $util->check_domain_dns($username, 'example.com'), 'check_domain_dns incorrect domain';
-	ok ! $util->check_domain_dns($username, 'invalid'), 'check_domain_dns invalid domain';
-	ok ! $util->check_domain_dns('nonexistent', $domain), 'check_domain_dns invalid usernam';
-};
-
 subtest 'create_stripe_url' => sub {
 	my $path = 'test/path';
 	my $emptypath;

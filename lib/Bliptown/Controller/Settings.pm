@@ -88,7 +88,7 @@ sub save_settings {
 	if ($new_domain ne $cur_domain) {
 		$c->update_domain_list('acme');
 		if ($new_domain) {
-			unless ($c->util->check_domain_dns($username, $new_domain)) {
+			unless ($c->dns->check_domain_dns($username, $new_domain)) {
 				$c->user->update_user({ username => $username, custom_domain => '' });
 				$c->flash(info => "Domain $new_domain DNS not set");
 				return $c->redirect_to($c->url_for('list_settings'));
@@ -97,7 +97,6 @@ sub save_settings {
 		}
 		$c->on(finish => sub { $c->update_domain_list('relayd') });
 	}
-
 
 	return $c->redirect_to($c->url_for('render_page'));
 }
