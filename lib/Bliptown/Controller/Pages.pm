@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Controller';
 use YAML::Tiny;
 use Mojo::DOM;
 use Mojo::File qw(path);
-use Mojo::Util qw(url_unescape sha1_sum);
+use Mojo::Util qw(url_unescape);
 
 sub process_redirects {
 	my ($file, $slug) = @_;
