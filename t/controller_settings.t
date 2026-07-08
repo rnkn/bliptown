@@ -90,6 +90,16 @@ $t->get_ok('/settings' => { Host => $user_domain })->status_is(200)
 	->attr_is('select#date-format option[value="2"]', 'selected', '')
 	->element_exists('input#create-backups[checked]');
 
+$t->get_ok('/settings/totp' => { Host => $user_domain })->status_is(200)
+	->attr_like('img#qrcode', 'src', qr{data:image/png;base64})
+	->text_like('code#secret', qr/[A-Z2-7]{37}/)
+	->attr_is('input#totp-check', 'value', '');
+
+$t->post_ok('/settings/totp' => { Host => $user_domain } => form => {
+	secret => 'MJRTGYRSMI2WMMRRGE2TMNJUGA3GMNRXGM4DA',
+	totp => '000000',
+})->status_is(302);
+
 $user->delete_user({
 	username	=> $username,
 });
