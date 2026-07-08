@@ -5,19 +5,6 @@ use Mojo::Util qw(decode);
 use POSIX qw(strftime);
 use Text::Glob qw(glob_to_regex_string);
 
-sub format_human_size {
-	my $size = shift;
-	return $size . 'B' if $size < 1024;
-	my @units = (qw(K M G T));
-	while (@units) {
-		my $unit = shift @units;
-		$size /= 1024;
-		if ($size < 1024) {
-			return sprintf('%.2f%s', $size, $unit);
-		}
-	}
-}
-
 sub list_files {
 	my $c = shift;
 	my $search = $c->param('search');
@@ -100,7 +87,7 @@ sub list_files {
 	}
 
 	foreach my $file (@files) {
-		$file->{size} = format_human_size($file->{size});
+		$file->{size} = $c->util->format_human_size($file->{size});
 		$file->{mtime} = strftime('%Y-%m-%d %H:%M %z', localtime($file->{mtime}));
 	}
 

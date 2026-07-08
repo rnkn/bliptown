@@ -8,6 +8,23 @@ use_ok qw(Bliptown::Model::Util);
 
 my $util = Bliptown::Model::Util->new;
 
+subtest 'format_human_size' => sub {
+    my $one_mb = 1024 * 1024;
+    my $one_gb = 1024 * 1024 * 1024;
+    my $one_tb = 1024 * 1024 * 1024 * 1024;
+
+    is $util->format_human_size(0),			'0B',		'zero bytes';
+    is $util->format_human_size(1),			'1B',		'one byte';
+    is $util->format_human_size(512),		'512B',		'sub-kilobyte';
+    is $util->format_human_size(1023),		'1023B',	'just below 1K';
+    is $util->format_human_size(1024),		'1.00K',	'exactly 1K';
+    is $util->format_human_size(1536),		'1.50K',	'1.5K';
+    is $util->format_human_size(2048),		'2.00K',	'2K';
+    is $util->format_human_size($one_mb),	'1.00M',	'1M';
+    is $util->format_human_size($one_gb),	'1.00G',	'1G';
+    is $util->format_human_size($one_tb),	'1.00T',	'1T';
+};
+
 subtest 'create_stripe_url' => sub {
 	my $path = 'test/path';
 	my $emptypath;

@@ -36,25 +36,6 @@ $t->app->hook(before_dispatch => sub {
 	return 1;
 });
 
-subtest 'format_human_size' => sub {
-	my $fhs = \&Bliptown::Controller::Files::format_human_size;
-
-    my $one_mb = 1024 * 1024;
-    my $one_gb = 1024 * 1024 * 1024;
-    my $one_tb = 1024 * 1024 * 1024 * 1024;
-
-    is $fhs->(0),       '0B',     'zero bytes';
-    is $fhs->(1),       '1B',     'one byte';
-    is $fhs->(512),     '512B',   'sub-kilobyte';
-    is $fhs->(1023),    '1023B',  'just below 1K';
-    is $fhs->(1024),    '1.00K',  'exactly 1K';
-    is $fhs->(1536),    '1.50K',  '1.5K';
-    is $fhs->(2048),    '2.00K',  '2K';
-    is $fhs->($one_mb), '1.00M',  '1M';
-    is $fhs->($one_gb), '1.00G',  '1G';
-    is $fhs->($one_tb), '1.00T',  '1T';
-};
-
 $t->post_ok('/files' => { Host => $user_domain } => form => {
 	action		=> 'new_directory',
 	name		=> 'fakedir',

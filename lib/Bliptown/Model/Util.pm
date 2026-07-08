@@ -4,6 +4,19 @@ use Mojo::URL;
 use Mojo::File qw(path);
 use POSIX qw(strftime);
 
+sub format_human_size {
+	my ($self, $size) = @_;
+	return $size . 'B' if $size < 1024;
+	my @units = (qw(K M G T));
+	while (@units) {
+		my $unit = shift @units;
+		$size /= 1024;
+		if ($size < 1024) {
+			return sprintf('%.2f%s', $size, $unit);
+		}
+	}
+}
+
 sub create_stripe_url {
 	my ($self, $path) = @_;
 	return unless $path;
