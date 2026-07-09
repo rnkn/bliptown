@@ -19,15 +19,15 @@ sub send_message {
 	my $data = {
 		command => $args->{command},
 		payload => {
-			username		=> $args->{username} // '',
-			filename		=> $args->{filename} // '',
-			new_filename	=> $args->{new_filename} // '',
-			create_backup	=> $args->{create_backup} // 0,
-			content			=> $args->{content} // '',
-			blob			=> $args->{blob} // '',
-			hash			=> $args->{hash} // '',
-			domain			=> $args->{domain} // '',
-			domains			=> $args->{domains} // [],
+			username		=> $args->{username}		// '',
+			filename		=> $args->{filename}		// '',
+			new_filename	=> $args->{new_filename}	// '',
+			create_backup	=> $args->{create_backup}	// 0,
+			content			=> $args->{content}			// '',
+			blob			=> $args->{blob}			// '',
+			hash			=> $args->{hash}			// '',
+			domain			=> $args->{domain}			// '',
+			domains			=> $args->{domains}			// [],
 		},
 	};
 
