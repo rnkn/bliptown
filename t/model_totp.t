@@ -16,19 +16,19 @@ subtest 'create_secret' => sub {
 };
 
 subtest 'read_totp' => sub {
-    my $secret = 'G43TKYZTG4YDSNBUGY3DSMJQGI3DQM3BGNSDE';
+    my $secret = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
     my $time = 1_000_000_000;
     my @totp_pair = $totp->read_totp({ totp_secret => $secret, time => $time });
 
     is scalar(@totp_pair), 2, 'read_totp returns a pair of values';
-	is $totp_pair[0], '543754', 'read_totp returns correct current TOTP';
-	is $totp_pair[1], '055065', 'read_totp returns correct old TOTP';
+	is $totp_pair[0], '855786', 'read_totp returns correct current TOTP';
+	is $totp_pair[1], '742818', 'read_totp returns correct old TOTP';
 };
 
 subtest 'check_totp' => sub {
-    my $secret = 'G43TKYZTG4YDSNBUGY3DSMJQGI3DQM3BGNSDE';
+    my $secret = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
     my $time = 1_000_000_000;
-    my @totp_pair = qw(543754 055065);
+    my @totp_pair = qw(855786 742818);
 
     ok $totp->check_totp({
 		totp => $totp_pair[0],
