@@ -98,7 +98,7 @@ check file users.db path /var/db/bliptown/users.db
 	if failed perm 0600 then alert
 
 check directory usr/local/www/bliptown path /usr/local/www/bliptown
-	if failed uid 0 then alert
+	if failed uid 1008 then alert
 	if failed gid 1008 then alert
 	if failed perm 0750 then alert
 
