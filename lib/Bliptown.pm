@@ -32,6 +32,7 @@ sub startup {
 		port => $app->mode eq 'production' ? '' : '3000',
 		user_home => $ENV{BLIPTOWN_USER_HOME},
 		log_home => $ENV{BLIPTOWN_LOG_HOME},
+		reverse_proxy => $app->mode eq 'production' ? 1 : 0,
 		allowed_exts => [ qw(md html css js txt) ]
 	);
 

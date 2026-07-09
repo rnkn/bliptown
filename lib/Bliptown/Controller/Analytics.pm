@@ -3,22 +3,22 @@ use Mojo::Base 'Mojolicious::Controller';
 use Digest::SHA qw(hmac_sha1_hex);
 use Mojo::File qw(path);
 
-sub track_visit {
-	my $c = shift;
-	my $username = $c->session('username') // '';
-	return $c->render(data => '') if $username eq $c->get_req_user;
-	my $tx = $c->tx;
+sub get_data {
+	my $c			= shift;
+	my $tx			= $c->tx	or return;
+	my $req			= $tx->req	or return;
 
-	my $ip = $tx->req->headers->header('X-Forwarded-For') //
-		$tx->remote_address;
-	my $vhost = $tx->req->headers->host;
-	my $country_obj = eval { $c->geoip->country(ip => $ip) };
-	my $country = $country_obj->country->name if $country_obj;
-	my $ip_hash = hmac_sha1_hex($ip, $c->app->secrets->[0]);
+	$req->reverse_proxy($c->app->config->{reverse_proxy});
 
-	my $url = Mojo::URL->new($tx->req->headers->referrer // '');
-	my $host = $url->host;
-	my $path_query = $url->path_query;
+	my $ip			= $tx->remote_address;
+	my $ip_hash		= hmac_sha1_hex($ip, $c->app->secrets->[0]);
+	my $vhost		= $req->headers->host;
+	my $cn			= eval { $c->geoip->country(ip => $ip) };
+	my $country		= $cn->country->name if $cn;
+
+	my $url			= Mojo::URL->new($req->headers->referrer // '');
+	my $host		= $url->host;
+	my $path_query	= $url->path_query;
 
 	my @data = (
 		$ip_hash						// '',
@@ -30,23 +30,31 @@ sub track_visit {
 		$vhost							// '',
 	);
 
-	$c->log_visit(\@data);
-
-	return $c->render(data => '');
+	return \@data;
 }
 
-sub log_visit {
-	my ($c, $data) = @_;
-	my $req_user = $c->get_req_user;
-	return unless $req_user;
-	my $logpath = path($c->config->{log_home}, 'users', $req_user, 'access.log');
-	my $logdir = $logpath->dirname;
-	$logdir->make_path unless -d $logdir;
-	$logpath->touch unless -f $logpath;
-	$logpath->chmod(0600);
+sub log_data {
+	my ($c, $req_user, $data) = @_;
+	my $logdir = path($c->config->{log_home}, 'users', $req_user)->make_path;
+	my $logpath = path($logdir, 'access.log')->touch->chmod(0600);
+
 	my $log = $c->accesslog($logpath);
 	return unless $log;
+
 	$log->info(@$data);
+}
+
+sub track_visit {
+	my $c = shift;
+	my $username = $c->session('username') // '';
+	my $req_user = $c->get_req_user;
+
+	if ($req_user && $username ne $req_user) {
+		my $data = $c->get_data;
+		$c->log_data($req_user, $data);
+	}
+
+	return $c->render(data => '');
 }
 
 return 1;
