@@ -1,4 +1,7 @@
 use Mojo::Base -strict;
+use Mojo::File qw(path curfile);
+use constant THIS_DIR => curfile->dirname;
+use lib path(THIS_DIR, '../lib');
 use Mojo::Util qw(generate_secret secure_compare);
 use Digest::SHA qw(sha1_hex);
 use MIME::Base32 qw(encode_base32 decode_base32);

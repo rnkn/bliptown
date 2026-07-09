@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile tempdir);
 use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib'), path(THIS_DIR, 'lib');
+use lib path(THIS_DIR, '../lib');
 use Test::More;
 
 use Bliptown::Model::Util;
