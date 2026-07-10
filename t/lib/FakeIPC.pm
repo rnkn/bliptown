@@ -6,30 +6,32 @@ use lib path(THIS_DIR, '../../lib');
 
 sub send_message {
 	my ($self, $args) = @_;
-	my $command = $args->{command} // '';
+	my $command		= $args->{command}	// '';
+	my $username	= $args->{username} // '';
+	my $hash		= $args->{hash}		// '';
 
 	my @git_log = ({
-		body => 'A  blog/2999-06-08.md',
-		date => '2999-06-08 11:03 +0000',
-		hash => 'df78309',
+		body	=> 'A  blog/2999-06-08.md',
+		date	=> '2999-06-08 11:03 +0000',
+		hash	=> 'df78309',
 		subject => 'Full snapshot on Bliptown'
     },
     {
-		body => 'A  blog/2999-05-30.md',
-		date => '2999-05-30 10:12 +0000',
-		hash => '5fc620b',
+		body	=> 'A  blog/2999-05-30.md',
+		date	=> '2999-05-30 10:12 +0000',
+		hash	=> '5fc620b',
 		subject => 'Full snapshot on Bliptown'
     },
     {
-		body => 'A  blog/2999-05-29.md',
-		date => '2999-05-29 21:12 +0000',
-		hash => 'aa569c5',
+		body	=> 'A  blog/2999-05-29.md',
+		date	=> '2999-05-29 21:12 +0000',
+		hash	=> 'aa569c5',
 		subject => 'Full snapshot on Bliptown'
     });
 
-	my $filename = $args->{filename} // '';
-	my $new_filename = $args->{new_filename} // '';
-	my $domain = $args->{domain} // '';
+	my $filename		= $args->{filename}		// '';
+	my $new_filename	= $args->{new_filename} // '';
+	my $domain			= $args->{domain}		// '';
 
 	my %responses = (
 		'write_blob'				=> "Wrote file: $filename",
