@@ -485,12 +485,9 @@ a.exit:before {
 	color: var(--warning-color);
 }
 
-#list .commit-message, #list .date {
+#list #commit-date {
 	white-space: nowrap;
 	overflow: hidden;
-}
-
-#list .cell.date {
 	width: 22ex;
 	text-align: right;
 }

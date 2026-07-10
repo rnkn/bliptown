@@ -35,11 +35,11 @@
 			% foreach (@$snapshots) {
 			<details name="snapshot">
 				<summary class="row">
-					<span class="cell"><code><%= $_->{hash} %></code></span>
-					<span class="cell commit-subject"><%= $_->{subject} %></span>
-					<span class="cell right date"><%= $_->{date} %></span>
+					<span id="commit-hash" class="cell"><code><%= $_->{hash} %></code></span>
+					<span id="commit-subject" class="cell"><%= $_->{subject} %></span>
+					<span id="commit-date" class="cell right"><%= $_->{date} %></span>
 				</summary>
-				<pre><%= $_->{body} || 'No commit message' %></pre>
+				<pre id="commit-body"><%= $_->{body} || 'No commit message' %></pre>
 				<ul class="controls">
 					<li><a href="<%= url_for('restore_snapshot', hash => $_->{hash}) %>">Restore</a></li>
 					<li><a href="<%= url_for('download_snapshot', hash => $_->{hash}) %>">Download</a></li>
