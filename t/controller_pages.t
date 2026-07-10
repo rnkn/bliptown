@@ -51,7 +51,7 @@ layout: one-column
 EOF
 
 $t->get_ok("/new/$slug" => { Host => $user_domain })->status_is(200)
-	->text_like('header h1', qr/new/i)
+	->text_like('header h1', qr/New/)
 	->attr_is('div#filename input', 'value', $slug)
 	->attr_is("div#filename select#ext option[value=\"$ext\"]", 'selected', '')
 	->text_is('textarea#content', '');
@@ -66,7 +66,7 @@ $t->post_ok('/edit' => { Host => $user_domain } => form => {
 my $path = path($user_dir, "$slug.$ext");
 $path->spew($content);
 
-like $debug_messages, qr/updated file: $path/i, 'edit_page updates file';
+like $debug_messages, qr/Updated file: $path/, 'edit_page updates file';
 
 $t->get_ok("/edit/$slug" => { Host => $user_domain })->status_is(200)
 	->text_is('header h1 a', $slug)
