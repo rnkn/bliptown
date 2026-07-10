@@ -1,7 +1,7 @@
 package Bliptown::Controller::TOTP;
 use Mojo::Base 'Mojolicious::Controller';
 
-sub totp_update {
+sub save_totp {
 	my $c = shift;
 	my $secret = $c->param('secret');
 	my $totp = $c->param('totp');
@@ -13,7 +13,7 @@ sub totp_update {
 		totp_expected_pair => \@totp_expected_pair
 	})) {
 		$c->flash(info => 'TOTP incorrent');
-		return $c->redirect_to('totp_initiate');
+		return $c->redirect_to('generate_totp');
 	}
 	$c->user->update_user({
 		username => $username,
@@ -22,7 +22,7 @@ sub totp_update {
 	return $c->redirect_to($redirect);
 }
 
-sub totp_initiate {
+sub generate_totp {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $secret = $c->totp->create_secret;

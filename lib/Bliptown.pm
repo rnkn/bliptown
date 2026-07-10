@@ -403,8 +403,8 @@ sub startup {
 	$protected->get('/backup/*catchall')->to(controller => 'Files', action => 'backup_file', catchall => '')->name('backup_file');
 	$protected->under($block_demo)->post('/upload/*catchall')->to(controller => 'Files', action => 'upload_files', catchall => '')->name('upload_files');
 
-	$protected->get('/settings/totp')->to(controller => 'TOTP', action => 'totp_initiate')->name('totp_initiate');
-	$protected->under($block_demo)->post('/settings/totp')->to(controller => 'TOTP', action => 'totp_update')->name('totp_update');
+	$protected->get('/settings/totp')->to(controller => 'TOTP', action => 'generate_totp')->name('generate_totp');
+	$protected->under($block_demo)->post('/settings/totp')->to(controller => 'TOTP', action => 'save_totp')->name('save_totp');
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 	$protected->under($block_demo)->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
 

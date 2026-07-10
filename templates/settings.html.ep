@@ -37,7 +37,7 @@
 					</span>
 				</li>
 				<li class="row">
-					<a href="<%= url_for('totp_initiate')->query(back_to => url_for)%>">Reset 2FA</a>
+					<a href="<%= url_for('generate_totp')->query(back_to => url_for)%>">Reset 2FA</a>
 				</li>
 				<hr>
 				<li class="row">
