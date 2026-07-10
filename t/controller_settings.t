@@ -69,14 +69,14 @@ $t->app->hook(before_dispatch => sub {
 
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
-$t->get_ok('/settings' => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('list_settings') => { Host => $user_domain })->status_is(200)
 	->attr_is('input#username', 'value', $username)
 	->attr_is('input#email', 'value', $email)
 	->attr_is('input#custom-domain', 'value', '')
 	->attr_is('select#date-format option[value="0"]', 'selected', '')
 	->element_exists_not('input#create-backups[checked]');
 
-$t->post_ok('/settings' => { Host => $user_domain } => form => {
+$t->post_ok($app->url_for('save_settings') => { Host => $user_domain } => form => {
 	email => 'newemail@mydomain.org',
 	new_password => 'newpassword456',
 	custom_domain => 'mydomain.org',
@@ -84,7 +84,7 @@ $t->post_ok('/settings' => { Host => $user_domain } => form => {
 	date_format => 2,
 })->status_is(302);
 
-$t->get_ok('/settings' => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('list_settings') => { Host => $user_domain })->status_is(200)
 	->attr_is('input#email', 'value', 'newemail@mydomain.org')
 	->attr_is('input#custom-domain', 'value', 'mydomain.org')
 	->attr_is('select#date-format option[value="2"]', 'selected', '')

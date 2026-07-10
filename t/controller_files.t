@@ -9,10 +9,11 @@ use FakeIPC;
 
 use_ok qw(Bliptown::Controller::Files);
 
-my $t = Test::Mojo->new('Bliptown');
-my $log = Mojo::Log->new;
-my $debug_messages = $log->capture('debug');
-my $app = $t->app;
+my $t				= Test::Mojo->new('Bliptown');
+my $app				= $t->app;
+my $log				= Mojo::Log->new;
+my $debug_messages	= $log->capture('debug');
+
 $app->log($log);
 
 my $ipc = FakeIPC->new;
@@ -48,33 +49,33 @@ $user_dir->child('bar.md')->touch;
 $user_dir->child('subdir')->make_path;
 $user_dir->child('subdir/baz.md')->touch;
 
-$t->get_ok('/files' => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('list_files') => { Host => $user_domain })->status_is(200)
 	->content_like(qr{<a href="/foo">foo.md</a>})
 	->content_like(qr{<a href="/bar">bar.md</a>})
 	->content_like(qr{<a href="/files/subdir">subdir</a>});
 
-$t->get_ok('/files/subdir' => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('list_files', catchall => 'subdir') => { Host => $user_domain })->status_is(200)
 	->content_like(qr{<a href="/subdir/baz">baz.md</a>});
 
-$t->get_ok(Mojo::URL->new('/files')->query(search => 'foo') => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('list_files')->query(search => 'foo') => { Host => $user_domain })->status_is(200)
 	->content_like(qr{<a href="/foo">foo.md</a>})
 	->content_unlike(qr{<a href="/bar">bar.md</a>});
 
-$t->get_ok('/delete/foo.md' => { Host => $user_domain })->status_is(302);
+$t->get_ok($app->url_for('delete_file', catchall => 'foo.md') => { Host => $user_domain })->status_is(302);
 like $debug_messages, qr{Deleted: $user_dir/foo.md};
 
-$t->get_ok(Mojo::URL->new('/files')->query(search => 'ba', delete => 1) => { Host => $user_domain })->status_is(302);
+$t->get_ok($app->url_for('list_files')->query(search => 'ba', delete => 1) => { Host => $user_domain })->status_is(302);
 like $debug_messages, qr{Deleted: $user_dir/bar.md};
 like $debug_messages, qr{Deleted: $user_dir/subdir/baz.md};
 
-$t->get_ok(Mojo::URL->new('/rename/foo.md')->query(name => 'bar.md') => { Host => $user_domain })->status_is(302);
+$t->get_ok($app->url_for('rename_file', catchall => 'foo.md')->query(name => 'bar.md') => { Host => $user_domain })->status_is(302);
 like $debug_messages, qr{Renamed file: $user_dir/foo.md -> $user_dir/bar.md};
 
-$t->get_ok(Mojo::URL->new('/files')->query(search => 'ba', replace => 'qu') => { Host => $user_domain })->status_is(302);
+$t->get_ok($app->url_for('list_files')->query(search => 'ba', replace => 'qu') => { Host => $user_domain })->status_is(302);
 like $debug_messages, qr{Renamed file: $user_dir/bar.md -> $user_dir/qur.md};
 like $debug_messages, qr{Renamed file: $user_dir/subdir/baz.md -> $user_dir/subdir/quz.md};
 
-$t->get_ok('/backup/foo.md' => { Host => $user_domain })->status_is(302);
+$t->get_ok($app->url_for('backup_file', catchall => 'foo.md') => { Host => $user_domain })->status_is(302);
 like $debug_messages, qr{Created backup file: $user_dir/foo.md~};
 
 done_testing;

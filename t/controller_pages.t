@@ -9,10 +9,11 @@ use FakeIPC;
 
 use_ok qw(Bliptown::Controller::Pages);
 
-my $t = Test::Mojo->new('Bliptown');
-my $log = Mojo::Log->new;
-my $debug_messages = $log->capture('debug');
-my $app = $t->app;
+my $t				= Test::Mojo->new('Bliptown');
+my $app				= $t->app;
+my $log				= Mojo::Log->new;
+my $debug_messages	= $log->capture('debug');
+
 $app->log($log);
 
 my $ipc = FakeIPC->new;
@@ -50,13 +51,13 @@ layout: one-column
 # {{ title }}
 EOF
 
-$t->get_ok("/new/$slug" => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('new_page', catchall => $slug) => { Host => $user_domain })->status_is(200)
 	->text_like('header h1', qr/New/)
 	->attr_is('div#filename input', 'value', $slug)
 	->attr_is("div#filename select#ext option[value=\"$ext\"]", 'selected', '')
 	->text_is('textarea#content', '');
 
-$t->post_ok('/edit' => { Host => $user_domain } => form => {
+$t->post_ok($app->url_for('save_page') => { Host => $user_domain } => form => {
 	slug		=> $slug,
 	ext			=> $ext,
 	action		=> 'save',
@@ -68,16 +69,16 @@ $path->spew($content);
 
 like $debug_messages, qr/Updated file: $path/, 'edit_page updates file';
 
-$t->get_ok("/edit/$slug" => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('edit_page', catchall => $slug) => { Host => $user_domain })->status_is(200)
 	->text_is('header h1 a', $slug)
 	->attr_is('div#filename input', 'value', $slug)
 	->attr_is("div#filename select#ext option[value=\"$ext\"]", 'selected', '')
 	->text_is('textarea#content', $content);
 
-$t->get_ok("/raw/$slug" => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('render_raw', catchall => $slug) => { Host => $user_domain })->status_is(200)
 	->content_is($content);
 
-$t->get_ok("/$slug" => { Host => $user_domain })->status_is(200)
+$t->get_ok($app->url_for('render_page', catchall => $slug) => { Host => $user_domain })->status_is(200)
 	->text_like('head title', qr/My Site . Hello World!/)
 	->content_like(qr{<h1>Hello World!</h1>});
 
