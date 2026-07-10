@@ -263,10 +263,10 @@ sub startup {
 
 	$app->hook(
 		before_server_start => sub {
-			my ($server, $app) = @_;
+			my $server = shift;
 			$server->on(
 				heartbeat => sub {
-					my ($prefork, $pid) = @_;
+					my $prefork = shift;
 					path($ENV{BLIPTOWN_HEALTH_FILE})->spew($prefork->healthy);
 				}
 			);
