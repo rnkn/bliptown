@@ -50,6 +50,14 @@ sub send_message {
 		'update_relayd_keypairs'	=> 'relayd keypairs up-to-date',
 	);
 
+	my @git_hash_commands = qw(git_show git_checkout git_archive);
+
+	if (grep { $command eq $_ } @git_hash_commands) {
+		unless (grep { $hash eq $_ } map { $_->{hash} } @git_log) {
+			return { info => '', error => "Invalid hash: $hash" }
+		}
+	}
+	
 	my $res = $responses{$command};
 	if ($res) {
 		return { info => $res, error => '' };
