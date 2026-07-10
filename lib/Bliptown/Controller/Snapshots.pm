@@ -84,7 +84,7 @@ sub download_snapshot {
 
 	$c->res->headers->content_type('application/gzip');
 	$c->res->headers->content_disposition(
-		"attachment; filename=${username}.blip.town-${hash}.tar.gz"
+		"attachment; filename=${username}.$ENV{BLIPTOWN_DOMAIN}-${hash}.tar.gz"
 	);
 
 	$c->on(
