@@ -1012,15 +1012,6 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       SQL::Abstract 2.0
       perl 5.016
-  Sereal-5.006
-    pathname: Y/YV/YVES/Sereal-5.006.tar.gz
-    provides:
-      Sereal 5.006
-    requirements:
-      ExtUtils::MakeMaker 0
-      Sereal::Decoder 5.006
-      Sereal::Encoder 5.006
-      perl 5.008
   Sereal-Decoder-5.006
     pathname: Y/YV/YVES/Sereal-Decoder-5.006.tar.gz
     provides:
