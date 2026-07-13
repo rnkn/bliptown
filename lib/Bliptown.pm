@@ -5,7 +5,7 @@ use Mojo::Util qw(url_unescape);
 use Mojo::SQLite;
 use lib '.';
 
-use Geo::Location::IP::Database::Reader;
+use Geo::Location::IP::Database::SimpleReader;
 
 use Bliptown::Model::User;
 use Bliptown::Model::File;
@@ -68,7 +68,7 @@ sub startup {
 	$app->helper(
 		geoip => sub {
 			my $db = path($ENV{BLIPTOWN_GEOIP_DB});
-			state $reader = Geo::Location::IP::Database::Reader->new(
+			state $reader = Geo::Location::IP::Database::SimpleReader->new(
 				file => $db,
 				locales => ['en']
 			);

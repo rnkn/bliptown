@@ -10,5 +10,5 @@ requires 'Imager::QRCode';
 requires 'Text::Glob';
 requires 'IO::Socket::SSL';
 requires 'Net::DNS';
-requires 'Geo::Location::IP::Database::Reader';
+requires 'Geo::Location::IP::Database::SimpleReader';
 requires 'HTTP::BrowserDetect';

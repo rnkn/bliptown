@@ -13,7 +13,7 @@ sub get_data {
 	my $ip			= $tx->remote_address;
 	my $ip_hash		= hmac_sha1_hex($ip, $c->app->secrets->[0]);
 	my $vhost		= $req->headers->host;
-	my $cn			= eval { $c->geoip->country(ip => $ip) };
+	my $cn			= $c->geoip->country(ip => $ip);
 	my $country		= $cn->country->name if $cn;
 
 	my $url			= Mojo::URL->new($req->headers->referrer // '');
