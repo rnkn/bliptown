@@ -489,10 +489,10 @@ DISTRIBUTIONS
       perl 5.014
       utf8 0
       warnings 0
-  Imager-1.031
-    pathname: T/TO/TONYC/Imager-1.031.tar.gz
+  Imager-1.033
+    pathname: T/TO/TONYC/Imager-1.033.tar.gz
     provides:
-      Imager 1.031
+      Imager 1.033
       Imager::Color 1.015
       Imager::Color::Float 1.008
       Imager::Color::Table 1.004
@@ -502,10 +502,10 @@ DISTRIBUTIONS
       Imager::Expr::Infix 1.008
       Imager::Expr::Postfix 1.008
       Imager::ExtUtils 1.003
-      Imager::FORMATS 1.031
+      Imager::FORMATS 1.033
       Imager::File::CUR 1.000
       Imager::File::ICO 0.08
-      Imager::File::SGI 0.05
+      Imager::File::SGI 0.06
       Imager::Fill 1.013
       Imager::Filter::DynTest 0.03
       Imager::Filter::Flines 0.04
@@ -519,7 +519,7 @@ DISTRIBUTIONS
       Imager::Font::Type1 1.013
       Imager::Font::Wrap 1.005
       Imager::Fountain 1.009
-      Imager::IO 1.031
+      Imager::IO 1.033
       Imager::Matrix2d 1.013
       Imager::Preprocess 1.003
       Imager::Probe 1.011
