@@ -7,7 +7,7 @@ has 'db';
 sub create_token {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
-	my $token = generate_secret;
+	my $token = substr(generate_secret, 0, 40);
 	my $expires = time + 30;
 	my $ok = $self->db->insert(
 		'login_tokens', {
