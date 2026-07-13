@@ -1019,11 +1019,11 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       SQL::Abstract 2.0
       perl 5.016
-  Sereal-Decoder-5.006
-    pathname: Y/YV/YVES/Sereal-Decoder-5.006.tar.gz
+  Sereal-Decoder-5.008
+    pathname: Y/YV/YVES/Sereal-Decoder-5.008.tar.gz
     provides:
-      Sereal::Decoder 5.006
-      Sereal::Decoder::Constants 5.006
+      Sereal::Decoder 5.008
+      Sereal::Decoder::Constants 5.008
       Sereal::Performance undef
     requirements:
       Devel::CheckLib 1.16
@@ -1031,16 +1031,16 @@ DISTRIBUTIONS
       ExtUtils::ParseXS 2.21
       XSLoader 0
       perl 5.008
-  Sereal-Encoder-5.006
-    pathname: Y/YV/YVES/Sereal-Encoder-5.006.tar.gz
+  Sereal-Encoder-5.008
+    pathname: Y/YV/YVES/Sereal-Encoder-5.008.tar.gz
     provides:
-      Sereal::Encoder 5.006
-      Sereal::Encoder::Constants 5.006
+      Sereal::Encoder 5.008
+      Sereal::Encoder::Constants 5.008
     requirements:
       Devel::CheckLib 1.16
       ExtUtils::MakeMaker 7.0
       ExtUtils::ParseXS 2.21
-      Sereal::Decoder 5.006
+      Sereal::Decoder 5.008
       XSLoader 0
       perl 5.008
   Sub-Quote-2.006009
