@@ -64,8 +64,7 @@
 				<details id="delete-account">
 					<summary class="row">Delete account</summary>
 					<li class="row">
-						<label class="cell name" for="delete-account-confirm">To confirm, enter <code>doas rm -rf <%= $username %></code></label>
-						<input class="cell" type="text" id="delete-account-confirm" name="delete_confirm" <%= $disabled %>>
+						<label class="cell name" for="delete-account-confirm">Automatic account deletion is not implemented during the alpha stage. Please contact <a href="mailto:support@blip.town">support@blip.town</a> to delete your account.</code></label>
 					</li>
 				</details>
 			</ul>
