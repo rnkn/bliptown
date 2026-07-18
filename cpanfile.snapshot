@@ -807,21 +807,21 @@ DISTRIBUTIONS
       Sub::Defer 2.006006
       Sub::Quote 2.006006
       perl 5.006
-  Net-DNS-1.55
-    pathname: N/NL/NLNETLABS/Net-DNS-1.55.tar.gz
+  Net-DNS-1.56
+    pathname: N/NL/NLNETLABS/Net-DNS-1.56.tar.gz
     provides:
-      Net::DNS 1.55
+      Net::DNS 1.56
       Net::DNS::Domain 2002
-      Net::DNS::DomainName 2005
-      Net::DNS::DomainName1035 2005
-      Net::DNS::DomainName2535 2005
+      Net::DNS::DomainName 2054
+      Net::DNS::DomainName1035 2054
+      Net::DNS::DomainName2535 2054
       Net::DNS::Header 2042
       Net::DNS::Mailbox 2002
       Net::DNS::Mailbox1035 2002
       Net::DNS::Mailbox2535 2002
       Net::DNS::Nameserver 2002
       Net::DNS::Packet 2003
-      Net::DNS::Parameters 2046
+      Net::DNS::Parameters 2054
       Net::DNS::Question 2002
       Net::DNS::RR 2037
       Net::DNS::RR::A 2003
@@ -836,7 +836,7 @@ DISTRIBUTIONS
       Net::DNS::RR::CERT 2042
       Net::DNS::RR::CNAME 2003
       Net::DNS::RR::CSYNC 2003
-      Net::DNS::RR::DELEG 2046
+      Net::DNS::RR::DELEG 2053
       Net::DNS::RR::DHCID 2003
       Net::DNS::RR::DNAME 2003
       Net::DNS::RR::DNSKEY 2042
@@ -869,28 +869,28 @@ DISTRIBUTIONS
       Net::DNS::RR::NSEC3PARAM 2003
       Net::DNS::RR::NULL 2002
       Net::DNS::RR::OPENPGPKEY 2003
-      Net::DNS::RR::OPT 2005
-      Net::DNS::RR::OPT::CHAIN 2005
-      Net::DNS::RR::OPT::CLIENT_SUBNET 2005
-      Net::DNS::RR::OPT::COOKIE 2005
-      Net::DNS::RR::OPT::DAU 2005
-      Net::DNS::RR::OPT::DHU 2005
-      Net::DNS::RR::OPT::EXPIRE 2005
-      Net::DNS::RR::OPT::EXTENDED_ERROR 2005
-      Net::DNS::RR::OPT::KEY_TAG 2005
-      Net::DNS::RR::OPT::N3U 2005
-      Net::DNS::RR::OPT::NSID 2005
-      Net::DNS::RR::OPT::PADDING 2005
-      Net::DNS::RR::OPT::REPORT_CHANNEL 2005
-      Net::DNS::RR::OPT::TCP_KEEPALIVE 2005
-      Net::DNS::RR::OPT::ZONEVERSION 2005
+      Net::DNS::RR::OPT 2054
+      Net::DNS::RR::OPT::CHAIN 2054
+      Net::DNS::RR::OPT::CLIENT_SUBNET 2054
+      Net::DNS::RR::OPT::COOKIE 2054
+      Net::DNS::RR::OPT::DAU 2054
+      Net::DNS::RR::OPT::DHU 2054
+      Net::DNS::RR::OPT::EXPIRE 2054
+      Net::DNS::RR::OPT::EXTENDED_ERROR 2054
+      Net::DNS::RR::OPT::KEY_TAG 2054
+      Net::DNS::RR::OPT::N3U 2054
+      Net::DNS::RR::OPT::NSID 2054
+      Net::DNS::RR::OPT::PADDING 2054
+      Net::DNS::RR::OPT::REPORT_CHANNEL 2054
+      Net::DNS::RR::OPT::TCP_KEEPALIVE 2054
+      Net::DNS::RR::OPT::ZONEVERSION 2054
       Net::DNS::RR::PTR 2002
       Net::DNS::RR::PX 2003
       Net::DNS::RR::RESINFO 2003
       Net::DNS::RR::RP 2002
-      Net::DNS::RR::RRSIG 2042
+      Net::DNS::RR::RRSIG 2057
       Net::DNS::RR::RT 2003
-      Net::DNS::RR::SIG 2042
+      Net::DNS::RR::SIG 2057
       Net::DNS::RR::SMIMEA 2003
       Net::DNS::RR::SOA 2002
       Net::DNS::RR::SPF 2003
@@ -905,10 +905,10 @@ DISTRIBUTIONS
       Net::DNS::RR::X25 2002
       Net::DNS::RR::ZONEMD 2003
       Net::DNS::Resolver 2017
-      Net::DNS::Resolver::Base 2049
+      Net::DNS::Resolver::Base 2057
       Net::DNS::Resolver::MSWin32 2002
       Net::DNS::Resolver::Recurse 2002
-      Net::DNS::Resolver::UNIX 2046
+      Net::DNS::Resolver::UNIX 2053
       Net::DNS::Resolver::android 2007
       Net::DNS::Resolver::cygwin 2002
       Net::DNS::Resolver::os2 2007
