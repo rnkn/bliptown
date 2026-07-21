@@ -7,7 +7,6 @@ use Test::Mojo;
 
 use Bliptown::Model::User;
 use Bliptown::Model::Customer;
-use Bliptown::Model::TOTP;
 use Bliptown::Model::Util;
 
 use FakeIPC;
@@ -16,6 +15,7 @@ use FakeDNS;
 use BliptownTest qw(create_db);
 
 use_ok qw(Bliptown::Controller::Settings);
+use_ok qw(Bliptown::Model::TOTP);
 
 my $t			= Test::Mojo->new('Bliptown');
 my $app			= $t->app;
@@ -95,10 +95,21 @@ $t->get_ok($app->url_for('generate_totp') => { Host => $user_domain })->status_i
 	->text_like('code#secret', qr/[A-Z2-7]{37}/)
 	->attr_is('input#totp-check', 'value', '');
 
+my $secret				= 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+my @totp_expected_pair	= $totp->read_totp({ totp_secret => $secret });
+
 $t->post_ok($app->url_for('save_totp') => { Host => $user_domain } => form => {
-	secret => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-	totp => '000000',
+	secret => $secret,
+	totp => $totp_expected_pair[0],
 })->status_is(302);
+
+subtest 'save_totp' => sub {
+	my $user_rec = $user->read_user({
+		key			=> 'username',
+		username	=> 'testuser',
+	});
+	is $user_rec->{totp_secret}, $secret, 'save_totp saves correct secret';
+};
 
 $user->delete_user({
 	username	=> $username,
