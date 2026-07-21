@@ -41,11 +41,11 @@ sub process_variables {
 		if ($date && $key eq 'prettydate') {
 			my $req_user = $self->req_user;
 			return unless $req_user;
-			my $user = $self->user->read_user({
+			my $user_rec = $self->user->read_user({
 				key => 'username',
 				username => $req_user,
 			});
-			my $format = $user->{date_format} // 0;
+			my $format = $user_rec->{date_format} // 0;
 			$val = $self->util->process_prettydate($date, $format);
 		}
 		else {

@@ -190,12 +190,12 @@ sub startup {
 				my @host_array = split(/\./, $host);
 				$username = @host_array >= 3 ? $host_array[-3] : 'mayor';
 			} else {
-				my $user = $c->user->read_user({
+				my $user_rec = $c->user->read_user({
 					key => 'custom_domain',
 					custom_domain => $host,
 				});
-				return '' unless $user;
-				$username = $user->{username};
+				return '' unless $user_rec;
+				$username = $user_rec->{username};
 			}
 			return '' unless $username;
 			my $dir = path($c->config->{user_home}, $username);
@@ -330,12 +330,12 @@ sub startup {
 		$url->scheme($c->config->{scheme});
 		$url->port($c->config->{port});
 
-		my $user = $c->user->read_user({
+		my $user_rec = $c->user->read_user({
 			key => 'username',
 			username => $username,
 		});
 		my $domain = $c->config->{domain};
-		my $custom_domain = $user->{custom_domain};
+		my $custom_domain = $user_rec->{custom_domain};
 		if ($custom_domain) {
 			$url->host($custom_domain);
 		}

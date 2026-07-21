@@ -33,43 +33,43 @@ subtest 'create_user' => sub {
 		password => 'password123',
 	});
 
-	my $record = $db->select('users', undef, { username => 'testuser' })->hash;
-	ok $record, 'create_user creates a user in database';
+	my $record_rec = $db->select('users', undef, { username => 'testuser' })->hash;
+	ok $record_rec, 'create_user creates a user in database';
 };
 
 subtest 'read_user by username' => sub {
-	my $record = $user->read_user({
+	my $record_rec = $user->read_user({
 		key => 'username',
 		username => 'testuser',
 	});
-	ok $record, 'read_user finds user by username';
-	is $record->{username}, 'testuser', 'read_user username matches';
-	is $record->{email}, 'testuser@example.com', 'read_user email matches';
-	ok $record->{password_hash}, 'read_user password_hash is set';
-	ok $record->{totp_secret}, 'read_user totp_secret is set';
-	ok $record->{customer_id}, 'read_user customer_id is set';
+	ok $record_rec, 'read_user finds user by username';
+	is $record_rec->{username}, 'testuser', 'read_user username matches';
+	is $record_rec->{email}, 'testuser@example.com', 'read_user email matches';
+	ok $record_rec->{password_hash}, 'read_user password_hash is set';
+	ok $record_rec->{totp_secret}, 'read_user totp_secret is set';
+	ok $record_rec->{customer_id}, 'read_user customer_id is set';
 };
 
 subtest 'read_user by email' => sub {
-	my $record = $user->read_user({
+	my $record_rec = $user->read_user({
 		key => 'email',
 		email => 'testuser@example.com',
 	});
-	ok $record, 'read_user finds user by email';
-	is $record->{username}, 'testuser', 'read_user username matches';
+	ok $record_rec, 'read_user finds user by email';
+	is $record_rec->{username}, 'testuser', 'read_user username matches';
 };
 
 subtest 'read_user with missing key returns undef' => sub {
-	my $record = $user->read_user({});
-	ok !defined $record, 'read_user returns undef with missing key';
+	my $record_rec = $user->read_user({});
+	ok !defined $record_rec, 'read_user returns undef with missing key';
 };
 
 subtest 'read_user nonexistent user returns undef' => sub {
-	my $record = $user->read_user({
+	my $record_rec = $user->read_user({
 		key => 'username',
 		username => 'nobody'
 	});
-	ok !defined $record, 'returns undef for nonexistent user';
+	ok !defined $record_rec, 'returns undef for nonexistent user';
 };
 
 subtest 'update_user email' => sub {
@@ -77,25 +77,25 @@ subtest 'update_user email' => sub {
 		username => 'testuser',
 		email => 'newemail@example.com'
 	});
-	my $record = $user->read_user({ key => 'username', username => 'testuser' });
-	is $record->{email}, 'newemail@example.com', 'update_user updates email';
+	my $record_rec = $user->read_user({ key => 'username', username => 'testuser' });
+	is $record_rec->{email}, 'newemail@example.com', 'update_user updates email';
 };
 
 subtest 'update_user password' => sub {
-	my $record = $user->read_user({
+	my $record_rec = $user->read_user({
 		key => 'username',
 		username => 'testuser',
 	});
-	my $old_password_hash = $record->{password_hash};
+	my $old_password_hash = $record_rec->{password_hash};
 	$user->update_user({
 		username => 'testuser',
 		new_password => 'newpassword456'
 	});
-	$record = $user->read_user({
+	$record_rec = $user->read_user({
 		key => 'username',
 		username => 'testuser'
 	});
-	ok $record->{password_hash} ne $old_password_hash, 'update_user password changed';
+	ok $record_rec->{password_hash} ne $old_password_hash, 'update_user password changed';
 };
 
 subtest 'update_user custom_domain' => sub {
@@ -103,18 +103,18 @@ subtest 'update_user custom_domain' => sub {
 		username => 'testuser',
 		custom_domain => 'mydomain.org',
 	});
-	my $record = $user->read_user({
+	my $record_rec = $user->read_user({
 		key => 'username',
 		username => 'testuser',
 	});
-	is $record->{custom_domain}, 'mydomain.org', 'update_user sets custom_domain';
+	is $record_rec->{custom_domain}, 'mydomain.org', 'update_user sets custom_domain';
 
 	$user->update_user({
 		username => 'testuser',
 		custom_domain => '',
 	});
-	$record = $user->read_user({ key => 'username', username => 'testuser' });
-	ok !defined $record->{custom_domain}, 'custom_domain removes custom domain';
+	$record_rec = $user->read_user({ key => 'username', username => 'testuser' });
+	ok !defined $record_rec->{custom_domain}, 'custom_domain removes custom domain';
 };
 
 subtest 'update_user date_format and create_backups' => sub {
@@ -123,12 +123,12 @@ subtest 'update_user date_format and create_backups' => sub {
 		date_format => 2,
 		create_backups => 1,
 	});
-	my $record = $user->read_user({
+	my $record_rec = $user->read_user({
 		key => 'username',
 		username => 'testuser',
 	});
-	is $record->{date_format}, 2, 'update_user sets date_format';
-	is $record->{create_backups}, 1, 'update_user sets create_backups';
+	is $record_rec->{date_format}, 2, 'update_user sets date_format';
+	is $record_rec->{create_backups}, 1, 'update_user sets create_backups';
 };
 
 $user->create_user({
@@ -166,13 +166,13 @@ $user->create_user({
 	password	=> 'correctpass123',
 });
 
-my $auth_user = $user->read_user({
+my $auth_user_rec = $user->read_user({
 	key			=> 'username',
 	username	=> 'authuser'
 });
 
 my @totp_pair = $totp->read_totp({
-	totp_secret => $auth_user->{totp_secret}
+	totp_secret => $auth_user_rec->{totp_secret}
 });
 
 subtest 'authenticate_user with credentials' => sub {

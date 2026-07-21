@@ -39,19 +39,19 @@ sub read_user {
 	my ($self, $args) = @_;
 	my $key = $args->{key};
 	return unless $key;
-	my $user = $self->db->select(
+	my $user_rec = $self->db->select(
 		'users', undef, { $key => $args->{$key} }
 	)->hash;
-	return unless $user;
-	$user->{custom_domain} = '' if $user->{custom_domain} &&
-		$user->{custom_domain} eq 'NULL';
-	return $user;
+	return unless $user_rec;
+	$user_rec->{custom_domain} = '' if $user_rec->{custom_domain} &&
+		$user_rec->{custom_domain} eq 'NULL';
+	return $user_rec;
 }
 
 sub update_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username};
-	my $user = $self->read_user({
+	my $user_rec = $self->read_user({
 		key => 'username',
 		username => $username,
 	});
@@ -93,11 +93,11 @@ sub update_user {
 sub delete_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
-	my $user = $self->read_user({
+	my $user_rec = $self->read_user({
 		key => 'username',
 		username => $username,
 	});
-	my $customer_id = $user->{customer_id};
+	my $customer_id = $user_rec->{customer_id};
 
 	$self->customer->delete_customer({
 		customer_id => $customer_id,
@@ -110,18 +110,18 @@ sub delete_user {
 sub authenticate_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username};
-	my $user = $self->read_user({
+	my $user_rec = $self->read_user({
 		key => 'username',
 		username => $username,
 	});
-	return unless $user;
-	my $hash = $user->{password_hash};
+	return unless $user_rec;
+	my $hash = $user_rec->{password_hash};
 	return unless $hash;
 	return unless bcrypt_check($args->{password}, $hash);
 
 	return 1 if $username eq 'demo';
 
-	my $secret = $user->{totp_secret};
+	my $secret = $user_rec->{totp_secret};
 	my $totp = $args->{totp};
 	my @totp_expected_pair = $self->totp->read_totp({ totp_secret => $secret });
 	return unless $self->totp->check_totp({

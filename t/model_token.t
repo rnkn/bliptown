@@ -24,29 +24,29 @@ subtest 'create_token username' => sub {
 
 subtest 'read_token retrieves record' => sub {
     my $tk = $token->create_token({ username => 'bob' });
-    my $record = $token->read_token({ token => $tk });
-    ok defined $record, 'read_token retrieves record';
-    is $record->{username}, 'bob', 'read_token returns username';
-    is $record->{token}, $tk, 'read_token returns token';
+    my $record_rec = $token->read_token({ token => $tk });
+    ok defined $record_rec, 'read_token retrieves record';
+    is $record_rec->{username}, 'bob', 'read_token returns username';
+    is $record_rec->{token}, $tk, 'read_token returns token';
 };
 
 subtest 'read_token invalid token' => sub {
-    my $record = $token->read_token({ token => 'nonexistent' });
-    ok !defined $record, 'read_token omits record for invalid token';
+    my $record_rec = $token->read_token({ token => 'nonexistent' });
+    ok !defined $record_rec, 'read_token omits record for invalid token';
 };
 
 subtest 'read_token empty token' => sub {
-    my $record = $token->read_token;
-    ok !defined $record, 'read_token omits record for empty token';
+    my $record_rec = $token->read_token;
+    ok !defined $record_rec, 'read_token omits record for empty token';
 };
 
 subtest 'delete_token' => sub {
     my $tk = $token->create_token({ username => 'carol' });
-    my $record = $token->read_token({ token => $tk });
+    my $record_rec = $token->read_token({ token => $tk });
     my $ok = $token->delete_token({ token => $tk });
     ok $ok, 'delete_token returns true';
-    $record = $token->read_token({ token => $tk });
-    ok !defined $record, 'delete_token deletes token record';
+    $record_rec = $token->read_token({ token => $tk });
+    ok !defined $record_rec, 'delete_token deletes token record';
 };
 
 subtest 'delete_token abort' => sub {
@@ -57,8 +57,8 @@ subtest 'delete_token abort' => sub {
 subtest 'token expiry' => sub {
     my $tk = $token->create_token({ username => 'dave' });
     $db->update('login_tokens', { expires => time - 1 }, { token => $tk });
-    my $record = $token->read_token({ token => $tk });
-    cmp_ok $record->{expires}, '<=', time, 'read_token returns expired token';
+    my $record_rec = $token->read_token({ token => $tk });
+    cmp_ok $record_rec->{expires}, '<=', time, 'read_token returns expired token';
 };
 
 done_testing;
