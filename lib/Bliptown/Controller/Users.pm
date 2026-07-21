@@ -12,22 +12,6 @@ sub validate_user {
 	return 1 unless $v->has_error;
 }
 
-sub check_duplicate_user {
-	my ($c, $args) = @_;
-	return $c->user->read_user({
-		key => 'username',
-		username => $args->{username}
-	});
-}
-
-sub check_duplicate_email {
-	my ($c, $args) = @_;
-	return $c->user->read_user({
-		key => 'email',
-		email => $args->{email}
-	});
-}
-
 sub user_join {
 	my $c = shift;
 	my $email = $c->param('email') || '';
@@ -45,12 +29,12 @@ sub user_join {
 		return $c->redirect_to($redirect);
 	}
 
-	if ($c->check_duplicate_user({ username => $username })) {
+	if ($c->user->read_user({ key => 'username', username => $username })) {
 		$c->flash(info => 'Username already in use');
 		return $c->redirect_to($redirect);
 	}
 
-	if ($c->check_duplicate_email({ email => $email })) {
+	if ($c->user->read_user({ key => 'email', email => $email })) {
 		$c->flash(info => 'Account with that email already exists');
 		return $c->redirect_to($redirect);
 	}
