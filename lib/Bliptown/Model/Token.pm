@@ -22,10 +22,10 @@ sub create_token {
 sub read_token {
 	my ($self, $args) = @_;
 	my $token = $args->{token} or return;
-	my $record_rec = $self->db->select(
+	my $token_rec = $self->db->select(
 		'login_tokens', undef, { token => $token }
 	)->hash;
-	return $record_rec if $record_rec;
+	return $token_rec if $token_rec;
 }
 
 sub delete_token {

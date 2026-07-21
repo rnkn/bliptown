@@ -69,10 +69,10 @@ sub token_login {
 	my $username	= $args->{username} // '';
 	my $token		= $args->{token} // '';
 	my $redirect	= $args->{redirect} // '/';
-	my $record_rec		= $c->token->read_token({ token => $args->{token} });
+	my $token_rec		= $c->token->read_token({ token => $args->{token} });
 
-	if (! $record_rec || ! $record_rec->{username} || $record_rec->{expires} <= time) {
-		$c->token->delete_token({ token => $token }) if $record_rec;
+	if (! $token_rec || ! $token_rec->{username} || $token_rec->{expires} <= time) {
+		$c->token->delete_token({ token => $token }) if $token_rec;
 		return $c->render(
 			status => 403,
 			template => 'message',
@@ -81,7 +81,7 @@ sub token_login {
 		);
 	}
 
-	if ($username eq $record_rec->{username}) {
+	if ($username eq $token_rec->{username}) {
 		$c->stash(custom_session_domain => $host);
 		$c->session(expiration => 2592000, username => $username);
 		$c->token->delete_token({ token => $token });
