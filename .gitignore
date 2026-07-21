@@ -1,6 +1,7 @@
 *_
 /TAGS
 /.envrc
-/local
+/.carmel/
+/local/
 /*.db
 
