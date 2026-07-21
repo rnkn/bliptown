@@ -39,12 +39,12 @@ sub list_settings {
 	my $username = $c->session('username');
 	return unless $username;
 	my $locked = $username eq 'demo' ? 1 : 0;
-	my $user = $c->user->read_user({
+	my $user_rec = $c->user->read_user({
 		key => 'username',
 		username => $username
 	});
 
-	my $customer_id = $user->{customer_id};
+	my $customer_id = $user_rec->{customer_id};
 	return $c->reply->exception("User $username customer_id not found")
 		unless $customer_id;
 	my $billing_session = $c->customer->create_billing_session({
@@ -59,11 +59,11 @@ sub list_settings {
 		template => 'settings',
 		show_sidebar => 1,
 		locked => $locked,
-		username => $user->{username} // '',
-		email => $user->{email} // '',
-		custom_domain => $user->{custom_domain} // '',
-		date_format => $user->{date_format} // 0,
-		create_backups => $user->{create_backups} // 0,
+		username => $user_rec->{username} // '',
+		email => $user_rec->{email} // '',
+		custom_domain => $user_rec->{custom_domain} // '',
+		date_format => $user_rec->{date_format} // 0,
+		create_backups => $user_rec->{create_backups} // 0,
 		billing_portal_url => $billing_portal_url // ''
 	);
 	return $c->render;
@@ -73,7 +73,7 @@ sub save_settings {
 	my $c = shift;
 	my $username = $c->session('username');
 	return unless $username;
-	my $user = $c->user->read_user({
+	my $user_rec = $c->user->read_user({
 		key => 'username',
 		username => $username
 	});
@@ -81,7 +81,7 @@ sub save_settings {
 	$params->{create_backups} //= 0;
 
 	my $new_domain = $params->{custom_domain} // '';
-	my $cur_domain = $user->{custom_domain} // '';
+	my $cur_domain = $user_rec->{custom_domain} // '';
 
 	$c->user->update_user({ username => $username, %$params });
 

@@ -263,8 +263,8 @@ sub save_page {
 	$filename = path($root, $filename)->to_string;
 	my $content = $c->param('content');
 	$content =~ s/\r\n/\n/g;
-	my $user = $c->user->read_user({ key => 'username', username => $username });
-	my $backup = $user->{create_backups} // 0;
+	my $user_rec = $c->user->read_user({ key => 'username', username => $username });
+	my $backup = $user_rec->{create_backups} // 0;
 	my $res = $c->ipc->send_message({
 		command => 'update_file',
 		username => $username,

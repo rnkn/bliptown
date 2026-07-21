@@ -69,10 +69,10 @@ sub token_login {
 	my $username	= $args->{username} // '';
 	my $token		= $args->{token} // '';
 	my $redirect	= $args->{redirect} // '/';
-	my $record		= $c->token->read_token({ token => $args->{token} });
+	my $token_rec		= $c->token->read_token({ token => $args->{token} });
 
-	if (! $record || ! $record->{username} || $record->{expires} <= time) {
-		$c->token->delete_token({ token => $token }) if $record;
+	if (! $token_rec || ! $token_rec->{username} || $token_rec->{expires} <= time) {
+		$c->token->delete_token({ token => $token }) if $token_rec;
 		return $c->render(
 			status => 403,
 			template => 'message',
@@ -81,7 +81,7 @@ sub token_login {
 		);
 	}
 
-	if ($username eq $record->{username}) {
+	if ($username eq $token_rec->{username}) {
 		$c->stash(custom_session_domain => $host);
 		$c->session(expiration => 2592000, username => $username);
 		$c->token->delete_token({ token => $token });
@@ -151,11 +151,11 @@ sub user_login {
 	if ($c->user->authenticate_user(\%creds)) {
 		$c->session(username => $username);
 
-		my $user = $c->user->read_user({
+		my $user_rec = $c->user->read_user({
 			key => 'username',
 			username => $username
 		});
-		my $custom_domain = $user->{custom_domain};
+		my $custom_domain = $user_rec->{custom_domain};
 
 		if ($custom_domain) {
 			my $token = $c->token->create_token({ username => $username });

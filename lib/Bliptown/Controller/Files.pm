@@ -14,7 +14,7 @@ sub list_files {
 	my $slug = $c->param('catchall');
 	my $username = $c->session('username');
 	my $locked = $username eq 'demo' ? 1 : 0;
-	my $user = $c->user->read_user({
+	my $user_rec = $c->user->read_user({
 		key => 'username',
 		username => $username
 	});
