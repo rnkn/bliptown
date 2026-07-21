@@ -146,8 +146,8 @@ sub update_relayd_keypairs {
 }
 
 sub get_uid_gid {
-	my $username = shift;
-	my @pw = getpwnam($username) or die "Cannot find user: $username";
+	my $user = shift;
+	my @pw = getpwnam($user) or die "Cannot find user: $user";
 	my $uid = $pw[2];
 	my $gid = $pw[3];
 	return ($uid, $gid);
@@ -223,16 +223,16 @@ sub make_directory {
 
 sub git_init {
 	my $payload = shift;
-	my $username = $payload->{username};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $user = $payload->{user};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
 	my $excludes_file = '/etc/gitignore';
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
 	system(qw(git init -q)) == 0
 		or die "Cannot initialize repository: $repo ($!)";
-	system('git', 'config', 'set', 'user.name', $username) == 0
+	system('git', 'config', 'set', 'user.name', $user) == 0
 		or die "Cannot configure repository user name ($!)";
-	system('git', 'config', 'set', 'user.email', "${username}\@blip.town") == 0
+	system('git', 'config', 'set', 'user.email', "${user}\@blip.town") == 0
 		or die "Cannot configure repository user email ($!)";
 	system('git', 'config', 'set', 'core.excludesFile', $excludes_file) == 0
 		or die "Cannot configure repository ignore file ($!)";
@@ -241,8 +241,8 @@ sub git_init {
 
 sub git_log {
 	my $payload = shift;
-	my $username = $payload->{username};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $user = $payload->{user};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 	my $out = `git log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b%x01" --max-count=50`;
 
@@ -262,10 +262,10 @@ sub git_log {
 
 sub git_show {
 	my $payload = shift;
-	my $username = $payload->{username};
+	my $user = $payload->{user};
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 	my $out = `git show $hash`;
 	return unless length $out;
@@ -274,8 +274,8 @@ sub git_show {
 
 sub git_commit {
 	my $payload = shift;
-	my $username = $payload->{username};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $user = $payload->{user};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
@@ -296,8 +296,8 @@ sub git_commit {
 
 sub git_checkout {
 	my $payload = shift;
-	my $username = $payload->{username};
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $user = $payload->{user};
+	my $root = path($ENV{BLIPTOWN_USER_HOME}, $user);
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $dir = path($root, 'snapshots', $hash);
@@ -311,8 +311,8 @@ sub git_checkout {
 
 sub git_archive {
 	my $payload = shift;
-	my $username = $payload->{username};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $user = $payload->{user};
+	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $tmpfile = tempfile(UNLINK => 0);
@@ -366,16 +366,16 @@ sub handle_conn {
 	}
 
 	eval {
-		my $username = $payload->{username};
+		my $user = $payload->{user};
 
-		unless ($username eq 'root') {
-			my ($uid, $gid) = get_uid_gid($username);
+		unless ($user eq 'root') {
+			my ($uid, $gid) = get_uid_gid($user);
 
 			setgid($gid) or die "Cannot set group: $gid ($!)";
 			setuid($uid) or die "Cannot set user: $uid ($!)";
 
 			if ($has_unveil) {
-				my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
+				my $root = path($ENV{BLIPTOWN_USER_HOME}, $user);
 				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
 				unveil();
 			}

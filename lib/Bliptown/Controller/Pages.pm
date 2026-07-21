@@ -267,7 +267,7 @@ sub save_page {
 	my $backup = $user_rec->{create_backups} // 0;
 	my $res = $c->ipc->send_message({
 		command => 'update_file',
-		username => $username,
+		user => $username,
 		filename => $filename,
 		content => $content,
 		create_backup => $backup,

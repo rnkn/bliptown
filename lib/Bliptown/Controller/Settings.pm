@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Controller';
 sub provision_cert {
 	my ($c, $domain) = @_;
 	my $res = $c->ipc->send_message({
-		username => 'root',
+		user => 'root',
 		command => 'provision_cert',
 		domain => $domain,
 	});
@@ -26,7 +26,7 @@ sub update_domain_list {
 	my $command = $commands{$context};
 	return unless $command;
 	my $res = $c->ipc->send_message({
-		username => 'root',
+		user => 'root',
 		command => $command,
 		domains => \@domains
 	});

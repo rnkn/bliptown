@@ -19,6 +19,7 @@ sub send_message {
 	my $data = {
 		command => $args->{command},
 		payload => {
+			user			=> $args->{user}			// '',
 			username		=> $args->{username}		// '',
 			filename		=> $args->{filename}		// '',
 			new_filename	=> $args->{new_filename}	// '',
