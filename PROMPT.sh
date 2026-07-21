@@ -9,12 +9,12 @@ and credentials. The server runs OpenBSD.
 
 ## Commands ##
 
-- Install dependencies: `carton install`
-- Run tests: `carton exec prove -l t`
-- Run a single test: `carton exec prove -l t/basic.t`
-- Syntax check a file: `carton exec perl -w -c lib/Bliptown.pm`
-- The deployed app starts through the existing wrapper scripts with
-  `carton exec -- script/bliptown`
+- Install dependencies: `carmel install`
+- Run tests: `carmel exec prove`
+- Run a single test: `carmel exec prove t/controller_files.t`
+- Syntax check a file: `carmel exec perl -w -c lib/Bliptown.pm`
+- The deployed app starts with `perl -Ilocal/lib/perl5/
+  script/bliptown`
 
 ## Architecture ##
 
