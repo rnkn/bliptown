@@ -52,7 +52,7 @@ my $user_home	= $tempbase->child('users')->make_path;
 $app->config->{user_home} = $user_home;
 
 my $username	= 'testuser';
-my $email		= 'test@example.com';
+my $email		= 'testuser@example.com';
 my $user_dir	= $user_home->child($username)->make_path;
 
 $user->create_user({
