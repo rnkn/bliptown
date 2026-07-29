@@ -109,7 +109,6 @@ sub startup {
 		page => sub {
 			my $c = shift;
 			return Bliptown::Model::Page->new(
-				req_user => $c->get_req_user,
 				user => $c->user,
 				metadata => $c->metadata,
 				mustache => $c->mustache,

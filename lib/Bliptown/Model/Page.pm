@@ -5,7 +5,6 @@ use FFI::Platypus;
 use Mojo::DOM;
 use Mojo::Util qw(encode decode);
 
-has 'req_user';
 has 'user';
 has 'metadata';
 has 'mustache';
