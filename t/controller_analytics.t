@@ -12,12 +12,12 @@ my $t						= Test::Mojo->new('Bliptown');
 my $app						= $t->app;
 my $username				= 'testuser';
 my $user_domain				= "$username.$ENV{BLIPTOWN_DOMAIN}";
-$app->config->{user_home}	= tempdir;
-$app->config->{log_home}	= tempdir;
+$ENV{BLIPTOWN_USER_HOME}	= tempdir;
+$ENV{BLIPTOWN_LOG_HOME}		= tempdir;
 
-path($app->config->{user_home}, $username)->make_path;
+path($ENV{BLIPTOWN_USER_HOME}, $username)->make_path;
 
-my $logdir	= path($app->config->{log_home}, 'users', $username)->make_path;
+my $logdir	= path($ENV{BLIPTOWN_LOG_HOME}, 'users', $username)->make_path;
 my $logpath = path($logdir, 'access.log')->touch->chmod(0600);
 
 my $url = Mojo::URL->new;

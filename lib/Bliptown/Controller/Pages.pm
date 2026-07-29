@@ -41,10 +41,9 @@ sub postprocess_skel {
 
 sub render_page {
 	my $c = shift;
-	my $user_home = $c->config->{user_home};
 	my $req_user = $c->get_req_user;
 	return $c->reply->not_found unless $req_user;
-	my $root = path($user_home, $req_user);
+	my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_user);
 	my $username = $c->session('username');
 
 	my $is_cur_user = $username && $username eq $req_user;
@@ -202,7 +201,7 @@ sub edit_page {
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	my $partial_re = qr/^\Q{{\E *> *(.*?) *\Q}}\E$/;
-	my $root = path($c->config->{user_home}, $username);
+	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
 	my $file;
 	if (!$slug || $slug =~ m{/$}) {
 		unless ($file = $c->get_file("$slug/index")) {
@@ -254,7 +253,7 @@ sub edit_page {
 sub save_page {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $root = path($c->config->{user_home}, $username)->to_string;
+	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username)->to_string;
 	my $slug = $c->param('slug');
 	$slug =~ s{^/}{};
 	my $ext = $c->param('ext');

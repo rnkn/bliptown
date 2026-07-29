@@ -49,7 +49,7 @@ my $user		= Bliptown::Model::User->new(
 my $tempbase	= tempdir;
 my $user_home	= $tempbase->child('users')->make_path;
 
-$app->config->{user_home} = $user_home;
+$ENV{BLIPTOWN_USER_HOME} = $user_home;
 
 my $username	= 'testuser';
 my $email		= 'testuser@example.com';

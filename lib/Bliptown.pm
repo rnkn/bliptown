@@ -181,7 +181,7 @@ sub startup {
 			my $host = $c->req->url->to_abs->host;
 			return unless $host;
 			$host =~ s/^www\.//;
-			my $domain = $c->config->{domain};
+			my $domain = $ENV{BLIPTOWN_DOMAIN};
 			my $username = '';
 			if ($host =~ /\Q$domain\E$/) {
 				my @host_array = split(/\./, $host);
@@ -195,7 +195,7 @@ sub startup {
 				$username = $user_rec->{username};
 			}
 			return '' unless $username;
-			my $dir = path($c->config->{user_home}, $username);
+			my $dir = path($ENV{BLIPTOWN_USER_HOME}, $username);
 			return '' unless -d $dir;
 			return $username;
 		});
@@ -205,7 +205,7 @@ sub startup {
 			my ($c, $slug) = @_;
 			my $req_user = $c->get_req_user;
 			return unless $req_user;
-			my $root = path($c->config->{user_home}, $req_user)->to_abs;
+			my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_user)->to_abs;
 			my $file = path($root, $slug)->to_abs;
 			return $file if -f $file;
 			foreach my $ext (@{$c->config->{allowed_exts}}) {
@@ -277,13 +277,12 @@ sub startup {
 			my $host = $req_url->host;
 			return unless $host;
 			$c->app->sessions->cookie_domain($host);
-			my $domain = $c->config->{domain};
 
-			if ($host eq "cdn-origin.$domain") {
+			if ($host eq "cdn-origin.$ENV{BLIPTOWN_DOMAIN}") {
 				my $req_user = shift @{$req_url->path->parts};
 				return unless $req_user;
 				my $path = join '/', @{$req_url->path->parts};
-				my $user_home = $c->config->{user_home};
+				my $user_home = $ENV{BLIPTOWN_USER_HOME};
 				my $file = path($user_home, $req_user, $path);
 				if (-f $file) {
 					my $max_age = 24 * 60 * 60;
@@ -325,14 +324,14 @@ sub startup {
 		}
 
 		my $url = Mojo::URL->new;
-		$url->scheme($c->config->{scheme});
-		$url->port($c->config->{port});
+		$url->scheme($ENV{BLIPTOWN_SCHEME});
+		$url->port($ENV{BLIPTOWN_PORT});
 
 		my $user_rec = $c->user->read_user({
 			key => 'username',
 			username => $username,
 		});
-		my $domain = $c->config->{domain};
+		my $domain = $ENV{BLIPTOWN_DOMAIN};
 		my $custom_domain = $user_rec->{custom_domain};
 		if ($custom_domain) {
 			$url->host($custom_domain);

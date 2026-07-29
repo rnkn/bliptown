@@ -26,7 +26,7 @@ my $tempbase	= tempdir;
 my $user_home	= $tempbase->child('users')->make_path;
 my $username	= 'testuser';
 
-$app->config->{user_home} = $user_home;
+$ENV{BLIPTOWN_USER_HOME} = $user_home;
 
 my $user_dir = $user_home->child($username)->make_path;
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";

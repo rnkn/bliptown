@@ -35,7 +35,7 @@ sub get_data {
 
 sub log_data {
 	my ($c, $req_user, $data) = @_;
-	my $logdir = path($c->config->{log_home}, 'users', $req_user)->make_path;
+	my $logdir = path($ENV{BLIPTOWN_LOG_HOME}, 'users', $req_user)->make_path;
 	my $logpath = path($logdir, 'access.log')->touch->chmod(0600);
 
 	my $log = $c->accesslog($logpath);

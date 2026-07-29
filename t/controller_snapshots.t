@@ -19,9 +19,9 @@ $app->helper(
 	ipc => sub { return $ipc }
 );
 
-$app->config->{user_home} = tempdir;
+$ENV{BLIPTOWN_USER_HOME} = tempdir;
 
-path($app->config->{user_home}, $username)->make_path;
+path($ENV{BLIPTOWN_USER_HOME}, $username)->make_path;
 
 $t->app->hook(before_dispatch => sub {
 	my $c = shift;
