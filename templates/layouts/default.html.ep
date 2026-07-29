@@ -55,9 +55,6 @@
 					<div class="input">
 						<input type="email" placeholder="email" name="email" maxlength="254" required disabled>
 					</div>
-					<div class="input">
-						<input type="password" placeholder="password" name="password" minlength="8" maxlength="256" required disabled>
-					</div>
 					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit" disabled>Join</button>
 				</form>
@@ -75,14 +72,6 @@
 					<div>
 						<input type="text" placeholder="username" name="username" value="<%= $username %>" required>
 					</div>
-					<div>
-						<input type="password" placeholder="password" name="password" required>
-					</div>
-					% unless ($req_user eq 'demo') {
-					<div>
-						<input type="text" placeholder="2FA" name="totp" required>
-					</div>
-					% }
 					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit">Login</button>
 				</form>
