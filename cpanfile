@@ -1,8 +1,6 @@
 requires 'Mojolicious';
 requires 'Mojo::SQLite';
 requires 'Mojo::SMTP::Client';
-requires 'Crypt::Bcrypt';
-requires 'Authen::OATH';
 requires 'FFI::Platypus';
 requires 'YAML::Tiny';
 requires 'Sereal::Encoder';
