@@ -23,10 +23,6 @@
 					<input class="cell" id="email" type="email" name="email" value="<%= $email %>" <%= $disabled %>>
 				</li>
 				<li class="row">
-					<label class="cell name" for="new-password">New password</label>
-					<input class="cell" id="new-password" type="password" name="new_password" <%= $disabled %>>
-				</li>
-				<li class="row">
 					<label class="cell name" for="custom-domain">Custom domain <a href="https://blip.town/faq/custom_domain" target="_blank" class="help-q">?</a></label>
 					<input class="cell" id="custom-domain" type="text" name="custom_domain" value="<%= $custom_domain %>" placeholder="example.com" <%= $disabled %>>
 				</li>
@@ -35,9 +31,6 @@
 						<a href="<%= url_for('edit_page', catchall => '_pubkeys' )->query([ext => 'txt', back_to => url_for])%>">SSH public keys</a>
 						<a href="https://blip.town/faq/shell_access" target="_blank" class="help-q">?</a>
 					</span>
-				</li>
-				<li class="row">
-					<a href="<%= url_for('generate_totp')->query(back_to => url_for)%>">Reset 2FA</a>
 				</li>
 				<hr>
 				<li class="row">
