@@ -1,20 +1,13 @@
 package Bliptown::Model::User;
 use Mojo::Base -base;
-use Mojo::Util qw(generate_secret);
-use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 
 has 'db';
-has 'totp';
 has 'customer';
 
 sub create_user {
 	my ($self, $args) = @_;
 	my $username = $args->{username};
 	my $email = $args->{email};
-
-	my $salt = substr(generate_secret, 0, 16);
-	my $password_hash = bcrypt($args->{password}, '2b', 12, $salt);
-	my $totp_secret = $self->totp->create_secret;
 
 	my $customer = $self->customer->create_customer({
 		username => $username,
@@ -26,8 +19,6 @@ sub create_user {
 		'users', {
 			username => $username,
 			email => $email,
-			password_hash => $password_hash,
-			totp_secret => $totp_secret,
 			customer_id => $customer_id,
 		}
 	);
@@ -58,7 +49,7 @@ sub update_user {
 
 	my %values;
 	my %keys_null		= map { $_ => 1 } qw(custom_domain);
-	my %keys_not_null	= map { $_ => 1 } qw(email totp_secret);
+	my %keys_not_null	= map { $_ => 1 } qw(email);
 	my %keys_int		= map { $_ => 1 } qw(date_format create_backups);
 
 	foreach my $key (keys %$args) {
@@ -74,13 +65,6 @@ sub update_user {
 			my $v = $args->{$key} // 0;
 			$values{$key} = $v;
 		}
-	};
-
-	my $new_password = $args->{new_password};
-	if ($new_password) {
-		my $salt = substr(generate_secret, 0, 16);
-		my $password_hash = bcrypt($new_password, '2b', 12, $salt);
-		$values{password_hash} = $password_hash;
 	};
 
 	if (%values) {
