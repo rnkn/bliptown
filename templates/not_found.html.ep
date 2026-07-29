@@ -1,5 +1,12 @@
 % layout 'default';
+<nav>
+	<header>
+		<h1>Bliptown</h1>
+	</header>
+	<menu>
+		<p><a href="/" class="exit">Home</a></p>
+	</menu>
+</nav>
 <main>
 	<p>404 Not Found</p>
-	<p><a href="/" class="exit">Home</a>
 </main>

@@ -1,4 +1,12 @@
 % layout 'default';
+<nav>
+	<header>
+		<h1>Bliptown</h1>
+	</header>
+	<menu>
+		<p><a href="/" class="exit">Home</a></p>
+	</menu>
+</nav>
 <main class="one-column">
 	<p>500 Internal Server Error</p>
 	<p>
@@ -7,5 +15,4 @@
 	</p>
 	<p>Request ID: <strong><%= $c->req->request_id %></strong></p>
 	<p>Please quote this ID with any support enquiries.</p>
-	<p><a href="/" class="exit">Home</a>
 </main>

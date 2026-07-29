@@ -355,7 +355,7 @@ sub startup {
 				$c->render(
 					status => 403,
 					template => 'message',
-					title => '403 Forbidden',
+					title => 'Bliptown :: 403 Forbidden',
 					content => '403 Forbidden: sorry, this page requires a login.'
 				);
 				return;
@@ -378,7 +378,7 @@ sub startup {
 			$c->render(
 				status => 403,
 				template => 'message',
-				title => '403 Forbidden',
+				title => 'Bliptown :: 403 Forbidden',
 				content => '403 Forbidden: demo user cannot perform this action.'
 			);
 			return;

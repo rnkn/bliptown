@@ -1,7 +1,7 @@
 % layout 'default';
 <nav>
 	<header>
-		<h1><%= $title %></h1>
+		<h1>Bliptown</h1>
 	</header>
 	<menu>
 		<a href="/" class="exit">Home</a>
