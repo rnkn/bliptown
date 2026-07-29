@@ -15,8 +15,7 @@ use Bliptown::Model::Mustache;
 use Bliptown::Model::Customer;
 use Bliptown::Model::Checkout;
 use Bliptown::Model::IPC;
-use Bliptown::Model::TOTP;
-use Bliptown::Model::QRCode;
+use Bliptown::Model::Email;
 use Bliptown::Model::Token;
 use Bliptown::Model::Util;
 
@@ -103,7 +102,6 @@ sub startup {
 			return Bliptown::Model::User->new(
 				db => $c->db,
 				customer => $c->customer,
-				totp => $c->totp,
 			);
 		});
 
@@ -138,16 +136,6 @@ sub startup {
 	$app->helper(
 		file => sub {
 			return Bliptown::Model::File->new;
-		});
-
-	$app->helper(
-		totp => sub {
-			return Bliptown::Model::TOTP->new;
-		});
-
-	$app->helper(
-		qrcode => sub {
-			return Bliptown::Model::QRCode->new;
 		});
 
 	$app->helper(
@@ -404,8 +392,6 @@ sub startup {
 	$protected->get('/backup/*catchall')->to(controller => 'Files', action => 'backup_file', catchall => '')->name('backup_file');
 	$protected->under($block_demo)->post('/upload/*catchall')->to(controller => 'Files', action => 'upload_files', catchall => '')->name('upload_files');
 
-	$protected->get('/settings/totp')->to(controller => 'TOTP', action => 'generate_totp')->name('generate_totp');
-	$protected->under($block_demo)->post('/settings/totp')->to(controller => 'TOTP', action => 'save_totp')->name('save_totp');
 	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 	$protected->under($block_demo)->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
 
