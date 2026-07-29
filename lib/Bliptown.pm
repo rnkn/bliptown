@@ -147,6 +147,16 @@ sub startup {
 		});
 
 	$app->helper(
+		email => sub {
+			my $c = shift;
+			return Bliptown::Model::Email->new(
+				user => $c->user,
+				token => $c->token,
+			);
+		}
+	);
+
+	$app->helper(
 		dns => sub {
 			return Bliptown::Model::DNS->new;
 		}
