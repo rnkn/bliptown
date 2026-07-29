@@ -311,8 +311,9 @@ sub startup {
 			return $c->reply->not_found;
 		})->name('acme_challenge');
 
-	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('token_auth');
-	$r->post('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
+	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
+	$r->post('/login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
+	$r->get('/auth')->to(controller => 'Users', action => 'user_auth')->name('user_auth');
 	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
 
 	$r->get('/track/:rand')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');

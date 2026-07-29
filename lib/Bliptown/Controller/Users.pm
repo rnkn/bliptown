@@ -1,7 +1,6 @@
 package Bliptown::Controller::Users;
 use Mojo::Base 'Mojolicious::Controller';
-use Crypt::Bcrypt qw(bcrypt bcrypt_check);
-use Mojo::Util qw(secure_compare);
+use Mojo::URL;
 
 sub validate_user {
 	my ($c, $args) = @_;
@@ -39,130 +38,93 @@ sub user_join {
 		return $c->redirect_to($redirect);
 	}
 
-	$c->user->create_user({
+	my $ok = $c->user->create_user({
 		username => $username,
 		email => $email,
 		password => $password,
 	});
-	return $c->redirect_to($redirect);
-}
 
-sub token_login {
-	my ($c, $args)	= @_;
-	my $host		= $args->{host} // '';
-	my $username	= $args->{username} // '';
-	my $token		= $args->{token} // '';
-	my $redirect	= $args->{redirect} // '/';
-	my $token_rec		= $c->token->read_token({ token => $args->{token} });
+	return $c->reply->exception("Failed to create user in database: $username")
+		unless $ok;
 
-	if (! $token_rec || ! $token_rec->{username} || $token_rec->{expires} <= time) {
-		$c->token->delete_token({ token => $token }) if $token_rec;
-		return $c->render(
-			status => 403,
-			template => 'message',
-			title => '403 Forbidden',
-			content => '403 Forbidden: invalid or expired token',
-		);
-	}
-
-	if ($username eq $token_rec->{username}) {
-		$c->stash(custom_session_domain => $host);
-		$c->session(expiration => 2592000, username => $username);
-		$c->token->delete_token({ token => $token });
-		return $c->redirect_to($redirect);
-	}
-
-	$c->token->delete_token({ token => $token });
-	return $c->redirect_to($redirect);
-}
-
-sub login_our_domain {
-	my ($c, $args)	= @_;
-	my $username	= $args->{username};
-	my $password	= $args->{password};
-	my $totp		= $args->{totp};
-	my $redirect	= $args->{redirect};
-	my $url			= Mojo::URL->new;
-	my $path		= $c->url_for('user_login')->path->to_string;
-
-	$url->host($c->config->{domain})->path($path);
-	$url->scheme($c->config->{scheme});
-	$url->port($c->config->{port});
-	$c->res->code(307);
-
-	return $c->redirect_to(
-		$url,
+	my $res = $c->ipc->send_message({
+		command => 'add_user',
+		user => 'root',
 		username => $username,
-		password => $password,
-		totp => $totp,
-		redirect => $redirect,
-	);
+	});
+
+	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+
+	return $c->redirect_to($redirect);
+}
+
+sub generate_login {
+	my $c = shift;
+	my $username = $c->param('username');
+	return unless $username;
+
+	$c->email->send_magic_link({
+		username => $username,
+	});
+
+	return $c->redirect_to('user_login');
 }
 
 sub user_login {
 	my $c = shift;
-	my $username	= $c->param('username') // '';
-	my $password	= $c->param('password') // '';
-	my $totp		= $c->param('totp') // '';
-	my $token		= $c->param('token') // '';
-	my $redirect	= $c->param('back_to') // '/';
+	$c->render(
+		template => 'message',
+		title => 'Bliptown',
+		content => 'Check your email for a login link. You can now close this window.',
+	);
+}
 
-	my $our_domain = $c->config->{domain};
+sub user_auth {
+	my $c = shift;
+	my $token = $c->param('token')	// '';
+
 	my $host = $c->req->url->to_abs->host;
 	return unless $host;
 	$host =~ s/^www\.//;
 
-	return $c->token_login({
-		host		=> $host,
-		username	=> $username,
-		token		=> $token,
-		redirect	=> $redirect
-	}) if $token;
+	my $token_rec		= $c->token->read_token({ token => $token });
+	my $username		= $token_rec->{username};
+	my $custom_domain	= $token_rec->{custom_domain} // '';
 
-	return $c->login_our_domain({
-		username	=> $username,
-		password	=> $password,
-		totp		=> $totp,
-		redirect	=> $redirect
-	}) if $host !~ /$our_domain$/;
+	if (! $token_rec || ! $username || $token_rec->{expires} <= time) {
+		$c->token->delete_token({ token => $token }) if $token_rec;
+		return $c->render(
+			status => 403,
+			template => 'message',
+			title => 'Bliptown',
+			content => '403 Forbidden: invalid or expired token',
+		);
+	}
+	else {
+		$c->session(expiration => 2592000, username => $username);
+	}
 
-	my %creds = (
-		username => $username,
-		password => $password,
-		totp => $totp
-	);
-
-	if ($c->user->authenticate_user(\%creds)) {
-		$c->session(username => $username);
-
-		my $user_rec = $c->user->read_user({
-			key => 'username',
-			username => $username
-		});
-		my $custom_domain = $user_rec->{custom_domain};
-
-		if ($custom_domain) {
-			my $token = $c->token->create_token({ username => $username });
+	if ($custom_domain) {
+		if ($host eq $custom_domain) {
+			$c->session(expiration => 2592000, username => $username);
+			$c->token->delete_token({ token => $token });
+			return $c->redirect_to($c->url_for('/'));
+		}
+		else {
 			my $url = Mojo::URL->new;
-			my $path = $c->url_for('user_login')->path->to_string;
-			$url->host($custom_domain)->path($path)->query(
-				username => $username,
-				token => $token,
-				back_to => $redirect
-			);
-			$url->scheme($c->config->{scheme});
-			$url->port($c->config->{port});
+			$url->host($custom_domain);
+			$url->scheme($ENV{BLIPTOWN_SCHEME});
+			$url->port($ENV{BLIPTOWN_PORT});
+			$url->path($c->url_for('user_auth'));
+			$url->query(token => $token);
 			return $c->redirect_to($url);
 		}
-		return $c->redirect_to($redirect);
 	}
-	return $c->render(
-		status => 401,
-		template => 'message',
-		title => '401 Unauthorized',
-		content => '401 Unauthorized: incorrect username, password or TOTP',
-		username => $username,
-	);
+	else {
+		$c->token->delete_token({ token => $token });
+		return $c->redirect_to('/');
+	}
 }
 
 sub user_logout {

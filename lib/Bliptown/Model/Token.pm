@@ -5,14 +5,17 @@ use Mojo::Util qw(generate_secret);
 has 'db';
 
 sub create_token {
-	my ($self, $args) = @_;
-	my $username = $args->{username} or return;
-	my $token = substr(generate_secret, 0, 40);
-	my $expires = time + 30;
+	my ($self, $args)	= @_;
+	my $username		= $args->{username} or return;
+	my $custom_domain	= $args->{custom_domain} // '';
+	my $token			= substr(generate_secret, 0, 40);
+	my $expires			= time + 3600;
+
 	my $ok = $self->db->insert(
 		'login_tokens', {
 			username => $username,
 			token => $token,
+			custom_domain => $custom_domain,
 			expires => $expires,
 		}
 	);
