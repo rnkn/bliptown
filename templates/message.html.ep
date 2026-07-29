@@ -1,5 +1,12 @@
 % layout 'default';
+<nav>
+	<header>
+		<h1><%= $title %></h1>
+	</header>
+	<menu>
+		<a href="/" class="exit">Home</a>
+	</menu>
+</nav>
 <main>
 	<p><%= $content %></p>
-	<p><a href="/" class="exit">Home</a>
 </main>
