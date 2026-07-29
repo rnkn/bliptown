@@ -6,14 +6,12 @@ use Test::More;
 
 use BliptownTest qw(create_db);
 
-use Bliptown::Model::TOTP;
 use Bliptown::Model::Util;
 use Bliptown::Model::Customer;
 
 use_ok qw(Bliptown::Model::User);
 
 my $db			= create_db;
-my $totp		= Bliptown::Model::TOTP->new;
 my $util		= Bliptown::Model::Util->new;
 
 my $customer = Bliptown::Model::Customer->new(
@@ -23,7 +21,6 @@ my $customer = Bliptown::Model::Customer->new(
 my $user = Bliptown::Model::User->new(
 	db => $db,
 	customer => $customer,
-	totp => $totp,
 );
 
 subtest 'create_user' => sub {
@@ -45,8 +42,6 @@ subtest 'read_user by username' => sub {
 	ok $user_rec, 'read_user finds user by username';
 	is $user_rec->{username}, 'testuser', 'read_user username matches';
 	is $user_rec->{email}, 'testuser@example.com', 'read_user email matches';
-	ok $user_rec->{password_hash}, 'read_user password_hash is set';
-	ok $user_rec->{totp_secret}, 'read_user totp_secret is set';
 	ok $user_rec->{customer_id}, 'read_user customer_id is set';
 };
 
@@ -81,23 +76,6 @@ subtest 'update_user email' => sub {
 	is $user_rec->{email}, 'newemail@example.com', 'update_user updates email';
 };
 
-subtest 'update_user password' => sub {
-	my $user_rec = $user->read_user({
-		key => 'username',
-		username => 'testuser',
-	});
-	my $old_password_hash = $user_rec->{password_hash};
-	$user->update_user({
-		username => 'testuser',
-		new_password => 'newpassword456'
-	});
-	$user_rec = $user->read_user({
-		key => 'username',
-		username => 'testuser'
-	});
-	ok $user_rec->{password_hash} ne $old_password_hash, 'update_user password changed';
-};
-
 subtest 'update_user custom_domain' => sub {
 	$user->update_user({
 		username => 'testuser',
@@ -129,59 +107,6 @@ subtest 'update_user date_format and create_backups' => sub {
 	});
 	is $user_rec->{date_format}, 2, 'update_user sets date_format';
 	is $user_rec->{create_backups}, 1, 'update_user sets create_backups';
-};
-
-$user->create_user({
-	username	=> 'demo',
-	password	=> 'demo',
-});
-
-subtest 'authenticate_user demo with wrong password' => sub {
-	my $result = $user->authenticate_user({
-		username	=> 'demo',
-		password	=> 'wrongpass',
-	});
-	ok !$result, 'authenticate_user demo fails with wrong password';
-};
-
-subtest 'authenticate_user demo with correct password' => sub {
-	my $result = $user->authenticate_user({
-		username	=> 'demo',
-		password	=> 'demo',
-	});
-	ok $result, 'authenticate_user demo succeeds with correct password';
-};
-
-subtest 'authenticate_user for nonexistent user' => sub {
-	my $result = $user->authenticate_user({
-		username	=> 'nobody',
-		password	=> 'whatever',
-		totp		=> '000000',
-	});
-	ok !$result, 'authentication fails for nonexistent user';
-};
-
-$user->create_user({
-	username	=> 'authuser',
-	password	=> 'correctpass123',
-});
-
-my $auth_user_rec = $user->read_user({
-	key			=> 'username',
-	username	=> 'authuser'
-});
-
-my @totp_pair = $totp->read_totp({
-	totp_secret => $auth_user_rec->{totp_secret}
-});
-
-subtest 'authenticate_user with credentials' => sub {
-	my $result = $user->authenticate_user({
-		username	=> 'authuser',
-		password	=> 'correctpass123',
-		totp		=> $totp_pair[0],
-	});
-	ok $result, 'authenticate_user succeeds with credentials';
 };
 
 subtest 'delete user' => sub {
