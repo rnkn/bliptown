@@ -24,7 +24,7 @@ sub generate_magic_link_email {
 	my $url = Mojo::URL->new;
 	$url->host($ENV{BLIPTOWN_DOMAIN});
 	$url->scheme($ENV{BLIPTOWN_SCHEME});
-	$url->port($ENV{BLIPTOWN_PORT});
+	$url->port($ENV{BLIPTOWN_PORT}) if $ENV{BLIPTOWN_PORT};
 	$url->path('auth');
 	$url->query(token => $token);
 
