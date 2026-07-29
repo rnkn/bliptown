@@ -75,7 +75,7 @@ sub user_login {
 	my $c = shift;
 	$c->render(
 		template => 'message',
-		title => 'Bliptown',
+		title => 'Bliptown :: Login',
 		content => 'Check your email for a login link. You can now close this window.',
 	);
 }
