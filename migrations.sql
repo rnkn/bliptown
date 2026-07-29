@@ -1,3 +1,19 @@
+-- 9 up
+ALTER TABLE users
+	DROP COLUMN password_hash;
+ALTER TABLE users
+	DROP COLUMN totp_secret;
+-- 9 down
+ALTER TABLE login_tokens
+	ADD COLUMN password_hash TEXT;
+ALTER TABLE login_tokens
+	ADD COLUMN totp_secret TEXT;
+-- 8 up
+ALTER TABLE login_tokens
+	ADD COLUMN custom_domain TEXT;
+-- 8 down
+ALTER TABLE login_tokens
+	DROP COLUMN custom_domain;
 -- 7 up
 ALTER TABLE users
 	ADD COLUMN email_verified INTEGER DEFAULT 0;
