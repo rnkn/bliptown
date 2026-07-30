@@ -15,7 +15,7 @@ die 'BLIPTOWN_HELPER_SOCKER not defined'		unless $ENV{BLIPTOWN_HELPER_SOCKET};
 
 die 'BLIPTOWN_DOMAIN not defined'				unless $ENV{BLIPTOWN_DOMAIN};
 die 'BLIPTOWN_SCHEME not defined'				unless $ENV{BLIPTOWN_SCHEME};
-die 'BLIPTOWN_PORT not defined'					unless $ENV{BLIPTOWN_PORT};
+die 'BLIPTOWN_PORT not defined'					unless defined $ENV{BLIPTOWN_PORT};
 die 'BLIPTOWN_IPV4 not defined'					unless $ENV{BLIPTOWN_IPV4};
 die 'BLIPTOWN_IPV6 not defined'					unless $ENV{BLIPTOWN_IPV6};
 die 'BLIPTOWN_SMTP_ADDR not defined'			unless $ENV{BLIPTOWN_SMTP_ADDR};
