@@ -20,7 +20,7 @@ fi
 if $ok
 then
 	echo "Restarting Bliptown:"
-	rcctl restart bliptown_staging bliptown
+	rcctl restart bliptown
 fi
 echo
 
