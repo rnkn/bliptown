@@ -53,26 +53,25 @@ sub process_prettydate {
 }
 
 sub glob_path {
-	my ($self, $path, $args) = @_;
-	$path =~ s/(\.md)?$/.md/;
+	my ($self, $glob, $root, $cur_filename) = @_;
+	$glob =~ s/(\.md)?$/.md/;
 
-	if ($path =~ m{^/}) {
-		$path =~ s{^/}{};
-		$path = path($args->{root}, $path)->to_string;
+	if ($glob =~ m{^/}) {
+		$glob =~ s{^/}{};
+		$glob = path($root, $glob)->to_string;
 	}
 	else {
-		my $file = Mojo::File->new($args->{filename});
-		$path = path($file->dirname, $path)->to_abs;
+		my $file = Mojo::File->new($cur_filename);
+		$glob = path($file->dirname, $glob)->to_abs;
 	}
 
-	my @filenames = glob $path;
-	@filenames = grep { $_ ne $args->{filename} } @filenames;
+	my @filenames = glob $glob;
+	@filenames = grep { $_ ne $cur_filename } @filenames;
 	return @filenames;
 }
 
-sub file_to_slug {
-	my ($self, $filename, $args) = @_;
-	my $root = $args->{root};
+sub filename_to_slug {
+	my ($self, $filename, $root) = @_;
 	my $rel = Mojo::File->new($filename)->to_rel($root)->to_string;
 	$rel =~ s/\.md$//;
 	return "/$rel";

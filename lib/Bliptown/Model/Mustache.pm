@@ -62,7 +62,7 @@ sub process_sections {
 
 	while ($text =~ $section_re) {
 		my ($glob, $template) = ($1, $2);
-		my @filenames = $self->util->glob_path($glob, $args);
+		my @filenames = $self->util->glob_path($glob, $args->{root}, $args->{filename});
 
 		my @items;
 		foreach my $filename (@filenames) {
@@ -74,7 +74,7 @@ sub process_sections {
 
 			my %parent_metadata = %{$args->{metadata} // {} };
 			%$item_metadata = (%parent_metadata, %$item_metadata);
-			$$item_metadata{url} = $self->util->file_to_slug($filename, $args);
+			$$item_metadata{url} = $self->util->filename_to_slug($filename, $args->{root});
 
 			push @items, $item_metadata;
 		}
@@ -96,7 +96,7 @@ sub process_partials {
 
 	while ($text =~ $partial_re) {
 		my $slug = $1;
-		my @filenames = $self->util->glob_path($slug, $args);
+		my @filenames = $self->util->glob_path($slug, $args->{root}, $args->{filename});
 
 		my $partial = '';
 		my @partials;

@@ -81,11 +81,11 @@ subtest 'process_prettydate ISO format (YYY-MM-DD)' => sub {
 	is $result, '2999-12-31', 'process_prettydate returns YYYY-MM-DD';
 };
 
-subtest 'file_to_slug strip' => sub {
+subtest 'filename_to_slug strip' => sub {
 	my $root = '/path/to/file';
 	my $filename = "$root/about.md";
-	my $slug = $util->file_to_slug($filename, { root => $root });
-	is $slug, '/about', 'file_to_slug returns slug';
+	my $slug = $util->filename_to_slug($filename, $root);
+	is $slug, '/about', 'filename_to_slug returns slug';
 };
 
 subtest 'glob_path absolute pattern' => sub {
@@ -96,7 +96,7 @@ subtest 'glob_path absolute pattern' => sub {
 	my $c = $root->child('c.md')->touch->to_abs->to_string;
 	my $ignore = $root->child('ignored.md')->touch->to_abs->to_string;
 
-	my @got = $util->glob_path('/*.md', { root => $root->to_abs->to_string, filename => $ignore });
+	my @got = $util->glob_path('/*.md', $root->to_abs->to_string, $ignore);
 	my @expected = ($a, $b, $c);
 	is_deeply [sort @got], [sort @expected], 'glob_path returns correct files';
 };
@@ -109,7 +109,7 @@ subtest 'glob_path relative pattern' => sub {
 	my $c = $root->child('c.md')->touch->to_abs->to_string;
 	my $ignore = $root->child('ignored.md')->touch->to_abs->to_string;
 
-	my @got = $util->glob_path('*.md', { filename => $ignore });
+	my @got = $util->glob_path('*.md', undef, $ignore);
 	my @expected = ($a, $b, $c);
 	is_deeply [sort @got], [sort @expected], 'glob_path returns correct files';
 };
