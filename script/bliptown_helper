@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use File::Basename;
-use constant CWD => dirname(__FILE__);
-use lib CWD . '/../lib', CWD . '/../local/lib/perl5';
+use constant DIR => dirname(__FILE__);
+use lib DIR . '/../lib', DIR . '/../local/lib/perl5';
 
 use IO::Socket::UNIX;
 use POSIX qw(setgid setuid pause WNOHANG);
