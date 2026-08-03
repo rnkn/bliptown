@@ -33,15 +33,15 @@ $0 = $0 . '[master]';
 
 die "$0 must be run as root"					unless $> == 0;
 
-die 'BLIPTOWN_HELPER_SOCKET not defined'		unless $ENV{BLIPTOWN_HELPER_SOCKET};
-die 'BLIPTOWN_HELPER_PREFORK not defined'		unless $ENV{BLIPTOWN_HELPER_PREFORK};
-die 'BLIPTOWN_HELPER_HEALTH_FILE not defined'	unless $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
+die 'BLIPTOWN_HELPER_SOCKET not defined'		unless defined $ENV{BLIPTOWN_HELPER_SOCKET};
+die 'BLIPTOWN_HELPER_PREFORK not defined'		unless defined $ENV{BLIPTOWN_HELPER_PREFORK};
+die 'BLIPTOWN_HELPER_HEALTH_FILE not defined'	unless defined $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 
-die 'BLIPTOWN_USER_HOME not defined'			unless $ENV{BLIPTOWN_USER_HOME};
-die 'BLIPTOWN_GID not defined'					unless $ENV{BLIPTOWN_GID};
+die 'BLIPTOWN_USER_HOME not defined'			unless defined $ENV{BLIPTOWN_USER_HOME};
+die 'BLIPTOWN_GID not defined'					unless defined $ENV{BLIPTOWN_GID};
 
-die 'BLIPTOWN_KEYPAIR_FILE not defined '		unless $ENV{BLIPTOWN_KEYPAIR_FILE};
-die 'BLIPTOWN_ACME_FILE not defined'			unless $ENV{BLIPTOWN_ACME_FILE};
+die 'BLIPTOWN_KEYPAIR_FILE not defined '		unless defined $ENV{BLIPTOWN_KEYPAIR_FILE};
+die 'BLIPTOWN_ACME_FILE not defined'			unless defined $ENV{BLIPTOWN_ACME_FILE};
 
 my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
 my %children;
