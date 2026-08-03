@@ -10,13 +10,11 @@ use Bliptown::Model::User;
 use Bliptown::Model::Metadata;
 use Bliptown::Model::Mustache;
 use Bliptown::Model::Util;
-use Bliptown::Model::TOTP;
 
 use_ok qw(Bliptown::Model::Page);
 
 my $db  = create_db;
-my $totp = Bliptown::Model::TOTP->new;
-my $user = Bliptown::Model::User->new(db => $db, totp => $totp);
+my $user = Bliptown::Model::User->new(db => $db);
 my $metadata = Bliptown::Model::Metadata->new;
 my $util = Bliptown::Model::Util->new(req_user => undef, user => $user);
 my $mustache = Bliptown::Model::Mustache->new(user => $user, metadata => $metadata, util => $util);
