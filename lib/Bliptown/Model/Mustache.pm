@@ -171,9 +171,10 @@ sub read_partial {
 	my $chars = Mojo::File->new($filename)->slurp('utf-8');
 	my ($yaml, $text) = $self->util->split_frontmatter($chars);
 
-	my %metadata = %{$args->{metadata} // {}};
+	my %metadata = %{$args->{metadata}};
 	delete $metadata{layout};
 	my $child_metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
+	$child_metadata->{url} = $self->util->filename_to_slug($filename, $args->{root});
 	%metadata = (%metadata, %$child_metadata) if $child_metadata;
 
 	my $child_args = {
