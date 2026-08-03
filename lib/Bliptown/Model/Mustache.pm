@@ -69,14 +69,15 @@ sub process_sections {
 			next unless -f $filename;
 			my $chars = Mojo::File->new($filename)->slurp('utf-8');
 			my ($yaml, undef) = $self->util->split_frontmatter($chars);
-			my $item_metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
-			next unless $item_metadata && $item_metadata->{date};
+			my $metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
+			my %item_metadata = %$metadata;
+			next unless %item_metadata && $item_metadata{date};
 
-			my %parent_metadata = %{$args->{metadata} // {} };
-			%$item_metadata = (%parent_metadata, %$item_metadata);
-			$$item_metadata{url} = $self->util->filename_to_slug($filename, $args->{root});
+			my %parent_metadata = %{$args->{metadata}};
+			%item_metadata = (%parent_metadata, %item_metadata);
+			$item_metadata{url} = $self->util->filename_to_slug($filename, $args->{root});
 
-			push @items, $item_metadata;
+			push @items, \%item_metadata;
 		}
 
 		@items = sort { $b->{date} cmp $a->{date} } @items;
