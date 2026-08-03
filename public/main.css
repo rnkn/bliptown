@@ -497,6 +497,11 @@ a.exit:before {
 	text-align: right;
 }
 
+#list .cell.date {
+	width: 22ex;
+	text-align: right;
+}
+
 #list .cell.sort {
 	opacity: 0;
 	text-align: center;
