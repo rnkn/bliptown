@@ -4,8 +4,8 @@ use YAML::Tiny;
 
 sub read_metadata {
 	my ($self, $yaml) = @_;
-	my $yaml_obj = YAML::Tiny->new;
-	my $metadata = eval { $yaml_obj->read_string($yaml)->[0] } // {};
+	my $y = YAML::Tiny->new;
+	my $metadata = eval { $y->read_string($yaml)->[0] } // {};
 	return $metadata;
 }
 
