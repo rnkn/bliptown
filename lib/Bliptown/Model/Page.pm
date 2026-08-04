@@ -131,8 +131,8 @@ sub read_page {
 
 	my $html = '';
 
-	if ($file =~ /\.(txt|html|css|js)$/) {
-		$html = $self->render_plaintext($chars, $1);
+	if (my ($ext) = $file =~ /\.(txt|html|css|js)$/) {
+		$html = $self->render_plaintext($chars, $ext);
 	}
 	elsif ($file =~ /\.md$/) {
 		my ($yaml, $text) = $self->util->split_frontmatter($chars);
