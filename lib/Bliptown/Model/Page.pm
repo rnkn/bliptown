@@ -49,14 +49,14 @@ $ffi->attach(
 );
 
 sub convert_typography {
-	my ($self, $s) = @_;
-	$s =~ s/(?<!\S)'/&lsquo;/g;
-	$s =~ s/'/&rsquo;/g;
-	$s =~ s/(?<!\S)"/&ldquo;/g;
-	$s =~ s/"/&rdquo;/g;
-	$s =~ s/---/&mdash;/g;
-	$s =~ s/--/&ndash;/g;
-	return $s;
+	my ($self, $text) = @_;
+	$text =~ s/(?<!\S)'/&lsquo;/g;
+	$text =~ s/'/&rsquo;/g;
+	$text =~ s/(?<!\S)"/&ldquo;/g;
+	$text =~ s/"/&rdquo;/g;
+	$text =~ s/---/&mdash;/g;
+	$text =~ s/--/&ndash;/g;
+	return $text;
 }
 
 sub walk_dom {
