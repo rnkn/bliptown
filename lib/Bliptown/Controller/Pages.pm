@@ -229,10 +229,15 @@ sub edit_page {
 		foreach my $line (@lines) {
 			if ($line =~ $partial_re) {
 				my $include = $1;
-				$include =~ s{\.[^.]+?$}{};
-				my $abs_url = Mojo::URL->new('/' . $slug);
-				$include = Mojo::URL->new($include)->to_abs($abs_url)->to_string;
-				push @includes, $include;
+				if ($include =~ qr/[*?{}\[\]]/) {
+					next;
+				}
+				else {
+					$include =~ s{\.[^.]+?$}{};
+					my $abs_url = Mojo::URL->new('/' . $slug);
+					$include = Mojo::URL->new($include)->to_abs($abs_url)->to_string;
+					push @includes, $include;
+				}
 			}
 		}
 	}
