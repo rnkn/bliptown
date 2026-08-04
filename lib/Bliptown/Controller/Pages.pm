@@ -199,7 +199,7 @@ sub edit_page {
 	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
-	my $partial_re = qr/^\Q{{\E *> *(.*?) *\Q}}\E$/;
+	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
 	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
 	my $file;
 	if (!$slug || $slug =~ m{/$}) {
