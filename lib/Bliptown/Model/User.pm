@@ -91,28 +91,4 @@ sub delete_user {
 	return 1;
 }
 
-sub authenticate_user {
-	my ($self, $args) = @_;
-	my $username = $args->{username};
-	my $user_rec = $self->read_user({
-		key => 'username',
-		username => $username,
-	});
-	return unless $user_rec;
-	my $hash = $user_rec->{password_hash};
-	return unless $hash;
-	return unless bcrypt_check($args->{password}, $hash);
-
-	return 1 if $username eq 'demo';
-
-	my $secret = $user_rec->{totp_secret};
-	my $totp = $args->{totp};
-	my @totp_expected_pair = $self->totp->read_totp({ totp_secret => $secret });
-	return unless $self->totp->check_totp({
-		totp => $totp,
-		totp_expected_pair => \@totp_expected_pair
-	});
-	return 1;
-}
-
 return 1;
