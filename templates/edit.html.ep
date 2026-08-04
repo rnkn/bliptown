@@ -27,8 +27,8 @@
 			<div id="filename">
 				<input type="text" name="slug" value="<%= $slug %>" required>
 				<select id="ext" name="ext">
-					% foreach my $allowed_ext (@{$c->config->{allowed_exts}}) {
-					<option value="<%= $allowed_ext %>" <%= 'selected' if $ext eq $allowed_ext %>><%= ".$allowed_ext" %></option>
+					% foreach my $render_ext (@{$c->config->{render_exts}}) {
+					<option value="<%= $render_ext %>" <%= 'selected' if $ext eq $render_ext %>><%= ".$render_ext" %></option>
 					% }
 				</select>
 			</div>

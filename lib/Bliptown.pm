@@ -27,7 +27,8 @@ sub startup {
 
 	$app->config(
 		reverse_proxy => $app->mode eq 'production' ? 1 : 0,
-		allowed_exts => [ qw(md html css js txt) ]
+		render_exts => [ qw(md html css js txt) ],
+		cdn_exts => [ qw(eot ttf woff woff2 jpg jpeg png webp gif mp3 mp4 mpeg webm) ],
 	);
 
 	$app->secrets([
@@ -203,7 +204,7 @@ sub startup {
 			my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_user)->to_abs;
 			my $file = path($root, $slug)->to_abs;
 			return $file if -f $file;
-			foreach my $ext (@{$c->config->{allowed_exts}}) {
+			foreach my $ext (@{$c->config->{render_exts}}) {
 				my $f = path($root, "$slug.$ext")->to_abs;
 				return $f if -f $f;
 			}

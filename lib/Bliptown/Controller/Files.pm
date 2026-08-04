@@ -56,7 +56,7 @@ sub list_files {
 		my $rel_root_filename = decode('utf-8', $file->to_rel($root)->to_string);
 		my $rel_dir_filename = decode('utf-8', $file->to_rel($dir)->to_string);
 		my $is_dir = -d $filename;
-		my $exts_re = join '|', @{$c->config->{allowed_exts}};
+		my $exts_re = join '|', @{$c->config->{render_exts}};
 		my $url = $rel_root_filename =~ s/\.($exts_re)$//r;
 
 		push @files, {

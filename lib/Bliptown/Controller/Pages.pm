@@ -61,9 +61,8 @@ sub render_page {
 	my $ext = $raw->extname;
 	if ($ext) {
 		if (-f $raw) {
-			my @cached_exts = qw(eot ttf woff woff2 jpg jpeg png webp gif mp3 mp4 mpeg webm);
-			my $cached = grep { $ext eq $_ } @cached_exts;
-			if ($c->app->mode eq 'production' && $cached) {
+			my @cached = grep { $ext eq $_ } @{$c->app->config->{cdn_exts}};
+			if ($c->app->mode eq 'production' && @cached) {
 				return $c->redirect_to("https://cdn.blip.town/$req_user/$slug");
 			}
 			return $c->reply->file($raw);
@@ -165,7 +164,7 @@ sub new_page {
 		 $ext = $2;
 	};
 	if ($ext) {
-		return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{allowed_exts}};
+		return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{render_exts}};
 	}
 	my $file;
 	if (!$slug || $slug =~ m{/$}) {
@@ -219,7 +218,7 @@ sub edit_page {
 	}
 	return $c->redirect_to('new_page', catchall => $slug) unless $file;
 	my $ext = $c->param('ext') || $file->extname || 'md';
-	return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{allowed_exts}};
+	return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{render_exts}};
 	my $rel_file = $file->to_rel($root); $rel_file =~ s/\.[^.]+?$//;
 	my $content;
 	my @includes;

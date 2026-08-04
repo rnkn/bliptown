@@ -1,6 +1,6 @@
 % layout 'default';
 % my $disabled = $locked ? 'disabled' : '';
-% my $exts_re = join '|', @{$c->config->{allowed_exts}};
+% my $render_exts_re = join '|', @{$c->config->{render_exts}};
 <nav>
 	<header>
 		<h1><%= $title %></h1>
@@ -102,11 +102,11 @@
 							<button type="submit">Rename</button>
 						</form>
 					</li>
-					% if ($file->{rel_filename} =~ /\.($exts_re)$/) {
+					% if ($file->{rel_filename} =~ /\.($render_exts_re)$/) {
 					<li><a href="<%= url_for('edit_page', catchall => $file->{url} )->query(back_to => url_for) %>">Edit</a></li>
 					<li><a href="<%= url_for('backup_file', catchall => $file->{abs_filename} )->query(back_to => url_for) %>">Backup</a></li>
 					% }
-					% if ($file->{rel_filename} =~ /\.($exts_re)~?$/) {
+					% if ($file->{rel_filename} =~ /\.($render_exts_re)~?$/) {
 					<li><a href="<%= url_for('render_raw', catchall => $file->{url} ) %>">Raw</a></li>
 					% }
 					<li><a class="warning" href="<%= url_for('delete_file', catchall => $file->{abs_filename} )->query(back_to => url_for)%>">Delete</a></li>
