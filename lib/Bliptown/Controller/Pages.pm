@@ -228,14 +228,9 @@ sub edit_page {
 		foreach my $line (@lines) {
 			if ($line =~ $partial_re) {
 				my $include = $1;
-				if ($include =~ qr/[*?{}\[\]]/) {
-					next;
-				}
-				else {
-					$include =~ s{\.[^.]+?$}{};
-					my $abs_url = Mojo::URL->new('/' . $slug);
-					$include = Mojo::URL->new($include)->to_abs($abs_url)->to_string;
-					push @includes, $include;
+				foreach my $f ($c->util->glob_path($include, $root, $file)) {
+					$f = Mojo::File->new($f)->to_rel($root);
+					push @includes, $f;
 				}
 			}
 		}
