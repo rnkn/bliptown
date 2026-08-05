@@ -166,15 +166,13 @@ sub render_page {
 sub new_page {
 	my $c = shift;
 	my $slug = $c->param('catchall');
-	my $ext = '';
+	my $ext = $c->param('ext') || 'md';
 	if ($slug =~ /(.+)\.([^.]+)$/) {
 		 $slug = $1;
 		 $ext = $2;
 	};
-	if ($ext) {
-		return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{render_exts}};
-	}
-	my $file;
+	return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{render_exts}};
+
 	if (!$slug || $slug =~ m{/$}) {
 		unless ($c->get_file("$slug/index")) {
 			$slug =~ s{/$}{};
@@ -191,12 +189,31 @@ sub new_page {
 		}
 	}
 
+	my ($template, $content);
+	if ($ext eq 'md') {
+		my $root = path($ENV{BLIPTOWN_USER_HOME}, $c->session('username'))->to_abs;
+		my $path = path($root, $slug)->to_abs;
+
+		while (1) {
+			my $candidate = $path->child('_template.md');
+			if (-f $candidate) {
+				$template = $candidate;
+				last;
+			}
+			last if $path le $root;
+			$path = $path->dirname;
+		}
+
+		$content = $template->slurp('utf-8') if $template;
+	}
+
 	$c->stash(
 		template => 'edit',
 		title => 'New',
 		show_sidebar => 1,
 		slug => $slug,
 		ext => $ext,
+		content => $content,
 		redirect => $c->url_for('edit_page', catchall => $slug),
 	);
 	return $c->render;
