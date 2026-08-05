@@ -140,7 +140,7 @@ EOF
 sub error_not_found {
 	my ($self, $slug) = @_;
 	my $html = <<"EOF";
-<span class="error">Error 404: "<a href="$slug">$slug</a>" not found</span>
+<p class="error">Error 404: "<a href="$slug">$slug</a>" not found</p>
 EOF
 	return {
 		metadata => {
