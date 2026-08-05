@@ -4,16 +4,24 @@ use YAML::Tiny;
 use Mojo::DOM;
 use Mojo::File qw(path);
 use Mojo::Util qw(url_unescape);
+use Text::Glob qw(glob_to_regex_string);
 
 sub process_redirects {
 	my ($file, $slug) = @_;
 	$slug =~ s{^/?}{/};
 	$slug =~ s{/?$}{};
 	my $chars = $file->slurp('utf-8');
-	my $yaml_obj = YAML::Tiny->new;
-	my $redirects = eval { $yaml_obj->read_string($chars)->[0] };
-	my $url = $redirects->{$slug};
-	return $url if $url;
+	my $y = YAML::Tiny->new;
+	my $redirects = eval { $y->read_string($chars)->[0] };
+
+	foreach my $glob (keys %$redirects) {
+		my $re = glob_to_regex_string($glob);
+		if ($slug =~ qr/$re/) {
+			my $url = $redirects->{$glob};
+			return $url;
+		}
+	}
+	return;
 }
 
 sub postprocess_skel {
