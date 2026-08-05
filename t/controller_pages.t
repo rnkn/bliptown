@@ -49,6 +49,9 @@ date: 2999-12-31
 layout: one-column
 ---
 # {{ title }}
+{{ > exists }}
+{{ > nonexistent }}
+{{ > foo* }}
 EOF
 
 $t->get_ok($app->url_for('new_page', catchall => $slug) => { Host => $user_domain })->status_is(200)
@@ -67,19 +70,36 @@ $t->post_ok($app->url_for('save_page') => { Host => $user_domain } => form => {
 my $path = path($user_dir, "$slug.$ext");
 $path->spew($content);
 
+my $include_content = <<'EOF';
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+EOF
+chomp $include_content;
+
+my $include = path($user_dir, 'exists.md');
+$include->spew($include_content);
+
+path($user_dir, 'foobar.md')->touch;
+path($user_dir, 'foobaz.md')->touch;
+
 like $debug_messages, qr/Updated file: $path/, 'edit_page updates file';
 
 $t->get_ok($app->url_for('edit_page', catchall => $slug) => { Host => $user_domain })->status_is(200)
 	->text_is('header h1 a', $slug)
 	->attr_is('div#filename input', 'value', $slug)
 	->attr_is("div#filename select#ext option[value=\"$ext\"]", 'selected', '')
-	->text_is('textarea#content', $content);
+	->text_is('textarea#content', $content)
+	->attr_is('div#includes a:nth-of-type(1)', 'href', $app->url_for('edit_page', catchall => 'exists.md'))
+	->attr_is('div#includes a:nth-of-type(2)', 'href', $app->url_for('edit_page', catchall => 'nonexistent.md'))
+	->attr_is('div#includes a:nth-of-type(3)', 'href', $app->url_for('edit_page', catchall => 'foobar.md'))
+	->attr_is('div#includes a:nth-of-type(4)', 'href', $app->url_for('edit_page', catchall => 'foobaz.md'));
 
 $t->get_ok($app->url_for('render_raw', catchall => $slug) => { Host => $user_domain })->status_is(200)
 	->content_is($content);
 
 $t->get_ok($app->url_for('render_page', catchall => $slug) => { Host => $user_domain })->status_is(200)
 	->text_like('head title', qr/My Site . Hello World!/)
-	->content_like(qr{<h1>Hello World!</h1>});
+	->text_is('main section h1', 'Hello World!')
+	->text_is('main section p:nth-of-type(1)', $include_content)
+	->text_like('main section p:nth-of-type(2)', qr/404/);
 
 done_testing;
