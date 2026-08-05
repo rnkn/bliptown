@@ -11,7 +11,7 @@
 		<title><%= $title %></title>
 		<link href="/main.css" rel="stylesheet">
 		% if ($user_style) {
-		<link href="/style.css" rel="stylesheet" sandbox>
+		<link href="/style.css?theme=<%= $theme %>" rel="stylesheet" sandbox>
 		% }
 		<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png" />
 		<link rel="icon" type="image/x-icon" sizes="32x32" href="/favicon.ico" />

@@ -47,6 +47,21 @@ sub postprocess_skel {
 	return $dom->to_string;
 }
 
+sub render_style {
+	my $c = shift;
+	my $theme = $c->param('theme');
+	my $req_user = $theme ? 'demo' : $c->get_req_user;
+	my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_user);
+	my $file;
+	if ($theme) {
+		$file = path($root, "$theme.css");
+	}
+	else {
+		$file = path($root, 'style.css');
+	}
+	return $c->reply->file($file);
+}
+
 sub render_page {
 	my $c = shift;
 	my $req_user = $c->get_req_user;
@@ -152,6 +167,7 @@ sub render_page {
 		head => $head || '',
 		scripts => $scripts || '',
 		user_style => 1,
+		theme => $c->param('theme'),
 		show_sidebar => $show_sidebar,
 		editable => 1,
 		header => $skel_html{header} || '',

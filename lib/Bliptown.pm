@@ -252,6 +252,7 @@ sub startup {
 		ext => 'md',
 		redirect => '/',
 		includes => [],
+		theme => '',
 	);
 
 	$app->hook(
@@ -406,6 +407,8 @@ sub startup {
 	$protected->get('/snapshots/diff/:hash')->to(controller => 'Snapshots', action => 'render_diff')->name('render_diff');
 
 	$r->get('/health')->to(controller => 'Health', action => 'health_check')->name('health_check');
+
+	$r->get('/style.css')->to(controller => 'Pages', action => 'render_style')->name('render_style');
 
 	$r->get('/raw/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_raw');
 	$r->get('/*catchall')->to(controller => 'Pages', action => 'render_page', catchall => '')->name('render_page');
