@@ -59,7 +59,10 @@ sub render_style {
 	else {
 		$file = path($root, 'style.css');
 	}
-	return $c->reply->file($file);
+	if (-f $file) {
+		return $c->reply->file($file);
+	}
+	return $c->reply->not_found;
 }
 
 sub render_page {
