@@ -267,6 +267,7 @@ label#drawer-toggle {
 	position: fixed;
 	top: 0;
 	z-index: 99;
+	width: 1em;
 	padding: 2rem;
 	padding-top: 2.2rem;
 	font-size: 2rem;
@@ -278,7 +279,7 @@ label#drawer-toggle {
 }
 
 label#drawer-toggle {
-	right: 0;
+	right: 0.5em;
 }
 
 input#drawer-toggle:checked ~ #drawer {
