@@ -39,7 +39,6 @@ sub list_snapshots {
 	$c->stash(
 		template => 'snapshots',
 		title => 'Snapshots',
-		show_sidebar => 1,
 		snapshots => $snapshots,
 		repo => "${username}\@blip.town:site",
 	);

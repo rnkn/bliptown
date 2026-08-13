@@ -130,13 +130,11 @@ sub render_page {
 		filename => $file->to_abs->to_string,
 	});
 
-	my @skel = qw(header sidebar footer);
+	my @skel = qw(header menu footer);
 	my %skel_html;
-	my $show_sidebar = 0;
 	foreach my $f (@skel) {
 		my $file = path($root, "_$f.md");
 		if (-f $file) {
-			$show_sidebar = 1 if $f eq 'sidebar';
 			my $page = $c->page->read_page({
 				filename => $file->to_abs->to_string,
 				root => $root->to_abs->to_string,
@@ -171,10 +169,9 @@ sub render_page {
 		scripts => $scripts || '',
 		user_style => 1,
 		theme => $c->param('theme'),
-		show_sidebar => $show_sidebar,
 		editable => 1,
 		header => $skel_html{header} || '',
-		menu => $skel_html{sidebar} || '',
+		menu => $skel_html{menu} || '',
 		footer => $skel_html{footer} || '',
 		content => $page->{html} || '',
 		redirect => $c->url_for('render_page'),
@@ -229,7 +226,6 @@ sub new_page {
 	$c->stash(
 		template => 'edit',
 		title => 'New',
-		show_sidebar => 1,
 		slug => $slug,
 		ext => $ext,
 		content => $content,
@@ -282,7 +278,6 @@ sub edit_page {
 	$c->stash(
 		template => 'edit',
 		title => 'Editing ',
-		show_sidebar => 1,
 		slug => $rel_file,
 		ext => $ext,
 		filename => $file->basename,

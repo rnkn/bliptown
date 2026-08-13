@@ -57,7 +57,6 @@ sub list_settings {
 	$c->stash(
 		title => 'Settings',
 		template => 'settings',
-		show_sidebar => 1,
 		locked => $locked,
 		username => $user_rec->{username} // '',
 		email => $user_rec->{email} // '',

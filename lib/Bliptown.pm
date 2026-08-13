@@ -243,7 +243,6 @@ sub startup {
 		scripts => '',
 		username => '',
 		user_style => 0,
-		show_sidebar => 0,
 		editable => 0,
 		header => '',
 		menu => '',
