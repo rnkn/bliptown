@@ -144,20 +144,35 @@ sub render_page {
 		}
 	}
 
-	my $title_file = path($root, "_title.txt");
-	my $title = "Untitled";
-	if (-s $title_file) {
-		open(my $fh, '<', $title_file);
-		$title = <$fh>;
-		close($fh);
+	my $title = 'Untitled';
+	my $title_file = path($root, '_title.txt');
+	if (-f $title_file) {
+		my $title_chars = $title_file->slurp('UTF-8');
+		$title = (split '\n', $title_chars)[0] if $title_chars;
 	}
 
 	my $page_title = $page->{metadata}->{title};
 	$title = "$title – $page_title" if $page_title;
 
+	my $desc = 'A very talented artist.';
+	my $desc_file = path($root, '_description.txt');
+	if (-f $desc_file) {
+		my $desc_chars = $desc_file->slurp('UTF-8');
+		$desc = join ' ', split '\n', $desc_chars;
+	}
+
+	my $author = 'Anonymous';
+	my $author_file = path($root, '_author.txt');
+	if (-f $author_file) {
+		my $author_chars = $author_file->slurp('UTF-8');
+		$author = (split '\n', $author_chars)[0];
+	}
+
 	$c->stash(
 		template => 'page',
 		title => $title,
+		description => $desc,
+		author => $author,
 		user_style => 1,
 		theme => $c->param('theme'),
 		editable => 1,

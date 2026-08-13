@@ -238,7 +238,9 @@ sub startup {
 	);
 
 	$app->defaults(
-		title => 'Untitled',
+		title => '',
+		description => '',
+		author => '',
 		username => '',
 		user_style => 0,
 		editable => 0,
