@@ -157,16 +157,9 @@ sub render_page {
 
 	my $date = $page->{metadata}->{date};
 
-	my $file_head = path($root, "_head.html");
-	my $head = $file_head->slurp('utf-8') if -f $file_head;
-	my $file_scripts = path($root, "_scripts.js");
-	my $scripts = $file_scripts->slurp('utf-8') if -f $file_scripts;
-
 	$c->stash(
 		template => 'page',
 		title => $title,
-		head => $head || '',
-		scripts => $scripts || '',
 		user_style => 1,
 		theme => $c->param('theme'),
 		editable => 1,

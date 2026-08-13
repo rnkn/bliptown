@@ -21,7 +21,6 @@
 			}
 		</style>
 		<script src="/main.js" defer></script>
-		%== $head
 	</head>
 	<body>
 		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden>
