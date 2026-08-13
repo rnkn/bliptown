@@ -155,8 +155,6 @@ sub render_page {
 	my $page_title = $page->{metadata}->{title};
 	$title = "$title – $page_title" if $page_title;
 
-	my $date = $page->{metadata}->{date};
-
 	$c->stash(
 		template => 'page',
 		title => $title,
