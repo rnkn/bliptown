@@ -827,10 +827,6 @@ main:has(.cover) footer {
 	flex-grow: 1;
 }
 
-.table details > summary::before {
-	display: none;
-}
-
 .table code {
 	background-color: initial;
 }
@@ -863,7 +859,6 @@ details > summary {
 details > summary::before {
     content: "\25B8";
     display: inline-block;
-    margin-right: 0.4em;
 }
 
 details[open] > summary::before {
