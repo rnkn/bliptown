@@ -28,7 +28,7 @@ sub startup {
 	$app->config(
 		reverse_proxy => $app->mode eq 'production' ? 1 : 0,
 		render_exts => [ qw(md html css txt) ],
-		cdn_exts => [ qw(eot ttf woff woff2 jpg jpeg png webp gif mp3 mp4 mpeg webm) ],
+		cdn_exts => [ qw(eot ttf woff woff2 jpg jpeg png webp gif mp3 mp4 mpeg webm pdf) ],
 	);
 
 	$app->secrets([
