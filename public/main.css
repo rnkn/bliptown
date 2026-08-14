@@ -67,6 +67,16 @@ ul ul {
 	margin: 0;
 }
 
+dialog.modal {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 2rem;
+	border: 1px solid black;
+	box-shadow: 0 0 10px 10px rgba(0,0,0,0.03);
+}
+
 blockquote {
 	margin: 1em 0;
 	padding: 0 2em;
