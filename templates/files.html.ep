@@ -92,8 +92,10 @@
 					</span>
 				</summary>
 				<ul class="controls">
-					% if ($file->{rel_filename} =~ /\.($render_exts_re)$/) {
+					% unless ($file->{is_dir}) {
 					<li><a href="<%= url_for('render_page', catchall => $file->{url}) %>">View</a></li>
+					% }
+					% if ($file->{rel_filename} =~ /\.($render_exts_re)$/) {
 					<li><a href="<%= url_for('edit_page', catchall => $file->{url} )->query(back_to => url_for) %>">Edit</a></li>
 					<li><a href="<%= url_for('backup_file', catchall => $file->{abs_filename} )->query(back_to => url_for) %>">Backup</a></li>
 					% }
