@@ -8,8 +8,8 @@
 			<small>
 				Restoring a snapshot will make the files available
 				at <code>/snapshots/&lt;HASH&gt;</code>. Downloading a
-				snapshot will retrieve a tarball of the files of that
-				snapshot.
+				snapshot will retrieve a tarball containing the site
+				files at the time of that snapshot.
 			</small>
 		</p>
 		<ul>
