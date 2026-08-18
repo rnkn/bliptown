@@ -38,16 +38,12 @@ pre {
 	margin-bottom: 1em;
 	padding: 1em;
 	overflow-x: auto;
+	background-color: rgba(235,235,235,0.5);
 }
 
 pre, code {
-	font-size: 0.9em;
-	background-color: rgba(235,235,235,0.5);
+	font-size: 0.9rem;
 	white-space: pre;
-}
-
-pre code {
-	font-size: 1em;
 }
 
 img {
