@@ -66,33 +66,6 @@ renew_cert() {
 
 backup() {
 	ok=true
-	backup_dir=/home/bliptown/backups
-
-	echo "Making backups:"
-	mkdir -p "$backup_dir"
-	cd "$backup_dir" && {
-		rm -f backup.7.tar.gz
-		for i in $(seq 6 1)
-		do
-			j=$(( i + 1 ))
-			test -f "backup.$i.tar.gz" && mv "backup.$i.tar.gz" "backup.$j.tar.gz" || ok=false
-			$ok || { echo "failed" >&2; return 1; }
-		done
-
-		install -m 0600 -o root -g wheel /dev/null "backup.1.tar.gz" || ok=false
-		$ok || { echo "Failed" >&2; return 1; }
-
-		find /home/bliptown/users -type f \
-			 \(	-name '*.md' \
-			 -or	-name '*.txt' \
-			 -or	-name '*.css' \
-			 -or	-name '*.html' \
-			 -or	-name '*.js' \) -print0 |
-			xargs -0 tar -czf "backup.1.tar.gz" 2> /dev/null || ok=false
-		$ok || { echo "Failed" >&2; return 1; }
-	}
-
-	ok=true
 	mnt=/mnt/beastie-box
 	dump_dir=${mnt}/dump
 	storage_box=u597578@u597578.your-storagebox.de
