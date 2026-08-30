@@ -62,12 +62,15 @@ sub user_join {
 sub generate_login {
 	my $c = shift;
 	my $username = $c->param('username');
+	my $redirect = $c->param('back_to') // '/';
 	return unless $username;
 
-	$c->email->send_magic_link({
-		username => $username,
-	});
+	if ($username eq $ENV{BLIPTOWN_DEMO_USER}) {
+		$c->session(username => $ENV{BLIPTOWN_DEMO_USER});
+		return $c->redirect_to($redirect);
+	}
 
+	$c->email->send_magic_link({ username => $username });
 	return $c->redirect_to('user_login');
 }
 

@@ -50,7 +50,7 @@ sub postprocess_skel {
 sub render_style {
 	my $c = shift;
 	my $theme = $c->param('theme');
-	my $req_user = $theme ? 'demo' : $c->get_req_user;
+	my $req_user = $theme ? $ENV{BLIPTOWN_THEME_USER} : $c->get_req_user;
 	my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_user);
 	my $file;
 	if ($theme) {

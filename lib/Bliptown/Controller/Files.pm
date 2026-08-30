@@ -13,7 +13,7 @@ sub list_files {
 	my $sort = $c->param('sort') // 'name';
 	my $slug = $c->param('catchall');
 	my $username = $c->session('username');
-	my $locked = $username eq 'demo' ? 1 : 0;
+	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
 	my $user_rec = $c->user->read_user({
 		key => 'username',
 		username => $username

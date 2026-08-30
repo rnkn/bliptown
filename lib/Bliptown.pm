@@ -370,7 +370,7 @@ sub startup {
 	my $block_demo = sub {
 		my $c = shift;
 		my $username = $c->session('username') // '';
-		if ($username eq 'demo') {
+		if ($username eq $ENV{BLIPTOWN_DEMO_USER}) {
 			$c->render(
 				status => 403,
 				template => 'message',

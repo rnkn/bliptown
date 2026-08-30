@@ -38,7 +38,7 @@ sub list_settings {
 	my $c = shift;
 	my $username = $c->session('username');
 	return unless $username;
-	my $locked = $username eq 'demo' ? 1 : 0;
+	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
 	my $user_rec = $c->user->read_user({
 		key => 'username',
 		username => $username
