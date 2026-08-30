@@ -291,11 +291,6 @@ sub upload_files {
 	foreach my $upload (@{$c->req->uploads}) {
 		my $filename = $upload->filename;
 		next unless $filename;
-		if ($upload->size > $c->app->max_request_size / 2) {
-			$c->flash(info => "File too large!");
-			$c->res->code(413);
-			return $c->redirect_to('list_files');
-		}
 		my $path = path($dir, $filename);
 		if (-f $path) {
 			$c->flash(info => "File $filename exists!");
