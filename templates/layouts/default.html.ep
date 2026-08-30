@@ -92,7 +92,7 @@
 				</div>
 			</label>
 			% }
-			<label id="drawer-toggle" class="button" for="drawer-toggle"></label>
+			<label id="drawer-toggle" class="button" for="drawer-toggle" style="<%= $drawer_toggle_style %>"></label>
 			%= content
 		</div>
 		<div id="analytics"></div>
