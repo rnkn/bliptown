@@ -52,6 +52,7 @@ pkill -USR1 -u bliptown -U bliptown -f script/bliptown prefork
 
 for user in mayor demo
 do
-/bin/cp "${user_home}/${user}/private/stats.md" \
-		"${user_home}/rnkn/private/stats-${user}.md"
+	test -f "${user_home}/${user}/private/stats.md" &&
+		cp "${user_home}/${user}/private/stats.md" \
+		   "${user_home}/rnkn/private/stats-${user}.md"
 done
