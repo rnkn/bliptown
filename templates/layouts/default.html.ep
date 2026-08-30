@@ -71,9 +71,9 @@
 					<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
 				</div>
 				% }
-				<form action="<%= url_for('user_login') %>" method="POST">
+				<form action="<%= url_for('generate_login') %>" method="POST">
 					<div>
-						<input type="text" placeholder="username" name="username" value="<%= $username %>" required>
+						<input type="text" placeholder="username" name="username" required>
 					</div>
 					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit">Login</button>
