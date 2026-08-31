@@ -1,0 +1,27 @@
+#!/bin/ksh
+
+case "$SSH_ORIGINAL_COMMAND" in
+    ("")
+		echo "Interactive shell is disabled"
+		exit 1
+		;;
+    (git-upload-pack*)
+		exec git-upload-pack ${SSH_ORIGINAL_COMMAND#git-upload-pack}
+		;;
+    (git-receive-pack*)
+        exec git-receive-pack ${SSH_ORIGINAL_COMMAND#git-receive-pack}
+		;;
+    (git-upload-archive*)
+        exec git-upload-archive ${SSH_ORIGINAL_COMMAND#git-upload-archive}
+		;;
+    (openrsync*)
+        exec openrsync ${SSH_ORIGINAL_COMMAND#openrsync}
+		;;
+    (rsync*)
+        exec openrsync ${SSH_ORIGINAL_COMMAND#rsync}
+		;;
+    (*)
+        echo "Command not permitted"
+        exit 1
+        ;;
+esac
