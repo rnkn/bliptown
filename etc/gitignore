@@ -3,3 +3,6 @@ snapshots/
 tmp/
 private/stats*
 *~
+._*
+.DS_Store
+.DS_Store?
