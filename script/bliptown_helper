@@ -225,6 +225,7 @@ sub make_directory {
 sub git_init {
 	my $payload = shift;
 	my $user = $payload->{user};
+	my $worktree = path($ENV{BLIPTOWN_USER_HOME}, $user);
 	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 	my $excludes_file = '/etc/gitignore';
 	chdir $repo or die "Cannot change directory: $repo ($!)";
@@ -237,6 +238,20 @@ sub git_init {
 		or die "Cannot configure repository user email ($!)";
 	system('git', 'config', 'set', 'core.excludesFile', $excludes_file) == 0
 		or die "Cannot configure repository ignore file ($!)";
+
+	my $post_update = <<"EOF";
+#!/bin/sh
+git --git-dir=$repo --work-tree=$worktree reset --hard
+EOF
+
+	my $hook_path = path($repo, 'hooks', 'post-update');
+	my $hook_file = Mojo::File->new($hook_path);
+
+	unless (-f $hook_file) {
+		$hook_file->spew($post_update, 'UTF-8');
+		$hook_file->chmod(0755);
+	}
+
 	return "Initialized Git repository: $repo";
 }
 
