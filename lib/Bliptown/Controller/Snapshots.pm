@@ -40,7 +40,7 @@ sub list_snapshots {
 		template => 'snapshots',
 		title => 'Snapshots',
 		snapshots => $snapshots,
-		repo => "${username}\@blip.town:site",
+		repo => "${username}\@blip.town:site.git",
 	);
 	return $c->render;
 }
