@@ -24,7 +24,7 @@ case "$SSH_ORIGINAL_COMMAND" in
 		usage
 		echo
 		;;
-	(git-upload-pack*|git-receive-pack*|git-upload-archive*)
+	(git*)
 		exec git-shell -c "$SSH_ORIGINAL_COMMAND"
 		;;
 	(openrsync*)
