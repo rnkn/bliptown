@@ -241,7 +241,7 @@ sub git_init {
 
 	my $post_update = <<"EOF";
 #!/bin/sh
-git --git-dir=$repo --work-tree=$worktree reset --hard
+git --work-tree=$worktree reset --hard
 EOF
 
 	my $hook_path = path($repo, 'hooks', 'post-update');
