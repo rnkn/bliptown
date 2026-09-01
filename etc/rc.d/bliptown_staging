@@ -6,7 +6,7 @@ daemon="perl -Ilocal/lib/perl5 script/bliptown"
 daemon_flags="prefork -p -m production -l http://127.0.0.1:8081 -P $pid_file"
 daemon_user="bliptown_staging"
 daemon_execdir="/usr/local/www/bliptown-staging"
-daemon_logger="daemon.debug"
+daemon_logger="daemon.info"
 
 rc_bg=YES
 rc_reload=NO
