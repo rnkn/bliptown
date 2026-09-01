@@ -452,61 +452,6 @@ DISTRIBUTIONS
       perl 5.014
       utf8 0
       warnings 0
-  Imager-1.033
-    pathname: T/TO/TONYC/Imager-1.033.tar.gz
-    provides:
-      Imager 1.033
-      Imager::Color 1.015
-      Imager::Color::Float 1.008
-      Imager::Color::Table 1.004
-      Imager::CountColor 0.03
-      Imager::Expr 1.008
-      Imager::Expr::Assem 1.004
-      Imager::Expr::Infix 1.008
-      Imager::Expr::Postfix 1.008
-      Imager::ExtUtils 1.003
-      Imager::FORMATS 1.033
-      Imager::File::CUR 1.000
-      Imager::File::ICO 0.08
-      Imager::File::SGI 0.06
-      Imager::Fill 1.013
-      Imager::Filter::DynTest 0.03
-      Imager::Filter::Flines 0.04
-      Imager::Filter::Mandelbrot 0.05
-      Imager::Font 1.039
-      Imager::Font::BBox 1.007
-      Imager::Font::FreeType2 1.021
-      Imager::Font::Image 1.000
-      Imager::Font::Test 1.002
-      Imager::Font::Truetype 1.013
-      Imager::Font::Type1 1.013
-      Imager::Font::Wrap 1.005
-      Imager::Fountain 1.009
-      Imager::IO 1.033
-      Imager::Matrix2d 1.013
-      Imager::Preprocess 1.003
-      Imager::Probe 1.011
-      Imager::Regops 1.000
-      Imager::Test 1.007
-      Imager::Test::OverUtf8 1.007
-      Imager::Transform 1.007
-      Imager::TrimColorList 1.000
-    requirements:
-      Exporter 5.57
-      ExtUtils::MakeMaker 0
-      Scalar::Util 1.00
-      Test::More 0.99
-      XSLoader 0
-  Imager-QRCode-0.035
-    pathname: K/KU/KURIHARA/Imager-QRCode-0.035.tar.gz
-    provides:
-      Imager::QRCode 0.035
-    requirements:
-      ExtUtils::MakeMaker 6.36
-      ExtUtils::ParseXS 3.18
-      Imager 0.55
-      Test::More 0
-      XSLoader 0.02
   MIME-Base32-1.303
     pathname: R/RE/REHSACK/MIME-Base32-1.303.tar.gz
     provides:

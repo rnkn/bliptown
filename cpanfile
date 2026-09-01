@@ -5,7 +5,6 @@ requires 'FFI::Platypus';
 requires 'YAML::Tiny';
 requires 'Sereal::Encoder';
 requires 'Sereal::Decoder';
-requires 'Imager::QRCode';
 requires 'Text::Glob';
 requires 'IO::Socket::SSL';
 requires 'Net::DNS';
