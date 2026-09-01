@@ -378,7 +378,9 @@ sub handle_conn {
 
 			if ($has_unveil) {
 				my $root = path($ENV{BLIPTOWN_USER_HOME}, $user);
+				my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
+				unveil($repo, 'rwc') or die "Cannot unveil path: $repo ($!)";
 				unveil();
 			}
 		}
