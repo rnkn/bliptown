@@ -17,6 +17,8 @@ EOF
 
 case "$SSH_ORIGINAL_COMMAND" in
     ("")
+		cat /etc/motd
+		echo
 		echo "Bliptown does not permit interactive shell login."
 		echo
 		usage
