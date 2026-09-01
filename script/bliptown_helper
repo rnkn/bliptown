@@ -38,6 +38,7 @@ die 'BLIPTOWN_HELPER_PREFORK not defined'		unless defined $ENV{BLIPTOWN_HELPER_P
 die 'BLIPTOWN_HELPER_HEALTH_FILE not defined'	unless defined $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 
 die 'BLIPTOWN_USER_HOME not defined'			unless defined $ENV{BLIPTOWN_USER_HOME};
+die 'BLIPTOWN_REPO_HOME not defined'			unless defined $ENV{BLIPTOWN_REPO_HOME};
 die 'BLIPTOWN_GID not defined'					unless defined $ENV{BLIPTOWN_GID};
 
 die 'BLIPTOWN_KEYPAIR_FILE not defined '		unless defined $ENV{BLIPTOWN_KEYPAIR_FILE};
@@ -224,7 +225,7 @@ sub make_directory {
 sub git_init {
 	my $payload = shift;
 	my $user = $payload->{user};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
+	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 	my $excludes_file = '/etc/gitignore';
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
@@ -242,7 +243,7 @@ sub git_init {
 sub git_log {
 	my $payload = shift;
 	my $user = $payload->{user};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
+	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 	my $out = `git log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b%x01" --max-count=50`;
 
@@ -265,7 +266,7 @@ sub git_show {
 	my $user = $payload->{user};
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
+	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 	my $out = `git show $hash`;
 	return unless length $out;
@@ -275,18 +276,19 @@ sub git_show {
 sub git_commit {
 	my $payload = shift;
 	my $user = $payload->{user};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
+	my $worktree = path($ENV{BLIPTOWN_USER_HOME}, $user);
+	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
-	system(qw(git add -A)) == 0
+	system('git', "--work-tree=$worktree", 'add', '-A') == 0
 		or die "Cannot add files to $repo";
 
 	my $subject = 'Full snapshot on Bliptown';
-	my $body = `git status --porcelain`;
+	my $body = `git --work-tree=$worktree status --porcelain`;
 	return unless length $body;
 
-	system('git', 'commit', '-q', '-m', $subject, '-m', $body) == 0
+	system('git', "--work-tree=$worktree", 'commit', '-q', '-m', $subject, '-m', $body) == 0
 		or die "Cannot commit files to repo: $repo ($!)";
 
 	my $commits = git_log($payload);
@@ -312,7 +314,7 @@ sub git_checkout {
 sub git_archive {
 	my $payload = shift;
 	my $user = $payload->{user};
-	my $repo = path($ENV{BLIPTOWN_USER_HOME}, $user);
+	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $tmpfile = tempfile(UNLINK => 0);

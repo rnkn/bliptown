@@ -36,4 +36,6 @@ die 'BLIPTOWN_CDN_API_KEY not defined'			unless defined $ENV{BLIPTOWN_CDN_API_KE
 die 'BLIPTOWN_STRIPE_API_KEY not defined'		unless defined $ENV{BLIPTOWN_STRIPE_API_KEY};
 die 'BLIPTOWN_STRIPE_PRICE_ID not defined'		unless defined $ENV{BLIPTOWN_STRIPE_PRICE_ID};
 
+die 'BLIPTOWN_DEMO_USER not defined'			unless defined $ENV{BLIPTOWN_DEMO_USER};
+
 Mojolicious::Commands->start_app('Bliptown');
