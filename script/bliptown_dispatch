@@ -1,9 +1,26 @@
 #!/bin/ksh
 
+usage() {
+	cat <<EOF
+Available commands are:
+
+sftp    upload, download and manage files
+        https://man.openbsd.org/sftp.1
+
+rsync   sync files between a local machine and the server
+        https://man.openbsd.org/openrsync.1
+
+git     version control files (snapshots)
+        https://git-scm.com/
+EOF
+}
+
 case "$SSH_ORIGINAL_COMMAND" in
     ("")
-		echo "Interactive shell is disabled"
-		exit 1
+		echo "Bliptown does not permit interactive shell login."
+		echo
+		usage
+		echo
 		;;
     (git-upload-pack*)
 		exec git-upload-pack ${SSH_ORIGINAL_COMMAND#git-upload-pack}
@@ -22,6 +39,9 @@ case "$SSH_ORIGINAL_COMMAND" in
 		;;
     (*)
         echo "Command not permitted"
-        exit 1
+		echo
+		usage
+		echo
+		exit 1
         ;;
 esac
