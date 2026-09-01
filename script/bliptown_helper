@@ -230,7 +230,7 @@ sub git_init {
 	my $excludes_file = '/etc/gitignore';
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
-	system(qw(git init -q)) == 0
+	system(qw(git init --bare -q)) == 0
 		or die "Cannot initialize repository: $repo ($!)";
 	system('git', 'config', 'set', 'user.name', $user) == 0
 		or die "Cannot configure repository user name ($!)";
