@@ -131,12 +131,6 @@ staging_db="/var/db/bliptown-staging/users.db"
 $ok && echo "Done" || echo "Failed"
 echo
 
-echo "Creating /software.txt:"
-ok=true
-pkg_info -m > /home/bliptown/users/mayor/software.txt || ok=false
-$ok && echo "Done" || echo "Failed"
-echo
-
 echo "Flushing rate-limited IPs:"
 ok=true
 pfctl -q -t rate_limit -T expire 86400 || ok=false
