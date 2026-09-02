@@ -31,9 +31,9 @@ Available commands:
     pwd       print current directory
     cd        change current directory
     touch     create new file (or update timestamp)
-    mkdir     create directory
-    rm        delete file
-    rmdir     delete directory
+    mkdir     create directories
+    rm        delete files
+    rmdir     delete directories
     cp        copy files
     mv        move (rename) files
     cat       print (concatenate) files
