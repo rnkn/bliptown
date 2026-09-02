@@ -974,6 +974,17 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Scalar::Util 0
       perl 5.006
+  Term-ReadLine-Perl-1.0303
+    pathname: I/IL/ILYAZ/modules/Term-ReadLine-Perl-1.0303.tar.gz
+    provides:
+      Term::ReadLine undef
+      Term::ReadLine::Compa 1.0303
+      Term::ReadLine::Perl 1.0303
+      Term::ReadLine::Perl::AU 1.0303
+      Term::ReadLine::Perl::Tie 1.0303
+      readline 1.0303
+    requirements:
+      ExtUtils::MakeMaker 0
   Test-Deep-1.205
     pathname: R/RJ/RJBS/Test-Deep-1.205.tar.gz
     provides:

@@ -3,7 +3,12 @@
 use strict;
 use warnings;
 use Cwd;
+use File::Basename;
+use constant DIR => dirname(__FILE__);
+use lib DIR . '/../local/lib/perl5';
+
 use Path::Tiny;
+use Term::ReadLine;
 
 binmode(STDOUT, ':encoding(UTF-8)');
 
@@ -74,28 +79,35 @@ my %builtins = (
 	}
 );
 
-while (1) {
+my $term = Term::ReadLine->new('bliptown-shell');
+$term->ornaments(0);
+
+my $prompt = sub {
 	my $cwd = getcwd;
-    print "$cwd > ";
-    my $input = <STDIN>;
+	return "$cwd > ";
+};
 
-	last unless defined $input;
+$SIG{INT} = sub { $term->redisplay };
 
-    chomp $input;
-    next unless $input;
+while (1) {
+	my $line;
+	eval { $line = $term->readline($prompt->()) };
+	next if $@;
+	last unless defined $line;
+	next unless $line;
 
-    my @args = split(/\s+/, $input);
+    my @args = split(/\s+/, $line);
     my $cmd = shift @args;
 	my $realcmd = $allowed_commands{$cmd};
 
     unless ($realcmd) {
-        print "Command '$cmd' not found. Use 'help' for a list of available commands.\n";
-        next;
+        warn "Command '$cmd' not found. Use 'help' for a list of available commands.\n";
+		next;
     }
 
     if (exists $builtins{$cmd}) {
         eval { $builtins{$cmd}->(@args) };
-		print $@ if $@;
+		warn $@ if $@;
         next;
     }
 
