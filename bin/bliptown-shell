@@ -7,13 +7,13 @@ use File::Basename;
 use constant DIR => dirname(__FILE__);
 use lib DIR . '/../local/lib/perl5';
 
-use Path::Tiny;
+use Mojo::File;
 use Term::ReadLine;
 
 binmode(STDOUT, ':encoding(UTF-8)');
 
-my $motd_file = Path::Tiny->new('/etc/motd');
-my $motd = $motd_file->slurp_utf8 if -f $motd_file;
+my $motd_file = Mojo::File->new('/etc/motd');
+my $motd = $motd_file->slurp('UTF-8') if -f $motd_file;
 
 my $welcome = <<EOF;
 Welcome to your Bliptown shell account. This is a restricted shell
