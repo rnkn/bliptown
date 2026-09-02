@@ -5,6 +5,8 @@ use warnings;
 use Cwd;
 use Path::Tiny;
 
+binmode(STDOUT, ':encoding(UTF-8)');
+
 my $motd_file = Path::Tiny->new('/etc/motd');
 my $motd = $motd_file->slurp_utf8 if -f $motd_file;
 
