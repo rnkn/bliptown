@@ -1,11 +1,7 @@
 package Bliptown::Model::IPC;
 use Mojo::Base -base;
 use IO::Socket::UNIX;
-use Sereal::Encoder;
-use Sereal::Decoder;
-
-my $encoder = Sereal::Encoder->new;
-my $decoder = Sereal::Decoder->new;
+use Mojo::JSON qw(encode_json decode_json);
 
 sub send_message {
 	my ($self, $args) = @_;
@@ -32,7 +28,7 @@ sub send_message {
 		},
 	};
 
-	my $req_blob = $encoder->encode($data);
+	my $req_blob = encode_json($data);
 	my $res_blob = '';
 
 	$client->send($req_blob)	or die "Cannot send data to socket ($!)";
@@ -43,7 +39,7 @@ sub send_message {
 	}
 
 	$client->close;
-	my $res = $decoder->decode($res_blob);
+	my $res = decode_json($res_blob);
 	return $res;
 }
 

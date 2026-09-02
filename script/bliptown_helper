@@ -10,9 +10,7 @@ use IO::Socket::UNIX;
 use POSIX qw(setgid setuid pause WNOHANG);
 use Mojo::File qw(path tempfile);
 use Mojo::Util qw(trim);
-
-use Sereal::Decoder;
-use Sereal::Encoder;
+use Mojo::JSON qw(encode_json decode_json);
 
 my $has_unveil = eval {
 	require OpenBSD::Unveil;
@@ -358,9 +356,6 @@ my %allowed_commands = (
 	update_relayd_keypairs	=> \&update_relayd_keypairs,
 );
 
-my $decoder = Sereal::Decoder->new;
-my $encoder = Sereal::Encoder->new;
-
 sub handle_conn {
 	my $conn = shift;
 
@@ -369,7 +364,7 @@ sub handle_conn {
 		$req_blob .= $buf;
 	}
 
-	my $data = $decoder->decode($req_blob);
+	my $data = decode_json($req_blob);
 	my $command = $data->{command};
 	my $payload = $data->{payload};
 
@@ -407,7 +402,7 @@ sub handle_conn {
 	};
 	$err = $@;
 
-	my $res_blob = $encoder->encode(
+	my $res_blob = encode_json(
 		{
 			info => $res,
 			error => $err,
