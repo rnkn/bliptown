@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Cwd;
+use Path::Tiny;
+
+my $motd_file = Path::Tiny->new('/etc/motd');
+my $motd = $motd_file->slurp_utf8 if -f $motd_file;
+
+my $welcome = <<EOF;
+Welcome to your Bliptown shell account. This is a restricted shell
+environment. Use 'help' for a list of available commands.
+EOF
+
+print "$motd\n" if $motd;
+print "$welcome\n";
+
+my $help = <<'EOF';
+Available commands:
+
+    help      print this help message
+    ls        list directory contents
+    pwd       print current directory
+    cd        change current directory
+    touch     create new file (or update timestamp)
+    mkdir     create directory
+    rm        delete file
+    rmdir     delete directory
+    cp        copy files
+    mv        move (rename) files
+    cat       print (concatenate) files
+    tree      print directory file structure
+    edit      edit file (nano)
+
+Server backend commands:
+
+    sftp      upload, download and manage files
+    rsync     sync files between a local machine and the server
+    git       version control files (snapshots)
+EOF
+
+my %allowed_commands = (
+    'help'  => 1,
+    'cd'    => 1,
+    'ls'    => '/bin/ls',
+    'pwd'   => '/bin/pwd',
+    'mkdir' => '/bin/mkdir',
+    'rm'    => '/bin/rm',
+    'rmdir' => '/bin/rmdir',
+    'cp'    => '/bin/cp',
+    'mv'    => '/bin/mv',
+    'cat'   => '/bin/cat',
+    'touch' => '/usr/bin/touch',
+    'tree'  => '/usr/local/bin/tree',
+    'edit'  => '/usr/local/bin/nano',
+);
+
+my %builtins = (
+    'cd' => sub {
+        my $dir = shift // $ENV{HOME};
+		my $oldpwd = getcwd;
+		if ($dir eq '-') {
+			chdir $ENV{OLDPWD} or die "cd: $ENV{OLDPWD}: $!\n";
+		} else {
+			chdir $dir or die "cd: $dir: $!\n";
+		}
+		$ENV{OLDPWD} = $oldpwd;
+    },
+	'help' => sub {
+		print "$help\n";
+	}
+);
+
+while (1) {
+	my $cwd = getcwd;
+    print "$cwd > ";
+    my $input = <STDIN>;
+
+	last unless defined $input;
+
+    chomp $input;
+    next unless $input;
+
+    my @args = split(/\s+/, $input);
+    my $cmd = shift @args;
+	my $realcmd = $allowed_commands{$cmd};
+
+    unless ($realcmd) {
+        print "Command '$cmd' not found. Use 'help' for a list of available commands.\n";
+        next;
+    }
+
+    if (exists $builtins{$cmd}) {
+        eval { $builtins{$cmd}->(@args) };
+		print $@ if $@;
+        next;
+    }
+
+    system($realcmd, @args);
+}
