@@ -49,25 +49,25 @@ Server backend commands:
 EOF
 
 my %allowed_commands = (
-    'help'  => 1,
-    'cd'    => 1,
-    'ls'    => '/bin/ls',
-    'pwd'   => '/bin/pwd',
-    'mkdir' => '/bin/mkdir',
-    'rm'    => '/bin/rm',
-    'rmdir' => '/bin/rmdir',
-    'cp'    => '/bin/cp',
-    'mv'    => '/bin/mv',
-    'cat'   => '/bin/cat',
-    'quota' => '/usr/bin/quota',
-    'touch' => '/usr/bin/touch',
-    'tree'  => '/usr/local/bin/tree',
-    'edit'  => '/usr/local/bin/nano',
+	'help'	=> 1,
+	'cd'	=> 1,
+	'ls'	=> '/bin/ls',
+	'pwd'	=> '/bin/pwd',
+	'mkdir' => '/bin/mkdir',
+	'rm'	=> '/bin/rm',
+	'rmdir' => '/bin/rmdir',
+	'cp'	=> '/bin/cp',
+	'mv'	=> '/bin/mv',
+	'cat'	=> '/bin/cat',
+	'quota' => '/usr/bin/quota',
+	'touch' => '/usr/bin/touch',
+	'tree'	=> '/usr/local/bin/tree',
+	'edit'	=> '/usr/local/bin/nano',
 );
 
 my %builtins = (
-    'cd' => sub {
-        my $dir = shift // $ENV{HOME};
+	'cd' => sub {
+		my $dir = shift // $ENV{HOME};
 		my $oldpwd = getcwd;
 		if ($dir eq '-') {
 			chdir $ENV{OLDPWD} or die "cd: $ENV{OLDPWD}: $!\n";
@@ -75,7 +75,7 @@ my %builtins = (
 			chdir $dir or die "cd: $dir: $!\n";
 		}
 		$ENV{OLDPWD} = $oldpwd;
-    },
+	},
 	'help' => sub {
 		print "$help\n";
 	}
@@ -98,20 +98,20 @@ while (1) {
 	last unless defined $line;
 	next unless $line;
 
-    my @args = split(/\s+/, $line);
-    my $cmd = shift @args;
+	my @args = split(/\s+/, $line);
+	my $cmd = shift @args;
 	my $realcmd = $allowed_commands{$cmd};
 
-    unless ($realcmd) {
-        warn "Command '$cmd' not found. Use 'help' for a list of available commands.\n";
+	unless ($realcmd) {
+		warn "Command '$cmd' not found. Use 'help' for a list of available commands.\n";
 		next;
-    }
+	}
 
-    if (exists $builtins{$cmd}) {
-        eval { $builtins{$cmd}->(@args) };
+	if (exists $builtins{$cmd}) {
+		eval { $builtins{$cmd}->(@args) };
 		warn $@ if $@;
-        next;
-    }
+		next;
+	}
 
-    system($realcmd, @args);
+	system($realcmd, @args);
 }
