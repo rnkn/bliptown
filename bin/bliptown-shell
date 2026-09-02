@@ -64,7 +64,7 @@ my %allowed_commands = (
 	'quota' => '/usr/bin/quota',
 	'touch' => '/usr/bin/touch',
 	'tree'	=> '/usr/local/bin/tree',
-	'edit'	=> '/usr/local/bin/nano',
+	'edit'	=> '/usr/local/bin/nano -R -/',
 );
 
 my %builtins = (
@@ -115,5 +115,5 @@ while (1) {
 		next;
 	}
 
-	system($realcmd, @args);
+	system(split(/\s+/, $realcmd), @args);
 }
