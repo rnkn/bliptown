@@ -28,6 +28,7 @@ Available commands:
 
     help      print this help message
     ls        list directory contents
+    ll        list directory contents (detailed)
     pwd       print current directory
     cd        change current directory
     touch     create new file (or update timestamp)
@@ -53,6 +54,7 @@ my %allowed_commands = (
 	'help'	=> 1,
 	'cd'	=> 1,
 	'ls'	=> '/bin/ls',
+	'll'	=> '/bin/ls -alp',
 	'pwd'	=> '/bin/pwd',
 	'mkdir' => '/bin/mkdir',
 	'rm'	=> '/bin/rm',
