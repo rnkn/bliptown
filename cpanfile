@@ -3,8 +3,6 @@ requires 'Mojo::SQLite';
 requires 'Mojo::SMTP::Client';
 requires 'FFI::Platypus';
 requires 'YAML::Tiny';
-requires 'Sereal::Encoder';
-requires 'Sereal::Decoder';
 requires 'Text::Glob';
 requires 'IO::Socket::SSL';
 requires 'Net::DNS';

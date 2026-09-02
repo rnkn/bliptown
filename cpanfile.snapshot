@@ -183,16 +183,6 @@ DISTRIBUTIONS
       Module::Load 0.22
       Test::Simple 0.96
       perl 5.008001
-  Devel-CheckLib-1.16
-    pathname: M/MA/MATTN/Devel-CheckLib-1.16.tar.gz
-    provides:
-      Devel::CheckLib 1.16
-    requirements:
-      Exporter 0
-      ExtUtils::MakeMaker 0
-      File::Spec 0
-      File::Temp 0.16
-      perl 5.004050
   Digest-HMAC-1.05
     pathname: A/AR/ARODLAND/Digest-HMAC-1.05.tar.gz
     provides:
@@ -941,30 +931,6 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       SQL::Abstract 2.0
       perl 5.016
-  Sereal-Decoder-5.009
-    pathname: Y/YV/YVES/Sereal-Decoder-5.009.tar.gz
-    provides:
-      Sereal::Decoder 5.009
-      Sereal::Decoder::Constants 5.009
-      Sereal::Performance undef
-    requirements:
-      Devel::CheckLib 1.16
-      ExtUtils::MakeMaker 7.0
-      ExtUtils::ParseXS 2.21
-      XSLoader 0
-      perl 5.008
-  Sereal-Encoder-5.009
-    pathname: Y/YV/YVES/Sereal-Encoder-5.009.tar.gz
-    provides:
-      Sereal::Encoder 5.009
-      Sereal::Encoder::Constants 5.009
-    requirements:
-      Devel::CheckLib 1.16
-      ExtUtils::MakeMaker 7.0
-      ExtUtils::ParseXS 2.21
-      Sereal::Decoder 5.009
-      XSLoader 0
-      perl 5.008
   Sub-Quote-2.006009
     pathname: H/HA/HAARG/Sub-Quote-2.006009.tar.gz
     provides:
