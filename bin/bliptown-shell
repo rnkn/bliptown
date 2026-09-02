@@ -64,7 +64,7 @@ my %allowed_commands = (
 	'quota' => '/usr/bin/quota',
 	'touch' => '/usr/bin/touch',
 	'tree'	=> '/usr/local/bin/tree',
-	'edit'	=> '/usr/local/bin/nano -R -/',
+	'edit'	=> '/usr/local/bin/nano -R/',
 );
 
 my %builtins = (
