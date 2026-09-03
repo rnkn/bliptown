@@ -182,12 +182,12 @@ main a:has(img) {
 
 h1 {
 	font-size: 1em;
-	margin-bottom: 1rem;
+	margin-bottom: 1em;
 }
 
 h2 {
 	font-size: 1em;
-	margin: 3rem 0 1em;
+	margin: 3em 0 1em;
 }
 
 h3 {
