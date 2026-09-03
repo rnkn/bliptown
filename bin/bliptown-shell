@@ -51,22 +51,22 @@ Server backend commands:
 EOF
 
 my %allowed_commands = (
-	'help'	=> 1,
-	'cd'	=> 1,
-	'ls'	=> '/bin/ls',
-	'll'	=> '/bin/ls -alp',
-	'pwd'	=> '/bin/pwd',
-	'mkdir' => '/bin/mkdir',
-	'rm'	=> '/bin/rm',
-	'rmdir' => '/bin/rmdir',
-	'cp'	=> '/bin/cp',
-	'mv'	=> '/bin/mv',
-	'cat'	=> '/bin/cat',
-	'grep'  => '/usr/bin/grep',
-	'quota' => '/usr/bin/quota',
-	'touch' => '/usr/bin/touch',
-	'tree'	=> '/usr/local/bin/tree',
-	'edit'	=> '/usr/local/bin/nano -R/',
+	help	=> 1,
+	cd		=> 1,
+	ls		=> '/bin/ls',
+	ll		=> '/bin/ls -alp',
+	pwd		=> '/bin/pwd',
+	mkdir	=> '/bin/mkdir',
+	rm		=> '/bin/rm',
+	rmdir	=> '/bin/rmdir',
+	cp		=> '/bin/cp',
+	mv		=> '/bin/mv',
+	cat		=> '/bin/cat',
+	grep	=> '/usr/bin/grep',
+	quota	=> '/usr/bin/quota',
+	touch	=> '/usr/bin/touch',
+	tree	=> '/usr/local/bin/tree',
+	edit	=> '/usr/local/bin/rnano',
 );
 
 my %builtins = (
@@ -117,5 +117,5 @@ while (1) {
 		next;
 	}
 
-	system(split(/\s+/, $realcmd), @args);
+	system($realcmd, @args);
 }
