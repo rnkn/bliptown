@@ -61,6 +61,7 @@ ul, ol {
 
 ul ul {
 	margin: 0;
+	padding-left: 1em;
 }
 
 dialog.modal {
