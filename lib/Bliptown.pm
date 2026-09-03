@@ -278,8 +278,7 @@ sub startup {
 				my $req_user = shift @{$req_url->path->parts};
 				return unless $req_user;
 				my $path = join '/', @{$req_url->path->parts};
-				my $user_home = $ENV{BLIPTOWN_USER_HOME};
-				my $file = path($user_home, $req_user, $path);
+				my $file = path($ENV{BLIPTOWN_USER_HOME}, $req_user, $path);
 				if (-f $file) {
 					my $max_age = 24 * 60 * 60;
 					$c->res->headers->cache_control("public, must-revalidate, max-age=$max_age");
