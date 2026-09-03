@@ -794,6 +794,10 @@ main:has(.cover) footer {
 
 /* tables */
 
+.table details ul.controls {
+	margin: 0;
+}
+
 .table-hover table tbody tr:hover {
 	background-color: var(--row-hover-color);
 }
