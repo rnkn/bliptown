@@ -28,7 +28,29 @@ sub startup {
 	$app->config(
 		reverse_proxy => $app->mode eq 'production' ? 1 : 0,
 		render_exts => [ qw(md html css txt) ],
-		cdn_exts => [ qw(eot ttf woff woff2 jpg jpeg png webp gif mp3 mp4 mpeg webm pdf) ],
+		cdn_exts => {
+			eot		=> 1,
+			ttf		=> 1,
+			woff	=> 1,
+			woff2	=> 1,
+			jpg		=> 1,
+			jpeg	=> 1,
+			png		=> 1,
+			webp	=> 1,
+			gif		=> 1,
+			mp3		=> 1,
+			mp4		=> 1,
+			mpeg	=> 1,
+			webm	=> 1,
+			pdf		=> 1,
+		},
+		prettydate => {
+			euro		=> '%e %B %Y',
+			us			=> '%B %e, %Y',
+			monthyear	=> '%B %Y',
+			year		=> '%Y',
+			iso			=> '%F',
+		},
 	);
 
 	$app->secrets([
@@ -121,10 +143,10 @@ sub startup {
 		mustache => sub {
 			my $c = shift;
 			return Bliptown::Model::Mustache->new(
-				req_user => $c->get_req_user,
 				user => $c->user,
 				metadata => $c->metadata,
-				util => $c->util
+				util => $c->util,
+				prettydate => $c->get_user_prettydate_style($c->get_req_username),
 			);
 		});
 
@@ -172,40 +194,65 @@ sub startup {
 		});
 
 	$app->helper(
-		get_req_user => sub {
+		get_user_home_path => sub {
 			my $c = shift;
-			my $host = $c->req->url->to_abs->host;
-			return unless $host;
-			$host =~ s/^www\.//;
-			my $domain = $ENV{BLIPTOWN_DOMAIN};
-			my $username = '';
-			if ($host =~ /\Q$domain\E$/) {
-				my @host_array = split(/\./, $host);
-				$username = @host_array >= 3 ? $host_array[-3] : 'mayor';
-			} else {
-				my $user_rec = $c->user->read_user({
-					key => 'custom_domain',
-					custom_domain => $host,
-				});
-				return '' unless $user_rec;
-				$username = $user_rec->{username};
+			my $path = $c->stash('user_home_path');
+			unless ($path) {
+				my $host = $c->req->url->to_abs->host;
+				return unless $host;
+				$host =~ s/^www\.//;
+				my $our_domain = $ENV{BLIPTOWN_DOMAIN};
+				if ($host =~ /\Q$our_domain\E$/) {
+					my @host_parts = split(/\./, $host);
+					my $username = @host_parts >= 3 ? $host_parts[-3] : 'mayor';
+					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+				}
+				else {
+					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host);
+				}
+				return $c->reply->not_found unless -d $path;
+				$c->stash(user_home_path => $path);
+			};
+			return $path;
+		});
+
+	$app->helper(
+		get_req_username => sub {
+			my $c = shift;
+			my $path = $c->get_user_home_path;
+			my $realpath = $path->realpath;
+			return ${$realpath->to_array}[-1];
+		});
+
+	$app->helper(
+		get_user_domain => sub {
+			my ($c, $username) = @_;
+			my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
+			if (-f $file) {
+				my $domain = $c->util->read_file_line($file);
+				my $domain_re = qr/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+				return $domain if $domain =~ $domain_re;
 			}
-			return '' unless $username;
-			my $dir = path($ENV{BLIPTOWN_USER_HOME}, $username);
-			return '' unless -d $dir;
-			return $username;
+			return "$username.$ENV{BLIPTOWN_DOMAIN}";
+		});
+
+	$app->helper(
+		get_user_prettydate_style => sub {
+			my ($c, $username) = @_;
+			my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_prettydate.txt');
+			my $style = -f $file ? $c->util->read_file_line($file) : 'euro';
+			my $format = $c->config->{prettydate}->{$style};
+			return $format;
 		});
 
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			my $req_user = $c->get_req_user;
-			return unless $req_user;
-			my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_user)->to_abs;
-			my $file = path($root, $slug)->to_abs;
+			my $home = $c->get_user_home_path;
+			my $file = path($home, $slug)->to_abs;
 			return $file if -f $file;
 			foreach my $ext (@{$c->config->{render_exts}}) {
-				my $f = path($root, "$slug.$ext")->to_abs;
+				my $f = path($home, "$slug.$ext")->to_abs;
 				return $f if -f $f;
 			}
 			return;
@@ -312,37 +359,27 @@ sub startup {
 	$r->get('/mysite' => sub {
 		my $c = shift;
 		my $username = $c->session('username');
+
 		unless ($username) {
 			$c->flash(info => 'Login required');
-			$c->redirect_to('/');
-			return;
+			return $c->redirect_to('/');
 		}
 
 		my $url = Mojo::URL->new;
 		$url->scheme($ENV{BLIPTOWN_SCHEME});
 		$url->port($ENV{BLIPTOWN_PORT});
+		my $host = $c->get_user_domain($username);
+		$url->host($host);
 
-		my $user_rec = $c->user->read_user({
-			key => 'username',
-			username => $username,
-		});
-		my $domain = $ENV{BLIPTOWN_DOMAIN};
-		my $custom_domain = $user_rec->{custom_domain};
-		if ($custom_domain) {
-			$url->host($custom_domain);
-		}
-		else {
-			$url->host("$username.$domain");
-		}
-		$c->redirect_to($url)
+		return $c->redirect_to($url);
 	})->name('my_site');
 
 	my $protected = $r->under(
 		sub {
 			my $c = shift;
 			my $username = $c->session('username');
-			my $req_user = $c->get_req_user // '';
-			if ($username && $username eq $req_user) {
+			my $req_username = $c->get_req_username;
+			if ($username && $username eq $req_username) {
 				return 1;
 			}
 			else {

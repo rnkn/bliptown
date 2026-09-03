@@ -11,9 +11,9 @@ use_ok qw(Bliptown::Controller::Snapshots);
 
 my $t			= Test::Mojo->new('Bliptown');
 my $app			= $t->app;
-my $ipc			= FakeIPC->new;
 my $username	= 'testuser';
 my $user_domain	= "$username.$ENV{BLIPTOWN_DOMAIN}";
+my $ipc			= FakeIPC->new;
 
 $app->helper(
 	ipc => sub { return $ipc }

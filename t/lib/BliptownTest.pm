@@ -15,6 +15,13 @@ sub create_db {
 	$sql->migrations->from_file($migrations_path)->migrate($ENV{BLIPTOWN_DB_MIGRATION});
 	state $db = $sql->db;
 	$db->query("PRAGMA busy_timeout = 10000");
+	$db->insert(
+		'users', {
+			username => 'testuser',
+			email => 'testuser@example.com',
+			customer_id => 'cus_XXXXXXXXXXXXXX',
+		}
+	);
 	return $db;
 }
 

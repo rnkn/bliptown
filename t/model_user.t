@@ -25,33 +25,32 @@ my $user = Bliptown::Model::User->new(
 
 subtest 'create_user' => sub {
 	$user->create_user({
-		username => 'testuser',
-		email => 'testuser@example.com',
-		password => 'password123',
+		username => 'newuser',
+		email => 'newuser@example.com',
 	});
 
-	my $user_rec = $db->select('users', undef, { username => 'testuser' })->hash;
+	my $user_rec = $db->select('users', undef, { username => 'newuser' })->hash;
 	ok $user_rec, 'create_user creates a user in database';
 };
 
 subtest 'read_user by username' => sub {
 	my $user_rec = $user->read_user({
 		key => 'username',
-		username => 'testuser',
+		username => 'newuser',
 	});
 	ok $user_rec, 'read_user finds user by username';
-	is $user_rec->{username}, 'testuser', 'read_user username matches';
-	is $user_rec->{email}, 'testuser@example.com', 'read_user email matches';
+	is $user_rec->{username}, 'newuser', 'read_user username matches';
+	is $user_rec->{email}, 'newuser@example.com', 'read_user email matches';
 	ok $user_rec->{customer_id}, 'read_user customer_id is set';
 };
 
 subtest 'read_user by email' => sub {
 	my $user_rec = $user->read_user({
 		key => 'email',
-		email => 'testuser@example.com',
+		email => 'newuser@example.com',
 	});
 	ok $user_rec, 'read_user finds user by email';
-	is $user_rec->{username}, 'testuser', 'read_user username matches';
+	is $user_rec->{username}, 'newuser', 'read_user username matches';
 };
 
 subtest 'read_user with missing key returns undef' => sub {
@@ -69,48 +68,27 @@ subtest 'read_user nonexistent user returns undef' => sub {
 
 subtest 'update_user email' => sub {
 	$user->update_user({
-		username => 'testuser',
+		username => 'newuser',
 		email => 'newemail@example.com'
 	});
-	my $user_rec = $user->read_user({ key => 'username', username => 'testuser' });
+	my $user_rec = $user->read_user({ key => 'username', username => 'newuser' });
 	is $user_rec->{email}, 'newemail@example.com', 'update_user updates email';
 };
 
-subtest 'update_user custom_domain' => sub {
+subtest 'update_user create_backups' => sub {
 	$user->update_user({
-		username => 'testuser',
-		custom_domain => 'mydomain.org',
-	});
-	my $user_rec = $user->read_user({
-		key => 'username',
-		username => 'testuser',
-	});
-	is $user_rec->{custom_domain}, 'mydomain.org', 'update_user sets custom_domain';
-
-	$user->update_user({
-		username => 'testuser',
-		custom_domain => '',
-	});
-	$user_rec = $user->read_user({ key => 'username', username => 'testuser' });
-	ok !defined $user_rec->{custom_domain}, 'custom_domain removes custom domain';
-};
-
-subtest 'update_user date_format and create_backups' => sub {
-	$user->update_user({
-		username => 'testuser',
-		date_format => 2,
+		username => 'newuser',
 		create_backups => 1,
 	});
 	my $user_rec = $user->read_user({
 		key => 'username',
-		username => 'testuser',
+		username => 'newuser',
 	});
-	is $user_rec->{date_format}, 2, 'update_user sets date_format';
 	is $user_rec->{create_backups}, 1, 'update_user sets create_backups';
 };
 
 subtest 'delete user' => sub {
-	my $result = $user->delete_user({ username => 'testuser' });
+	my $result = $user->delete_user({ username => 'newuser' });
 	ok $result, 'delete_user succeeds';
 };
 

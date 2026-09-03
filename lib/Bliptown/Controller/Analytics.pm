@@ -34,8 +34,8 @@ sub get_data {
 }
 
 sub log_data {
-	my ($c, $req_user, $data) = @_;
-	my $logdir = path($ENV{BLIPTOWN_LOG_HOME}, 'users', $req_user)->make_path;
+	my ($c, $req_username, $data) = @_;
+	my $logdir = path($ENV{BLIPTOWN_LOG_HOME}, 'users', $req_username)->make_path;
 	my $logpath = path($logdir, 'access.log')->touch->chmod(0600);
 
 	my $log = $c->accesslog($logpath);
@@ -47,11 +47,14 @@ sub log_data {
 sub track_visit {
 	my $c = shift;
 	my $username = $c->session('username') // '';
-	my $req_user = $c->get_req_user;
+	my $req_user_rec = $c->get_req_user_rec;
+	return unless $req_user_rec;
+	my $req_username = $req_user_rec->{username};
+	return unless $req_username;
 
-	if ($req_user && $username ne $req_user) {
+	if ($username ne $req_username) {
 		my $data = $c->get_data;
-		$c->log_data($req_user, $data);
+		$c->log_data($req_username, $data);
 	}
 
 	return $c->render(data => '');

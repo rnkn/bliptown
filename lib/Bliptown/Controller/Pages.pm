@@ -50,14 +50,13 @@ sub postprocess_skel {
 sub render_style {
 	my $c = shift;
 	my $theme = $c->param('theme');
-	my $req_user = $theme ? $ENV{BLIPTOWN_THEME_USER} : $c->get_req_user;
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_user);
 	my $file;
 	if ($theme) {
-		$file = path($root, "$theme.css");
+		$file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $ENV{BLIPTOWN_THEME_USER}, "$theme.css");
 	}
 	else {
-		$file = path($root, 'style.css');
+		my $path = $c->get_user_home_path;
+		$file = path($path, 'style.css');
 	}
 	if (-f $file) {
 		return $c->reply->file($file);
@@ -67,12 +66,11 @@ sub render_style {
 
 sub render_page {
 	my $c = shift;
-	my $req_user = $c->get_req_user;
-	return $c->reply->not_found unless $req_user;
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_user);
+	my $req_username = $c->get_req_username;
+	my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_username);
 	my $username = $c->session('username');
 
-	my $is_cur_user = $username && $username eq $req_user;
+	my $is_cur_user = $username && $username eq $req_username;
 
 	my $slug = url_unescape $c->param('catchall');
 	my $subdir = $c->stash('subdir');
@@ -87,9 +85,9 @@ sub render_page {
 	my $ext = $raw->extname;
 	if ($ext) {
 		if (-f $raw) {
-			my @cached = grep { $ext eq $_ } @{$c->app->config->{cdn_exts}};
-			if ($c->app->mode eq 'production' && @cached) {
-				return $c->redirect_to("https://cdn.blip.town/$req_user/$slug");
+			my $cached = $c->app->config->{cdn_exts}->{$ext};
+			if ($c->app->mode eq 'production' && $cached) {
+				return $c->redirect_to("https://cdn.blip.town/$req_username/$slug");
 			}
 			return $c->reply->file($raw);
 		}

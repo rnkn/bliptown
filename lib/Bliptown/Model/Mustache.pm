@@ -1,11 +1,12 @@
 package Bliptown::Model::Mustache;
 use Mojo::Base -base;
 use Mojo::File;
+use POSIX qw(strftime);
 
-has 'req_user';
 has 'user';
 has 'metadata';
 has 'util';
+has 'prettydate';
 
 sub process {
 	my ($self, $text, $args) = @_;
@@ -28,6 +29,15 @@ $text
 EOF
 }
 
+sub process_prettydate {
+	my ($self, $date) = @_;
+	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
+	$year = $year - 1900;
+	$month--;
+	my $format = $self->prettydate;
+	return strftime($format, 0, 0, 0, $day, $month, $year) // '';
+}
+
 sub process_variables {
 	my ($self, $text, $args) = @_;
 	my $metadata = $args->{metadata};
@@ -39,14 +49,7 @@ sub process_variables {
 		my $date = $metadata->{date};
 
 		if ($date && $key eq 'prettydate') {
-			my $req_user = $self->req_user;
-			return unless $req_user;
-			my $user_rec = $self->user->read_user({
-				key => 'username',
-				username => $req_user,
-			});
-			my $format = $user_rec->{date_format} // 0;
-			$val = $self->util->process_prettydate($date, $format);
+			$val = $self->process_prettydate($date);
 		}
 		else {
 			$val = $metadata->{$key} // '';

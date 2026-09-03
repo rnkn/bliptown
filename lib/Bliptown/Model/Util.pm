@@ -36,22 +36,6 @@ sub split_frontmatter {
 	return (undef, $chars);
 }
 
-sub process_prettydate {
-	my ($self, $date, $format) = @_;
-	$format //= 0;
-	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
-	$year = $year - 1900;
-	$month--;
-	my %date_formats = (
-		0 => '%e %B %Y',
-		1 => '%B %e, %Y',
-		2 => '%B %Y',
-		3 => '%Y',
-		4 => '%F'
-	);
-	return strftime($date_formats{$format}, 0, 0, 0, $day, $month, $year) // '';
-}
-
 sub glob_path {
 	my ($self, $glob, $root, $cur_filename) = @_;
 	$glob =~ s/(\.md)?$/.md/;

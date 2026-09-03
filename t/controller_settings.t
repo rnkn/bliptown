@@ -52,11 +52,6 @@ my $username	= 'testuser';
 my $email		= 'testuser@example.com';
 my $user_dir	= $user_home->child($username)->make_path;
 
-$user->create_user({
-    username	=> $username,
-    email		=> $email,
-});
-
 $t->app->hook(before_dispatch => sub {
 	my $c = shift;
 	$c->session(username => $username);
