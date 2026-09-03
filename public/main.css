@@ -64,7 +64,7 @@ ul ul {
 	padding-left: 1em;
 }
 
-dialog.modal {
+dialog {
 	position: absolute;
 	top: 50%;
 	left: 50%;
