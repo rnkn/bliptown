@@ -26,7 +26,7 @@ body {
 }
 
 p {
-	margin: 1em 0;
+	margin-bottom: 1em;
 }
 
 a {
@@ -90,10 +90,6 @@ table td {
 
 details summary:hover {
 	cursor: pointer;
-}
-
-details ul {
-	margin: 0;
 }
 
 button, input, select {
@@ -173,10 +169,6 @@ main {
 	padding-right: 4rem;
 	background-color: inherit;
 	scrollbar-width: none;
-}
-
-main p:first-child {
-	margin-top: 0;
 }
 
 main a {
