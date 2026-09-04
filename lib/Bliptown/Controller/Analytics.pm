@@ -47,10 +47,8 @@ sub log_data {
 sub track_visit {
 	my $c = shift;
 	my $username = $c->session('username') // '';
-	my $req_user_rec = $c->get_req_user_rec;
-	return unless $req_user_rec;
-	my $req_username = $req_user_rec->{username};
-	return unless $req_username;
+	my $req_username = $c->get_req_username;
+	return $c->reply->not_found unless $req_username;
 
 	if ($username ne $req_username) {
 		my $data = $c->get_data;
