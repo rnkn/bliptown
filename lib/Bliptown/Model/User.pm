@@ -48,9 +48,9 @@ sub update_user {
 	});
 
 	my %values;
-	my %keys_null		= map { $_ => 1 } qw(custom_domain);
+	my %keys_null		= map { $_ => 1 } qw();
 	my %keys_not_null	= map { $_ => 1 } qw(email);
-	my %keys_int		= map { $_ => 1 } qw(date_format create_backups);
+	my %keys_int		= map { $_ => 1 } qw(create_backups);
 
 	foreach my $key (keys %$args) {
 		if ($keys_null{$key}) {
