@@ -1,4 +1,5 @@
 % my $username = session('username') // '';
+% my $req_username = get_req_username;
 % my $drawer_toggle_style = param('toggle') ? 'display: block' : '';
 % my $rand = sprintf '%07x', int(rand(16**7));
 <!DOCTYPE html>
