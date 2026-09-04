@@ -209,7 +209,7 @@ sub startup {
 				else {
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host);
 				}
-				return $c->reply->not_found unless -d $path;
+				return unless -d $path;
 				$c->stash(user_home_path => $path);
 			};
 			return $path;
