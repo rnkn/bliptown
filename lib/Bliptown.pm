@@ -201,8 +201,7 @@ sub startup {
 				my $host = $c->req->url->to_abs->host;
 				return unless $host;
 				$host =~ s/^www\.//;
-				my $our_domain = $ENV{BLIPTOWN_DOMAIN};
-				if ($host =~ /\Q$our_domain\E$/) {
+				if ($host =~ /\Q$ENV{BLIPTOWN_DOMAIN}\E$/) {
 					my @host_parts = split(/\./, $host);
 					my $username = @host_parts >= 3 ? $host_parts[-3] : 'mayor';
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
