@@ -23,8 +23,10 @@
 					<input class="cell" id="email" type="email" name="email" value="<%= $email %>" <%= $disabled %>>
 				</li>
 				<li class="row">
-					<label class="cell name" for="custom-domain">Custom domain <a href="https://blip.town/faq/custom_domain" target="_blank" class="help-q">?</a></label>
-					<input class="cell" id="custom-domain" type="text" name="custom_domain" value="<%= $custom_domain %>" placeholder="example.com" <%= $disabled %>>
+					<span>
+						<a href="<%= url_for('edit_page', catchall => '_domain.txt' )->query(back_to => url_for)%>">Custom domain</a>
+						<a href="https://blip.town/faq/custom_domain" target="_blank" class="help-q">?</a>
+					</span>
 				</li>
 				<li class="row">
 					<span>
@@ -33,15 +35,6 @@
 					</span>
 				</li>
 				<hr>
-				<li class="row">
-					<label class="cell name" for="date-format">Formatted date</label>
-					<select class="cell" id="date-format" name="date_format">
-						<option value="0" <%= 'selected' if $date_format == 0 %>>Day Month Year</option>
-						<option value="1" <%= 'selected' if $date_format == 1 %>>Month Day, Year</option>
-						<option value="2" <%= 'selected' if $date_format == 2 %>>Month Year</option>
-						<option value="3" <%= 'selected' if $date_format == 3 %>>Year</option>
-					</select>
-				</li>
 				<label for="create-backups">
 					<li class="row">
 						<span class="cell name">Automatically create backups (e.g. <code>file.md~</code>)</span>
