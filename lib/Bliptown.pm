@@ -344,7 +344,9 @@ sub startup {
 		'/.well-known/acme-challenge/:file' => sub {
 			my $c = shift;
 			my $file = path('/var/www/acme/', $c->param('file'));
-			return $c->reply->file("$file") if -f $file;
+			if (-f $file) {
+				return $c->reply->file("$file");
+			}
 			return $c->reply->not_found;
 		})->name('acme_challenge');
 
