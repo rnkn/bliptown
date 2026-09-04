@@ -28,6 +28,15 @@ sub create_stripe_url {
 	return $url;
 }
 
+sub read_file_line {
+	my ($self, $file) = @_;
+	open(my $fh, '<', $file);
+	my $line = <$fh>;
+	close($fh);
+	chomp $line;
+	return $line;
+}
+
 sub split_frontmatter {
 	my ($self, $chars) = @_;
 	if ($chars =~ /^(---\n.*?---\n)\s*(.*)$/s) {
