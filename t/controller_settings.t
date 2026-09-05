@@ -70,8 +70,4 @@ $t->get_ok($app->url_for('list_settings') => { Host => $user_domain })->status_i
 	->attr_is('input#email', 'value', 'newemail@mydomain.org')
 	->element_exists('input#create-backups[checked]');
 
-$user->delete_user({
-	username	=> $username,
-});
-
 done_testing;
