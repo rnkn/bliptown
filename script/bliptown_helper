@@ -35,8 +35,7 @@ die 'BLIPTOWN_HELPER_SOCKET not defined'		unless defined $ENV{BLIPTOWN_HELPER_SO
 die 'BLIPTOWN_HELPER_PREFORK not defined'		unless defined $ENV{BLIPTOWN_HELPER_PREFORK};
 die 'BLIPTOWN_HELPER_HEALTH_FILE not defined'	unless defined $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 
-die 'BLIPTOWN_USER_HOME not defined'			unless defined $ENV{BLIPTOWN_USER_HOME};
-die 'BLIPTOWN_REPO_HOME not defined'			unless defined $ENV{BLIPTOWN_REPO_HOME};
+die 'BLIPTOWN_DATA_HOME not defined'			unless defined $ENV{BLIPTOWN_DATA_HOME};
 die 'BLIPTOWN_GID not defined'					unless defined $ENV{BLIPTOWN_GID};
 
 die 'BLIPTOWN_KEYPAIR_FILE not defined '		unless defined $ENV{BLIPTOWN_KEYPAIR_FILE};
@@ -223,8 +222,8 @@ sub make_directory {
 sub git_init {
 	my $payload = shift;
 	my $user = $payload->{user};
-	my $worktree = path($ENV{BLIPTOWN_USER_HOME}, $user);
-	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
+	my $worktree = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	my $excludes_file = '/etc/gitignore';
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
@@ -289,8 +288,8 @@ sub git_show {
 sub git_commit {
 	my $payload = shift;
 	my $user = $payload->{user};
-	my $worktree = path($ENV{BLIPTOWN_USER_HOME}, $user);
-	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
+	my $worktree = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 
@@ -312,7 +311,7 @@ sub git_commit {
 sub git_checkout {
 	my $payload = shift;
 	my $user = $payload->{user};
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $user);
+	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $dir = path($root, 'snapshots', $hash);
@@ -387,8 +386,8 @@ sub handle_conn {
 			setuid($uid) or die "Cannot set user: $uid ($!)";
 
 			if ($has_unveil) {
-				my $root = path($ENV{BLIPTOWN_USER_HOME}, $user);
-				my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
+				my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+				my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
 				unveil($repo, 'rwc') or die "Cannot unveil path: $repo ($!)";
 				unveil();
