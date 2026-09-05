@@ -41,7 +41,8 @@ Available commands:
     grep      file pattern searcher
     quota     print disk quota usage
     tree      print directory file structure
-    edit      edit file (nano)
+    vi        edit files in vi
+    nano      edit files in nano
 
 Server backend commands:
 
@@ -65,8 +66,9 @@ my %allowed_commands = (
 	grep	=> '/usr/bin/grep',
 	quota	=> '/usr/bin/quota',
 	touch	=> '/usr/bin/touch',
+	vi		=> '/usr/bin/vi -S',
 	tree	=> '/usr/local/bin/tree',
-	edit	=> '/usr/local/bin/rnano',
+	nano	=> '/usr/local/bin/nano -R',
 );
 
 my %builtins = (
@@ -117,5 +119,5 @@ while (1) {
 		next;
 	}
 
-	system($realcmd, @args);
+	system(split(/\s+/, $realcmd), @args);
 }
