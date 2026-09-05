@@ -67,6 +67,7 @@ sub render_style {
 sub render_page {
 	my $c = shift;
 	my $req_username = $c->get_req_username;
+	return $c->reply->not_found unless $req_username;
 	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username);
 	my $username = $c->session('username');
 
