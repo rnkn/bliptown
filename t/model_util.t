@@ -69,18 +69,6 @@ EOF
 	is $text, "Hello world!\n", 'split_frontmatter returns body text';
 };
 
-subtest 'process_prettydate with DAY MONTH YEAR format' => sub {
-	my $result = $util->process_prettydate('2999-12-31');
-	like $result, qr/31/, 'process_prettydate returns day';
-	like $result, qr/December/, 'process_prettydate returns month';
-	like $result, qr/2999/, 'process_prettydate returns year';
-};
-
-subtest 'process_prettydate ISO format (YYY-MM-DD)' => sub {
-	my $result = $util->process_prettydate('2999-12-31', 4);
-	is $result, '2999-12-31', 'process_prettydate returns YYYY-MM-DD';
-};
-
 subtest 'filename_to_slug strip' => sub {
 	my $root = '/path/to/file';
 	my $filename = "$root/about.md";

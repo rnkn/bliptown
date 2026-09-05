@@ -30,6 +30,13 @@ EOF
     is $out, "Hello Alice, welcome to Earth.\n", 'process_variables replaces variables';
 };
 
+subtest 'process_prettydate with DAY MONTH YEAR format' => sub {
+	my $result = $mustache->process_prettydate('2999-12-31');
+	like $result, qr/31/, 'process_prettydate returns day';
+	like $result, qr/December/, 'process_prettydate returns month';
+	like $result, qr/2999/, 'process_prettydate returns year';
+};
+
 subtest 'process_variables unknown keys' => sub {
     my $text = 'Hello {{ unknown }}.';
     my $args = { metadata => {} };
