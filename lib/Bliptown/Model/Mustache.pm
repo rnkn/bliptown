@@ -34,8 +34,8 @@ sub process_prettydate {
 	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
 	$year = $year - 1900;
 	$month--;
-	my $format = $self->prettydate_fmt;
-	return strftime($format, 0, 0, 0, $day, $month, $year) // '';
+	my $fmt = $self->prettydate_fmt;
+	return strftime($fmt, 0, 0, 0, $day, $month, $year) // '';
 }
 
 sub process_variables {
