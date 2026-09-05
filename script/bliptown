@@ -23,7 +23,7 @@ die 'BLIPTOWN_SMTP_PORT not defined'			unless defined $ENV{BLIPTOWN_SMTP_PORT};
 die 'BLIPTOWN_SMTP_LOGIN not defined'			unless defined $ENV{BLIPTOWN_SMTP_LOGIN};
 die 'BLIPTOWN_SMTP_PASS not defined'			unless defined $ENV{BLIPTOWN_SMTP_PASS};
 
-die 'BLIPTOWN_USER_HOME not defined'			unless defined $ENV{BLIPTOWN_USER_HOME};
+die 'BLIPTOWN_DATA_HOME not defined'			unless defined $ENV{BLIPTOWN_DATA_HOME};
 die 'BLIPTOWN_DB not defined'					unless defined $ENV{BLIPTOWN_DB};
 die 'BLIPTOWN_DB_SCHEMA not defined'			unless defined $ENV{BLIPTOWN_DB_SCHEMA};
 die 'BLIPTOWN_GEOIP_DB not defined'				unless defined $ENV{BLIPTOWN_GEOIP_DB};
