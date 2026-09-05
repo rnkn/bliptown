@@ -246,7 +246,7 @@ sub startup {
 			my ($c, $username) = @_;
 			my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_prettydate.txt');
 			my $style = -f $file ? $c->util->read_file_line($file) : 'euro';
-			my $fmt = $c->config->{prettydate}->{$style};
+			my $fmt = $c->app->config->{prettydate_fmts}->{$style};
 			return $fmt;
 		});
 
