@@ -142,11 +142,12 @@ sub startup {
 	$app->helper(
 		mustache => sub {
 			my $c = shift;
+			my $fmt = $c->get_user_prettydate_fmt($c->get_req_username);
 			return Bliptown::Model::Mustache->new(
 				user => $c->user,
 				metadata => $c->metadata,
 				util => $c->util,
-				prettydate_fmt => $c->get_user_prettydate_fmt($c->get_req_username),
+				prettydate_fmt => $fmt,
 			);
 		});
 
