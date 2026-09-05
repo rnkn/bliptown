@@ -169,6 +169,7 @@ sub startup {
 			return Bliptown::Model::Email->new(
 				user => $c->user,
 				token => $c->token,
+				util => $c->util,
 			);
 		}
 	);

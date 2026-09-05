@@ -7,6 +7,7 @@ use POSIX 'strftime';
 
 has 'user';
 has 'token';
+has 'util';
 
 sub generate_magic_link_email {
 	my ($self, $args) = @_;
@@ -78,7 +79,9 @@ sub send_magic_link {
 
 	my $email = $user_rec->{email};
 	return unless $email;
-	my $custom_domain = $user_rec->{custom_domain} // '';
+
+	my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
+	my $custom_domain = $self->util->read_file_line($file) if -f $file;
 
 	my $smtp = Mojo::SMTP::Client->new(
 		address => $ENV{BLIPTOWN_SMTP_ADDR},
@@ -89,7 +92,7 @@ sub send_magic_link {
 	my $email_text = $self->generate_magic_link_email({
 		username => $username,
 		email => $email,
-		custom_domain => $custom_domain,
+		custom_domain => $custom_domain // '',
 	});
 
 	$smtp->send(
