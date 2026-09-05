@@ -67,7 +67,7 @@ sub render_style {
 sub render_page {
 	my $c = shift;
 	my $req_username = $c->get_req_username;
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $req_username);
+	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username);
 	my $username = $c->session('username');
 
 	my $is_cur_user = $username && $username eq $req_username;
@@ -211,7 +211,7 @@ sub new_page {
 
 	my ($template, $content);
 	if ($ext eq 'md') {
-		my $root = path($ENV{BLIPTOWN_USER_HOME}, $c->session('username'))->to_abs;
+		my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'))->to_abs;
 		my $path = path($root, $slug)->to_abs;
 
 		while (1) {
@@ -244,7 +244,7 @@ sub edit_page {
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my $file;
 	if (!$slug || $slug =~ m{/$}) {
 		unless ($file = $c->get_file("$slug/index")) {
@@ -295,7 +295,7 @@ sub edit_page {
 sub save_page {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username)->to_string;
+	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->to_abs->to_string;
 	my $slug = $c->param('slug');
 	$slug =~ s{^/}{};
 	my $ext = $c->param('ext');

@@ -22,13 +22,10 @@ $app->helper(
 	ipc => sub { return $ipc }
 );
 
-my $tempbase	= tempdir;
-my $user_home	= $tempbase->child('users')->make_path;
+$ENV{BLIPTOWN_DATA_HOME} = tempdir;
+
 my $username	= 'testuser';
-
-$ENV{BLIPTOWN_USER_HOME} = $user_home;
-
-my $user_dir = $user_home->child($username)->make_path;
+my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 $t->app->hook(before_dispatch => sub {
@@ -42,12 +39,12 @@ $t->post_ok('/files' => { Host => $user_domain } => form => {
 	name		=> 'fakedir',
 })->status_is(302);
 
-like $debug_messages, qr{Created directory: $user_dir/fakedir};
+like $debug_messages, qr{Created directory: $user_home/fakedir};
 
-$user_dir->child('foo.md')->touch;
-$user_dir->child('bar.md')->touch;
-$user_dir->child('subdir')->make_path;
-$user_dir->child('subdir/baz.md')->touch;
+$user_home->child('foo.md')->touch;
+$user_home->child('bar.md')->touch;
+$user_home->child('subdir')->make_path;
+$user_home->child('subdir/baz.md')->touch;
 
 $t->get_ok($app->url_for('list_files') => { Host => $user_domain })->status_is(200)
 	->content_like(qr{<a href="/foo">foo.md</a>})
@@ -62,20 +59,20 @@ $t->get_ok($app->url_for('list_files')->query(search => 'foo') => { Host => $use
 	->content_unlike(qr{<a href="/bar">bar.md</a>});
 
 $t->get_ok($app->url_for('delete_file', catchall => 'foo.md') => { Host => $user_domain })->status_is(302);
-like $debug_messages, qr{Deleted: $user_dir/foo.md};
+like $debug_messages, qr{Deleted: $user_home/foo.md};
 
 $t->get_ok($app->url_for('list_files')->query(search => 'ba', delete => 1) => { Host => $user_domain })->status_is(302);
-like $debug_messages, qr{Deleted: $user_dir/bar.md};
-like $debug_messages, qr{Deleted: $user_dir/subdir/baz.md};
+like $debug_messages, qr{Deleted: $user_home/bar.md};
+like $debug_messages, qr{Deleted: $user_home/subdir/baz.md};
 
 $t->get_ok($app->url_for('rename_file', catchall => 'foo.md')->query(name => 'bar.md') => { Host => $user_domain })->status_is(302);
-like $debug_messages, qr{Renamed file: $user_dir/foo.md -> $user_dir/bar.md};
+like $debug_messages, qr{Renamed file: $user_home/foo.md -> $user_home/bar.md};
 
 $t->get_ok($app->url_for('list_files')->query(search => 'ba', replace => 'qu') => { Host => $user_domain })->status_is(302);
-like $debug_messages, qr{Renamed file: $user_dir/bar.md -> $user_dir/qur.md};
-like $debug_messages, qr{Renamed file: $user_dir/subdir/baz.md -> $user_dir/subdir/quz.md};
+like $debug_messages, qr{Renamed file: $user_home/bar.md -> $user_home/qur.md};
+like $debug_messages, qr{Renamed file: $user_home/subdir/baz.md -> $user_home/subdir/quz.md};
 
 $t->get_ok($app->url_for('backup_file', catchall => 'foo.md') => { Host => $user_domain })->status_is(302);
-like $debug_messages, qr{Created backup file: $user_dir/foo.md~};
+like $debug_messages, qr{Created backup file: $user_home/foo.md~};
 
 done_testing;

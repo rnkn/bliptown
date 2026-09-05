@@ -22,13 +22,10 @@ $app->helper(
 	ipc => sub { return $ipc }
 );
 
-my $tempbase	= tempdir;
-my $user_home	= $tempbase->child('users')->make_path;
+$ENV{BLIPTOWN_DATA_HOME} = tempdir;
+
 my $username	= 'testuser';
-
-$ENV{BLIPTOWN_USER_HOME} = $user_home;
-
-my $user_dir = $user_home->child($username)->make_path;
+my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 $t->app->hook(before_dispatch => sub {
@@ -37,7 +34,7 @@ $t->app->hook(before_dispatch => sub {
 	return 1;
 });
 
-my $titlefile = path($user_dir, '_title.txt');
+my $titlefile = path($user_home, '_title.txt');
 $titlefile->spew('My Site');
 
 my $slug	= 'foo';
@@ -67,7 +64,7 @@ $t->post_ok($app->url_for('save_page') => { Host => $user_domain } => form => {
 	content		=> $content,
 })->status_is(302);
 
-my $path = path($user_dir, "$slug.$ext");
+my $path = path($user_home, "$slug.$ext");
 $path->spew($content);
 
 my $include_content = <<'EOF';
@@ -75,11 +72,11 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 EOF
 chomp $include_content;
 
-my $include = path($user_dir, 'exists.md');
+my $include = path($user_home, 'exists.md');
 $include->spew($include_content);
 
-path($user_dir, 'foobar.md')->touch;
-path($user_dir, 'foobaz.md')->touch;
+path($user_home, 'foobar.md')->touch;
+path($user_home, 'foobaz.md')->touch;
 
 like $debug_messages, qr/Updated file: $path/, 'edit_page updates file';
 

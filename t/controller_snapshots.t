@@ -11,17 +11,18 @@ use_ok qw(Bliptown::Controller::Snapshots);
 
 my $t			= Test::Mojo->new('Bliptown');
 my $app			= $t->app;
-my $username	= 'testuser';
-my $user_domain	= "$username.$ENV{BLIPTOWN_DOMAIN}";
 my $ipc			= FakeIPC->new;
 
 $app->helper(
 	ipc => sub { return $ipc }
 );
 
-$ENV{BLIPTOWN_USER_HOME} = tempdir;
+$ENV{BLIPTOWN_DATA_HOME} = tempdir;
 
-path($ENV{BLIPTOWN_USER_HOME}, $username)->make_path;
+my $username	= 'testuser';
+my $email		= 'testuser@example.com';
+my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
+my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 $t->app->hook(before_dispatch => sub {
 	my $c = shift;

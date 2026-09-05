@@ -321,10 +321,10 @@ sub startup {
 			$c->app->sessions->cookie_domain($host);
 
 			if ($host eq "cdn-origin.$ENV{BLIPTOWN_DOMAIN}") {
-				my $req_user = shift @{$req_url->path->parts};
-				return unless $req_user;
-				my $path = join '/', @{$req_url->path->parts};
-				my $file = path($ENV{BLIPTOWN_USER_HOME}, $req_user, $path);
+				my $req_username = shift @{$req_url->path->parts};
+				return unless $req_username;
+				my $slug = join '/', @{$req_url->path->parts};
+				my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username, $slug);
 				if (-f $file) {
 					my $max_age = 24 * 60 * 60;
 					$c->res->headers->cache_control("public, must-revalidate, max-age=$max_age");

@@ -43,14 +43,12 @@ my $user		= Bliptown::Model::User->new(
 	customer => $customer,
 );
 
-my $tempbase	= tempdir;
-my $user_home	= $tempbase->child('users')->make_path;
-
-$ENV{BLIPTOWN_USER_HOME} = $user_home;
+$ENV{BLIPTOWN_DATA_HOME} = tempdir;
 
 my $username	= 'testuser';
 my $email		= 'testuser@example.com';
-my $user_dir	= $user_home->child($username)->make_path;
+my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
+my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 $t->app->hook(before_dispatch => sub {
 	my $c = shift;

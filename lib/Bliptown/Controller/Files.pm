@@ -18,7 +18,7 @@ sub list_files {
 		key => 'username',
 		username => $username
 	});
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my $dir = $slug ? path($root, $slug) : $root;
 	return $c->reply->not_found unless -d $dir;
 
@@ -133,7 +133,7 @@ sub new_directory {
 	my ($c, $slug, $name) = @_;
 	my $username = $c->session('username');
 	my $rel_dir = $slug ? join '/', ($slug, $name) : $name;
-	my $dir = path($ENV{BLIPTOWN_USER_HOME}, $username, $rel_dir);
+	my $dir = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $rel_dir);
 	my $redirect = $c->url_for('list_files', catchall => $rel_dir);
 	return $c->redirect_to($redirect) if -d $dir;
 
@@ -182,7 +182,7 @@ sub rename_file {
 	my $username = $c->session('username');
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my $slug = $c->param('catchall');
 	my $file = path($root, $slug);
 	my $filename = $file->to_abs->to_string;
@@ -242,7 +242,7 @@ sub delete_file {
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
-	my $file = path($ENV{BLIPTOWN_USER_HOME}, $username, $slug)->to_abs;
+	my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $slug)->to_abs;
 	if (-d $file && @{$file->list({ dir => 1 })} > 0) {
 		$c->flash(info => "Directory $slug not empty!");
 		return $c->redirect_to($redirect);
@@ -264,7 +264,7 @@ sub backup_file {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $filename = $c->param('catchall');
-	my $file = path($ENV{BLIPTOWN_USER_HOME}, $username, $filename);
+	my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $filename);
 	return $c->reply->not_found unless -f $file;
 	my $redirect = $c->param('back_to') // $c->url_for('list_files');
 	my $res = $c->ipc->send_message({
@@ -286,7 +286,7 @@ sub upload_files {
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
 	my $username = $c->session('username');
-	my $root = path($ENV{BLIPTOWN_USER_HOME}, $username);
+	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my $dir = $slug ? path($root, $slug) : $root;
 	foreach my $upload (@{$c->req->uploads}) {
 		my $filename = $upload->filename;
