@@ -44,26 +44,34 @@ sub list_settings {
 		username => $username
 	});
 
+	my $email = $user_rec->{email};
+	return $c->reply->exception("User $username email not found")
+		unless $email;
+
 	my $customer_id = $user_rec->{customer_id};
 	return $c->reply->exception("User $username customer_id not found")
 		unless $customer_id;
+
 	my $billing_session = $c->customer->create_billing_session({
 		customer_id => $customer_id
 	});
 	return $c->reply->exception("Cannot create billing sessions for customer_id $customer_id")
 		unless $billing_session;
+
 	my $billing_portal_url = $billing_session->{url};
+	return $c->reply->exception("Cannot create billing portal URL for customer_id $customer_id")
+		unless $billing_portal_url;
+
+	my $create_backups = $user_rec->{create_backups} // 0;
 
 	$c->stash(
 		title => 'Settings',
 		template => 'settings',
 		locked => $locked,
-		username => $user_rec->{username} // '',
-		email => $user_rec->{email} // '',
-		custom_domain => $user_rec->{custom_domain} // '',
-		date_format => $user_rec->{date_format} // 0,
-		create_backups => $user_rec->{create_backups} // 0,
-		billing_portal_url => $billing_portal_url // ''
+		username => $username,
+		email => $email,
+		create_backups => $create_backups,
+		billing_portal_url => $billing_portal_url,
 	);
 	return $c->render;
 }
