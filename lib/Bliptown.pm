@@ -252,6 +252,7 @@ sub startup {
 		get_file => sub {
 			my ($c, $slug) = @_;
 			my $home = $c->get_user_home_path;
+			return unless $home;
 			my $file = path($home, $slug)->to_abs;
 			return $file if -f $file;
 			foreach my $ext (@{$c->config->{render_exts}}) {
