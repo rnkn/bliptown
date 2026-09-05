@@ -2,8 +2,9 @@ package Bliptown::Model::Email;
 use Mojo::Base -base;
 use Mojo::Template;
 use Mojo::URL;
+use Mojo::File qw(path);
 use Mojo::SMTP::Client;
-use POSIX 'strftime';
+use POSIX qw(strftime);
 
 has 'user';
 has 'token';
