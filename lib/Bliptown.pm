@@ -234,7 +234,7 @@ sub startup {
 			my ($c, $username) = @_;
 			my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
 			if (-f $file) {
-				my $domain = $c->util->read_file_line($file);
+				my $domain = $c->util->read_file_line($file) // '';
 				my $domain_re = qr/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 				return $domain if $domain =~ $domain_re;
 			}
