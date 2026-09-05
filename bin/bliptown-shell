@@ -10,7 +10,7 @@ use lib DIR . '/../local/lib/perl5';
 use Mojo::File;
 use Term::ReadLine;
 
-binmode(STDOUT, ':encoding(UTF-8)');
+binmode STDOUT, ':encoding(UTF-8)';
 
 my $motd_file = Mojo::File->new('/etc/motd');
 my $motd = $motd_file->slurp('UTF-8') if -f $motd_file;
@@ -72,7 +72,7 @@ my %allowed_commands = (
 );
 
 my %builtins = (
-	'cd' => sub {
+	cd => sub {
 		my $dir = shift // $ENV{HOME};
 		my $oldpwd = getcwd;
 		if ($dir eq '-') {
@@ -82,7 +82,7 @@ my %builtins = (
 		}
 		$ENV{OLDPWD} = $oldpwd;
 	},
-	'help' => sub {
+	help => sub {
 		print "$help\n";
 	}
 );
