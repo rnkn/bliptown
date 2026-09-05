@@ -19,7 +19,7 @@ sub create_db {
 		'users', {
 			username => 'testuser',
 			email => 'testuser@example.com',
-			customer_id => 'cus_XXXXXXXXXXXXXX',
+			customer_id => 'cus_VCdpxcHMhvORXo',
 		}
 	);
 	return $db;
