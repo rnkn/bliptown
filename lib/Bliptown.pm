@@ -207,7 +207,7 @@ sub startup {
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 				}
 				else {
-					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host);
+					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host)->realpath;
 				}
 				return unless -d $path;
 				$c->stash(user_home_path => $path);
