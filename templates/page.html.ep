@@ -1,11 +1,12 @@
 % layout 'default';
+% my $req_username = get_req_username() // '';
 <nav>
 	<header>
 		%== $header
 	</header>
 	<menu>
 		%== $menu
-		% if ($req_username eq 'mayor' && ! $c->session('username')) {
+		% if ($req_username eq 'mayor' && ! session('username')) {
 		<ul>
 			<li><label for="drawer-toggle">Join/Login</label>
 		</ul>
