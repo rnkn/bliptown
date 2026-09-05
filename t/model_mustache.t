@@ -14,11 +14,11 @@ my $user		= Bliptown::Model::User->new;
 my $metadata	= Bliptown::Model::Metadata->new;
 my $util		= Bliptown::Model::Util->new;
 
-my $mustache	= Bliptown::Model::Mustache->new(
-    req_user	=> 'nobody',
-    user		=> $user,
-    metadata	=> $metadata,
-    util		=> $util,
+my $mustache = Bliptown::Model::Mustache->new(
+    user			=> $user,
+    metadata		=> $metadata,
+    util			=> $util,
+	prettydate_fmt  => '%e %B %Y',
 );
 
 subtest 'process_variables known keys' => sub {

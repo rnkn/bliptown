@@ -6,7 +6,7 @@ use POSIX qw(strftime);
 has 'user';
 has 'metadata';
 has 'util';
-has 'prettydate';
+has 'prettydate_fmt';
 
 sub process {
 	my ($self, $text, $args) = @_;
@@ -34,7 +34,7 @@ sub process_prettydate {
 	my ($year, $month, $day) = $date =~ /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
 	$year = $year - 1900;
 	$month--;
-	my $format = $self->prettydate;
+	my $format = $self->prettydate_fmt;
 	return strftime($format, 0, 0, 0, $day, $month, $year) // '';
 }
 

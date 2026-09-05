@@ -44,7 +44,7 @@ sub startup {
 			webm	=> 1,
 			pdf		=> 1,
 		},
-		prettydate => {
+		prettydate_fmts => {
 			euro		=> '%e %B %Y',
 			us			=> '%B %e, %Y',
 			monthyear	=> '%B %Y',
@@ -146,7 +146,7 @@ sub startup {
 				user => $c->user,
 				metadata => $c->metadata,
 				util => $c->util,
-				prettydate => $c->get_user_prettydate_style($c->get_req_username),
+				prettydate_fmt => $c->get_user_prettydate_fmt($c->get_req_username),
 			);
 		});
 
@@ -236,12 +236,12 @@ sub startup {
 		});
 
 	$app->helper(
-		get_user_prettydate_style => sub {
+		get_user_prettydate_fmt => sub {
 			my ($c, $username) = @_;
 			my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_prettydate.txt');
 			my $style = -f $file ? $c->util->read_file_line($file) : 'euro';
-			my $format = $c->config->{prettydate}->{$style};
-			return $format;
+			my $fmt = $c->config->{prettydate}->{$style};
+			return $fmt;
 		});
 
 	$app->helper(
