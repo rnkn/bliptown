@@ -218,9 +218,13 @@ sub startup {
 	$app->helper(
 		get_req_username => sub {
 			my $c = shift;
-			my $path = $c->get_user_home_path;
-			my $realpath = $path->realpath;
-			return ${$realpath->to_array}[-1];
+			my $req_username = $c->stash('req_username');
+			unless ($req_username) {
+				my $path = $c->get_user_home_path;
+				return unless $path;
+				$req_username = ${$path->to_array}[-1];
+			}
+			return $req_username;
 		});
 
 	$app->helper(
