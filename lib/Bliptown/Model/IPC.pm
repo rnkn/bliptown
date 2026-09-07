@@ -32,7 +32,7 @@ sub send_message {
 	my $res_blob = '';
 
 	$client->send($req_blob)	or die "Cannot send data to socket ($!)";
-	$client->shutdown(1)		or die "Cannot shutdown socket ($!)";
+	$client->shutdown(SHUT_WR)	or die "Cannot shutdown socket ($!)";
 
 	while (read($client, my $buf, 512)) {
 		$res_blob .= $buf;
