@@ -230,7 +230,7 @@ sub startup {
 		});
 
 	$app->helper(
-		get_user_domain => sub {
+		get_user_custom_domain => sub {
 			my ($c, $username) = @_;
 			my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
 			if (-f $file) {
@@ -238,7 +238,7 @@ sub startup {
 				my $domain_re = qr/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 				return $domain if $domain =~ $domain_re;
 			}
-			return "$username.$ENV{BLIPTOWN_DOMAIN}";
+			return;
 		});
 
 	$app->helper(
@@ -376,7 +376,7 @@ sub startup {
 		my $url = Mojo::URL->new;
 		$url->scheme($ENV{BLIPTOWN_SCHEME});
 		$url->port($ENV{BLIPTOWN_PORT});
-		my $host = $c->get_user_domain($username);
+		my $host = $c->get_user_custom_domain($username) // "$username.$ENV{BLIPTOWN_DOMAIN}";
 		$url->host($host);
 
 		return $c->redirect_to($url);
