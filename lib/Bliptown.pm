@@ -24,7 +24,7 @@ sub startup {
 	my $app = shift;
 
 	my $health_file = path($ENV{BLIPTOWN_HEALTH_FILE})->remove->touch;
-	$app->log->info("Creating worker health file \"$health_file\"");
+	$app->log->debug("Creating worker health file '$health_file'");
 
 	$app->config(
 		reverse_proxy => $app->mode eq 'production' ? 1 : 0,
