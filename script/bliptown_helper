@@ -94,9 +94,9 @@ domain $domain {
 EOF
 	}
 
-	my $acme_file_str = $acme_file->slurp('utf-8');
+	my $acme_file_str = $acme_file->slurp('UTF-8');
 	unless ($acme_domains_str eq $acme_file_str) {
-		$acme_file->spew($acme_domains_str, 'utf-8');
+		$acme_file->spew($acme_domains_str, 'UTF-8');
 	}
 	return 'ACME domain list up-to-date';
 }
@@ -133,9 +133,9 @@ sub update_relayd_keypairs {
 		$keypairs_str .= "tls keypair \"$domain\"\n";
 	}
 
-	my $keypair_file_str = $keypair_file->slurp('utf-8');
+	my $keypair_file_str = $keypair_file->slurp('UTF-8');
 	unless ($keypairs_str eq $keypair_file_str) {
-		$keypair_file->spew($keypairs_str, 'utf-8')
+		$keypair_file->spew($keypairs_str, 'UTF-8')
 			or die "Cannot write keypair file: $keypair_file ($!)";
 
 		system('rcctl reload relayd') == 0 or die "Cannot reload relayd ($!)";
@@ -180,7 +180,7 @@ sub update_file {
 	if ($payload->{create_backup} && -e $filename) {
 		backup_file $payload;
 	}
-	$path->spew($content, 'utf-8') or die "Cannot write file: $path ($!)";
+	$path->spew($content, 'UTF-8') or die "Cannot write file: $path ($!)";
 	return "Updated file: $filename"
 }
 

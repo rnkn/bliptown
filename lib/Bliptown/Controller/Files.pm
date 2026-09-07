@@ -51,10 +51,10 @@ sub list_files {
 	my $max_depth = $search_re ? undef : 1;
 	my $tree = $dir->list_tree({ dir => 1, max_depth => $max_depth });
 	foreach my $file (@$tree) {
-		my $filename = decode('utf-8', $file);
+		my $filename = decode('UTF-8', $file);
 		my @stats = stat($filename);
-		my $rel_root_filename = decode('utf-8', $file->to_rel($root)->to_string);
-		my $rel_dir_filename = decode('utf-8', $file->to_rel($dir)->to_string);
+		my $rel_root_filename = decode('UTF-8', $file->to_rel($root)->to_string);
+		my $rel_dir_filename = decode('UTF-8', $file->to_rel($dir)->to_string);
 		my $is_dir = -d $filename;
 		my $exts_re = join '|', @{$c->config->{render_exts}};
 		my $url = $rel_root_filename =~ s/\.($exts_re)$//r;

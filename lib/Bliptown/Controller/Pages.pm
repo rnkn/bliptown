@@ -10,7 +10,7 @@ sub process_redirects {
 	my ($file, $slug) = @_;
 	$slug =~ s{^/?}{/};
 	$slug =~ s{/?$}{};
-	my $chars = $file->slurp('utf-8');
+	my $chars = $file->slurp('UTF-8');
 	my $y = YAML::Tiny->new;
 	my $redirects = eval { $y->read_string($chars)->[0] };
 
@@ -225,7 +225,7 @@ sub new_page {
 			$path = $path->dirname;
 		}
 
-		$content = $template->slurp('utf-8') if $template;
+		$content = $template->slurp('UTF-8') if $template;
 	}
 
 	$c->stash(
@@ -333,7 +333,7 @@ sub render_raw {
 	$slug = "$subdir/" . $slug if $subdir;
 
 	return $c->reply->txt_not_found unless my $file = $c->get_file($slug);
-	my $chars = $file->slurp('utf-8');
+	my $chars = $file->slurp('UTF-8');
 	return $c->render(text => $chars, format => 'txt');
 }
 

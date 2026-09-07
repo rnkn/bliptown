@@ -70,7 +70,7 @@ sub process_sections {
 		my @items;
 		foreach my $filename (@filenames) {
 			next unless -f $filename;
-			my $chars = Mojo::File->new($filename)->slurp('utf-8');
+			my $chars = Mojo::File->new($filename)->slurp('UTF-8');
 			my ($yaml, undef) = $self->util->split_frontmatter($chars);
 			my $metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
 			my %item_metadata = %$metadata;
@@ -172,7 +172,7 @@ sub read_partial {
 	my ($self, $filename, $args) = @_;
 	return unless $filename =~ /\.md$/;
 
-	my $chars = Mojo::File->new($filename)->slurp('utf-8');
+	my $chars = Mojo::File->new($filename)->slurp('UTF-8');
 	my ($yaml, $text) = $self->util->split_frontmatter($chars);
 
 	my %metadata = %{$args->{metadata}};

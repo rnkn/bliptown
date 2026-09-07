@@ -8,7 +8,7 @@ sub read_file {
 	my ($self, $args) = @_;
 	my $file = Mojo::File->new($args->{file});
 	return unless -r $file;
-	my $chars = $file->slurp('utf-8');
+	my $chars = $file->slurp('UTF-8');
 	return { chars => $chars };
 }
 

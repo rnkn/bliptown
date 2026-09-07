@@ -112,11 +112,11 @@ sub markdown_to_html {
 		sub {
 			my ($chunk, $size) = @_;
 			my $bytes = substr($chunk, 0, $size);
-			$html .= decode('utf-8', $bytes);
+			$html .= decode('UTF-8', $bytes);
 		}
 	);
 
-	my $octets = encode('utf-8', $text);
+	my $octets = encode('UTF-8', $text);
 	md_html($octets, length($octets), $html_handler, undef, $md_flags, 0);
 	return $html;
 }
@@ -124,7 +124,7 @@ sub markdown_to_html {
 sub read_page {
 	my ($self, $args) = @_;
 	my $file = Mojo::File->new($args->{filename});
-	my $chars = $file->slurp('utf-8');
+	my $chars = $file->slurp('UTF-8');
 
 	$args->{metadata} //= {};
 	$args->{recur} //= 0;
