@@ -1,3 +1,12 @@
+-- 10 up
+CREATE TABLE logout_tokens (
+	token TEXT,
+	username TEXT,
+	custom_domain TEXT,
+	expires INTEGER
+);
+-- 10 down
+DROP TABLE logout_tokens;
 -- 9 up
 ALTER TABLE users
 	DROP COLUMN password_hash;
