@@ -388,6 +388,7 @@ sub startup {
 			my $c = shift;
 			my $username = $c->session('username');
 			my $req_username = $c->get_req_username;
+			return unless $req_username;
 			if ($username && $username eq $req_username) {
 				return 1;
 			}
