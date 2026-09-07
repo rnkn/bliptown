@@ -69,9 +69,10 @@ sub generate_login {
 		$c->session(username => $ENV{BLIPTOWN_DEMO_USER});
 		return $c->redirect_to($redirect);
 	}
-
-	$c->email->send_magic_link({ username => $username });
-	return $c->redirect_to('user_login');
+	else {
+		$c->email->send_magic_link({ username => $username });
+		return $c->redirect_to('user_login');
+	}
 }
 
 sub user_login {
