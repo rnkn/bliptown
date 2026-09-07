@@ -255,7 +255,7 @@ EOF
 sub git_log {
 	my $payload = shift;
 	my $user = $payload->{system_user};
-	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
+	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 	my $out = `git log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b%x01" --max-count=50`;
 
@@ -278,7 +278,7 @@ sub git_show {
 	my $user = $payload->{system_user};
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
+	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 	my $out = `git show $hash`;
 	return unless length $out;
@@ -326,7 +326,7 @@ sub git_checkout {
 sub git_archive {
 	my $payload = shift;
 	my $user = $payload->{system_user};
-	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
+	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $tmpfile = tempfile(UNLINK => 0);
