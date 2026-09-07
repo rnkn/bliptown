@@ -7,17 +7,13 @@ use Text::Glob qw(glob_to_regex_string);
 
 sub list_files {
 	my $c = shift;
+	my $username = $c->session('username');
 	my $search = $c->param('search');
 	my $delete = $c->param('delete');
 	my $replace = $c->param('replace');
 	my $sort = $c->param('sort') // 'name';
 	my $slug = $c->param('catchall');
-	my $username = $c->session('username');
 	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
-	my $user_rec = $c->user->read_user({
-		key => 'username',
-		username => $username
-	});
 	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my $dir = $slug ? path($root, $slug) : $root;
 	return $c->reply->not_found unless -d $dir;
