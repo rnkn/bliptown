@@ -14,22 +14,22 @@ use Mojo::JSON qw(encode_json decode_json);
 
 my $has_unveil = eval {
 	require OpenBSD::Unveil;
-	OpenBSD::Unveil->import();
+	OpenBSD::Unveil->import;
 	return 1;
 };
 
 my $has_pledge = eval {
 	require OpenBSD::Pledge;
-	OpenBSD::Pledge->import();
+	OpenBSD::Pledge->import;
 	return 1;
 };
 
 pledge(qw(rpath wpath cpath chown fattr unix proc id unveil exec))
 	if $has_pledge;
 
-$0 = $0 . '[master]';
-
 die "$0 must be run as root"					unless $> == 0;
+
+$0 = $0 . '[master]';
 
 die 'BLIPTOWN_HELPER_SOCKET not defined'		unless defined $ENV{BLIPTOWN_HELPER_SOCKET};
 die 'BLIPTOWN_HELPER_PREFORK not defined'		unless defined $ENV{BLIPTOWN_HELPER_PREFORK};
@@ -415,12 +415,12 @@ $SIG{CHLD} = sub { $needs_reap = 1 };
 $SIG{TERM} = $SIG{INT} = sub { $shutdown = 1 };
 
 sub spawn_worker {
-	my $pid = fork();
+	my $pid = fork;
 	die "Cannot fork process ($!)" unless defined $pid;
 
 	if ($pid == 0) {
 		$0 =~ s/master/worker/;
-		my $conn = $sock->accept();
+		my $conn = $sock->accept;
 
 		if (!$conn) {
 			next if $!{EINTR} && !$shutdown;
@@ -429,7 +429,7 @@ sub spawn_worker {
 		}
 
 		handle_conn $conn;
-		close $conn;
+		$conn->close;
 		exit 0;
 	}
 
@@ -444,7 +444,7 @@ sub reap_children {
 
 while (1) {
 	if ($needs_reap) {
-		reap_children();
+		reap_children;
 		$needs_reap = 0;
 	}
 
@@ -460,11 +460,11 @@ while (1) {
 	my $ok = kill(0, keys %children);
 	$health_file->spew($ok);
 
-	while (!$needs_reap && !$shutdown) { pause() }
+	while (!$needs_reap && !$shutdown) { pause }
 }
 
 while (%children) {
-	reap_children();
+	reap_children;
 	sleep 1;
 }
 

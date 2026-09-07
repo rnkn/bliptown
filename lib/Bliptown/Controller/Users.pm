@@ -105,14 +105,14 @@ sub user_auth {
 		);
 	}
 	else {
-		$c->session(expiration => 2592000, username => $username);
+		$c->session(expiration => 30 * 24 * 60 * 60, username => $username);
 	}
 
 	if ($custom_domain) {
 		if ($host eq $custom_domain) {
-			$c->session(expiration => 2592000, username => $username);
+			$c->session(expiration => 30 * 24 * 60 * 60, username => $username);
 			$c->token->delete_token({ token => $token });
-			return $c->redirect_to($c->url_for('/'));
+			return $c->redirect_to('/');
 		}
 		else {
 			my $url = Mojo::URL->new;

@@ -32,7 +32,7 @@ sub read_file_line {
 	my ($self, $file) = @_;
 	open(my $fh, '<', $file);
 	my $line = <$fh>;
-	close($fh);
+	close $fh;
 	chomp $line;
 	return $line;
 }

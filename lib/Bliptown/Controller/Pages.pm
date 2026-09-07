@@ -30,7 +30,8 @@ sub postprocess_skel {
 	my $url_path = Mojo::URL->new($slug)->to_string;
 	$url_path =~ s{/$}{};
 	my $dom = Mojo::DOM->new($html);
-	foreach my $link (@{$dom->find("a[href=\"$url_path\"]")}) {
+	my @links = @{$dom->find("a[href=\"$url_path\"]")};
+	foreach my $link (@links) {
 		my $cur_class = $link->attr('class') // '';
 		my @classes = split /\s+/, $cur_class;
 		push @classes, 'selected';
@@ -120,7 +121,7 @@ sub render_page {
 		}
 	}
 
-	if ($$file[-1] eq 'index.html') {
+	if (${$file}[-1] eq 'index.html') {
 		return $c->reply->file($file);
 	}
 
@@ -305,8 +306,13 @@ sub save_page {
 	$filename = path($root, $filename)->to_string;
 	my $content = $c->param('content');
 	$content =~ s/\r\n/\n/g;
-	my $user_rec = $c->user->read_user({ key => 'username', username => $username });
+
+	my $user_rec = $c->user->read_user({
+		key => 'username',
+		username => $username
+	});
 	my $backup = $user_rec->{create_backups} // 0;
+
 	my $res = $c->ipc->send_message({
 		command => 'update_file',
 		system_user => $username,
