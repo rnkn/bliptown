@@ -373,11 +373,10 @@ sub startup {
 			return $c->redirect_to('/');
 		}
 
-		my $url = Mojo::URL->new;
-		$url->scheme($ENV{BLIPTOWN_SCHEME});
-		$url->port($ENV{BLIPTOWN_PORT});
 		my $host = $c->get_user_custom_domain($username) // "$username.$ENV{BLIPTOWN_DOMAIN}";
-		$url->host($host);
+		my $url = $c->util->create_bliptown_url({
+			host => $host,
+		});
 
 		return $c->redirect_to($url);
 	})->name('my_site');
