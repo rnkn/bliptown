@@ -28,6 +28,17 @@ sub create_stripe_url {
 	return $url;
 }
 
+sub create_bliptown_url {
+	my ($self, $args) = @_;
+	my $url = Mojo::URL->new;
+	$url->scheme($ENV{BLIPTOWN_SCHEME});
+	$url->port($ENV{BLIPTOWN_PORT});
+	$url->host($args->{host} // $ENV{BLIPTOWN_DOMAIN});
+	$url->path($args->{path});
+	$url->query(token => $args->{token}, back_to => $args->{redirect});
+	return $url;
+}
+
 sub read_file_line {
 	my ($self, $file) = @_;
 	open(my $fh, '<', $file);
