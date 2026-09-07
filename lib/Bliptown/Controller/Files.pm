@@ -139,7 +139,7 @@ sub new_directory {
 
 	my $res = $c->ipc->send_message({
 		command => 'make_directory',
-		user	 => $username,
+		system_user => $username,
 		filename => $dir->to_string,
 	});
 
@@ -167,7 +167,7 @@ sub rename_files_regex {
 		$new_filename = path($dir, $new_filename)->to_abs->to_string;
 		my $res = $c->ipc->send_message({
 			command => 'rename_file',
-			user => $username,
+			system_user => $username,
 			filename => $old_filename,
 			new_filename => $new_filename,
 		});
@@ -197,7 +197,7 @@ sub rename_file {
 
 	my $res = $c->ipc->send_message({
 		command => 'rename_file',
-		user => $username,
+		system_user => $username,
 		filename => $filename,
 		new_filename => $new_filename,
 	});
@@ -227,7 +227,7 @@ sub delete_files_regex {
 	foreach my $filename (@filenames_abs) {
 		my $res = $c->ipc->send_message({
 			command => 'delete_file',
-			user => $username,
+			system_user => $username,
 			filename => $filename,
 		});
 		return $c->reply->exception($res->{error}) if $res->{error};
@@ -249,7 +249,7 @@ sub delete_file {
 	}
 	my $res = $c->ipc->send_message({
 		command => 'delete_file',
-		user => $username,
+		system_user => $username,
 		filename => $file->to_string,
 	});
 
@@ -269,7 +269,7 @@ sub backup_file {
 	my $redirect = $c->param('back_to') // $c->url_for('list_files');
 	my $res = $c->ipc->send_message({
 		command => 'backup_file',
-		user => $username,
+		system_user => $username,
 		filename => $file->to_string
 	});
 
@@ -300,7 +300,7 @@ sub upload_files {
 		my $blob = $upload->slurp;
 		my $res = $c->ipc->send_message({
 			command => 'write_blob',
-			user => $username,
+			system_user => $username,
 			filename => $path->to_abs->to_string,
 			blob => $blob,
 		});

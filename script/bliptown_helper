@@ -221,7 +221,7 @@ sub make_directory {
 
 sub git_init {
 	my $payload = shift;
-	my $user = $payload->{user};
+	my $user = $payload->{system_user};
 	my $worktree = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
 	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	my $excludes_file = '/etc/gitignore';
@@ -254,7 +254,7 @@ EOF
 
 sub git_log {
 	my $payload = shift;
-	my $user = $payload->{user};
+	my $user = $payload->{system_user};
 	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 	my $out = `git log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b%x01" --max-count=50`;
@@ -275,7 +275,7 @@ sub git_log {
 
 sub git_show {
 	my $payload = shift;
-	my $user = $payload->{user};
+	my $user = $payload->{system_user};
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
@@ -287,7 +287,7 @@ sub git_show {
 
 sub git_commit {
 	my $payload = shift;
-	my $user = $payload->{user};
+	my $user = $payload->{system_user};
 	my $worktree = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
 	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	git_init($payload);
@@ -310,7 +310,7 @@ sub git_commit {
 
 sub git_checkout {
 	my $payload = shift;
-	my $user = $payload->{user};
+	my $user = $payload->{system_user};
 	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
@@ -325,7 +325,7 @@ sub git_checkout {
 
 sub git_archive {
 	my $payload = shift;
-	my $user = $payload->{user};
+	my $user = $payload->{system_user};
 	my $repo = path($ENV{BLIPTOWN_REPO_HOME}, "$user.git");
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
@@ -377,7 +377,7 @@ sub handle_conn {
 	}
 
 	eval {
-		my $user = $payload->{user};
+		my $user = $payload->{system_user};
 
 		unless ($user eq 'root') {
 			my ($uid, $gid) = get_uid_gid($user);

@@ -8,7 +8,7 @@ sub take_snapshot {
 
 	my $res = $c->ipc->send_message({
 		command => 'git_commit',
-		user => $username,
+		system_user => $username,
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
@@ -29,7 +29,7 @@ sub list_snapshots {
 
 	my $res = $c->ipc->send_message({
 		command => 'git_log',
-		user => $username,
+		system_user => $username,
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
@@ -52,7 +52,7 @@ sub restore_snapshot {
 
 	my $res = $c->ipc->send_message({
 		command => 'git_checkout',
-		user => $username,
+		system_user => $username,
 		hash => $hash,
 	});
 
@@ -71,7 +71,7 @@ sub download_snapshot {
 
 	my $res = $c->ipc->send_message({
 		command => 'git_archive',
-		user => $username,
+		system_user => $username,
 		hash => $hash,
 	});
 
@@ -90,7 +90,7 @@ sub download_snapshot {
 		finish => sub {
 			my $res = $c->ipc->send_message({
 				command => 'delete_file',
-				user => $username,
+				system_user => $username,
 				filename => $filename,
 			});
 			return $c->log->error($res->{error}) if $res->{error};
@@ -141,7 +141,7 @@ sub render_diff {
 
 	my $res = $c->ipc->send_message({
 		command => 'git_show',
-		user => $username,
+		system_user => $username,
 		hash => $hash,
 	});
 	return $c->reply->exception($res->{error}) if $res->{error};

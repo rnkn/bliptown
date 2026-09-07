@@ -49,7 +49,7 @@ sub user_join {
 
 	my $res = $c->ipc->send_message({
 		command => 'add_user',
-		user => 'root',
+		system_user => 'root',
 		username => $username,
 	});
 

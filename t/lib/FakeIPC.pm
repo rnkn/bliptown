@@ -29,7 +29,7 @@ sub send_message {
 		subject => 'Full snapshot on Bliptown'
     });
 
-	my $user			= $args->{user}			// '';
+	my $system_user		= $args->{system_user}	// '';
 	my $filename		= $args->{filename}		// '';
 	my $new_filename	= $args->{new_filename} // '';
 	my $domain			= $args->{domain}		// '';
