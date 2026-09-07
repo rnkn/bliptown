@@ -58,8 +58,6 @@ sub startup {
 		$ENV{BLIPTOWN_SECRET}
 	]);
 
-	$app->sessions->default_expiration(30 * 24 * 60 * 60);
-
 	$app->max_request_size(1024 * 1024 * 250);
 
 	delete $app->static->extra->{'favicon.ico'};
@@ -325,7 +323,12 @@ sub startup {
 			my $req_url = $c->req->url->to_abs;
 			my $host = $req_url->host;
 			return unless $host;
-			$c->app->sessions->cookie_domain($host);
+
+			$host =~s/^www\.//;
+
+			$c->app->sessions->cookie_domain(
+				$host =~ /\Q$ENV{BLIPTOWN_DOMAIN}\E$/ ? $ENV{BLIPTOWN_DOMAIN} : $host
+			);
 
 			if ($host eq "cdn-origin.$ENV{BLIPTOWN_DOMAIN}") {
 				my $req_username = shift @{$req_url->path->parts};
@@ -357,9 +360,10 @@ sub startup {
 			return $c->reply->not_found;
 		})->name('acme_challenge');
 
-	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
-	$r->post('/login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
 	$r->get('/auth')->to(controller => 'Users', action => 'user_auth')->name('user_auth');
+	$r->post('/login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
+	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
+	$r->post('/logout')->to(controller => 'Users', action => 'generate_logout')->name('generate_logout');
 	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
 
 	$r->get('/track/:rand')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');

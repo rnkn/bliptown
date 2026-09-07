@@ -17,7 +17,7 @@ sub generate_magic_link_email {
 	return unless $username and $email;
 	my $custom_domain = $args->{custom_domain} // '';
 
-	my $token = $self->token->create_token({
+	my $token = $self->token->create_login_token({
 		username => $username,
 		custom_domain => $custom_domain,
 	});

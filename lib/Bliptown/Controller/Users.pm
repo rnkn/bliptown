@@ -86,17 +86,21 @@ sub user_login {
 sub user_auth {
 	my $c = shift;
 	my $token = $c->param('token')	// '';
+	my $redirect = $c->param('back_to') // '/';
 
 	my $host = $c->req->url->to_abs->host;
 	return unless $host;
 	$host =~ s/^www\.//;
 
-	my $token_rec		= $c->token->read_token({ token => $token });
-	my $username		= $token_rec->{username};
-	my $custom_domain	= $token_rec->{custom_domain} // '';
+	my $token_rec = $c->token->read_login_token({ token => $token });
+	my ($username, $custom_domain);
+	if ($token_rec) {
+		$username = $token_rec->{username};
+		$custom_domain = $token_rec->{custom_domain};
+	}
 
 	if (! $token_rec || ! $username || $token_rec->{expires} <= time) {
-		$c->token->delete_token({ token => $token }) if $token_rec;
+		$c->token->delete_login_token({ token => $token }) if $token_rec;
 		return $c->render(
 			status => 403,
 			template => 'message',
@@ -111,7 +115,7 @@ sub user_auth {
 	if ($custom_domain) {
 		if ($host eq $custom_domain) {
 			$c->session(expiration => 30 * 24 * 60 * 60, username => $username);
-			$c->token->delete_token({ token => $token });
+			$c->token->delete_login_token({ token => $token });
 			return $c->redirect_to('/');
 		}
 		else {
@@ -125,15 +129,67 @@ sub user_auth {
 		}
 	}
 	else {
-		$c->token->delete_token({ token => $token });
-		return $c->redirect_to('/');
+		$c->token->delete_login_token({ token => $token });
+		return $c->redirect_to($redirect);
 	}
+}
+
+sub generate_logout {
+	my $c = shift;
+	my $username = $c->session('username');
+	return $c->redirect_to('/') unless $username;
+	my $redirect = $c->param('back_to');
+	my $custom_domain = $c->get_user_custom_domain($username);
+
+	my $token;
+	if ($custom_domain) {
+		$token = $c->token->create_logout_token({
+			username => $username,
+			custom_domain => $custom_domain,
+		});
+	}
+
+	my $url = $c->util->create_bliptown_url({
+		path => $c->url_for('user_logout'),
+		token => $token,
+		redirect => $redirect,
+	});
+
+	return $c->redirect_to($url);
 }
 
 sub user_logout {
 	my $c = shift;
+	my $token = $c->param('token')	// '';
+	my $redirect = $c->param('back_to') // '/';
+
+	my $host = $c->req->url->to_abs->host;
+	$host =~ s/^www\.//;
+
 	$c->session(expires => 1);
-	return $c->redirect_to('/');
+
+	my $token_rec = $c->token->read_logout_token({ token => $token });
+	my $custom_domain = $token_rec->{custom_domain} if $token_rec;
+
+	if ($custom_domain) {
+		if ($host eq $custom_domain) {
+			my $url = $c->create_bliptown_url({
+				path => $c->url_for('user_logout'),
+				redirect => $redirect,
+			});
+			return $c->redirect_to($url);
+		}
+		else {
+			my $url = $c->util->create_bliptown_url({
+				host => $custom_domain,
+				path => $c->url_for('user_logout'),
+				redirect => $redirect,
+			});
+			return $c->redirect_to($url);
+		}
+	}
+
+	return $c->redirect_to($redirect);
 }
 
 return 1;

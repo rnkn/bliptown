@@ -104,10 +104,11 @@ echo "Restarting relayd:"
 rcctl restart relayd
 echo
 
-echo "Expunging database dead login tokens:"
+echo "Expunging database dead tokens:"
 ok=true
 now=$(date +%s)
 /usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now" || ok=false
+/usr/local/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM logout_tokens WHERE expires < $now" || ok=false
 $ok && echo "Done" || echo "Failed"
 echo
 
