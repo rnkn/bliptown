@@ -34,7 +34,7 @@ sub create_bliptown_url {
 	$url->scheme($ENV{BLIPTOWN_SCHEME});
 	$url->port($ENV{BLIPTOWN_PORT});
 	$url->host($args->{host} // $ENV{BLIPTOWN_DOMAIN});
-	$url->path($args->{path});
+	$url->path($args->{path} // '/');
 	$url->query(token => $args->{token}, back_to => $args->{redirect});
 	return $url;
 }
