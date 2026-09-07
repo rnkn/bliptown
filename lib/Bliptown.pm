@@ -12,6 +12,7 @@ use Bliptown::Model::File;
 use Bliptown::Model::Page;
 use Bliptown::Model::Metadata;
 use Bliptown::Model::Mustache;
+use Bliptown::Model::DNS;
 use Bliptown::Model::Customer;
 use Bliptown::Model::Checkout;
 use Bliptown::Model::IPC;
