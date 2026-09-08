@@ -381,15 +381,15 @@ sub handle_conn {
 			setgid($gid) or die "Cannot set group: $gid ($!)";
 			setuid($uid) or die "Cannot set user: $uid ($!)";
 
+			$private->make_path->chmod(0750) or die "Cannot create path: $private";
+			$repo->make_path->chmod(0750) or die "Cannot create path: $repo";
+
 			if ($has_unveil) {
 				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
 				unveil($repo, 'rwc') or die "Cannot unveil path: $repo ($!)";
 				unveil();
 			}
 		}
-
-		chmod 0750, $private or die "Cannot chmod: $private";
-		chmod 0750, $repo or die "Cannot chmod: $repo";
 
 		my $func = $allowed_commands{$command} or
 			die "Command not permitted: $command";
