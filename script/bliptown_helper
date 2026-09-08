@@ -202,10 +202,9 @@ sub delete_file {
 
 sub make_directory {
 	my $payload = shift;
-	my $dirname = $payload->{filename};
-	my $path = path $dirname;
-	$path->make_path or die "Cannot create directory: $dirname ($!)";
-	return "Created directory: $dirname";
+	my $dir = $payload->{filename};
+	path($dir)->make_path or die "Cannot create directory: $dir ($!)";
+	return "Created directory: $dir";
 }
 
 sub git_init {
