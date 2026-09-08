@@ -375,6 +375,12 @@ sub handle_conn {
 		my $private = path($root, 'private');
 
 		unless ($user eq 'root') {
+			if ($has_unveil) {
+				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
+				unveil($repo, 'rwc') or die "Cannot unveil path: $repo ($!)";
+				unveil();
+			}
+
 			my $uid = getpwnam($user) or die "Cannot find user: $user";
 			my $gid = $ENV{BLIPTOWN_GID};
 
@@ -383,12 +389,6 @@ sub handle_conn {
 
 			$private->make_path->chmod(0750) or die "Cannot create path: $private";
 			$repo->make_path->chmod(0750) or die "Cannot create path: $repo";
-
-			if ($has_unveil) {
-				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
-				unveil($repo, 'rwc') or die "Cannot unveil path: $repo ($!)";
-				unveil();
-			}
 		}
 
 		my $func = $allowed_commands{$command} or
