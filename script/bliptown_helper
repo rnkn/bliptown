@@ -48,7 +48,6 @@ my $shutdown;
 
 my $health_file = path($ENV{BLIPTOWN_HELPER_HEALTH_FILE});
 $health_file->remove->touch or die "Cannot create health file: $health_file\n";
-print "Health file created: $health_file\n";
 
 my $sock_file = path($ENV{BLIPTOWN_HELPER_SOCKET});
 $sock_file->remove;
@@ -61,8 +60,6 @@ my $sock = IO::Socket::UNIX->new(
 
 chown(0, $ENV{BLIPTOWN_GID}, $sock_file) or die "Cannot chown: $sock_file ($!)";
 chmod(0660, $sock_file) or die "Cannot chmod: $sock_file ($!)";
-
-print "Socket created: $sock_file\n";
 
 my $safe_domain_regex = qr/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
 my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;
