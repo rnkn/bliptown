@@ -1,6 +1,6 @@
 package Bliptown::Model::File;
 use Mojo::Base -base;
-use Mojo::File;
+use Mojo::File qw(path);
 use Mojo::URL;
 use Mojo::UserAgent;
 
@@ -14,14 +14,20 @@ sub read_file {
 
 sub purge_cdn_file {
 	my ($self, $args) = @_;
-	my $url = Mojo::URL->new;
-	$url->host($ENV{BLIPTOWN_CDN_API_HOST});
-	$url->scheme('https');
-	$url->path('/purge');
-	$url->query(url => $args->{url});
+
+	my $path = path($args->{path});
+	$path = $path->to_rel($ENV{BLIPTOWN_DATA_HOME}, 'users');
+
+	my $cdn_url = "https://cdn.blip.town/$path";
+
+	my $purge_url = Mojo::URL->new;
+	$purge_url->host($ENV{BLIPTOWN_CDN_API_HOST});
+	$purge_url->scheme('https');
+	$purge_url->path('/purge');
+	$purge_url->query(url => $cdn_url);
 
 	my $ua = Mojo::UserAgent->new;
-	my $res = $ua->post($url => { 'AccessKey' => $ENV{BLIPTOWN_CDN_API_KEY} })->result;
+	my $res = $ua->post($purge_url => { 'AccessKey' => $ENV{BLIPTOWN_CDN_API_KEY} })->result;
 	return $res;
 }
 
