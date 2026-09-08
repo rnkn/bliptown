@@ -143,14 +143,6 @@ sub update_relayd_keypairs {
 	return 'relayd keypairs up-to-date';
 }
 
-sub get_uid_gid {
-	my $user = shift;
-	my @pw = getpwnam($user) or die "Cannot find user: $user";
-	my $uid = $pw[2];
-	my $gid = $pw[3];
-	return ($uid, $gid);
-}
-
 sub write_blob {
 	my $payload = shift;
 	my $filename = $payload->{filename};
@@ -380,7 +372,8 @@ sub handle_conn {
 		my $user = $payload->{system_user};
 
 		unless ($user eq 'root') {
-			my ($uid, $gid) = get_uid_gid($user);
+			my $uid = getpwnam($user) or die "Cannot find user: $user";
+			my $gid = $ENV{BLIPTOWN_GID};
 
 			setgid($gid) or die "Cannot set group: $gid ($!)";
 			setuid($uid) or die "Cannot set user: $uid ($!)";
