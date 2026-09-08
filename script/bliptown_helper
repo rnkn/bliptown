@@ -318,8 +318,7 @@ sub git_archive {
 	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $tmpfile = tempfile(UNLINK => 0);
-	chmod(0644, $tmpfile);
+	my $tmpfile = tempfile(UNLINK => 0)->chmod(0644);
 	git_init($payload);
 	chdir $repo or die "Cannot change directory: $repo ($!)";
 	system('git', 'archive', '--format=tar.gz', '-o', $tmpfile, $hash) == 0
