@@ -38,7 +38,7 @@ die 'BLIPTOWN_HELPER_HEALTH_FILE not defined'	unless defined $ENV{BLIPTOWN_HELPE
 die 'BLIPTOWN_DATA_HOME not defined'			unless defined $ENV{BLIPTOWN_DATA_HOME};
 die 'BLIPTOWN_GID not defined'					unless defined $ENV{BLIPTOWN_GID};
 
-die 'BLIPTOWN_KEYPAIR_FILE not defined '		unless defined $ENV{BLIPTOWN_KEYPAIR_FILE};
+die 'BLIPTOWN_KEYPAIR_FILE not defined'			unless defined $ENV{BLIPTOWN_KEYPAIR_FILE};
 die 'BLIPTOWN_ACME_FILE not defined'			unless defined $ENV{BLIPTOWN_ACME_FILE};
 
 my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
@@ -146,7 +146,7 @@ sub write_blob {
 	my $blob = $payload->{blob};
 	my $path = path $filename;
 	my $dir = $path->dirname;
-	$dir->make_path or die "Cannot creat path: $dir ($!)";;
+	$dir->make_path or die "Cannot create path: $dir ($!)";;
 	$path->spew($blob) or die "Cannot write file: $path ($!)";
 	return "Wrote file: $filename";
 }
@@ -165,7 +165,7 @@ sub update_file {
 	my $content = $payload->{content};
 	my $path = path $filename;
 	my $dir = $path->dirname;
-	$dir->make_path or die "Cannot creat path: $dir ($!)";
+	$dir->make_path or die "Cannot create path: $dir ($!)";
 	if ($payload->{create_backup} && -e $filename) {
 		backup_file $payload;
 	}
@@ -193,7 +193,7 @@ sub delete_file {
 	my $filename = $payload->{filename};
 	if (-d $filename) {
 		unlink glob("$filename/.*");
-		rmdir $filename or die "Cannot delete directory: $filename ($!)";;
+		rmdir $filename or die "Cannot delete directory: $filename ($!)";
 	} else {
 		unlink $filename or die "Cannot delete file: $filename ($!)";
 	}
