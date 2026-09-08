@@ -370,6 +370,9 @@ sub handle_conn {
 
 	eval {
 		my $user = $payload->{system_user};
+		my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+		my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
+		my $private = path($root, 'private');
 
 		unless ($user eq 'root') {
 			my $uid = getpwnam($user) or die "Cannot find user: $user";
@@ -379,13 +382,14 @@ sub handle_conn {
 			setuid($uid) or die "Cannot set user: $uid ($!)";
 
 			if ($has_unveil) {
-				my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
-				my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
 				unveil($repo, 'rwc') or die "Cannot unveil path: $repo ($!)";
 				unveil();
 			}
 		}
+
+		chmod 0750, $private or die "Cannot chmod: $private";
+		chmod 0750, $repo or die "Cannot chmod: $repo";
 
 		my $func = $allowed_commands{$command} or
 			die "Command not permitted: $command";
