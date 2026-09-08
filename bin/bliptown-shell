@@ -43,6 +43,7 @@ Available commands:
     tree      print directory file structure
     vi        edit files in vi
     nano      edit files in nano
+    quit      exit the shell
 
 Server backend commands:
 
@@ -106,6 +107,8 @@ while (1) {
 
 	my @args = split(/\s+/, $line);
 	my $cmd = shift @args;
+	last if $cmd eq 'quit';
+
 	my $realcmd = $allowed_commands{$cmd};
 
 	unless ($realcmd) {
