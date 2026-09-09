@@ -123,18 +123,19 @@ sub markdown_to_html {
 
 sub read_page {
 	my ($self, $args) = @_;
-	my $file = Mojo::File->new($args->{filename});
-	my $chars = $file->slurp('UTF-8');
+	my $path = path($args->{filename});
+	my $chars = $path->slurp('UTF-8');
 
 	$args->{metadata} //= {};
 	$args->{recur} //= 0;
 
 	my $html = '';
 
-	if (my ($ext) = $file =~ /\.(txt|html|css|js)$/) {
+	my $ext = $path->extname;
+	if (grep { $ext eq $_ } qw(html css txt)) {
 		$html = $self->render_plaintext($chars, $ext);
 	}
-	elsif ($file =~ /\.md$/) {
+	elsif ($ext eq 'md') {
 		my ($yaml, $text) = $self->util->split_frontmatter($chars);
 		my $parent_metadata = $args->{metadata};
 		delete $parent_metadata->{layout};

@@ -4,6 +4,8 @@ use Mojo::URL;
 use Mojo::File qw(path);
 use POSIX qw(strftime);
 
+has 'user_path';
+
 sub format_human_size {
 	my ($self, $size) = @_;
 	return $size . 'B' if $size < 1024;
@@ -40,8 +42,8 @@ sub create_bliptown_url {
 }
 
 sub read_file_line {
-	my ($self, $file) = @_;
-	open(my $fh, '<', $file);
+	my ($self, $filename) = @_;
+	open(my $fh, '<', $filename);
 	my $line = <$fh>;
 	close $fh;
 	chomp $line;
@@ -57,16 +59,16 @@ sub split_frontmatter {
 }
 
 sub glob_path {
-	my ($self, $glob, $root, $cur_filename) = @_;
+	my ($self, $glob, $cur_filename) = @_;
 	$glob =~ s/(\.md)?$/.md/;
 
 	if ($glob =~ m{^/}) {
 		$glob =~ s{^/}{};
-		$glob = path($root, $glob)->to_string;
+		$glob = path($self->user_path, $glob)->to_string;
 	}
 	else {
-		my $file = Mojo::File->new($cur_filename);
-		$glob = path($file->dirname, $glob)->to_abs;
+		my $path = path($cur_filename);
+		$glob = path($path->dirname, $glob)->to_abs->to_string;
 	}
 
 	my @filenames = glob $glob;
@@ -76,10 +78,10 @@ sub glob_path {
 }
 
 sub filename_to_slug {
-	my ($self, $filename, $root) = @_;
-	my $rel = Mojo::File->new($filename)->to_rel($root)->to_string;
-	$rel =~ s/\.md$//;
-	return "/$rel";
+	my ($self, $filename) = @_;
+	my $rel_filename = path($filename)->to_rel($self->user_path)->to_string;
+	$rel_filename =~ s/\.md$//;
+	return "/$rel_filename";
 }
 
 return 1;

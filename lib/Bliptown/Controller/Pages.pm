@@ -7,10 +7,10 @@ use Mojo::Util qw(url_unescape);
 use Text::Glob qw(glob_to_regex_string);
 
 sub process_redirects {
-	my ($file, $slug) = @_;
+	my ($path, $slug) = @_;
 	$slug =~ s{^/?}{/};
 	$slug =~ s{/?$}{};
-	my $chars = $file->slurp('UTF-8');
+	my $chars = $path->slurp('UTF-8');
 	my $y = YAML::Tiny->new;
 	my $redirects = eval { $y->read_string($chars)->[0] };
 
@@ -51,16 +51,16 @@ sub postprocess_skel {
 sub render_style {
 	my $c = shift;
 	my $theme = $c->param('theme');
-	my $file;
+	my $path;
 	if ($theme) {
-		$file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $ENV{BLIPTOWN_THEME_USER}, "$theme.css");
+		$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $ENV{BLIPTOWN_THEME_USER}, "$theme.css");
 	}
 	else {
-		my $path = $c->get_user_home_path;
-		$file = path($path, 'style.css');
+		my $user_path = $c->get_user_path;
+		$path = path($user_path, 'style.css');
 	}
-	if (-f $file) {
-		return $c->reply->file($file);
+	if (-f $path) {
+		return $c->reply->file($path);
 	}
 	return $c->reply->not_found;
 }
@@ -69,7 +69,7 @@ sub render_page {
 	my $c = shift;
 	my $req_username = $c->get_req_username;
 	return $c->reply->not_found unless $req_username;
-	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username);
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username);
 	my $username = $c->session('username');
 
 	my $is_cur_user = $username && $username eq $req_username;
@@ -78,12 +78,12 @@ sub render_page {
 	my $subdir = $c->stash('subdir');
 	$slug = "$subdir/" . $slug if $subdir;
 
-	my $redirects_file = path($root, '_redirects.txt');
-	my $redirect_url = process_redirects($redirects_file, $slug)
-		if -f $redirects_file;
+	my $redirects_path = path($user_path, '_redirects.txt');
+	my $redirect_url = process_redirects($redirects_path, $slug)
+		if -f $redirects_path;
 	return $c->redirect_to($redirect_url) if $redirect_url;
 
-	my $raw = path($root, $slug);
+	my $raw = path($user_path, $slug);
 	my $ext = $raw->extname;
 	if ($ext) {
 		if (-f $raw) {
@@ -126,28 +126,26 @@ sub render_page {
 	}
 
 	my $page = $c->page->read_page({
-		root => $root->to_abs->to_string,
 		filename => $file->to_abs->to_string,
 	});
 
 	my @skel = qw(header menu footer);
 	my %skel_html;
 	foreach my $f (@skel) {
-		my $file = path($root, "_$f.md");
-		if (-f $file) {
-			my $page = $c->page->read_page({
-				filename => $file->to_abs->to_string,
-				root => $root->to_abs->to_string,
+		my $skel_path = path($user_path, "_$f.md");
+		if (-f $skel_path) {
+			my $skel_page = $c->page->read_page({
+				filename => $skel_path->to_abs->to_string,
 			});
-			$page->{html} = postprocess_skel($page->{html}, $slug);
-			$skel_html{$f} = $page->{html};
+			$skel_page->{html} = postprocess_skel($skel_page->{html}, $slug);
+			$skel_html{$f} = $skel_page->{html};
 		}
 	}
 
 	my $title = 'Untitled';
-	my $title_file = path($root, '_title.txt');
-	if (-f $title_file) {
-		my $title_chars = $title_file->slurp('UTF-8');
+	my $title_path = path($user_path, '_title.txt');
+	if (-f $title_path) {
+		my $title_chars = $title_path->slurp('UTF-8');
 		$title = (split '\n', $title_chars)[0] if $title_chars;
 	}
 
@@ -155,16 +153,16 @@ sub render_page {
 	$title = "$title – $page_title" if $page_title;
 
 	my $desc = 'A very talented artist.';
-	my $desc_file = path($root, '_description.txt');
-	if (-f $desc_file) {
-		my $desc_chars = $desc_file->slurp('UTF-8');
+	my $desc_path = path($user_path, '_description.txt');
+	if (-f $desc_path) {
+		my $desc_chars = $desc_path->slurp('UTF-8');
 		$desc = join ' ', split '\n', $desc_chars;
 	}
 
 	my $author = 'Anonymous';
-	my $author_file = path($root, '_author.txt');
-	if (-f $author_file) {
-		my $author_chars = $author_file->slurp('UTF-8');
+	my $author_path = path($user_path, '_author.txt');
+	if (-f $author_path) {
+		my $author_chars = $author_path->slurp('UTF-8');
 		$author = (split '\n', $author_chars)[0];
 	}
 
@@ -213,17 +211,17 @@ sub new_page {
 
 	my ($template, $content);
 	if ($ext eq 'md') {
-		my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'))->to_abs;
-		my $path = path($root, $slug)->to_abs;
+		my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'))->to_abs;
+		my $search_path = path($user_path, $slug)->to_abs;
 
 		while (1) {
-			my $candidate = $path->child('_template.md');
+			my $candidate = $search_path->child('_template.md');
 			if (-f $candidate) {
 				$template = $candidate;
 				last;
 			}
-			last if $path le $root;
-			$path = $path->dirname;
+			last if $search_path le $user_path;
+			$search_path = $search_path->dirname;
 		}
 
 		$content = $template->slurp('UTF-8') if $template;
@@ -246,36 +244,37 @@ sub edit_page {
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
-	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $file;
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $path;
 	if (!$slug || $slug =~ m{/$}) {
-		unless ($file = $c->get_file("$slug/index")) {
+		unless ($path = $c->get_file("$slug/index")) {
 			$slug =~ s{/$}{};
-			if ($file = $c->get_file($slug)) {
+			if ($path = $c->get_file($slug)) {
 				return $c->redirect_to('edit_page', catchall => $slug);
 			}
 		};
 	} else {
-		unless ($file = $c->get_file($slug)) {
-			if ($file = $c->get_file("$slug/index")) {
+		unless ($path = $c->get_file($slug)) {
+			if ($path = $c->get_file("$slug/index")) {
 				return $c->redirect_to('edit_page', catchall => "$slug/");
 			}
 		}
 	}
-	return $c->redirect_to('new_page', catchall => $slug) unless $file;
-	my $ext = $c->param('ext') || $file->extname || 'md';
+	return $c->redirect_to('new_page', catchall => $slug) unless -f $path;
+	my $ext = $c->param('ext') || $path->extname || 'md';
 	return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{render_exts}};
-	my $rel_file = $file->to_rel($root); $rel_file =~ s/\.[^.]+?$//;
+	my $rel_filename = $path->to_rel($user_path)->to_string;
+	my $basename = $rel_filename =~ s/\.[^.]+?$//r;
 	my $content;
 	my @includes;
-	if (-f $file) {
-		$content = $c->file->read_file({ file => $file })->{chars};
+	if (-f $path) {
+		$content = $c->file->read_file({ filename => $path->to_string })->{chars};
 		my @lines = split /\n/, $content;
 		foreach my $line (@lines) {
 			if ($line =~ $partial_re) {
 				my $include = $1;
-				foreach my $f ($c->util->glob_path($include, $root, $file)) {
-					$f = Mojo::File->new($f)->to_rel($root);
+				foreach my $f ($c->util->glob_path($include, $path->to_string)) {
+					$f = path($f)->to_rel($user_path);
 					push @includes, $f;
 				}
 			}
@@ -284,9 +283,8 @@ sub edit_page {
 	$c->stash(
 		template => 'edit',
 		title => 'Editing ',
-		slug => $rel_file,
+		slug => $basename,
 		ext => $ext,
-		filename => $file->basename,
 		redirect => $redirect,
 		content => $content,
 		includes => \@includes,
@@ -297,13 +295,13 @@ sub edit_page {
 sub save_page {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->to_abs->to_string;
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->to_abs;
 	my $slug = $c->param('slug');
 	$slug =~ s{^/}{};
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
-	my $filename = "$slug.$ext";
-	$filename = path($root, $filename)->to_string;
+	my $path = path($user_path, "$slug.$ext");
+	my $filename = $path->to_string;
 	my $content = $c->param('content');
 	$content =~ s/\r\n/\n/g;
 
@@ -320,7 +318,6 @@ sub save_page {
 		content => $content,
 		create_backup => $backup,
 	});
-
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
@@ -338,8 +335,8 @@ sub render_raw {
 	my $subdir = $c->stash('subdir');
 	$slug = "$subdir/" . $slug if $subdir;
 
-	return $c->reply->txt_not_found unless my $file = $c->get_file($slug);
-	my $chars = $file->slurp('UTF-8');
+	return $c->reply->txt_not_found unless my $path = $c->get_file($slug);
+	my $chars = $path->slurp('UTF-8');
 	return $c->render(text => $chars, format => 'txt');
 }
 

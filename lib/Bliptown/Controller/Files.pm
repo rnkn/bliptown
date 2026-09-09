@@ -14,16 +14,16 @@ sub list_files {
 	my $sort = $c->param('sort') // 'name';
 	my $slug = $c->param('catchall');
 	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
-	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $dir = $slug ? path($root, $slug) : $root;
-	return $c->reply->not_found unless -d $dir;
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $dir_path = $slug ? path($user_path, $slug) : $user_path;
+	return $c->reply->not_found unless -d $dir_path;
 
 	my $search_re = glob_to_regex_string($search) if $search;
 
 	if ($search_re && $delete) {
 		my $res = $c->delete_files_regex({
 			username => $username,
-			dir => $dir,
+			dir => $dir_path->to_string,
 			search => $search_re,
 		});
 		my $message = $res > 1 ? "$res files deleted" : "$res file deleted";
@@ -34,7 +34,7 @@ sub list_files {
 	if ($search_re && defined $replace) {
 		my $res = $c->rename_files_regex({
 			username => $username,
-			dir => $dir,
+			dir => $dir_path->to_string,
 			search => $search_re,
 			replace => $replace
 		});
@@ -45,19 +45,19 @@ sub list_files {
 
 	my @files;
 	my $max_depth = $search_re ? undef : 1;
-	my $tree = $dir->list_tree({ dir => 1, max_depth => $max_depth });
-	foreach my $file (@$tree) {
-		my $filename = decode('UTF-8', $file);
+	my @tree = $dir_path->list_tree({ dir => 1, max_depth => $max_depth })->each;
+	foreach my $path (@tree) {
+		my $filename = decode('UTF-8', $path->to_string);
 		my @stats = stat($filename);
-		my $rel_root_filename = decode('UTF-8', $file->to_rel($root)->to_string);
-		my $rel_dir_filename = decode('UTF-8', $file->to_rel($dir)->to_string);
+		my $filename_rel_user_path = decode('UTF-8', $path->to_rel($user_path)->to_string);
+		my $filename_rel_dir_path = decode('UTF-8', $path->to_rel($dir_path)->to_string);
 		my $is_dir = -d $filename;
 		my $exts_re = join '|', @{$c->config->{render_exts}};
-		my $url = $rel_root_filename =~ s/\.($exts_re)$//r;
+		my $url = $filename_rel_user_path =~ s/\.($exts_re)$//r;
 
 		push @files, {
-			abs_filename => $rel_root_filename,
-			rel_filename => $rel_dir_filename,
+			abs_filename => $filename_rel_user_path,
+			rel_filename => $filename_rel_dir_path,
 			is_dir => $is_dir,
 			url => $url,
 			size => $stats[7],
@@ -88,15 +88,15 @@ sub list_files {
 	}
 
 	my @breadcrumbs;
-	unless ($dir eq $root) {
-		my @breadcrumb_dirs = @{$dir->to_rel($root)};
+	unless ($dir_path eq $user_path) {
+		my @breadcrumb_dirs = @{$dir_path->to_rel($user_path)};
 
 		while (@breadcrumb_dirs) {
-			my $path = join '/', @breadcrumb_dirs;
+			my $path_to_string = join '/', @breadcrumb_dirs;
 			my $name = pop @breadcrumb_dirs;
 			my %crumb = (
 				name => $name,
-				path => $path,
+				path => $path_to_string,
 			);
 			push @breadcrumbs, \%crumb;
 		}
@@ -129,14 +129,14 @@ sub new_directory {
 	my ($c, $slug, $name) = @_;
 	my $username = $c->session('username');
 	my $rel_dir = $slug ? join '/', ($slug, $name) : $name;
-	my $dir = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $rel_dir);
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $rel_dir);
 	my $redirect = $c->url_for('list_files', catchall => $rel_dir);
-	return $c->redirect_to($redirect) if -d $dir;
+	return $c->redirect_to($redirect) if -d $path;
 
 	my $res = $c->ipc->send_message({
 		command => 'make_directory',
 		system_user => $username,
-		filename => $dir->to_string,
+		filename => $path->to_string,
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
@@ -152,7 +152,7 @@ sub rename_files_regex {
 	my $dir = $args->{dir};
 	my $search = $args->{search};
 	my $replace = $args->{replace};
-	my @files = $dir->list_tree({ dir => 1 })->each;
+	my @files = path($dir)->list_tree({ dir => 1 })->each;
 	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @files;
 	my @filenames_abs = map { path($dir, $_)->to_abs->to_string } @filenames;
 	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
@@ -178,15 +178,14 @@ sub rename_file {
 	my $username = $c->session('username');
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
-	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my $slug = $c->param('catchall');
-	my $file = path($root, $slug);
-	my $filename = $file->to_abs->to_string;
-	return $c->reply->not_found unless -e $file;
-	my $rename_to = $c->param('name');
-	my $new_filename = path($root, $rename_to)->to_abs->to_string;
+	my $filename = path($user_path, $slug)->to_abs->to_string;
+	return $c->reply->not_found unless -e $filename;
+	my $new_name = $c->param('name');
+	my $new_path = path($user_path, $new_name)->to_abs;
 
-	if (-d $filename && $new_filename =~ m{^$filename(/|$)}) {
+	if (-d $new_path && $new_path =~ m{^\Q$filename\E(/|$)}) {
 		$c->flash(info => "Cannot move $slug into itself!");
 		return $c->redirect_to($redirect);
 	}
@@ -195,7 +194,7 @@ sub rename_file {
 		command => 'rename_file',
 		system_user => $username,
 		filename => $filename,
-		new_filename => $new_filename,
+		new_filename => $new_path->to_string,
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
@@ -203,9 +202,9 @@ sub rename_file {
 
 	my $message;
 	if (-d $filename) {
-		$message = "Directory $slug renamed to $rename_to";
+		$message = "Directory $slug renamed to $new_name";
 	} else {
-		$message = "File $slug renamed to $rename_to"
+		$message = "File $slug renamed to $new_name";
 	}
 	$c->flash(info => $message);
 	return $c->redirect_to($redirect);
@@ -214,10 +213,10 @@ sub rename_file {
 sub delete_files_regex {
 	my ($c, $args) = @_;
 	my $username = $args->{username};
-	my $dir =$args->{dir};
+	my $dir = $args->{dir};
 	my $search = $args->{search};
-	my @files = $dir->list_tree({ dir => 1 })->each;
-	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @files;
+	my @tree = path($dir)->list_tree({ dir => 1 })->each;
+	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @tree;
 	my @filenames_abs = map { path($dir, $_)->to_abs->to_string } @filenames;
 	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
 	foreach my $filename (@filenames_abs) {
@@ -238,17 +237,17 @@ sub delete_file {
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
-	my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $slug)->to_abs;
-	if (-d $file && @{$file->list({ dir => 1 })} > 0) {
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $slug)->to_abs;
+	if (-d $path && @{$path->list({ dir => 1 })} > 0) {
 		$c->flash(info => "Directory $slug not empty!");
 		return $c->redirect_to($redirect);
 	}
+
 	my $res = $c->ipc->send_message({
 		command => 'delete_file',
 		system_user => $username,
-		filename => $file->to_string,
+		filename => $path->to_string,
 	});
-
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
@@ -259,20 +258,21 @@ sub delete_file {
 sub backup_file {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $filename = $c->param('catchall');
-	my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $filename);
-	return $c->reply->not_found unless -f $file;
+	my $slug = $c->param('catchall');
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $slug);
+	return $c->reply->not_found unless -f $path;
 	my $redirect = $c->param('back_to') // $c->url_for('list_files');
+
 	my $res = $c->ipc->send_message({
 		command => 'backup_file',
 		system_user => $username,
-		filename => $file->to_string
+		filename => $path->to_string,
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
-	$c->flash(info => "File ${filename}~ created");
+	$c->flash(info => "File ${slug}~ created");
 	return $c->redirect_to($redirect);
 }
 
@@ -282,8 +282,8 @@ sub upload_files {
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
 	my $username = $c->session('username');
-	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $dir = $slug ? path($root, $slug) : $root;
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $dir = $slug ? path($user_path, $slug) : $user_path;
 	foreach my $upload (@{$c->req->uploads}) {
 		my $filename = $upload->filename;
 		next unless $filename;

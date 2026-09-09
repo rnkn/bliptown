@@ -181,7 +181,11 @@ sub startup {
 
 	$app->helper(
 		util => sub {
-			return Bliptown::Model::Util->new;
+			my $c = shift;
+			my $user_path = $c->get_user_path;
+			return Bliptown::Model::Util->new(
+				user_path => $user_path,
+			);
 		}
 	);
 
@@ -194,7 +198,7 @@ sub startup {
 		});
 
 	$app->helper(
-		get_user_home_path => sub {
+		get_user_path => sub {
 			my $c = shift;
 			my $path = $c->stash('user_home_path');
 			unless ($path) {
@@ -220,7 +224,7 @@ sub startup {
 			my $c = shift;
 			my $req_username = $c->stash('req_username');
 			unless ($req_username) {
-				my $path = $c->get_user_home_path;
+				my $path = $c->get_user_path;
 				return unless $path;
 				$req_username = ${$path->to_array}[-1];
 			}
@@ -230,9 +234,9 @@ sub startup {
 	$app->helper(
 		get_user_custom_domain => sub {
 			my ($c, $username) = @_;
-			my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
-			if (-f $file) {
-				my $domain = $c->util->read_file_line($file) // '';
+			my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
+			if (-f $path) {
+				my $domain = $c->util->read_file_line($path) // '';
 				my $domain_re = qr/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 				return $domain if $domain =~ $domain_re;
 			}
@@ -242,8 +246,8 @@ sub startup {
 	$app->helper(
 		get_user_prettydate_fmt => sub {
 			my ($c, $username) = @_;
-			my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_prettydate.txt');
-			my $style = -f $file ? $c->util->read_file_line($file) : 'euro';
+			my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_prettydate.txt');
+			my $style = -f $path ? $c->util->read_file_line($path) : 'euro';
 			my $fmt = $c->app->config->{prettydate_fmts}->{$style};
 			return $fmt;
 		});
@@ -251,12 +255,12 @@ sub startup {
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			my $home = $c->get_user_home_path;
-			return unless $home;
-			my $file = path($home, $slug)->to_abs;
-			return $file if -f $file;
+			my $user_path = $c->get_user_path;
+			return unless $user_path;
+			my $path = path($user_path, $slug)->to_abs;
+			return $path if -f $path;
 			foreach my $ext (@{$c->config->{render_exts}}) {
-				my $f = path($home, "$slug.$ext")->to_abs;
+				my $f = path($user_path, "$slug.$ext")->to_abs;
 				return $f if -f $f;
 			}
 			return;
@@ -334,11 +338,11 @@ sub startup {
 				my $req_username = shift @{$req_url->path->parts};
 				return unless $req_username;
 				my $slug = join '/', @{$req_url->path->parts};
-				my $file = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username, $slug);
-				if (-f $file) {
+				my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username, $slug);
+				if (-f $path) {
 					my $max_age = 24 * 60 * 60;
 					$c->res->headers->cache_control("public, must-revalidate, max-age=$max_age");
-					return $c->reply->file($file);
+					return $c->reply->file($path);
 				}
 			}
 			else {
@@ -353,9 +357,9 @@ sub startup {
 	$r->get(
 		'/.well-known/acme-challenge/:file' => sub {
 			my $c = shift;
-			my $file = path('/var/www/acme/', $c->param('file'));
-			if (-f $file) {
-				return $c->reply->file("$file");
+			my $path = path('/var/www/acme/', $c->param('file'));
+			if (-f $path) {
+				return $c->reply->file($path);
 			}
 			return $c->reply->not_found;
 		})->name('acme_challenge');

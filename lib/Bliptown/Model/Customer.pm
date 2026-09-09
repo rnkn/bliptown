@@ -8,8 +8,8 @@ my $ua = Mojo::UserAgent->new;
 
 sub create_customer {
 	my ($self, $args) = @_;
-	my $username =  $args->{username};
-	my $email =  $args->{email};
+	my $username = $args->{username};
+	my $email = $args->{email};
 	return unless ($username && $email);
 	my $url = $self->util->create_stripe_url("/v1/customers");
 

@@ -6,16 +6,16 @@ use Mojo::UserAgent;
 
 sub read_file {
 	my ($self, $args) = @_;
-	my $file = Mojo::File->new($args->{file});
-	return unless -r $file;
-	my $chars = $file->slurp('UTF-8');
+	my $path = path($args->{filename});
+	return unless -r $path;
+	my $chars = $path->slurp('UTF-8');
 	return { chars => $chars };
 }
 
 sub purge_cdn_file {
 	my ($self, $args) = @_;
 
-	my $path = path($args->{path});
+	my $path = path($args->{filename});
 	$path = $path->to_rel($ENV{BLIPTOWN_DATA_HOME}, 'users');
 
 	my $cdn_url = "https://cdn.blip.town/$path";

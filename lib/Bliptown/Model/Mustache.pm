@@ -1,6 +1,6 @@
 package Bliptown::Model::Mustache;
 use Mojo::Base -base;
-use Mojo::File;
+use Mojo::File qw(path);
 use POSIX qw(strftime);
 
 has 'user';
@@ -65,12 +65,12 @@ sub process_sections {
 
 	while ($text =~ $section_re) {
 		my ($glob, $template) = ($1, $2);
-		my @filenames = $self->util->glob_path($glob, $args->{root}, $args->{filename});
+		my @filenames = $self->util->glob_path($glob, $args->{filename});
 
 		my @items;
 		foreach my $filename (@filenames) {
 			next unless -f $filename;
-			my $chars = Mojo::File->new($filename)->slurp('UTF-8');
+			my $chars = path($filename)->slurp('UTF-8');
 			my ($yaml, undef) = $self->util->split_frontmatter($chars);
 			my $metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
 			my %item_metadata = %$metadata;
@@ -78,7 +78,7 @@ sub process_sections {
 
 			my %parent_metadata = %{$args->{metadata}};
 			%item_metadata = (%parent_metadata, %item_metadata);
-			$item_metadata{url} = $self->util->filename_to_slug($filename, $args->{root});
+			$item_metadata{url} = $self->util->filename_to_slug($filename);
 
 			push @items, \%item_metadata;
 		}
@@ -100,7 +100,7 @@ sub process_partials {
 
 	while ($text =~ $partial_re) {
 		my $slug = $1;
-		my @filenames = $self->util->glob_path($slug, $args->{root}, $args->{filename});
+		my @filenames = $self->util->glob_path($slug, $args->{filename});
 
 		my $partial = '';
 		my @partials;
@@ -172,17 +172,16 @@ sub read_partial {
 	my ($self, $filename, $args) = @_;
 	return unless $filename =~ /\.md$/;
 
-	my $chars = Mojo::File->new($filename)->slurp('UTF-8');
+	my $chars = path($filename)->slurp('UTF-8');
 	my ($yaml, $text) = $self->util->split_frontmatter($chars);
 
 	my %metadata = %{$args->{metadata}};
 	delete $metadata{layout};
 	my $child_metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
-	$child_metadata->{url} = $self->util->filename_to_slug($filename, $args->{root});
+	$child_metadata->{url} = $self->util->filename_to_slug($filename);
 	%metadata = (%metadata, %$child_metadata) if $child_metadata;
 
 	my $child_args = {
-		root     => $args->{root},
 		filename => $filename,
 		recur    => ($args->{recur} // 0) + 1,
 		metadata => \%metadata,

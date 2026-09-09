@@ -6,7 +6,11 @@ use Test::More;
 
 use_ok qw(Bliptown::Model::Util);
 
-my $util = Bliptown::Model::Util->new;
+my $user_path = tempdir;
+
+my $util = Bliptown::Model::Util->new(
+	user_path => $user_path,
+);
 
 subtest 'format_human_size' => sub {
     my $one_mb = 1024 * 1024;
@@ -70,34 +74,29 @@ EOF
 };
 
 subtest 'filename_to_slug strip' => sub {
-	my $root = '/path/to/file';
-	my $filename = "$root/about.md";
-	my $slug = $util->filename_to_slug($filename, $root);
+	my $filename = $user_path->child('about.md');
+	my $slug = $util->filename_to_slug($filename);
 	is $slug, '/about', 'filename_to_slug returns slug';
 };
 
 subtest 'glob_path absolute pattern' => sub {
-	my $root = tempdir(DIR => THIS_DIR);
+	my $a = $user_path->child('a.md')->touch->to_abs->to_string;
+	my $b = $user_path->child('b.md')->touch->to_abs->to_string;
+	my $c = $user_path->child('c.md')->touch->to_abs->to_string;
+	my $ignore = $user_path->child('ignored.md')->touch->to_abs->to_string;
 
-	my $a = $root->child('a.md')->touch->to_abs->to_string;
-	my $b = $root->child('b.md')->touch->to_abs->to_string;
-	my $c = $root->child('c.md')->touch->to_abs->to_string;
-	my $ignore = $root->child('ignored.md')->touch->to_abs->to_string;
-
-	my @got = $util->glob_path('/*.md', $root->to_abs->to_string, $ignore);
+	my @got = $util->glob_path('/*.md', $ignore);
 	my @expected = ($a, $b, $c);
 	is_deeply [sort @got], [sort @expected], 'glob_path returns correct files';
 };
 
 subtest 'glob_path relative pattern' => sub {
-	my $root = tempdir(DIR => THIS_DIR);
+	my $a = $user_path->child('a.md')->touch->to_abs->to_string;
+	my $b = $user_path->child('b.md')->touch->to_abs->to_string;
+	my $c = $user_path->child('c.md')->touch->to_abs->to_string;
+	my $ignore = $user_path->child('ignored.md')->touch->to_abs->to_string;
 
-	my $a = $root->child('a.md')->touch->to_abs->to_string;
-	my $b = $root->child('b.md')->touch->to_abs->to_string;
-	my $c = $root->child('c.md')->touch->to_abs->to_string;
-	my $ignore = $root->child('ignored.md')->touch->to_abs->to_string;
-
-	my @got = $util->glob_path('*.md', undef, $ignore);
+	my @got = $util->glob_path('*.md', $ignore);
 	my @expected = ($a, $b, $c);
 	is_deeply [sort @got], [sort @expected], 'glob_path returns correct files';
 };

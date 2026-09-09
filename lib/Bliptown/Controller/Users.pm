@@ -86,7 +86,7 @@ sub user_login {
 
 sub user_auth {
 	my $c = shift;
-	my $token = $c->param('token')	// '';
+	my $token = $c->param('token') // '';
 	my $redirect = $c->param('back_to') // '/';
 
 	my $host = $c->req->url->to_abs->host;
@@ -161,7 +161,7 @@ sub generate_logout {
 
 sub user_logout {
 	my $c = shift;
-	my $token = $c->param('token')	// '';
+	my $token = $c->param('token') // '';
 	my $redirect = $c->param('back_to') // '/';
 
 	my $host = $c->req->url->to_abs->host;
