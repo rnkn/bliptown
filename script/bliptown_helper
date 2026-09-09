@@ -140,12 +140,20 @@ sub update_relayd_keypairs {
 	return 'relayd keypairs up-to-date';
 }
 
+sub chdir_home {
+	my $user = shift;
+	my $home = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+	chdir $home or die "Cannot change directory: $home ($!)";
+	return $home->to_string;
+}
+
 sub write_blob {
 	my $payload = shift;
+	my $home = chdir_home($payload->{system_user});
 	my $filename = $payload->{filename};
 	my $b64_encoded = $payload->{blob};
 	my $blob = b64_decode($b64_encoded);
-	my $path = path $filename;
+	my $path = path($filename);
 	my $dir = $path->dirname;
 	$dir->make_path or die "Cannot create path: $dir ($!)";;
 	$path->spew($blob) or die "Cannot write file: $path ($!)";
@@ -154,6 +162,7 @@ sub write_blob {
 
 sub backup_file {
 	my $payload = shift;
+	my $home = chdir_home($payload->{system_user});
 	my $filename = $payload->{filename};
 	my $path = path $filename;
 	$path->copy_to("${filename}~") or die "Cannot backup file: $path ($!)";
@@ -162,6 +171,7 @@ sub backup_file {
 
 sub update_file {
 	my $payload = shift;
+	my $home = chdir_home($payload->{system_user});
 	my $filename = $payload->{filename};
 	my $content = $payload->{content};
 	my $path = path $filename;
@@ -176,6 +186,7 @@ sub update_file {
 
 sub rename_file {
 	my $payload = shift;
+	my $home = chdir_home($payload->{system_user});
 	my $filename = $payload->{filename};
 	my $path = path $filename;
 	my $new_filename = $payload->{new_filename};
@@ -191,6 +202,7 @@ sub rename_file {
 
 sub delete_file {
 	my $payload = shift;
+	my $home = chdir_home($payload->{system_user});
 	my $filename = $payload->{filename};
 	if (-d $filename) {
 		path($filename)->remove_tree or die "Cannot delete directory: $filename ($!)";
@@ -203,6 +215,7 @@ sub delete_file {
 
 sub make_directory {
 	my $payload = shift;
+	my $home = chdir_home($payload->{system_user});
 	my $dir = $payload->{filename};
 	path($dir)->make_path or die "Cannot create directory: $dir ($!)";
 	return "Created directory: $dir";
@@ -211,10 +224,9 @@ sub make_directory {
 sub git_init {
 	my $payload = shift;
 	my $user = $payload->{system_user};
+	my $repo = chdir_repo($user);
 	my $worktree = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
-	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	my $excludes_file = '/etc/gitignore';
-	chdir $repo or die "Cannot change directory: $repo ($!)";
 
 	system(qw(git init --bare -q)) == 0
 		or die "Cannot initialize repository: $repo ($!)";
@@ -241,11 +253,16 @@ EOF
 	return "Initialized Git repository: $repo";
 }
 
-sub git_log {
-	my $payload = shift;
-	my $user = $payload->{system_user};
+sub chdir_repo {
+	my $user = shift;
 	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	chdir $repo or die "Cannot change directory: $repo ($!)";
+	return $repo->to_string;
+}
+
+sub git_log {
+	my $payload = shift;
+	chdir_repo($payload->{system_user});
 	my $out = `git log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b%x01" --max-count=50`;
 
 	my @commits;
@@ -264,11 +281,9 @@ sub git_log {
 
 sub git_show {
 	my $payload = shift;
-	my $user = $payload->{system_user};
+	chdir_repo($payload->{system_user});
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
-	chdir $repo or die "Cannot change directory: $repo ($!)";
 	my $out = `git show $hash`;
 	return unless length $out;
 	return $out;
@@ -277,10 +292,10 @@ sub git_show {
 sub git_commit {
 	my $payload = shift;
 	my $user = $payload->{system_user};
+	chdir_repo($user);
 	my $worktree = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
 	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
 	git_init($payload);
-	chdir $repo or die "Cannot change directory: $repo ($!)";
 
 	system('git', "--work-tree=$worktree", 'add', '-A') == 0
 		or die "Cannot add files to $repo";
@@ -299,11 +314,10 @@ sub git_commit {
 
 sub git_checkout {
 	my $payload = shift;
-	my $user = $payload->{system_user};
-	my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+	my $home = chdir_home($payload->{system_user});
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $dir = path($root, 'snapshots', $hash);
+	my $dir = path($home, 'snapshots', $hash);
 	$dir->make_path or die "Cannot make path: $dir ($!)";
 	my $tarball = git_archive($payload);
 	system('tar', '-xzf', $tarball, '-C', $dir) == 0
@@ -314,13 +328,11 @@ sub git_checkout {
 
 sub git_archive {
 	my $payload = shift;
-	my $user = $payload->{system_user};
-	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
+	chdir_repo($payload->{system_user});
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $tmpfile = tempfile(UNLINK => 0)->chmod(0644);
 	git_init($payload);
-	chdir $repo or die "Cannot change directory: $repo ($!)";
 	system('git', 'archive', '--format=tar.gz', '-o', $tmpfile, $hash) == 0
 		or die "Failed to extract archive from hash: $hash ($!)";
 	return $tmpfile->to_string;
