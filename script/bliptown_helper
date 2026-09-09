@@ -346,12 +346,12 @@ my %allowed_commands = (
 sub handle_conn {
 	my $conn = shift;
 
-	my $req_blob;
+	my $req_json;
 	while (read($conn, my $buf, 512)) {
-		$req_blob .= $buf;
+		$req_json .= $buf;
 	}
 
-	my $data = decode_json($req_blob);
+	my $data = decode_json($req_json);
 	my $command = $data->{command};
 	my $payload = $data->{payload};
 
@@ -394,13 +394,13 @@ sub handle_conn {
 	};
 	$err = $@;
 
-	my $res_blob = encode_json(
+	my $res_json = encode_json(
 		{
 			info => $res,
 			error => $err,
 		});
 
-	$conn->send($res_blob) or warn "Cannot send response ($!)";
+	$conn->send($res_json) or warn "Cannot send response ($!)";
 	return;
 }
 

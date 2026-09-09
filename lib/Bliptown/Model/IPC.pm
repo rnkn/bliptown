@@ -31,18 +31,18 @@ sub send_message {
 		},
 	};
 
-	my $req_blob = encode_json($data);
-	my $res_blob = '';
+	my $req_json = encode_json($data);
+	my $res_json = '';
 
-	$client->send($req_blob)	or die "Cannot send data to socket ($!)";
+	$client->send($req_json)	or die "Cannot send data to socket ($!)";
 	$client->shutdown(SHUT_WR)	or die "Cannot shutdown socket ($!)";
 
 	while (read($client, my $buf, 512)) {
-		$res_blob .= $buf;
+		$res_json .= $buf;
 	}
 
 	$client->close;
-	my $res = decode_json($res_blob);
+	my $res = decode_json($res_json);
 	return $res;
 }
 
