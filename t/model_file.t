@@ -22,8 +22,8 @@ subtest 'read_file' => sub {
 };
 
 subtest 'purge_cdn_file' => sub {
-	my $url = 'https://example.com/dog.jpg';
-	my $res = $file->purge_cdn_file({ url => $url });
+	my $path = path($user_dir, $filename)->to_abs->to_string;
+	my $res = $file->purge_cdn_file({ path => $path });
 	ok $res = 404;
 };
 
