@@ -9,7 +9,7 @@ use lib DIR . '/../lib', DIR . '/../local/lib/perl5';
 use IO::Socket::UNIX;
 use POSIX qw(setgid setuid pause WNOHANG);
 use Mojo::File qw(path tempfile);
-use Mojo::Util qw(trim);
+use Mojo::Util qw(trim b64_decode);
 use Mojo::JSON qw(encode_json decode_json);
 
 my $has_unveil = eval {
@@ -143,7 +143,8 @@ sub update_relayd_keypairs {
 sub write_blob {
 	my $payload = shift;
 	my $filename = $payload->{filename};
-	my $blob = $payload->{blob};
+	my $b64_encoded = $payload->{blob};
+	my $blob = b64_decode($b64_encoded);
 	my $path = path $filename;
 	my $dir = $path->dirname;
 	$dir->make_path or die "Cannot create path: $dir ($!)";;
