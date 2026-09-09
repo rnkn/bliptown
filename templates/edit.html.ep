@@ -6,11 +6,7 @@
 			<%= $title %>
 			% } elsif (current_route eq 'edit_page') {
 			<%= $title %>
-			% if ($slug =~ /^_/) {
-			<%= $slug %>
-			% } else {
 			<a href="/<%= $slug %>"><%= $slug %></a>
-			% }
 			% }
 		</h1>
 	</header>
