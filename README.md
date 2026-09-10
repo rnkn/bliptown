@@ -50,6 +50,8 @@ and credentials. The server runs OpenBSD.
 
 ## Configuration
 
+Initial system setup:
+
 	# syspatch
 	# cat <<EOF >> /etc/mail/aliases
 	root: rnkn
@@ -85,21 +87,15 @@ and credentials. The server runs OpenBSD.
 	# crontab -l | head -2
 	MAXMIND_ID=*******
 	MAXMIND_KEY=************************************_mmk
-	# geolite2_endpoint="https://${MAXMIND_ID}:${MAXMIND_KEY}@download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz"
-	# ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint"
-	# tar -C /var/db/GeoIP -xzf /tmp/geolite2-country.tar.gz
-	# mv /var/db/GeoIP/GeoLite2-Country_*/*.mmdb \
-		/var/db/GeoIP/geolite2-country-current.mmdb
-	# rm -rf /var/db/GeoIP/GeoLite2-Country_*
 
 ## Installation
 
 Install required packages:
 
-	# pkg_add sqlite3 libffi md4c libqrencode png git sqlports libmaxminddb \
-		curl jq monit p5-DBI p5-DBD-SQLite pkglocatedb
+	# pkg_add sqlite3 libffi md4c git sqlports libmaxminddb jq monit \
+		p5-DBI p5-DBD-SQLite pkglocatedb
 
-Build and install [Carton](https://metacpan.org/pod/Carton):
+Build and install [Carmel](https://metacpan.org/pod/Carmel):
 
 	$ cd /tmp
 	$ ftp https://cdn.openbsd.org/pub/OpenBSD/$(uname -r)/{ports.tar.gz,SHA256.sig}
@@ -108,8 +104,8 @@ Build and install [Carton](https://metacpan.org/pod/Carton):
 	# tar xzf /tmp/ports.tar.gz
 	# chown -R :wsrc ports
 	# chmod -R g+w ports
-	$ /usr/ports/infrastructure/bin/portgen p5 Carton
-	$ cd /usr/ports/mystuff/cpan/p5-Carton
+	$ /usr/ports/infrastructure/bin/portgen p5 Carmel
+	$ cd /usr/ports/mystuff/cpan/p5-Carmel
 	# make install
 
 Install Bliptown app:
@@ -118,19 +114,23 @@ Install Bliptown app:
 	$ cd /usr/local/www
 	$ git clone /home/rnkn/git/bliptown.git
 	$ cd bliptown
-	# carton install
+	# carmel install
+	# carmel rollout
 	# cd etc
 	# cp hourly.local daily.local weekly.local \
-		httpd.conf pf.conf relayd.conf monitrc motd /etc
+		httpd.conf pf.conf relayd.conf rc.local \
+		gitignore monitrc motd /etc
+	# cat syslog.conf /etc/syslog.conf > /tmp/syslog.conf.tmp
+	# mv /tmp/syslog.conf.tmp /etc/syslog.conf
 	# install -m 755 -o root -g bin etc/rc.d/bliptown_helper /etc/rc.d/
 	# install -m 755 -o root -g bin etc/rc.d/bliptown /etc/rc.d/
 	# cat <<EOF >> /etc/login.conf
 	bliptown:\
 		:setenv=\
 	BLIPTOWN_SECRET=***********,\
-	BLIPTOWN_HEALTH_FILE=/tmp/bliptown.health,\
-	BLIPTOWN_HELPER_HEALTH_FILE=/tmp/bliptown_helper.health,\
-	BLIPTOWN_HELPER_SOCKET=/var/run/bliptown_helper.sock,\
+	BLIPTOWN_HEALTH_FILE=
+	BLIPTOWN_HELPER_HEALTH_FILE=
+	BLIPTOWN_HELPER_SOCKET=
 	BLIPTOWN_DOMAIN=blip.town,\
 	BLIPTOWN_IPV4=**.***.**.***,\
 	BLIPTOWN_IPV6=****:****:****:****::*,\
@@ -141,23 +141,44 @@ Install Bliptown app:
 	BLIPTOWN_MD4C_LIB=/usr/local/lib/libmd4c-html.so.0.0,\
 	BLIPTOWN_MD4C_HTML_LIB=/usr/local/lib/libmd4c-html.so.0.0,\
 
+	BLIPTOWN_SECRET=*************,\
+	BLIPTOWN_HEALTH_FILE=/tmp/bliptown.health,\
+	BLIPTOWN_HELPER_HEALTH_FILE=/tmp/bliptown_helper.health,\
+	BLIPTOWN_HELPER_SOCKET=/var/run/bliptown_helper.sock,\
+	BLIPTOWN_DOMAIN=blip.town,\
+	BLIPTOWN_SCHEME=https,\
+	BLIPTOWN_PORT=,\
+	BLIPTOWN_IPV4=**.**.**.**,\
+	BLIPTOWN_IPV6=****\c****\c****\c****\c\c1,\
+	BLIPTOWN_SMTP_ADDR=*************,\
+	BLIPTOWN_SMTP_PORT=465,\
+	BLIPTOWN_SMTP_LOGIN=*************,\
+	BLIPTOWN_SMTP_PASS=*************,\
+	BLIPTOWN_DATA_HOME=/home/bliptown,\
+	BLIPTOWN_DB=/var/db/bliptown/users.db,\
+	BLIPTOWN_DB_SCHEMA=**,\
+	BLIPTOWN_LOG_HOME=/var/log/bliptown,\
+	BLIPTOWN_GEOIP_DB=/var/db/GeoIP/geolite2-country-current.mmdb,\
+	BLIPTOWN_MD4C_HTML_LIB=/usr/local/lib/libmd4c-html.so.0.0,\
+	BLIPTOWN_CDN_API_HOST=*************,\
+	BLIPTOWN_CDN_API_KEY=*************,\
+	BLIPTOWN_STRIPE_API_KEY=sk_live_*************,\
+	BLIPTOWN_STRIPE_PRICE_ID=price_*************,\
+	BLIPTOWN_DEMO_USER=demo,\
+	BLIPTOWN_THEME_USER=themes,\
+
 	bliptown_helper:\
-		:setenv=\
+        :setenv=\
 	BLIPTOWN_HELPER_HEALTH_FILE=/tmp/bliptown_helper.health,\
 	BLIPTOWN_HELPER_SOCKET=/var/run/bliptown_helper.sock,\
 	BLIPTOWN_HELPER_PREFORK=4,\
-	BLIPTOWN_DOMAIN=blip.town,\
 	BLIPTOWN_GID=****,\
-	BLIPTOWN_USER_HOME=/home/bliptown/users,\
+	BLIPTOWN_DATA_HOME=/home/bliptown,\
 	BLIPTOWN_KEYPAIR_FILE=/etc/relayd-keypairs.conf,\
 	BLIPTOWN_ACME_FILE=/etc/acme-domains.conf:
-
 	EOF
+	# sh /etc/hourly.local
+	# sh /etc/daily.local
 	# sh /etc/weekly.local
 	# rcctl enable httpd relayd bliptown_helper bliptown monit
 	# rcctl start httpd relayd bliptown_helper bliptown monit
-
-Install optional packages:
-
-	# pkg_add rlwrap emacs vim nano sfeed stagit
-
