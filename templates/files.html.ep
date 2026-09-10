@@ -56,7 +56,7 @@
 			<input type="checkbox" id="create-directory-toggle" hidden>
 			<a href="<%= url_for('list_files', catchall => '') %>">home</a> /
 			% foreach my $crumb (@$breadcrumbs) {
-			<a href="<%= url_for('list_files', catchall => $crumb->{path}) %>"><%= $crumb->{name} %></a> /
+			<a href="<%= url_for('list_files', catchall => $crumb->{path}) %>"><%= $crumb->{dirname} %></a> /
 			% }
 			<label id="create-directory-toggle" for="create-directory-toggle">+</label>
 			<div id="create-directory-controls">

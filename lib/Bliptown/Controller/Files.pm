@@ -93,9 +93,9 @@ sub list_files {
 
 		while (@breadcrumb_dirs) {
 			my $path_to_string = join '/', @breadcrumb_dirs;
-			my $name = pop @breadcrumb_dirs;
+			my $dirname = pop @breadcrumb_dirs;
 			my %crumb = (
-				name => $name,
+				dirname => $dirname,
 				path => $path_to_string,
 			);
 			push @breadcrumbs, \%crumb;
