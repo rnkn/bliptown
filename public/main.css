@@ -170,6 +170,7 @@ main {
 	padding-right: 4rem;
 	background-color: inherit;
 	scrollbar-width: none;
+	overflow: auto;
 }
 
 main a {
