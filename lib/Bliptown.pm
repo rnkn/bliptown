@@ -259,7 +259,7 @@ sub startup {
 			return unless $user_path;
 			my $path = path($user_path, $slug)->to_abs;
 			return $path if -f $path;
-			foreach my $ext (@{$c->config->{render_exts}}) {
+			foreach my $ext (@{$c->app->config->{render_exts}}) {
 				my $f = path($user_path, "$slug.$ext")->to_abs;
 				return $f if -f $f;
 			}

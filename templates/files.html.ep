@@ -1,6 +1,6 @@
 % layout 'default';
 % my $disabled = $locked ? 'disabled' : '';
-% my $render_exts_re = join '|', @{$c->config->{render_exts}};
+% my $render_exts_re = join '|', @{$c->app->config->{render_exts}};
 <nav>
 	<header>
 		<h1><%= $title %></h1>

@@ -52,7 +52,7 @@ sub list_files {
 		my $filename_rel_user_path = decode('UTF-8', $path->to_rel($user_path)->to_string);
 		my $filename_rel_dir_path = decode('UTF-8', $path->to_rel($dir_path)->to_string);
 		my $is_dir = -d $filename;
-		my $exts_re = join '|', @{$c->config->{render_exts}};
+		my $exts_re = join '|', @{$c->app->config->{render_exts}};
 		my $url = $filename_rel_user_path =~ s/\.($exts_re)$//r;
 
 		push @files, {

@@ -191,7 +191,7 @@ sub new_page {
 		 $slug = $1;
 		 $ext = $2;
 	};
-	return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{render_exts}};
+	return $c->reply->not_found unless grep { $ext eq $_} @{$c->app->config->{render_exts}};
 
 	if (!$slug || $slug =~ m{/$}) {
 		unless ($c->get_file("$slug/index")) {
@@ -262,7 +262,7 @@ sub edit_page {
 	}
 	return $c->redirect_to('new_page', catchall => $slug) unless -f $path;
 	my $ext = $c->param('ext') || $path->extname || 'md';
-	return $c->reply->not_found unless grep { $ext eq $_} @{$c->config->{render_exts}};
+	return $c->reply->not_found unless grep { $ext eq $_} @{$c->app->config->{render_exts}};
 	my $rel_filename = $path->to_rel($user_path)->to_string;
 	my $basename = $rel_filename =~ s/\.[^.]+?$//r;
 	my $content;
