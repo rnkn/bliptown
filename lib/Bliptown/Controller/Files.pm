@@ -47,8 +47,8 @@ sub list_files {
 	my $max_depth = $search_re ? undef : 1;
 	my @tree = $dir_path->list_tree({ dir => 1, max_depth => $max_depth })->each;
 	foreach my $path (@tree) {
+		my $stats = $path->stat;
 		my $filename = decode('UTF-8', $path->to_string);
-		my @stats = stat($filename);
 		my $filename_rel_user_path = decode('UTF-8', $path->to_rel($user_path)->to_string);
 		my $filename_rel_dir_path = decode('UTF-8', $path->to_rel($dir_path)->to_string);
 		my $is_dir = -d $filename;
@@ -60,8 +60,8 @@ sub list_files {
 			rel_filename => $filename_rel_dir_path,
 			is_dir => $is_dir,
 			url => $url,
-			size => $stats[7],
-			mtime => $stats[9],
+			size => $stats->size,
+			mtime => $stats->mtime,
 		}
 	};
 
