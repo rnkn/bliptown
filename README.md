@@ -11,6 +11,7 @@ and credentials. The server runs OpenBSD.
 - Run a single test: `carmel exec prove t/controller_files.t`
 - Syntax check a file: `carmel exec perl -w -c lib/Bliptown.pm`
 - The deployed app starts with `perl -Ilocal/lib/perl5/script/bliptown`
+- Generate an analytics report from access logs: `script/bliptown_analytics`
 
 ## Architecture ##
 
@@ -28,6 +29,19 @@ and credentials. The server runs OpenBSD.
 - Routing is host-aware: `get_req_username` maps subdomains/custom
   domains to a user, and the page/file helpers always resolve paths
   relative to that user's home.
+- Site versioning (history, restore, diff) is implemented as git
+  operations (`git_commit`, `git_log`, `git_show`, `git_checkout`,
+  `git_archive`) run by `script/bliptown_helper` and surfaced through
+  `Controller::Snapshots`, reusing the same privileged-IPC mechanism
+  as filesystem operations.
+- Custom domains are verified in `Model::DNS`, which checks that a
+  domain's A/AAAA records point at the server and that a `_bliptown`
+  TXT record matches the owning user.
+- User login is passwordless: `Controller::Users` and `Model::Email`
+  implement a magic-link flow (one-time tokens in SQLite, emailed via
+  `Mojo::SMTP::Client`).
+- Billing (`Model::Checkout`, `Model::Customer`) talks to the Stripe
+  REST API directly via `Mojo::UserAgent`.
 
 ## Conventions ##
 
@@ -43,6 +57,8 @@ and credentials. The server runs OpenBSD.
   `reply->exception`, while user-facing validation issues use flash
   messages and redirects.
 - `demo` is treated as a restricted account for destructive actions.
+- Controller/model tests avoid the real `bliptown_helper` socket by
+  swapping in `t/lib/FakeIPC.pm` for the `ipc` helper.
 - Prefer simple, pragmatic, clear, elegant code. Follow the 12 Factor
   App methodology, except for "Twelve-factor apps also do not rely on
   the implicit existence of any system tools" as Bliptown is deeply
@@ -118,12 +134,13 @@ Install Bliptown app:
 	# carmel rollout
 	# cd etc
 	# cp hourly.local daily.local weekly.local \
-		httpd.conf pf.conf relayd.conf rc.local \
-		gitignore monitrc motd /etc
-	# cat syslog.conf /etc/syslog.conf > /tmp/syslog.conf.tmp
+		httpd.conf pf.conf relayd.conf rc.local newsyslog.conf \
+		gitignore monitrc motd usermgmt.conf /etc
 	# mv /tmp/syslog.conf.tmp /etc/syslog.conf
+	# cat newsyslog.conf >> /etc/newsyslog.conf
 	# install -m 755 -o root -g bin etc/rc.d/bliptown_helper /etc/rc.d/
 	# install -m 755 -o root -g bin etc/rc.d/bliptown /etc/rc.d/
+	# install -m 755 -o root -g bin etc/rc.d/block_php /etc/rc.d/
 	# cat <<EOF >> /etc/login.conf
 	bliptown:\
 		:setenv=\
@@ -182,3 +199,9 @@ Install Bliptown app:
 	# sh /etc/weekly.local
 	# rcctl enable httpd relayd bliptown_helper bliptown monit
 	# rcctl start httpd relayd bliptown_helper bliptown monit
+
+`etc/rc.d/bliptown_staging` and `bliptown_staging_helper` run a second,
+separate instance of the app (as the `bliptown_staging` user, on
+`127.0.0.1:8081`) for testing changes before they go live; install and
+enable them the same way as the production `bliptown`/`bliptown_helper`
+scripts if a staging instance is needed.
