@@ -579,6 +579,10 @@ nav #controls #additional-controls,
 	padding: 8px;
 }
 
+#breadcrumbs #create-directory-controls {
+	font-size: 0.9em;
+}
+
 nav input#additional-controls-toggle:checked ~ #additional-controls {
 	display: block;
 }
