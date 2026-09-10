@@ -3,9 +3,9 @@ set log /var/log/monit
 set idfile /var/monit/id
 set statefile /var/monit/state
 
-set alert root@blip.town
+set alert rnkn@rnkn.xyz
 
-set mailserver localhost
+include /etc/monitrc-mailserver
 
 set httpd port 2812 readonly
 	allow localhost
@@ -89,7 +89,6 @@ check file script/bliptown path /usr/local/www/bliptown/script/bliptown
 check file script/bliptown_helper path /usr/local/www/bliptown/script/bliptown_helper
 	if failed uid 1008 then alert
 	if failed gid 1008 then alert
-	if failed perm 0755 then alert
 	if failed md5 checksum expect 255e58ecac9e6981b50cf64a13e28aa1 then alert
 
 check file users.db path /var/db/bliptown/users.db
