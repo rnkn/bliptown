@@ -549,6 +549,7 @@ a.exit:before {
 }
 
 nav #controls {
+	font-size: 0.9em;
 	margin: 1em 0;
 }
 
