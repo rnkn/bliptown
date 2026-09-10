@@ -46,21 +46,19 @@
 					<li><a href="<%= url_for('my_site') %>" id="my-site">My Site</a></li>
 					% }
 					<li><a href="https://blip.town/faq">Help</a></li>
-					<form action="<%= url_for('generate_logout') %>" method="POST">
-						<input name="back_to" value="<%= url_for %>" hidden>
-						<button type="submit">Logout</button>
-					</form>
+					<li>
+						<form action="<%= url_for('generate_logout') %>" method="POST">
+							<input name="back_to" value="<%= url_for %>" hidden>
+							<button type="submit">Logout</button>
+						</form>
+					</li>
 				</ul>
 			</div>
 			% } else {
 			<div id="join" class="panel">
 				<form method="POST" action="<%= url_for('user_join') %>">
-					<div class="input">
-						<input type="text" placeholder="username" pattern="[a-zA-Z][a-zA-Z0-9_\-]*" name="username" maxlength="31" required disabled>
-					</div>
-					<div class="input">
-						<input type="email" placeholder="email" name="email" maxlength="254" required disabled>
-					</div>
+					<input type="text" placeholder="username" pattern="[a-zA-Z][a-zA-Z0-9_\-]*" name="username" maxlength="31" required disabled>
+					<input type="email" placeholder="email" name="email" maxlength="254" required disabled>
 					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit" disabled>Join</button>
 				</form>
@@ -75,9 +73,7 @@
 				</div>
 				% }
 				<form action="<%= url_for('generate_login') %>" method="POST">
-					<div>
-						<input type="text" placeholder="username" name="username" required>
-					</div>
+					<input type="text" placeholder="username" name="username" required>
 					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit">Login</button>
 				</form>

@@ -64,9 +64,19 @@ ul ul {
 	padding-left: 1em;
 }
 
-dialog {
+button:hover {
+	background-color: rgb(244,244,244);
+	cursor: pointer;
+}
+
+ul li > button, ul li > form {
+	position: relative;
+	top: -0.25em;
+}
+
+dialog.modal {
 	position: absolute;
-	top: 50%;
+	top: 33%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	padding: 2rem;
@@ -94,7 +104,11 @@ details summary:hover {
 }
 
 button, input, select {
-	font-size: 14px;
+	font-size: inherit;
+	padding: 0.25em;
+	background-color: white;
+	border: 1px solid rgb(162,162,162);
+	border-radius: 0;
 }
 
 button {
@@ -249,7 +263,7 @@ main textarea {
 	font-weight: initial;
 }
 
-#drawer .panel form {
+#drawer .panel ul li form {
 	display: flex;
 	gap: 1em;
 }
@@ -473,9 +487,10 @@ a.exit:before {
 
 #list details ul {
 	display: flex;
-	gap: 0.5em 1em;
+	gap: 1em;
 	list-style: none;
 	padding: 4px;
+	margin: 0 4px;
 }
 
 #list details ul li {
