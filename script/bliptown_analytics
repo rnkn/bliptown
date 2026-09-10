@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use File::Basename;
-use constant CWD => dirname(__FILE__);
-use lib CWD . "/../lib", CWD . "/../local/lib/perl5";
+use constant THIS_DIR => dirname(__FILE__);
+use lib THIS_DIR . "/../lib", THIS_DIR . "/../local/lib/perl5";
 
 use HTTP::BrowserDetect;
 use POSIX qw(strftime);
