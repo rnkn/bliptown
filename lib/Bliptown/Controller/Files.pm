@@ -176,17 +176,16 @@ sub rename_files_regex {
 sub rename_file {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $redirect = $c->param('back_to')
-		// $c->url_for('list_files', catchall => '');
+	my $filename = $c->param('filename');
+	my $new_filename = $c->param('new_filename');
+	my $redirect = $c->param('back_to') // $c->url_for('list_files');
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $slug = $c->param('catchall');
-	my $filename = path($user_path, $slug)->to_abs->to_string;
-	return $c->reply->not_found unless -e $filename;
-	my $new_name = $c->param('name');
-	my $new_path = path($user_path, $new_name)->to_abs;
+	my $path = path($user_path, $filename)->to_abs;
+	return $c->reply->not_found unless -e $path;
+	my $new_path = path($user_path, $new_filename)->to_abs;
 
-	if (-d $new_path && $new_path =~ m{^\Q$filename\E(/|$)}) {
-		$c->flash(info => "Cannot move $slug into itself!");
+	if (-d $new_path && $new_path =~ m{^\Q$path\E(/|$)}) {
+		$c->flash(info => "Cannot move $filename into itself!");
 		return $c->redirect_to($redirect);
 	}
 
@@ -201,10 +200,10 @@ sub rename_file {
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	my $message;
-	if (-d $filename) {
-		$message = "Directory $slug renamed to $new_name";
+	if (-d $path) {
+		$message = "Directory $filename renamed to $new_filename";
 	} else {
-		$message = "File $slug renamed to $new_name";
+		$message = "File $filename renamed to $new_filename";
 	}
 	$c->flash(info => $message);
 	return $c->redirect_to($redirect);
