@@ -19,7 +19,7 @@
 </nav>
 <main id="edit" class="backstage">
 	<section class="one-column">
-		<form method="POST" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">
+		<form method="POST" action="<%= url_for('save_page')->query(back_to => $redirect) %>">
 			<div id="filename">
 				<input type="text" name="slug" value="<%= $slug %>" required>
 				<select id="ext" name="ext">
