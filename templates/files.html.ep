@@ -48,17 +48,41 @@
 <main id="files" class="backstage">
 	<section class="one-column">
 		<div id="breadcrumbs">
-			<input type="checkbox" id="create-directory-toggle" hidden>
+			<input type="checkbox" id="current-directory-controls-toggle" hidden>
 			<a href="<%= url_for('list_files', catchall => '') %>">home</a> /
 			% foreach my $crumb (@$breadcrumbs) {
 			<a href="<%= url_for('list_files', catchall => $crumb->{path}) %>"><%= $crumb->{dirname} %></a> /
 			% }
-			<label id="create-directory-toggle" for="create-directory-toggle">+</label>
-			<div id="create-directory-controls">
-				<form id="create-directory" method="post" action="<%= url_for->query(action => 'new_directory') %>">
-					<input placeholder="directory" name="name">
-					<button type="submit">Create</button>
-				</form>
+			<label id="current-directory-controls-toggle" for="current-directory-controls-toggle">+</label>
+			<div id="current-directory-controls" class="controls">
+				<button popovertarget="new-file-popover">New File</button>
+				<dialog id="new-file-popover" class="modal" popover>
+					<form id="new-file" method="POST" action="<%= url_for('new_file')->query(back_to => url_for) %>">
+						<input type="text" name="filename">
+						<select id="ext" name="ext">
+							% foreach my $render_ext (@{$c->app->config->{render_exts}}) {
+							<option value="<%= $render_ext %>" <%= 'selected' if $ext eq $render_ext %>><%= ".$render_ext" %></option>
+							% }
+						</select>
+						<button type="submit">Create File</button>
+					</form>
+				</dialog>
+				<button popovertarget="new-directory-popover">New Directory</button>
+				<dialog id="new-directory-popover" class="modal" popover>
+					<form id="new-directory" method="POST" action="<%= url_for('list_files')->query(action => 'new_directory') %>">
+						<input type="text" name="name">
+						<input type="text" name="back_to" value="<%= url_for('list_files') %>" hidden>
+						<button type="submit">Create Directory</button>
+					</form>
+				</dialog>
+				<button popovertarget="upload-popover">Upload Files</button>
+				<dialog id="upload-popover" class="modal" popover>
+					<form id="upload" method="POST" action="<%= url_for('upload_files') %>" enctype="multipart/form-data">
+						<input type="file" accept="text/*,image/*,audio/*,video/*,font/*,application/pdf,application/zip,application/gzip"
+							   id="file-uploads" name="file-uploadss" multiple <%= $disabled %>>
+						<button type="submit" <%= $disabled %>>Upload</button>
+					</form>
+				</dialog>
 			</div>
 		</div>
 		<div id="list" class="table">
