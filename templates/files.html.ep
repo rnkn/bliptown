@@ -24,8 +24,7 @@
 			</fieldset>
 			<div id="additional-controls">
 				% if (param('search')) {
-				<form id="replace" method="GET" action="<%= url_for('list_files')%>">
-					<input type="hidden" name="search" value="<%= param('search') %>">
+				<form id="replace" method="POST" action="<%= url_for('rename_files')->query(dir => $dir, search => param('search')) %>">
 					<input type="text" name="replace" placeholder="string" value="<%= param('replace') %>">
 					<button type="submit">Replace Match in Filenames</button>
 				</form>
@@ -126,7 +125,7 @@
 					<li>
 						<button popovertarget="rename-popover-<%= $file->{rel_filename} %>">Rename</button>
 						<dialog id="rename-popover-<%= $file->{rel_filename} %>" class="modal" popover>
-							<form method="POST" action="<%= url_for('rename_file')->query(filename => $file->{abs_filename}, back_to => url_for) %>">
+							<form method="POST" action="<%= url_for('rename_files')->query(filename => $file->{abs_filename}, back_to => url_for) %>">
 								<input type="text" name="new_filename" value="<%= $file->{abs_filename} %>">
 								<button type="submit">Rename</button>
 							</form>

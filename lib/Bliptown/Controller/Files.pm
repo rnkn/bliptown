@@ -21,7 +21,6 @@ sub list_files {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $search = $c->param('search');
-	my $replace = $c->param('replace');
 	my $sort = $c->param('sort') // 'name';
 	my $slug = $c->param('catchall');
 	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
@@ -30,18 +29,6 @@ sub list_files {
 	return $c->reply->not_found unless -d $dir_path;
 
 	my $search_re = glob_to_regex_string($search) if $search;
-
-	if ($search_re && defined $replace) {
-		my $res = $c->rename_files_regex({
-			username => $username,
-			dir => $dir_path->to_string,
-			search => $search_re,
-			replace => $replace
-		});
-		my $message = $res > 1 ? "$res files renamed" : "$res file renamed";
-		$c->flash(info => $message);
-		return $c->redirect_to($c->url_for('list_files')->query(search => $replace));
-	}
 
 	my @files;
 	my $max_depth = $search_re ? undef : 1;
@@ -138,65 +125,62 @@ sub new_directory {
 	return $c->redirect_to($redirect);
 }
 
-sub rename_files_regex {
-	my ($c, $args) = @_;
-	my $username = $args->{username};
-	my $dir = $args->{dir};
-	my $search = $args->{search};
-	my $replace = $args->{replace};
-	my @files = path($dir)->list_tree({ dir => 1 })->each;
-	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @files;
-	my @filenames_abs = map { path($dir, $_)->to_abs->to_string } @filenames;
-	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
-	foreach my $filename (@filenames) {
-		my ($old_filename, $new_filename) = ($filename, $filename);
-		$old_filename = path($dir, $old_filename)->to_abs->to_string;
-		$new_filename =~ s/$search/$replace/g;
-		$new_filename = path($dir, $new_filename)->to_abs->to_string;
+sub rename_files {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $dir = $c->param('dir') // '';
+	my $filename = $c->param('filename');
+	my $new_filename = $c->param('new_filename');
+	my $search = $c->param('search');
+	my $replace = $c->param('replace');
+	my $redirect = $c->param('back_to') // $c->url_for('list_files');
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+
+	my %filename_pairs;
+	if ($search) {
+		return $c->reply->not_found unless $replace;
+
+		my $search_re = glob_to_regex_string($search);
+		my $dir_path = path($user_path, $dir);
+		return $c->reply->not_found unless -d $dir_path;
+
+		my @tree = $dir_path->list_tree({ dir => 1 })->each;
+		my @old_rel_paths = grep { /$search_re/ } map { $_->to_rel($dir_path) } @tree;
+
+		foreach my $old_rel (@old_rel_paths) {
+			my $new_rel = $old_rel =~ s/$search_re/$replace/gr;
+			my $old_abs = path($dir_path, $old_rel)->to_abs->to_string;
+			my $new_abs = path($dir_path, $new_rel)->to_abs->to_string;
+			$filename_pairs{$old_abs} = $new_abs;
+		}
+	}
+	else {
+		my $old_abs_path = path($user_path, $filename)->to_abs;
+		return $c->reply->not_found unless -e $old_abs_path;
+
+		my $new_abs_path = path($user_path, $new_filename)->to_abs;
+
+		if (-d $new_abs_path && $new_abs_path =~ m{^\Q$old_abs_path\E(/|$)}) {
+			$c->flash(info => "Cannot move $filename into itself!");
+			return $c->redirect_to($redirect);
+		}
+
+		$filename_pairs{$old_abs_path->to_string} = $new_abs_path->to_string;
+	}
+
+	foreach my $old_abs (sort { length $b <=> length $a } keys %filename_pairs) {
 		my $res = $c->ipc->send_message({
 			command => 'rename_file',
 			system_user => $username,
-			filename => $old_filename,
-			new_filename => $new_filename,
+			filename => $old_abs,
+			new_filename => $filename_pairs{$old_abs},
 		});
 		return $c->reply->exception($res->{error}) if $res->{error};
 		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 	}
-	return @filenames;
-}
 
-sub rename_file {
-	my $c = shift;
-	my $username = $c->session('username');
-	my $filename = $c->param('filename');
-	my $new_filename = $c->param('new_filename');
-	my $redirect = $c->param('back_to') // $c->url_for('list_files');
-	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $path = path($user_path, $filename)->to_abs;
-	return $c->reply->not_found unless -e $path;
-	my $new_path = path($user_path, $new_filename)->to_abs;
-
-	if (-d $new_path && $new_path =~ m{^\Q$path\E(/|$)}) {
-		$c->flash(info => "Cannot move $filename into itself!");
-		return $c->redirect_to($redirect);
-	}
-
-	my $res = $c->ipc->send_message({
-		command => 'rename_file',
-		system_user => $username,
-		filename => $filename,
-		new_filename => $new_path->to_string,
-	});
-
-	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
-
-	my $message;
-	if (-d $path) {
-		$message = "Directory $filename renamed to $new_filename";
-	} else {
-		$message = "File $filename renamed to $new_filename";
-	}
+	my $count = keys %filename_pairs;
+	my $message = $count > 1 ? "$count files renamed" : "$count file renamed";
 	$c->flash(info => $message);
 	return $c->redirect_to($redirect);
 }
