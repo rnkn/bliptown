@@ -440,7 +440,7 @@ sub startup {
 
 	$protected->post('/_new_directory')->to(controller => 'Files', action => 'new_directory')->name('new_directory');
 	$protected->post('/_new')->to(controller => 'Files', action => 'new_file')->name('new_file');
-	$protected->post('/_delete')->to(controller => 'Files', action => 'delete_file')->name('delete_file');
+	$protected->post('/_delete')->to(controller => 'Files', action => 'delete_files')->name('delete_files');
 	$protected->post('/_rename')->to(controller => 'Files', action => 'rename_file')->name('rename_file');
 	$protected->post('/_backup')->to(controller => 'Files', action => 'backup_file')->name('backup_file');
 	$protected->under($block_demo)->post('/_upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');

@@ -21,7 +21,6 @@ sub list_files {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $search = $c->param('search');
-	my $delete = $c->param('delete');
 	my $replace = $c->param('replace');
 	my $sort = $c->param('sort') // 'name';
 	my $slug = $c->param('catchall');
@@ -31,17 +30,6 @@ sub list_files {
 	return $c->reply->not_found unless -d $dir_path;
 
 	my $search_re = glob_to_regex_string($search) if $search;
-
-	if ($search_re && $delete) {
-		my $res = $c->delete_files_regex({
-			username => $username,
-			dir => $dir_path->to_string,
-			search => $search_re,
-		});
-		my $message = $res > 1 ? "$res files deleted" : "$res file deleted";
-		$c->flash(info => $message);
-		return $c->redirect_to($c->url_for('list_files')->query(search => $search));
-	}
 
 	if ($search_re && defined $replace) {
 		my $res = $c->rename_files_regex({
@@ -213,15 +201,33 @@ sub rename_file {
 	return $c->redirect_to($redirect);
 }
 
-sub delete_files_regex {
-	my ($c, $args) = @_;
-	my $username = $args->{username};
-	my $dir = $args->{dir};
-	my $search = $args->{search};
-	my @tree = path($dir)->list_tree({ dir => 1 })->each;
-	my @filenames = grep { /$search/ } map { $_->to_rel($dir)->to_string } @tree;
-	my @filenames_abs = map { path($dir, $_)->to_abs->to_string } @filenames;
-	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
+sub delete_files {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $dir = $c->param('dir') // '';
+	my $filename = $c->param('filename') // '';
+	my $search = $c->param('search');
+	my $redirect = $c->param('back_to') // $c->url_for('list_files');
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+
+	my @filenames_abs;
+	if ($search) {
+		my $search_re = glob_to_regex_string($search);
+		my $dir_path = path($user_path, $dir);
+		my @tree = $dir_path->list_tree({ dir => 1 })->each;
+		my @filenames = grep { /$search_re/ } map { $_->to_rel($dir_path)->to_string } @tree;
+		@filenames_abs = map { path($dir_path, $_)->to_abs->to_string } @filenames;
+		@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
+	}
+	else {
+		my $path = path($user_path, $filename)->to_abs;
+		if (-d $path && @{$path->list({ dir => 1 })} > 0) {
+			$c->flash(info => "Directory $filename not empty!");
+			return $c->redirect_to($redirect);
+		}
+		@filenames_abs = ($path->to_string);
+	}
+
 	foreach my $filename (@filenames_abs) {
 		my $res = $c->ipc->send_message({
 			command => 'delete_file',
@@ -231,30 +237,10 @@ sub delete_files_regex {
 		return $c->reply->exception($res->{error}) if $res->{error};
 		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 	}
-	return @filenames_abs;
-}
 
-sub delete_file {
-	my $c = shift;
-	my $username = $c->session('username');
-	my $filename = $c->param('filename');
-	my $search = $c->param('search');
-	my $redirect = $c->param('back_to') // $c->url_for('list_files', catchall => '');
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $filename)->to_abs;
-	if (-d $path && @{$path->list({ dir => 1 })} > 0) {
-		$c->flash(info => "Directory $filename not empty!");
-		return $c->redirect_to($redirect);
-	}
-
-	my $res = $c->ipc->send_message({
-		command => 'delete_file',
-		system_user => $username,
-		filename => $path->to_string,
-	});
-	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
-
-	$c->flash(info => "File $filename deleted");
+	my $count = @filenames_abs;
+	my $message = $count > 1 ? "$count files deleted" : "$count file deleted";
+	$c->flash(info => $message);
 	return $c->redirect_to($redirect);
 }
 
