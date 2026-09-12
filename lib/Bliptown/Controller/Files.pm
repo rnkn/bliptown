@@ -127,21 +127,12 @@ sub list_files {
 	return $c->render;
 }
 
-sub file_action {
-	my $c = shift;
-	my $slug = $c->param('catchall');
-	my $action = $c->param('action');
-
-	if ($action eq 'new_directory') {
-		my $name = $c->param('name');
-		return $c->new_directory($slug, $name);
-	}
-}
-
 sub new_directory {
-	my ($c, $slug, $name) = @_;
+	my $c = shift;
+	my $dir = $c->param('dir');
+	my $name = $c->param('name');
 	my $username = $c->session('username');
-	my $rel_dir = $slug ? join '/', ($slug, $name) : $name;
+	my $rel_dir = join '/', ($dir, $name);
 	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $rel_dir);
 	my $redirect = $c->url_for('list_files', catchall => $rel_dir);
 	return $c->redirect_to($redirect) if -d $path;
