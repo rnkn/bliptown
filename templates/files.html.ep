@@ -121,17 +121,15 @@
 					<li><a href="<%= url_for('render_raw', catchall => $file->{url}) %>">Raw</a></li>
 					% }
 					<li>
-						<form id="backup" method="POST" action="<%= url_for('backup_file')->query(filename => $file->{abs_filename}) %>">
-							<input type="text" name="back_to" value="<%= url_for %>" hidden>
+						<form method="POST" action="<%= url_for('backup_file')->query(filename => $file->{abs_filename}, back_to => url_for) %>">
 							<button type="submit">Backup</button>
 						</form>
 					</li>
 					<li>
 						<button popovertarget="rename-popover-<%= $file->{rel_filename} %>">Rename</button>
 						<dialog id="rename-popover-<%= $file->{rel_filename} %>" class="modal" popover>
-							<form id="rename" method="POST" action="<%= url_for('rename_file')->query(filename => $file->{abs_filename}, back_to => url_for) %>">
+							<form method="POST" action="<%= url_for('rename_file')->query(filename => $file->{abs_filename}, back_to => url_for) %>">
 								<input type="text" name="new_filename" value="<%= $file->{abs_filename} %>">
-								<input type="text" name="back_to" value="<%= url_for %>" hidden>
 								<button type="submit">Rename</button>
 							</form>
 						</dialog>
@@ -141,7 +139,7 @@
 						<dialog id="delete-popover-<%= $file->{rel_filename} %>" class="modal" popover>
 							<p>Really delete this file?</p>
 							<pre><%= $file->{rel_filename} %></pre>
-							<form id="delete" method="POST" action="<%= url_for('delete_file')->query(filename => $file->{abs_filename}, back_to => url_for) %>">
+							<form method="POST" action="<%= url_for('delete_file')->query(filename => $file->{abs_filename}, back_to => url_for) %>">
 								<button type="submit" class="warning">Delete</button>
 							</form>
 						</dialog>
