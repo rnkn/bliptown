@@ -5,6 +5,18 @@ use Mojo::Util qw(decode);
 use POSIX qw(strftime);
 use Text::Glob qw(glob_to_regex_string);
 
+sub new_file {
+	my $c = shift;
+	my $basename = $c->param('name');
+	my $ext = $c->param('ext');
+	my $dir = $c->param('dir');
+	my $redirect = $c->param('back_to') // $c->url_for('list_files');
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'));
+
+	my $path = path($user_path, $dir, "$basename.$ext")->touch;
+	return $c->redirect_to($redirect);
+}
+
 sub list_files {
 	my $c = shift;
 	my $username = $c->session('username');
