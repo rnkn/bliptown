@@ -27,7 +27,7 @@ sub generate_magic_link_email {
 	$url->host($ENV{BLIPTOWN_DOMAIN});
 	$url->scheme($ENV{BLIPTOWN_SCHEME});
 	$url->port($ENV{BLIPTOWN_PORT}) if $ENV{BLIPTOWN_PORT};
-	$url->path('auth');
+	$url->path('_auth');
 	$url->query(token => $token);
 
 	my %data = (

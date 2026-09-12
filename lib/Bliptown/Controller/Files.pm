@@ -234,12 +234,12 @@ sub delete_files_regex {
 sub delete_file {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $slug = $c->param('catchall');
-	my $redirect = $c->param('back_to')
-		// $c->url_for('list_files', catchall => '');
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $slug)->to_abs;
+	my $filename = $c->param('filename');
+	my $search = $c->param('search');
+	my $redirect = $c->param('back_to') // $c->url_for('list_files', catchall => '');
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $filename)->to_abs;
 	if (-d $path && @{$path->list({ dir => 1 })} > 0) {
-		$c->flash(info => "Directory $slug not empty!");
+		$c->flash(info => "Directory $filename not empty!");
 		return $c->redirect_to($redirect);
 	}
 

@@ -19,7 +19,7 @@
 </nav>
 <main id="edit" class="backstage">
 	<section class="one-column">
-		<form method="post" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">
+		<form method="POST" action="<%= url_for('edit_page')->query(back_to => $redirect) %>">
 			<div id="filename">
 				<input type="text" name="slug" value="<%= $slug %>" required>
 				<select id="ext" name="ext">
@@ -39,7 +39,6 @@
 			</div>
 			% }
 			<div id="controls">
-				<input name="back_to" value="<%= $redirect %>" hidden>
 				<button type="submit" name="action" value="save">Save</button>
 				<button type="submit" name="action" value="save-exit">Save & Exit</button>
 				<a href="<%= param('back_to') || '/' %>">Cancel</a>

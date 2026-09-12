@@ -364,11 +364,11 @@ sub startup {
 			return $c->reply->not_found;
 		})->name('acme_challenge');
 
-	$r->get('/auth')->to(controller => 'Users', action => 'user_auth')->name('user_auth');
-	$r->post('/login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
-	$r->get('/login')->to(controller => 'Users', action => 'user_login')->name('user_login');
-	$r->post('/logout')->to(controller => 'Users', action => 'generate_logout')->name('generate_logout');
-	$r->get('/logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
+	$r->post('/_login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
+	$r->post('/_generate_logout')->to(controller => 'Users', action => 'generate_logout')->name('generate_logout');
+	$r->post('/_logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
+	$r->get('/_auth')->to(controller => 'Users', action => 'user_auth')->name('user_auth');
+	$r->get('/_login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 
 	$r->get('/track/:rand')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');
 
@@ -434,34 +434,35 @@ sub startup {
 		return 1;
 	};
 
-	$private->get('/raw/private/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_private_raw');
+	$private->get('/_raw/private/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_private_raw');
 	$private->get('/private/*catchall')->to(controller => 'Pages', action => 'render_page', catchall => '')->name('render_private_page');
 
-	$protected->get('/new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
-	$protected->get('/edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');
-	$protected->post('/edit/*catchall')->to(controller => 'Pages', action => 'save_page', catchall => '')->name('save_page');
+	$protected->post('/_edit/*catchall')->to(controller => 'Pages', action => 'save_page', catchall => '')->name('save_page');
+	$protected->get('/_new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
+	$protected->get('/_edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');
 
-	$protected->post('/files/*catchall')->to(controller => 'Files', action => 'file_action', catchall => '')->name('file_action');
-	$protected->get('/files/*catchall')->to(controller => 'Files', action => 'list_files', catchall => '')->name('list_files');
-	$protected->get('/rename/*catchall')->to(controller => 'Files', action => 'rename_file', catchall => '')->name('rename_file');
-	$protected->get('/delete/*catchall')->to(controller => 'Files', action => 'delete_file', catchall => '')->name('delete_file');
-	$protected->get('/backup/*catchall')->to(controller => 'Files', action => 'backup_file', catchall => '')->name('backup_file');
-	$protected->under($block_demo)->post('/upload/*catchall')->to(controller => 'Files', action => 'upload_files', catchall => '')->name('upload_files');
+	$protected->post('/_new_directory')->to(controller => 'Files', action => 'file_action')->name('file_action');
+	$protected->post('/_new')->to(controller => 'Files', action => 'new_file')->name('new_file');
+	$protected->post('/_delete')->to(controller => 'Files', action => 'delete_file')->name('delete_file');
+	$protected->post('/_rename')->to(controller => 'Files', action => 'rename_file')->name('rename_file');
+	$protected->post('/_backup')->to(controller => 'Files', action => 'backup_file')->name('backup_file');
+	$protected->under($block_demo)->post('/_upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');
+	$protected->get('/_files/*catchall')->to(controller => 'Files', action => 'list_files', catchall => '')->name('list_files');
 
-	$protected->get('/settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
-	$protected->under($block_demo)->post('/settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
+	$protected->under($block_demo)->post('/_settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
+	$protected->get('/_settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 
-	$protected->get('/snapshots')->to(controller => 'Snapshots', action => 'list_snapshots')->name('list_snapshots');
-	$protected->get('/snapshots/new')->to(controller => 'Snapshots', action => 'take_snapshot')->name('take_snapshot');
-	$protected->get('/snapshots/download/:hash')->to(controller => 'Snapshots', action => 'download_snapshot')->name('download_snapshot');
-	$protected->get('/snapshots/restore/:hash')->to(controller => 'Snapshots', action => 'restore_snapshot')->name('restore_snapshot');
-	$protected->get('/snapshots/diff/:hash')->to(controller => 'Snapshots', action => 'render_diff')->name('render_diff');
+	$protected->post('/_snapshots/new')->to(controller => 'Snapshots', action => 'take_snapshot')->name('take_snapshot');
+	$protected->post('/_snapshots/restore/:hash')->to(controller => 'Snapshots', action => 'restore_snapshot')->name('restore_snapshot');
+	$protected->get('/_snapshots/download/:hash')->to(controller => 'Snapshots', action => 'download_snapshot')->name('download_snapshot');
+	$protected->get('/_snapshots/diff/:hash')->to(controller => 'Snapshots', action => 'render_diff')->name('render_diff');
+	$protected->get('/_snapshots')->to(controller => 'Snapshots', action => 'list_snapshots')->name('list_snapshots');
 
-	$r->get('/health')->to(controller => 'Health', action => 'health_check')->name('health_check');
+	$r->get('/_health')->to(controller => 'Health', action => 'health_check')->name('health_check');
 
 	$r->get('/style.css')->to(controller => 'Pages', action => 'render_style')->name('render_style');
 
-	$r->get('/raw/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_raw');
+	$r->get('/_raw/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_raw');
 	$r->get('/*catchall')->to(controller => 'Pages', action => 'render_page', catchall => '')->name('render_page');
 }
 

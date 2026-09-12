@@ -34,11 +34,11 @@
 			<div id="user" class="panel">
 				<ul>
 					% if ($username && $username eq $req_username) {
-					<li><a href="<%= url_for('new_page', catchall => '')->query(back_to => $redirect) %>">New</a></li>
+					<li><a href="<%= url_for('new_page')->query(back_to => $redirect) %>">New</a></li>
 					% if ($editable) {
 					<li><a href="<%= url_for('edit_page', catchall => get_slug)->query(back_to => $redirect) %>">Edit</a></li>
 					% }
-					<li><a href="<%= url_for('list_files', catchall => '') %>">Files</a></li>
+					<li><a href="<%= url_for('list_files') %>">Files</a></li>
 					<li><a href="/style">Style</a></li>
 					<li><a href="/private/stats">Stats</a></li>
 					<li><a href="<%= url_for('list_settings') %>">Settings</a></li>
@@ -47,8 +47,7 @@
 					% }
 					<li><a href="https://blip.town/faq">Help</a></li>
 					<li>
-						<form action="<%= url_for('generate_logout') %>" method="POST">
-							<input name="back_to" value="<%= url_for %>" hidden>
+						<form id="logout" method="POST" action="<%= url_for('generate_logout')->query(back_to => url_for) %>">
 							<button type="submit">Logout</button>
 						</form>
 					</li>
@@ -72,9 +71,8 @@
 					<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
 				</div>
 				% }
-				<form action="<%= url_for('generate_login') %>" method="POST">
+				<form id="login-credentials" method="POST" action="<%= url_for('generate_login')->query(back_to => url_for) %>">
 					<input type="text" placeholder="username" name="username" required>
-					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit">Login</button>
 				</form>
 			</div>
