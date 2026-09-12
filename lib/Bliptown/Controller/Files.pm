@@ -257,8 +257,8 @@ sub delete_file {
 sub backup_file {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $slug = $c->param('catchall');
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $slug);
+	my $filename = $c->param('filename');
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $filename);
 	return $c->reply->not_found unless -f $path;
 	my $redirect = $c->param('back_to') // $c->url_for('list_files');
 
@@ -271,7 +271,7 @@ sub backup_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
-	$c->flash(info => "File ${slug}~ created");
+	$c->flash(info => "File ${filename}~ created");
 	return $c->redirect_to($redirect);
 }
 
