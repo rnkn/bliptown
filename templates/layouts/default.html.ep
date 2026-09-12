@@ -76,16 +76,13 @@
 		<div id="viewport">
 			<input type="checkbox" id="nav-toggle" hidden>
 			<label id="nav-toggle" class="button" for="nav-toggle"></label>
-			% if (flash('info')) {
-			<input type="checkbox" id="toast-close" hidden checked>
-			<label id="toast-close" class="button" for="toast-close">
-				<div id="toast">
-					<p><%= flash('info') %></p>
-				</div>
-			</label>
-			% }
-			<label id="drawer-toggle" class="button" for="drawer-toggle" style="<%= $drawer_toggle_style %>"></label>
+			<label id="drawer-toggle" class="button" for="drawer-toggle" style="<%= $drawer_toggle_style %>">+</label>
 			%= content
+			% if (flash('info')) {
+			<dialog id="toast" open>
+				<p><%= flash('info') %></p>
+			</dialog>
+			% }
 		</div>
 		<div id="analytics"></div>
 	</body>
