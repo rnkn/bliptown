@@ -105,7 +105,7 @@ sub list_files {
 
 	$c->stash(
 		template => 'files',
-		title => 'Files',
+		page_title => 'Files',
 		locked => $locked,
 		redirect => $c->url_for,
 		breadcrumbs => \@breadcrumbs,

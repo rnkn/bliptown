@@ -3,9 +3,9 @@
 	<header>
 		<h1>
 			% if (current_route eq 'new_page') {
-			<%= $title %>
+			<%= $page_title %>
 			% } elsif (current_route eq 'edit_page') {
-			<%= $title %>
+			<%= $page_title %>
 			<a href="/<%= $slug %>"><%= $slug %></a>
 			% }
 		</h1>

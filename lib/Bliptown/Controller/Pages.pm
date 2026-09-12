@@ -141,24 +141,23 @@ sub render_page {
 		}
 	}
 
-	my $title = 'Untitled';
+	my $site_title = $c->app->defaults('site_title');
 	my $title_path = path($user_path, '_title.txt');
 	if (-f $title_path) {
 		my $title_chars = $title_path->slurp('UTF-8');
-		$title = (split '\n', $title_chars)[0] if $title_chars;
+		$site_title = (split '\n', $title_chars)[0] if $title_chars;
 	}
 
-	my $page_title = $page->{metadata}->{title};
-	$title = "$title – $page_title" if $page_title;
+	my $page_title = $page->{metadata}->{title} // $c->app->defaults('page_title');
 
-	my $desc = 'A very talented artist.';
+	my $desc = $c->app->defaults('description');
 	my $desc_path = path($user_path, '_description.txt');
 	if (-f $desc_path) {
 		my $desc_chars = $desc_path->slurp('UTF-8');
 		$desc = join ' ', split '\n', $desc_chars;
 	}
 
-	my $author = 'Anonymous';
+	my $author = $c->app->defaults('author');
 	my $author_path = path($user_path, '_author.txt');
 	if (-f $author_path) {
 		my $author_chars = $author_path->slurp('UTF-8');
@@ -167,7 +166,8 @@ sub render_page {
 
 	$c->stash(
 		template => 'page',
-		title => $title,
+		site_title => $site_title,
+		page_title => $page_title,
 		description => $desc,
 		author => $author,
 		user_style => 1,
