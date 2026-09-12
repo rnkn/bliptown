@@ -130,7 +130,7 @@ sub collect_partials {
 	@partials = grep { defined $_->{metadata}->{date} } @partials;
 	@partials = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @partials;
 	map { $_->{text} = <<"EOF"
-<div class="blog-post">
+<div class="post">
 
 $_->{text}
 
