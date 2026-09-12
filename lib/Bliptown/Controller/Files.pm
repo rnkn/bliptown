@@ -119,6 +119,7 @@ sub list_files {
 		template => 'files',
 		page_title => 'Files',
 		locked => $locked,
+		dir => $slug,
 		redirect => $c->url_for,
 		breadcrumbs => \@breadcrumbs,
 		files => \@files,
