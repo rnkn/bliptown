@@ -55,10 +55,9 @@
 			</div>
 			% } else {
 			<div id="join" class="panel">
-				<form method="POST" action="<%= url_for('user_join') %>">
+				<form id="join-credentials" method="POST" action="<%= url_for('user_join')->query(back_to => url_for) %>">
 					<input type="text" placeholder="username" pattern="[a-zA-Z][a-zA-Z0-9_\-]*" name="username" maxlength="31" required disabled>
 					<input type="email" placeholder="email" name="email" maxlength="254" required disabled>
-					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit" disabled>Join</button>
 				</form>
 				<label id="drawer-switch-login" class="switch" for="drawer-switch-login">Login</label>
