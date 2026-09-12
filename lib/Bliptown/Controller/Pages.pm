@@ -239,11 +239,10 @@ sub new_page {
 
 sub edit_page {
 	my $c = shift;
-	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
-	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'));
 	my $path;
 	if (!$slug || $slug =~ m{/$}) {
 		unless ($path = $c->get_file("$slug/index")) {
