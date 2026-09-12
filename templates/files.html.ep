@@ -57,8 +57,8 @@
 			<div id="current-directory-controls" class="controls">
 				<button popovertarget="new-file-popover">New File</button>
 				<dialog id="new-file-popover" class="modal" popover>
-					<form id="new-file" method="POST" action="<%= url_for('new_file')->query(back_to => url_for) %>">
-						<input type="text" name="filename">
+					<form id="new-file" method="POST" action="<%= url_for('new_file')->query(dir => $dir, back_to => url_for) %>">
+						<input type="text" name="name">
 						<select id="ext" name="ext">
 							% foreach my $render_ext (@{$c->app->config->{render_exts}}) {
 							<option value="<%= $render_ext %>" <%= 'selected' if $ext eq $render_ext %>><%= ".$render_ext" %></option>
