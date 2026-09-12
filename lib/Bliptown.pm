@@ -293,9 +293,10 @@ sub startup {
 	);
 
 	$app->defaults(
-		title => '',
-		description => '',
-		author => '',
+		site_title => 'Bliptown',
+		page_title => 'Untitled',
+		description => 'A very talented artist',
+		author => 'Anonymous',
 		username => '',
 		user_style => 0,
 		editable => 0,
