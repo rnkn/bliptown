@@ -35,13 +35,17 @@
 			% foreach (@$snapshots) {
 			<details name="snapshot">
 				<summary class="row">
-					<span id="commit-hash" class="cell"><code><%= $_->{hash} %></code></span>
-					<span id="commit-subject" class="cell"><%= $_->{subject} %></span>
-					<span id="commit-date" class="cell right"><%= $_->{date} %></span>
+					<span class="cell commit hash"><code><%= $_->{hash} %></code></span>
+					<span class="cell commit subject"><%= $_->{subject} %></span>
+					<span class="cell commit date right"><%= $_->{date} %></span>
 				</summary>
-				<pre id="commit-body"><%= $_->{body} || 'No commit message' %></pre>
+				<pre class="commit body"><%= $_->{body} || 'No commit message' %></pre>
 				<ul class="controls">
-					<li><a href="<%= url_for('restore_snapshot', hash => $_->{hash}) %>">Restore</a></li>
+					<li>
+						<form method="POST" action="<%= url_for('restore_snapshot')->query(hash => $_->{hash}) %>">
+							<button type="submit">Restore</button>
+						</form>
+					</li>
 					<li><a href="<%= url_for('download_snapshot', hash => $_->{hash}) %>">Download</a></li>
 					<li><a href="<%= url_for('render_diff', hash => $_->{hash}) %>">Changes</a></li>
 				</ul>
