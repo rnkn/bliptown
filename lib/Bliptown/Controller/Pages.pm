@@ -56,8 +56,7 @@ sub render_style {
 		$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $ENV{BLIPTOWN_THEME_USER}, "$theme.css");
 	}
 	else {
-		my $user_path = $c->get_user_path;
-		$path = path($user_path, 'style.css');
+		$path = path($c->get_req_user_path, 'style.css');
 	}
 	if (-f $path) {
 		return $c->reply->file($path);
@@ -69,7 +68,7 @@ sub render_page {
 	my $c = shift;
 	my $req_username = $c->get_req_username;
 	return $c->reply->not_found unless $req_username;
-	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username);
+	my $user_path = $c->get_req_user_path;
 	my $username = $c->session('username');
 
 	my $is_cur_user = $username && $username eq $req_username;

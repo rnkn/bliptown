@@ -182,7 +182,7 @@ sub startup {
 	$app->helper(
 		util => sub {
 			my $c = shift;
-			my $user_path = $c->get_user_path;
+			my $user_path = $c->get_req_user_path;
 			return Bliptown::Model::Util->new(
 				user_path => $user_path,
 			);
@@ -198,7 +198,7 @@ sub startup {
 		});
 
 	$app->helper(
-		get_user_path => sub {
+		get_req_user_path => sub {
 			my $c = shift;
 			my $path = $c->stash('user_home_path');
 			unless ($path) {
@@ -224,7 +224,7 @@ sub startup {
 			my $c = shift;
 			my $req_username = $c->stash('req_username');
 			unless ($req_username) {
-				my $path = $c->get_user_path;
+				my $path = $c->get_req_user_path;
 				return unless $path;
 				$req_username = ${$path->to_array}[-1];
 			}
@@ -255,7 +255,7 @@ sub startup {
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug) = @_;
-			my $user_path = $c->get_user_path;
+			my $user_path = $c->get_req_user_path;
 			return unless $user_path;
 			my $path = path($user_path, $slug)->to_abs;
 			return $path if -f $path;
@@ -338,7 +338,7 @@ sub startup {
 				my $req_username = shift @{$req_url->path->parts};
 				return unless $req_username;
 				my $slug = join '/', @{$req_url->path->parts};
-				my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username, $slug);
+				my $path = path($c->get_req_user_path, $slug)->to_abs;
 				if (-f $path) {
 					my $max_age = 24 * 60 * 60;
 					$c->res->headers->cache_control("public, must-revalidate, max-age=$max_age");
