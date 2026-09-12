@@ -61,15 +61,11 @@
 					<input name="back_to" value="<%= url_for %>" hidden>
 					<button type="submit" disabled>Join</button>
 				</form>
-				<div class="extras">
-					<label id="drawer-switch-login" class="switch" for="drawer-switch-login">Login</label>
-				</div>
+				<label id="drawer-switch-login" class="switch" for="drawer-switch-login">Login</label>
 			</div>
 			<div id="login" class="panel">
 				% if ($req_username eq 'mayor') {
-				<div class="extras">
-					<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
-				</div>
+				<label id="drawer-switch-join" class="switch" for="drawer-switch-join">Join</label>
 				% }
 				<form id="login-credentials" method="POST" action="<%= url_for('generate_login')->query(back_to => url_for) %>">
 					<input type="text" placeholder="username" name="username" required>
