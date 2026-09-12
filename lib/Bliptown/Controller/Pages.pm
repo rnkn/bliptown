@@ -300,7 +300,6 @@ sub save_page {
 	my $ext = $c->param('ext');
 	my $action = $c->param('action');
 	my $path = path($user_path, "$slug.$ext");
-	my $filename = $path->to_string;
 	my $content = $c->param('content');
 	$content =~ s/\r\n/\n/g;
 
@@ -313,7 +312,7 @@ sub save_page {
 	my $res = $c->ipc->send_message({
 		command => 'update_file',
 		system_user => $username,
-		filename => $filename,
+		filename => $path->to_string,
 		content => $content,
 		create_backup => $backup,
 	});
