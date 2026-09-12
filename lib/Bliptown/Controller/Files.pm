@@ -250,7 +250,7 @@ sub delete_file {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
-	$c->flash(info => "File $slug deleted");
+	$c->flash(info => "File $filename deleted");
 	return $c->redirect_to($redirect);
 }
 
