@@ -170,13 +170,13 @@ sub render_page {
 		page_title => $page_title,
 		description => $desc,
 		author => $author,
+		theme => $c->param('theme')		// '',
 		user_style => 1,
-		theme => $c->param('theme'),
 		editable => 1,
-		header => $skel_html{header} || '',
-		menu => $skel_html{menu} || '',
-		footer => $skel_html{footer} || '',
-		content => $page->{html} || '',
+		header => $skel_html{header}	// '',
+		menu => $skel_html{menu}		// '',
+		footer => $skel_html{footer}	// '',
+		content => $page->{html}		// '',
 		redirect => $c->url_for('render_page'),
 	);
 	return $c->render;
