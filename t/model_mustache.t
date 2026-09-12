@@ -96,6 +96,31 @@ EOF
 	ok index($out, 'Post 1') > index($out, 'Post 2'), 'process_sections returns posts in reverse chronological order';
 };
 
+subtest 'collect_partials css class' => sub {
+    my $root = tempdir;
+    my $partial1 = $root->child('partial1.md');
+    my $partial2 = $root->child('partial2.md');
+    
+    my $date1 = '2999-12-31';
+    my $date2 = '3000-01-01';
+    
+    $partial1->spew("---\ndate: $date1\n---\nContent 1\n");
+    $partial2->spew("---\ndate: $date2\n---\nContent 2\n");
+    
+    my $partial_list = [
+        { text => "Content 1\n", metadata => { date => $date1 } },
+        { text => "Content 2\n", metadata => { date => $date2 } }
+    ];
+    
+    my $result = $mustache->collect_partials($partial_list);
+    my @results = @$result;
+    
+    is scalar @results, 2, 'collect_partials returns correct number of results';
+    like $results[0]->{text}, qr/<div class="post">/, 'collect_partials uses .post class';
+    like $results[1]->{text}, qr/<div class="post">/, 'collect_partials uses .post class';
+    unlike $results[0]->{text}, qr/<div class="blog-post">/, 'collect_partials does not use .blog-post class';
+};
+
 subtest 'process_partials partials' => sub {
     my $root = tempdir;
 	$root->child('partial.md')->spew("Partial content.\n");

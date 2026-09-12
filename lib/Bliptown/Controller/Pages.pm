@@ -228,7 +228,7 @@ sub new_page {
 
 	$c->stash(
 		template => 'edit',
-		title => 'New',
+		page_title => 'New',
 		slug => $slug,
 		ext => $ext,
 		content => $content,
@@ -280,7 +280,7 @@ sub edit_page {
 	}
 	$c->stash(
 		template => 'edit',
-		title => 'Editing ',
+		page_title => 'Editing ',
 		slug => $basename,
 		ext => $ext,
 		redirect => $redirect,
