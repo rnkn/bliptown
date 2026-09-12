@@ -69,9 +69,8 @@
 				</dialog>
 				<button popovertarget="new-directory-popover">New Directory</button>
 				<dialog id="new-directory-popover" class="modal" popover>
-					<form id="new-directory" method="POST" action="<%= url_for('list_files')->query(action => 'new_directory') %>">
+					<form id="new-directory" method="POST" action="<%= url_for('new_directory')->query(dir => $dir, back_to => url_for) %>">
 						<input type="text" name="name">
-						<input type="text" name="back_to" value="<%= url_for('list_files') %>" hidden>
 						<button type="submit">Create Directory</button>
 					</form>
 				</dialog>
