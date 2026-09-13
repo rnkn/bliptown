@@ -101,4 +101,66 @@ subtest 'glob_path relative pattern' => sub {
 	is_deeply [sort @got], [sort @expected], 'glob_path returns correct files';
 };
 
+subtest 'create_bliptown_url' => sub {
+	local $ENV{BLIPTOWN_SCHEME}		= 'https';
+	local $ENV{BLIPTOWN_PORT}		= '';
+	local $ENV{BLIPTOWN_DOMAIN}		= 'blip.town';
+
+	my $url = $util->create_bliptown_url({
+		path		=> '/_auth',
+		token		=> 'abc123',
+		redirect	=> '/',
+	});
+	is $url->scheme, 'https', 'create_bliptown_url uses BLIPTOWN_SCHEME';
+	is $url->host, 'blip.town', 'create_bliptown_url falls back to BLIPTOWN_DOMAIN';
+	is $url->path, '/_auth', 'create_bliptown_url sets path';
+	is $url->query->param('token'), 'abc123', 'create_bliptown_url sets token query';
+	is $url->query->param('back_to'), '/', 'create_bliptown_url sets back_to query';
+};
+
+subtest 'create_bliptown_url with host and port' => sub {
+	local $ENV{BLIPTOWN_SCHEME}		= 'http';
+	local $ENV{BLIPTOWN_PORT}		= '3000';
+	local $ENV{BLIPTOWN_DOMAIN}		= 'blip.town';
+
+	my $url = $util->create_bliptown_url({
+		host		=> 'mayor.blip.town',
+		path		=> '/_logout',
+		redirect	=> '/page',
+	});
+	is $url->scheme, 'http', 'create_bliptown_url uses custom scheme';
+	is $url->host, 'mayor.blip.town', 'create_bliptown_url uses explicit host';
+	is $url->port, '3000', 'create_bliptown_url sets port from env';
+	is $url->path, '/_logout', 'create_bliptown_url sets path';
+	is $url->query->param('back_to'), '/page', 'create_bliptown_url sets redirect';
+	ok !defined $url->query->param('token'), 'create_bliptown_url omits token when undef';
+};
+
+subtest 'create_bliptown_url defaults path and query' => sub {
+	local $ENV{BLIPTOWN_SCHEME}		= 'https';
+	local $ENV{BLIPTOWN_PORT}		= '';
+	local $ENV{BLIPTOWN_DOMAIN}		= 'blip.town';
+
+	my $url = $util->create_bliptown_url({});
+	is $url->scheme, 'https', 'create_bliptown_url uses scheme';
+	is $url->host, 'blip.town', 'create_bliptown_url defaults host';
+	is $url->path, '/', 'create_bliptown_url defaults path';
+	ok !defined $url->query->param('token'), 'create_bliptown_url omits token by default';
+	ok !defined $url->query->param('back_to'), 'create_bliptown_url omits back_to by default';
+};
+
+subtest 'read_file_line' => sub {
+	my $file = $user_path->child('_domain.txt');
+	$file->spew("alice.example.com\nsecond line\n");
+	is $util->read_file_line($file), 'alice.example.com',
+		'read_file_line returns first line chomped';
+};
+
+subtest 'read_file_line single line no newline' => sub {
+	my $file = $user_path->child('_title.txt');
+	$file->spew('My Site');
+	is $util->read_file_line($file), 'My Site',
+		'read_file_line reads line without trailing newline';
+};
+
 done_testing;
