@@ -44,6 +44,9 @@ fetch_cert() {
 
 	install -m 0600 -o root -g wheel "$cert_key_tmp" "$cert_key" && echo "$cert_key installed" || ok=false
 	$ok || { echo "$cert_key failed" >&2; return 1; }
+
+	echo "Certificate end date:"
+	openssl x509 -in "$cert_chain" -enddate -noout | cut -d= -f2
 }
 
 renew_cert() {
