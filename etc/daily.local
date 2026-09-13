@@ -70,6 +70,7 @@ backup() {
 	dump_dir=${mnt}/dump
 	storage_box=u597578@u597578.your-storagebox.de
 
+	echo "Making backups:"
 	if [ ! -d "$dump_dir" ]
 	then
 		/usr/local/bin/sshfs "${storage_box}:" "$mnt" -p 23 || ok=false
