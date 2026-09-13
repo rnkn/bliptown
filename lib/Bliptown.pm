@@ -491,11 +491,10 @@ and credentials. The server runs OpenBSD.
 
 =item * Syntax check a file: C<carmel exec perl -w -c lib/Bliptown.pm>
 
-=item * The deployed app starts with C<perl
-  -Ilocal/lib/perl5/script/bliptown>
+=item * The deployed app starts with C<perl -Ilocal/lib/perl5/script/bliptown>
 
 =item * Generate an analytics report from access logs:
-  C<script/bliptown_analytics>
+  F<script/bliptown_analytics>
 
 =back
 
@@ -503,17 +502,17 @@ and credentials. The server runs OpenBSD.
 
 =over
 
-=item * C<lib/Bliptown.pm> wires config, helpers, hooks, and routes.
+=item * F<lib/Bliptown.pm> wires config, helpers, hooks, and routes.
 
-=item * Controllers live in C<lib/Bliptown/Controller/>; models/helpers live
-  in C<lib/Bliptown/Model/>.
+=item * Controllers live in F<lib/Bliptown/Controller/>; models/helpers live
+  in F<lib/Bliptown/Model/>.
 
-=item * User content under each user's home directory C<~/site>, while
+=item * User content under each user's home directory F<~/site>, while
   account state lives in SQLite via C<Mojo::SQLite>.
 
-=item * Privileged filesystem, git, and certificate operations are not done
-  directly in controllers. They go through C<script/bliptown_helper>
-  over a Unix socket using JSON.
+=item * Privileged filesystem, B<git>, and certificate operations are
+  not done directly in controllers. They go through
+  F<script/bliptown_helper> over a Unix socket using JSON.
 
 =item * Markdown page rendering is handled by C<Model::Page>, which combines
   YAML frontmatter, Mustache-style templating, md4c rendering, and DOM
@@ -523,11 +522,11 @@ and credentials. The server runs OpenBSD.
   domains to a user, and the page/file helpers always resolve paths
   relative to that user's home.
 
-=item * Site versioning (history, restore, diff) is implemented as git
-  operations (C<git_commit>, C<git_log>, C<git_show>, C<git_checkout>,
-  C<git_archive>) run by C<script/bliptown_helper> and surfaced through
-  C<Controller::Snapshots>, reusing the same privileged-IPC mechanism
-  as filesystem operations.
+=item * Site versioning (history, restore, diff) is implemented as
+  B<git> operations (C<git_commit>, C<git_log>, C<git_show>,
+  C<git_checkout>, C<git_archive>) run by F<script/bliptown_helper>
+  and surfaced through C<Controller::Snapshots>, reusing the same
+  privileged-IPC mechanism as filesystem operations.
 
 =item * Custom domains are verified in C<Model::DNS>, which checks that a
   domain's A/AAAA records point at the server and that a C<_bliptown>
@@ -554,22 +553,24 @@ and credentials. The server runs OpenBSD.
   C<get_slug>, and C<ipc->send_message> instead of open-coding path
   resolution or helper calls.
 
-=item * Preserve the existing page syntax: C<---> YAML frontmatter, C<{{ }}>
-  variables, C<{{ # ... }}> sections, and C<{{ E<gt> ... }}> partials.
+=item * Preserve the existing page syntax: C<---> YAML frontmatter,
+  C<{{ }}> variables, C<{{ # ... }}> sections, and C<{{ E<gt> ... }}>
+  partials.
 
-=item * Preserve the current error flow: helper failures are surfaced with
-  C<reply->exception>, while user-facing validation issues use flash
-  messages and redirects.
+=item * Preserve the current error flow: helper failures are surfaced
+  with C<reply->exception>, while user-facing validation issues use
+  flash messages and redirects.
 
-=item * C<demo> is treated as a restricted account for destructive actions.
+=item * C<demo> is treated as a restricted account for destructive
+  actions.
 
-=item * Controller/model tests avoid the real C<bliptown_helper> socket by
-  swapping in C<t/lib/FakeIPC.pm> for the C<ipc> helper.
+=item * Controller/model tests avoid the real F<bliptown_helper>
+  socket by swapping in F<t/lib/FakeIPC.pm> for the C<ipc> helper.
 
-=item * Prefer simple, pragmatic, clear, elegant code. Follow the 12 Factor
-  App methodology, except for "Twelve-factor apps also do not rely on
-  the implicit existence of any system tools" as Bliptown is deeply
-  integrated with OpenBSD.
+=item * Prefer simple, pragmatic, clear, elegant code. Follow the I<12
+  Factor App> methodology, except for "Twelve-factor apps also do not
+  rely on the implicit existence of any system tools" as Bliptown is
+  deeply integrated with OpenBSD.
 
 =back
 
