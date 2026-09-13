@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cat PLAN.md
+PAGER=cat perldoc lib/Bliptown.pm
 echo
 
 find -f lib/ script/ templates/ t/ public/ -type f ! -name '*~' ! -name '*_' ! -path 'public/defaults/*' | while read -r file
