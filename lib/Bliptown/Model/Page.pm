@@ -63,7 +63,7 @@ sub convert_typography {
 sub walk_dom {
 	my ($self, $node) = @_;
 
-	my @skip_tags = qw(pre code kbd script);
+	my @skip_tags = qw(pre code kbd);
 	return if $node->tag && any { $node->tag eq $_ } @skip_tags;
 
 	if ($node->tag && $node->tag eq 'x-wikilink') {
@@ -149,6 +149,7 @@ sub read_page {
 
 	unless ($args->{recur}) {
 		my $dom = Mojo::DOM->new($html);
+		$dom->find('script')->map('remove');
 		$self->walk_dom($dom);
 		$html = $dom->to_string;
 	}
