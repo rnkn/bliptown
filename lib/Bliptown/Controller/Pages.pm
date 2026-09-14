@@ -208,22 +208,11 @@ sub new_page {
 		}
 	}
 
-	my ($template, $content);
+	my $content;
 	if ($ext eq 'md') {
 		my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'))->to_abs;
-		my $search_path = path($user_path, $slug)->to_abs;
-
-		while (1) {
-			my $candidate = $search_path->child('_template.md');
-			if (-f $candidate) {
-				$template = $candidate;
-				last;
-			}
-			last if $search_path le $user_path;
-			$search_path = $search_path->dirname;
-		}
-
-		$content = $template->slurp('UTF-8') if $template;
+		my $search_path = path($user_path, $slug);
+		$content = $c->util->get_template($search_path);
 	}
 
 	$c->stash(

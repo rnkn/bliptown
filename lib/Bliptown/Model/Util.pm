@@ -50,6 +50,24 @@ sub read_file_line {
 	return $line;
 }
 
+sub get_template {
+	my ($self, $search_path) = @_;
+
+	my ($template, $content);
+	while (1) {
+		my $candidate = $search_path->child('_template.md');
+		if (-f $candidate) {
+			$template = $candidate;
+			last;
+		}
+		last if $search_path le $self->user_path;
+		$search_path = $search_path->dirname;
+	}
+
+	$content = $template->slurp('UTF-8') if $template;
+	return $content;
+}
+
 sub split_frontmatter {
 	my ($self, $chars) = @_;
 	if ($chars =~ /^(---\n.*?---\n)\s*(.*)$/s) {
