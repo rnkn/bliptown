@@ -277,20 +277,22 @@ sub backup_file {
 
 sub upload_files {
 	my $c = shift;
-	my $slug = $c->param('catchall');
+	my $username = $c->session('username');
+	my $dir = $c->param('dir') // '';
 	my $redirect = $c->param('back_to')
 		// $c->url_for('list_files', catchall => '');
-	my $username = $c->session('username');
+
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $dir = $slug ? path($user_path, $slug) : $user_path;
+	my $dir_path = path($user_path, $dir);
+
 	foreach my $upload (@{$c->req->uploads}) {
 		my $filename = $upload->filename;
 		next unless $filename;
-		my $path = path($dir, $filename);
+		my $path = path($dir_path, $filename);
 		if (-f $path) {
 			$c->flash(info => "File $filename exists!");
 			$c->res->code(409);
-			return $c->redirect_to('list_files');
+			return $c->redirect_to($redirect);
 		};
 		my $blob = $upload->slurp;
 		my $res = $c->ipc->send_message({
@@ -304,12 +306,12 @@ sub upload_files {
 
 		if ($c->app->mode eq 'production') {
 			my $res = $c->file->purge_cdn_file({
-				path => $path->to_abs->to_string,
+				filename => $path->to_abs->to_string,
 			});
 			$c->log->error("CDN Purge failed: $path") unless $res->code == 200;
 		}
 	}
-	return $c->redirect_to('list_files');
+	return $c->redirect_to($redirect);
 }
 
 return 1;

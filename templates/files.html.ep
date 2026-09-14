@@ -74,7 +74,7 @@
 				</dialog>
 				<button popovertarget="upload-popover">Upload Files</button>
 				<dialog id="upload-popover" class="modal" popover>
-					<form id="upload" method="POST" action="<%= url_for('upload_files') %>" enctype="multipart/form-data">
+					<form id="upload" method="POST" action="<%= url_for('upload_files')->query(dir => $dir, back_to => url_for) %>" enctype="multipart/form-data">
 						<input type="file" accept="text/*,image/*,audio/*,video/*,font/*,application/pdf,application/zip,application/gzip"
 							   id="file-uploads" name="file-uploadss" multiple <%= $disabled %>>
 						<button type="submit" <%= $disabled %>>Upload</button>
