@@ -5,6 +5,7 @@ use Mojo::DOM;
 use Mojo::File qw(path);
 use Mojo::Util qw(url_unescape);
 use Text::Glob qw(glob_to_regex_string);
+use List::Util qw(any);
 
 sub process_redirects {
 	my ($path, $slug) = @_;
@@ -190,7 +191,7 @@ sub new_page {
 		 $slug = $1;
 		 $ext = $2;
 	};
-	return $c->reply->not_found unless grep { $ext eq $_} @{$c->app->config->{render_exts}};
+	return $c->reply->not_found unless any { $ext eq $_} @{$c->app->config->{render_exts}};
 
 	if (!$slug || $slug =~ m{/$}) {
 		unless ($c->get_file("$slug/index")) {

@@ -4,6 +4,7 @@ use Mojo::File qw(path);
 use FFI::Platypus;
 use Mojo::DOM;
 use Mojo::Util qw(encode decode);
+use List::Util qw(any);
 
 has 'user';
 has 'metadata';
@@ -63,7 +64,7 @@ sub walk_dom {
 	my ($self, $node) = @_;
 
 	my @skip_tags = qw(pre code kbd script);
-	return if $node->tag && grep { $node->tag eq $_ } @skip_tags;
+	return if $node->tag && any { $node->tag eq $_ } @skip_tags;
 
 	if ($node->tag && $node->tag eq 'x-wikilink') {
 		my $href = $node->attr('data-target');
@@ -132,7 +133,7 @@ sub read_page {
 	my $html = '';
 
 	my $ext = $path->extname;
-	if (grep { $ext eq $_ } qw(html css txt)) {
+	if (any { $ext eq $_ } qw(html css txt)) {
 		$html = $self->render_plaintext($chars, $ext);
 	}
 	elsif ($ext eq 'md') {
