@@ -53,7 +53,8 @@ sub startup {
 			iso			=> '%F',
 		},
 		scripts => {
-			scrollreveal	=> 'https://unpkg.com/scrollreveal',
+			scrollreveal	=> 'https://unpkg.com/scrollreveal@4.0.9/dist/scrollreveal.js',
+			baguettebox		=> 'https://unpkg.com/baguettebox.js@1.13.0/dist/baguetteBox.js',
 		}
 	);
 

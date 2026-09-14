@@ -27,3 +27,7 @@ if (window.ScrollReveal) {
 		distance: '4em'
 	});
 }
+
+if (window.baguetteBox) {
+	baguetteBox.run('.baguettebox p');
+}
