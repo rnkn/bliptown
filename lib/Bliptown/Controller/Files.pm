@@ -48,10 +48,10 @@ sub list_files {
 	my $username = $c->session('username');
 	my $search = $c->param('search');
 	my $sort = $c->param('sort') // 'name';
-	my $slug = $c->param('catchall');
+	my $dir = $c->param('catchall') // '';
 	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $dir_path = $slug ? path($user_path, $slug) : $user_path;
+	my $dir_path = $dir ? path($user_path, $dir) : $user_path;
 	return $c->reply->not_found unless -d $dir_path;
 
 	my $search_re = glob_to_regex_string($search) if $search;
@@ -120,7 +120,7 @@ sub list_files {
 		template => 'files',
 		page_title => 'Files',
 		locked => $locked,
-		dir => $slug,
+		dir => $dir,
 		redirect => $c->url_for,
 		breadcrumbs => \@breadcrumbs,
 		files => \@files,
