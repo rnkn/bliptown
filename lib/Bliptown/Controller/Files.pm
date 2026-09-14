@@ -104,12 +104,12 @@ sub list_files {
 
 sub new_directory {
 	my $c = shift;
-	my $dir = $c->param('dir');
+	my $dir = $c->param('dir') // '';
 	my $name = $c->param('name');
 	my $username = $c->session('username');
-	my $rel_dir = join '/', ($dir, $name);
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $rel_dir);
-	my $redirect = $c->url_for('list_files', catchall => $rel_dir);
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $dir, $name);
+	my $rel_path = $path->to_rel($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $redirect = $c->url_for('list_files', catchall => $rel_path);
 	return $c->redirect_to($redirect) if -d $path;
 
 	my $res = $c->ipc->send_message({
