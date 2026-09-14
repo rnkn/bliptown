@@ -20,3 +20,10 @@ window.addEventListener('pagehide', (e) => {
         top: nav.scrollTop,
     }));
 });
+
+if (window.ScrollReveal) {
+	ScrollReveal().reveal('.scrollreveal section', {
+		duration: 1000,
+		distance: '4em'
+	});
+}

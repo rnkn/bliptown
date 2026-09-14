@@ -13,9 +13,6 @@
 		<meta name="author" content="<%= $author %>">
 		<meta name="generator" content="Bliptown">
 		<link href="/main.css" rel="stylesheet">
-		% if ($user_style) {
-		<link href="/style.css?theme=<%= $theme %>" rel="stylesheet" sandbox>
-		% }
 		<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png" />
 		<link rel="icon" type="image/x-icon" sizes="32x32" href="/favicon.ico" />
 		<style>
@@ -23,6 +20,12 @@
 				background-image: url("<%= url_for('track_visit', rand => $rand )->query(ref => $c->req->headers->referrer) %>");
 			}
 		</style>
+		% if ($customize) {
+		<link href="/style.css?theme=<%= $theme %>" rel="stylesheet" sandbox>
+		% foreach my $url (@$scripts) {
+		<script src="<%= $url %>" defer></script>
+		% }
+		% }
 		<script src="/main.js" defer></script>
 	</head>
 	<body>

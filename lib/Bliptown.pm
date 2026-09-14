@@ -52,6 +52,9 @@ sub startup {
 			year		=> '%Y',
 			iso			=> '%F',
 		},
+		scripts => {
+			scrollreveal	=> 'https://unpkg.com/scrollreveal',
+		}
 	);
 
 	$app->secrets([
@@ -297,8 +300,9 @@ sub startup {
 		page_title => 'Untitled',
 		description => 'A very talented artist',
 		author => 'Anonymous',
+		scripts => [],
 		username => '',
-		user_style => 0,
+		customize => 0,
 		editable => 0,
 		header => '',
 		menu => '',

@@ -158,14 +158,26 @@ sub render_page {
 		$desc = join ' ', split /\n/, $desc_chars;
 	}
 
+	my $scripts_path = path($user_path, '_scripts.txt');
+	my @scripts;
+	if (-f $scripts_path) {
+		my $script_chars = $scripts_path->slurp('UTF-8');
+		my @lines = split /\n/, $script_chars;
+		foreach my $line (@lines) {
+			my $url = $c->app->config->{scripts}->{$line};
+			push @scripts, $url if $url;
+		}
+	}
+
 	$c->stash(
 		template => 'page',
 		site_title => $site_title,
 		page_title => $page_title,
 		description => $desc,
 		author => $author,
+		scripts => \@scripts,
 		theme => $c->param('theme')		// '',
-		user_style => 1,
+		customize => 1,
 		editable => 1,
 		header => $skel_html{header}	// '',
 		menu => $skel_html{menu}		// '',
