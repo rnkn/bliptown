@@ -438,6 +438,10 @@ sub startup {
 	$private->get('/_raw/private/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_private_raw');
 	$private->get('/private/*catchall')->to(controller => 'Pages', action => 'render_page', catchall => '')->name('render_private_page');
 
+	$protected->post('/_edit')->to(controller => 'Pages', action => 'save_page')->name('save_page');
+	$protected->get('/_new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
+	$protected->get('/_edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');
+
 	$protected->post('/_new_directory')->to(controller => 'Files', action => 'new_directory')->name('new_directory');
 	$protected->post('/_new')->to(controller => 'Files', action => 'new_file')->name('new_file');
 	$protected->post('/_delete')->to(controller => 'Files', action => 'delete_files')->name('delete_files');
@@ -445,10 +449,6 @@ sub startup {
 	$protected->post('/_backup')->to(controller => 'Files', action => 'backup_file')->name('backup_file');
 	$protected->under($block_demo)->post('/_upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');
 	$protected->get('/_files/*catchall')->to(controller => 'Files', action => 'list_files', catchall => '')->name('list_files');
-
-	$protected->post('/_edit')->to(controller => 'Pages', action => 'save_page')->name('save_page');
-	$protected->get('/_new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
-	$protected->get('/_edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');
 
 	$protected->under($block_demo)->post('/_settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
 	$protected->get('/_settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
