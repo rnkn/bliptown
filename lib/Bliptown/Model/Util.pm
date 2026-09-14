@@ -43,6 +43,7 @@ sub create_bliptown_url {
 
 sub read_file_line {
 	my ($self, $filename) = @_;
+	return unless -f $filename;
 	open(my $fh, '<', $filename);
 	my $line = <$fh>;
 	close $fh;
