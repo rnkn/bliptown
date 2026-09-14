@@ -107,8 +107,8 @@ sub new_directory {
 	my $dir = $c->param('dir') // '';
 	my $name = $c->param('name');
 	my $username = $c->session('username');
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $dir, $name);
-	my $rel_path = $path->to_rel($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $rel_path = path($dir, $name);
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $rel_path)->to_abs;
 	my $redirect = $c->url_for('list_files', catchall => $rel_path);
 	return $c->redirect_to($redirect) if -d $path;
 
