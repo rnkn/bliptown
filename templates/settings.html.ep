@@ -12,7 +12,7 @@
 </nav>
 <main id="settings" class="backstage">
 	<div class="one-column">
-		<form action="<%= url_for('settings') %>" method="post">
+		<form method="POST" action="<%= url_for('save_settings') %>">
 			<ul class="table">
 				<li class="row">
 					<label class="cell name" for="username">Username (cannot be changed)</label>
