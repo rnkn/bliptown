@@ -32,10 +32,10 @@
 					<button type="submit">Delete Matching Files</button>
 				</form>
 				% }
-				<form id="snapshot" method="GET" action="<%= url_for('take_snapshot') %>">
+				<form id="snapshot" method="POST" action="<%= url_for('take_snapshot') %>">
 					<button type="submit">Take Snapshot</button>
-					<div><a href="<%= url_for('list_snapshots') %>">Browse Snapshots</a></div>
 				</form>
+				<div><a href="<%= url_for('list_snapshots') %>">Browse Snapshots</a></div>
 			</div>
 		</div>
 		<ul>
