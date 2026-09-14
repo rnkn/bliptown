@@ -26,7 +26,7 @@ $helper_health_file->spew('2');
 local $ENV{BLIPTOWN_HEALTH_FILE} = $health_file;
 local $ENV{BLIPTOWN_HELPER_HEALTH_FILE} = $helper_health_file;
 
-$t->get_ok('/health')->status_is(200)
+$t->get_ok('/_health')->status_is(200)
 		->json_is('/BliptownServerWorkers', 3)
 		->json_is('/BliptownHelperWorkers', 2)
 		->json_is('/BliptownDatabaseOK', 1);
