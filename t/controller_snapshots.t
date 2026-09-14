@@ -41,11 +41,11 @@ $t->get_ok($app->url_for('list_snapshots') => { Host => $user_domain })->status_
 	->text_is('nav header h1', 'Snapshots', 'list_snapshots renders title')
 	->element_exists('main#snapshots div#list', 'list_snapshots renders list element')
 	->text_is('details#clone pre', "git clone $username\@blip.town:site.git", 'list_snapshots returns git clone URL')
-	->text_is('div#list details summary span#commit-hash code', $hash, 'list_snapshots returns git commit hash')
-	->text_is('div#list details summary span#commit-date', '2999-06-08 11:03 +0000', 'list_snapshots returns git commit date')
-	->text_is('div#list details pre#commit-body', 'A  blog/2999-06-08.md', 'list_snapshots returns git commit body');
+	->text_is('div#list details summary.row .commit.hash code', $hash, 'list_snapshots returns git commit hash')
+	->text_is('div#list details summary.row .commit.date', '2999-06-08 11:03 +0000', 'list_snapshots returns git commit date')
+	->text_is('div#list details pre.commit.body', 'A  blog/2999-06-08.md', 'list_snapshots returns git commit body');
 
-$t->get_ok($app->url_for('take_snapshot') => { Host => $user_domain })->status_is(302);
+$t->post_ok($app->url_for('take_snapshot') => { Host => $user_domain })->status_is(302);
 
 subtest 'take_snapshot' => sub {
 	is $t->tx->res->headers->location, $app->url_for('list_snapshots'),
@@ -63,14 +63,14 @@ subtest 'download_snapshot' => sub {
 
 $t->get_ok($app->url_for('download_snapshot', hash => 'invalid') => { Host => $user_domain })->status_is(500);
 
-$t->get_ok($app->url_for('restore_snapshot', hash => $hash) => { Host => $user_domain })->status_is(302);
+$t->post_ok($app->url_for('restore_snapshot')->query(hash => $hash) => { Host => $user_domain })->status_is(302);
 
 subtest 'restore_snapshot' => sub {
 	is $t->tx->res->headers->location, $app->url_for('list_files')->query(search => "snapshots/$hash"),
 		'restore_snapshot redirects to search URL';
 };
 
-$t->get_ok($app->url_for('restore_snapshot', hash => 'invalid') => { Host => $user_domain })->status_is(500);
+$t->post_ok($app->url_for('restore_snapshot')->query(hash => 'invalid') => { Host => $user_domain })->status_is(500);
 
 $t->get_ok($app->url_for('render_diff', hash => $hash) => { Host => $user_domain })->status_is(200)
 	->text_is('nav header h1', "Snapshot $hash", 'render_diff renders title')
