@@ -7,6 +7,7 @@ use Text::Glob qw(glob_to_regex_string);
 
 sub new_file {
 	my $c = shift;
+	my $username = $c->session('username');
 	my $name = $c->param('name');
 	my $ext = $c->param('ext');
 	my $dir = $c->param('dir');
@@ -14,13 +15,31 @@ sub new_file {
 	my $dir_path = path($dir, $name)->dirname // '';
 	my $redirect = $c->param('back_to') // $c->url_for('list_files');
 
-	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'))->to_abs;
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->to_abs;
+	$dir_path = path($user_path, $dir_path);
 
-	$dir_path = path($user_path, $dir_path)->make_path;
-	my $path = path($dir_path, "$basename.$ext")->touch;
+	unless (-d $dir_path) {
+		my $res = $c->ipc->send_message({
+			command => 'make_directory',
+			system_user => $username,
+			filename => $dir_path->to_string,
+		});
+		return $c->reply->exception($res->{error}) if $res->{error};
+		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	}
 
-	my $content = $c->util->get_template($dir_path);
-	$path->spew($content) if $content;
+	my $path = path($dir_path, "$basename.$ext");
+	my $content = $c->util->get_template($dir_path) // '';
+
+	my $res = $c->ipc->send_message({
+		command => 'update_file',
+		system_user => $username,
+		filename => $path->to_string,
+		content => $content,
+	});
+	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+
 	return $c->redirect_to($redirect);
 }
 
