@@ -38,7 +38,7 @@ sub list_snapshots {
 	my $snapshots = $res->{info};
 	$c->stash(
 		template => 'snapshots',
-		title => 'Snapshots',
+		page_title => 'Snapshots',
 		snapshots => $snapshots,
 		repo => "${username}\@blip.town:site.git",
 	);
@@ -153,7 +153,7 @@ sub render_diff {
 
 	$c->stash(
 		template => 'diff',
-		title => "Snapshot $hash",
+		page_title => "Snapshot $hash",
 		content => $html
 	);
 	return $c->render;
