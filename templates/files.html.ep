@@ -9,7 +9,7 @@
 		<p>
 			<small>Search by filename to rename/delete multiple files at once.</small>
 		</p>
-		<div id="controls">
+		<div id="file-controls">
 			<form id="search" method="GET" action="<%= url_for('list_files') %>">
 				<input type="text" name="search" placeholder="glob" value="<%= param('search') %>">
 			</form>
@@ -22,7 +22,7 @@
 				% }
 				<label id="additional-controls-toggle" class="button" for="additional-controls-toggle">+ more</label>
 			</fieldset>
-			<div id="additional-controls">
+			<div id="additional-controls" class="controls">
 				% if (param('search')) {
 				<form id="replace" method="POST" action="<%= url_for('rename_files')->query(dir => $dir, search => param('search')) %>">
 					<input type="text" name="replace" placeholder="string" value="<%= param('replace') %>">
