@@ -6,7 +6,7 @@ use File::Basename;
 use constant THIS_DIR => dirname(__FILE__);
 use lib THIS_DIR . '/../lib', THIS_DIR . '/../local/lib/perl5';
 
-use IO::Socket::UNIX;
+use IO::Socket::INET;
 use POSIX qw(setgid setuid pause WNOHANG);
 use Mojo::File qw(path tempfile);
 use Mojo::Util qw(trim b64_decode);
@@ -31,7 +31,8 @@ die "$0 must be run as root"					unless $> == 0;
 
 $0 = $0 . '[master]';
 
-die 'BLIPTOWN_HELPER_SOCKET not defined'		unless defined $ENV{BLIPTOWN_HELPER_SOCKET};
+die 'BLIPTOWN_HELPER_HOST not defined'			unless defined $ENV{BLIPTOWN_HELPER_HOST};
+die 'BLIPTOWN_HELPER_PORT not defined'			unless defined $ENV{BLIPTOWN_HELPER_PORT};
 die 'BLIPTOWN_HELPER_PREFORK not defined'		unless defined $ENV{BLIPTOWN_HELPER_PREFORK};
 die 'BLIPTOWN_HELPER_HEALTH_FILE not defined'	unless defined $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
 
@@ -49,17 +50,18 @@ my $shutdown;
 my $health_file = path($ENV{BLIPTOWN_HELPER_HEALTH_FILE});
 $health_file->remove->touch or die "Cannot create health file: $health_file\n";
 
-my $sock_file = path($ENV{BLIPTOWN_HELPER_SOCKET});
-$sock_file->remove;
+my $host = $ENV{BLIPTOWN_HELPER_HOST};
+my $port = $ENV{BLIPTOWN_HELPER_PORT};
 
-my $sock = IO::Socket::UNIX->new(
+my $sock = IO::Socket::INET->new(
 	Type => SOCK_STREAM,
-	Local => $sock_file,
+	LocalAddr => $host,
+	LocalPort => $port,
 	Listen => 128,
-) or die "Cannot create socket: $sock_file ($!)";
+	Reuse => 1,
+) or die "Cannot create TCP socket on: $host:$port ($!)";
 
-chown(0, $ENV{BLIPTOWN_GID}, $sock_file) or die "Cannot chown: $sock_file ($!)";
-chmod(0660, $sock_file) or die "Cannot chmod: $sock_file ($!)";
+print "Listening on $host:$port\n";
 
 my $safe_domain_regex = qr/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
 my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;

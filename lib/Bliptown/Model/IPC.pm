@@ -1,17 +1,19 @@
 package Bliptown::Model::IPC;
 use Mojo::Base -base;
-use IO::Socket::UNIX;
+use IO::Socket::INET;
 use Mojo::JSON qw(encode_json decode_json);
 use Mojo::Util qw(b64_encode);
 
 sub send_message {
 	my ($self, $args) = @_;
-	my $sock_path = $ENV{BLIPTOWN_HELPER_SOCKET};
+	my $host = $ENV{BLIPTOWN_HELPER_HOST};
+	my $port = $ENV{BLIPTOWN_HELPER_PORT};
 
-	my $client = IO::Socket::UNIX->new(
+	my $client = IO::Socket::INET->new(
 		Type => SOCK_STREAM,
-		Peer => $sock_path,
-	) or die "Cannot connect to socket: $sock_path ($!)";
+		PeerAddr => $host,
+		PeerPort => $port,
+	) or die "Cannot connect to TCP socket: $host:$port ($!)";
 
 	my $b64_encoded = b64_encode($args->{blob}) if length $args->{blob};
 
