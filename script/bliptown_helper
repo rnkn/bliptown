@@ -24,7 +24,7 @@ my $has_pledge = eval {
 	return 1;
 };
 
-pledge(qw(rpath wpath cpath chown fattr unix proc id unveil exec))
+pledge(qw(rpath wpath cpath chown fattr inet proc id unveil exec))
 	if $has_pledge;
 
 die "$0 must be run as root"					unless $> == 0;
