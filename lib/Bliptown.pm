@@ -344,7 +344,7 @@ sub startup {
 				my $req_username = shift @{$req_url->path->parts};
 				return unless $req_username;
 				my $slug = join '/', @{$req_url->path->parts};
-				my $path = path($c->get_req_user_path, $slug)->to_abs;
+				my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username, $slug);
 				if (-f $path) {
 					my $max_age = 24 * 60 * 60;
 					$c->res->headers->cache_control("public, must-revalidate, max-age=$max_age");
