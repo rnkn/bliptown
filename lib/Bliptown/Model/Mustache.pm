@@ -10,10 +10,19 @@ has 'prettydate_fmt';
 
 sub process {
 	my ($self, $text, $args) = @_;
+
+	$text =~ s/\{\{\ *!\ *([^\n]*?)\ *\}\}/&#123;&#123; $1 &#125;&#125;/g;
+
 	$text = $self->process_sections($text, $args);
 	$text = $self->process_partials($text, $args);
 	$text = $self->apply_layout($text, $args) if $args->{metadata}->{layout};
 	$text = $self->process_variables($text, $args);
+
+	unless ($args->{recur}) {
+		$text =~ s/&#123;&#123;/{{/g;
+		$text =~ s/&#125;&#125;/}}/g;
+	}
+
 	return $text;
 }
 
