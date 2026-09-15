@@ -865,6 +865,28 @@ button.warning:hover {
 	background-color: var(--warning-hover-color);
 }
 
+/* Clipboard */
+
+.js-clipboard pre {
+	position: relative;
+}
+
+.js-clipboard pre button {
+	position: absolute;
+	top: 0.5em;
+	right: 0.5em;
+	width: var(--minor-buttom-width);
+	z-index: 1;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.js-clipboard pre:hover button {
+	opacity: 1;
+	visibility: visible;
+}
+
 /* Decorations */
 
 .button {

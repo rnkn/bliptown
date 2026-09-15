@@ -31,3 +31,25 @@ if (window.ScrollReveal) {
 if (window.baguetteBox) {
 	baguetteBox.run('.baguettebox p');
 }
+
+document.querySelectorAll('.js-clipboard pre').forEach((pre) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = 'Copy';
+    pre.appendChild(button);
+
+    button.addEventListener('click', async () => {
+        const clone = pre.cloneNode(true);
+        clone.querySelector('button')?.remove();
+        try {
+            await navigator.clipboard.writeText(clone.innerText);
+            button.textContent = 'Copied';
+        } catch (e) {
+            console.error('Clipboard copy failed:', e);
+        }
+    });
+
+	pre.addEventListener('mouseenter', () => {
+        button.textContent = 'Copy';
+    });
+});
