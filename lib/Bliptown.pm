@@ -231,6 +231,7 @@ sub startup {
 				my $path = $c->get_req_user_path;
 				return unless $path;
 				$req_username = ${$path->to_array}[-1];
+				$c->stash(req_username => $req_username);
 			}
 			return $req_username;
 		});
