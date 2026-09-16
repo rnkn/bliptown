@@ -217,7 +217,6 @@ sub startup {
 				else {
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host)->realpath;
 				}
-				return unless -d $path;
 				$c->stash(req_user_path => $path);
 			};
 			return $path;
