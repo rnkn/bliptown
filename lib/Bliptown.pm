@@ -55,7 +55,28 @@ sub startup {
 		scripts => {
 			scrollreveal	=> 'https://unpkg.com/scrollreveal@4.0.9/dist/scrollreveal.js',
 			baguettebox		=> 'https://unpkg.com/baguettebox.js@1.13.0/dist/baguetteBox.js',
-		}
+		},
+		csp_default => join('; ', qw(
+			default-src 'self'
+			object-src 'none'
+			base-uri 'none'
+			frame-ancestors 'none'
+			form-action 'self'
+			img-src 'self'
+			style-src 'self' 'unsafe-inline'
+			script-src 'self'
+			connect-src 'self'
+		)),
+		csp_pages => join('; ', qw(
+			default-src 'self'
+			object-src 'none'
+			base-uri 'none'
+			form-action 'self'
+			img-src 'self' data: https:
+			style-src 'self' 'unsafe-inline'
+			script-src 'self' 'unsafe-inline' https://unpkg.com
+			connect-src 'self'
+		)),
 	);
 
 	$app->secrets([
@@ -357,6 +378,24 @@ sub startup {
 			else {
 				$c->res->headers->cache_control('public, max-age=60, stale-while-revalidate=600');
 			}
+			return;
+		}
+	);
+
+	$app->hook(
+		after_dispatch => sub {
+			my $c = shift;
+			my $res = $c->res;
+			return if $res->code && $res->code >= 300 && $res->code < 400;
+
+			my $csp = $c->app->config->{csp_default};
+			my $endpoint = eval { $c->match->endpoint };
+			my $name = $endpoint ? $endpoint->name : '';
+			$csp = $c->app->config->{csp_pages}
+				if $name eq 'render_page'
+				|| $name eq 'render_private_page';
+
+			$res->headers->content_security_policy($csp) if $csp;
 			return;
 		}
 	);
