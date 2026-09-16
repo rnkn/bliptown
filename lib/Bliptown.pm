@@ -56,27 +56,23 @@ sub startup {
 			scrollreveal	=> 'https://unpkg.com/scrollreveal@4.0.9/dist/scrollreveal.js',
 			baguettebox		=> 'https://unpkg.com/baguettebox.js@1.13.0/dist/baguetteBox.js',
 		},
-		csp_default => join('; ', qw(
-			default-src 'self'
-			object-src 'none'
-			base-uri 'none'
-			frame-ancestors 'none'
-			form-action 'self'
-			img-src 'self'
-			style-src 'self' 'unsafe-inline'
-			script-src 'self'
-			connect-src 'self'
-		)),
-		csp_pages => join('; ', qw(
-			default-src 'self'
-			object-src 'none'
-			base-uri 'none'
-			form-action 'self'
-			img-src 'self' data: https:
-			style-src 'self' 'unsafe-inline'
-			script-src 'self' 'unsafe-inline' https://unpkg.com
-			connect-src 'self'
-		)),
+		csp_default => "default-src 'self'; "
+			. "object-src 'none'; "
+			. "base-uri 'none'; "
+			. "frame-ancestors 'none'; "
+			. "form-action 'self'; "
+			. "img-src 'self'; "
+			. "style-src 'self' 'unsafe-inline'; "
+			. "script-src 'self'; "
+			. "connect-src 'self'",
+		csp_pages => "default-src 'self'; "
+			. "object-src 'none'; "
+			. "base-uri 'none'; "
+			. "form-action 'self'; "
+			. "img-src 'self' data: https:; "
+			. "style-src 'self' 'unsafe-inline'; "
+			. "script-src 'self' 'unsafe-inline' https://unpkg.com; "
+			. "connect-src 'self'",
 	);
 
 	$app->secrets([
