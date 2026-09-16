@@ -204,7 +204,7 @@ sub startup {
 	$app->helper(
 		get_req_user_path => sub {
 			my $c = shift;
-			my $path = $c->stash('user_home_path');
+			my $path = $c->stash('req_user_path');
 			unless ($path) {
 				my $host = $c->req->url->to_abs->host;
 				return unless $host;
@@ -218,7 +218,7 @@ sub startup {
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host)->realpath;
 				}
 				return unless -d $path;
-				$c->stash(user_home_path => $path);
+				$c->stash(req_user_path => $path);
 			};
 			return $path;
 		});
