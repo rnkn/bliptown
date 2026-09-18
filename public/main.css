@@ -14,8 +14,8 @@
 	--drawer-height: 3.5rem;
 	--controls-gap: 0.3em;
 	--text-input-width: 18em;
-	--major-buttom-width: 9em;
-	--minor-buttom-width: 6em;
+	--major-button-width: 9em;
+	--minor-button-width: 6em;
 }
 
 * {
@@ -601,7 +601,7 @@ dialog#toast p {
 }
 
 #edit form button {
-	width: var(--major-buttom-width);
+	width: var(--major-button-width);
 }
 
 #edit form #includes {
@@ -693,7 +693,7 @@ nav #file-controls fieldset#search-controls {
 }
 
 nav #file-controls fieldset#search-controls button {
-	width: var(--minor-buttom-width);
+	width: var(--minor-button-width);
 }
 
 nav #file-controls #search-controls label#additional-controls-toggle {
@@ -768,6 +768,10 @@ nav #file-controls #additional-controls a:hover {
 	background-color: var(--warning-bg-color);
 }
 
+#settings form button {
+	width: var(--major-button-width);
+}
+
 /* Diffs */
 
 .diff .hunk-header {
@@ -819,7 +823,7 @@ nav #file-controls #additional-controls a:hover {
 }
 
 .table .controls button {
-	width: var(--minor-buttom-width);
+	width: var(--minor-button-width);
 }
 
 .table .row {
@@ -887,7 +891,7 @@ button.warning:hover {
 	position: absolute;
 	top: 0.5em;
 	right: 0.5em;
-	width: var(--minor-buttom-width);
+	width: var(--minor-button-width);
 	z-index: 1;
 	visibility: hidden;
 	opacity: 0;
