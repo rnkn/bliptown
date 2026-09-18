@@ -48,19 +48,10 @@ sub list_settings {
 	return $c->reply->exception("User $username email not found")
 		unless $email;
 
-	my $customer_id = $user_rec->{customer_id};
-	return $c->reply->exception("User $username customer_id not found")
-		unless $customer_id;
-
-	my $billing_session = $c->customer->create_billing_session({
-		customer_id => $customer_id
-	});
-	return $c->reply->exception("Cannot create billing sessions for customer_id $customer_id")
-		unless $billing_session;
-
-	my $billing_portal_url = $billing_session->{url};
-	return $c->reply->exception("Cannot create billing portal URL for customer_id $customer_id")
-		unless $billing_portal_url;
+	my $customer_id = $user_rec->{customer_id} // '';
+	unless ($customer_id || $locked) {
+		return $c->reply->exception("User $username customer_id not found");
+	}
 
 	my $create_backups = $user_rec->{create_backups} // 0;
 
@@ -70,8 +61,8 @@ sub list_settings {
 		locked => $locked,
 		username => $username,
 		email => $email,
+		customer_id => $customer_id,
 		create_backups => $create_backups,
-		billing_portal_url => $billing_portal_url,
 	);
 	return $c->render;
 }

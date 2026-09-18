@@ -42,7 +42,7 @@
 				<hr>
 				% unless($locked) {
 				<li class="row">
-					<a href="<%= $billing_portal_url %>" target="_blank">Manage subscription and payment details</a>
+					<a href="<%= url_for('billing_session')->query(customer_id => $customer_id) %>" target="_blank">Manage subscription and payment details</a>
 				</li>
 				% }
 				<details id="delete-account">

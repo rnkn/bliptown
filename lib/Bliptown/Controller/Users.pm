@@ -193,4 +193,21 @@ sub user_logout {
 	return $c->redirect_to($redirect);
 }
 
+sub billing_session {
+	my $c = shift;
+	my $customer_id = $c->param('customer_id');
+
+	my $billing_session = $c->customer->create_billing_session({
+		customer_id => $customer_id
+	});
+	return $c->reply->exception("Cannot create billing sessions for customer_id $customer_id")
+		unless $billing_session;
+
+	my $billing_portal_url = $billing_session->{url};
+	return $c->reply->exception("Cannot create billing portal URL for customer_id $customer_id")
+		unless $billing_portal_url;
+
+	return $c->redirect_to($billing_portal_url);
+}
+
 return 1;
