@@ -129,6 +129,12 @@ install -m 0600 -o root -g wheel /dev/null "$backup_db"
 $ok && echo "Done" || echo "Failed"
 echo
 
+echo "Deleting old database backups:"
+ok=true
+find /var/db/bliptown -name '*.db.backup' -mtime +30 -delete || ok=false
+$ok && echo "Done" || echo "Failed"
+echo
+
 echo "Flushing rate-limited IPs:"
 ok=true
 pfctl -q -t rate_limit -T expire 86400 || ok=false
