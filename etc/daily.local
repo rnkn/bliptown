@@ -87,16 +87,13 @@ backup() {
 	then
 		backup_type="monthly"
 		dump_level=0
-		suffix=$(date +%m)
 	elif [ $weekday == 7 ]
 	then
 		 backup_type="weekly"
 		 dump_level=0
-		 suffix=$(date +%V)
 	else
 		backup_type="daily"
 		dump_level=1
-		suffix=0$weekday
 	fi
 
 	for d in daily weekly monthly
@@ -106,11 +103,14 @@ backup() {
 	
 	for f in home var
 	do
-		dump -${dump_level}uaf "${dump_dir}/${backup_type}/${f}.dump.${suffix}" "/$f" 2> /dev/null || ok=false
+		dump -${dump_level}uaf "${dump_dir}/${backup_type}/${f}-$(date +%F).dump" "/$f" 2> /dev/null || ok=false
 		$ok || { echo "Dumping $f failed" >&2; return 1; }
 	done
 
-	find "${dump_dir}/weekly" -name "*.dump.*" -mtime +30 -delete
+	find "${dump_dir}/daily" -name "*.dump" -mtime +7 -delete
+	find "${dump_dir}/weekly" -name "*.dump" -mtime +30 -delete
+	find "${dump_dir}/monthly" -name "*.dump" -mtime +365 -delete
+
 	echo "Done"
 }
 
