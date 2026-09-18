@@ -71,7 +71,6 @@ sub walk_dom {
 		delete $node->attr->{'data-target'};
 		$node->tag('a');
 		$node->attr({ href => $href });
-		return;
 	}
 
 	if ($node->type eq 'text') {
@@ -84,6 +83,7 @@ sub walk_dom {
 	foreach my $child (@{$node->child_nodes}) {
 		$self->walk_dom($child);
 	}
+	return;
 }
 
 sub render_plaintext {
