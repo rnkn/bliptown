@@ -275,14 +275,33 @@ sub startup {
 
 	$app->helper(
 		get_file => sub {
-			my ($c, $slug) = @_;
-			my $user_path = $c->get_req_user_path;
+			my ($c, $slug, $ext) = @_;
+			my $user_path = $c->get_req_user_path->realpath;
 			return unless $user_path;
 			my $path = path($user_path, $slug)->to_abs;
-			return $path if -f $path;
+			if (-f $path && -r $path) {
+				$path = $path->realpath;
+				return unless index($path, $user_path) == 0;
+				return $path;
+			}
+
+			my $defaults_path = path($c->app->static->paths->[0], 'defaults')->realpath;
+			my $fallback_path = path($defaults_path, $slug)->to_abs;
+			if (-f $fallback_path && -r $fallback_path) {
+				$fallback_path = $fallback_path->realpath;
+				return unless index($fallback_path, $defaults_path) == 0;
+				return $fallback_path;
+			}
+
+			return if $ext;
+
 			foreach my $ext (@{$c->app->config->{render_exts}}) {
-				my $f = path($user_path, "$slug.$ext")->to_abs;
-				return $f if -f $f;
+				my $path_ext = path($user_path, "$slug.$ext")->to_abs;
+				if (-f $path_ext && -r $path_ext) {
+					$path_ext = $path_ext->realpath;
+					next unless index($path_ext, $user_path) == 0;
+					return $path_ext;
+				}
 			}
 			return;
 		}
