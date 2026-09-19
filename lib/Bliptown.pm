@@ -406,35 +406,31 @@ sub startup {
 		return $c->redirect_to($url);
 	})->name('my_site');
 
-	my $protected = $r->under(
-		sub {
-			my $c = shift;
-			my $username = $c->session('username');
-			my $req_username = $c->get_req_username;
-			return unless $req_username;
-			if ($username && $username eq $req_username) {
-				return 1;
-			}
-			else {
-				$c->flash(info => 'Login required');
-				$c->render(
-					status => 403,
-					template => 'message',
-					title => 'Bliptown :: 403 Forbidden',
-					content => '403 Forbidden: sorry, this page requires a login.'
-				);
-				return;
-			}
-		}
-	);
-
-	my $private = $protected->under(
-		sub {
-			my $c = shift;
-			$c->stash(subdir => 'private');
+	my $protected = $r->under(sub {
+		my $c = shift;
+		my $username = $c->session('username');
+		my $req_username = $c->get_req_username;
+		return unless $req_username;
+		if ($username && $username eq $req_username) {
 			return 1;
 		}
-	);
+		else {
+			$c->flash(info => 'Login required');
+			$c->render(
+				status => 403,
+				template => 'message',
+				page_title => '403 Forbidden',
+				content => '403 Forbidden: sorry, this page requires a login.'
+			);
+			return;
+		}
+	});
+
+	my $private = $protected->under(sub {
+		my $c = shift;
+		$c->stash(subdir => 'private');
+		return 1;
+	});
 
 	my $block_demo = sub {
 		my $c = shift;
