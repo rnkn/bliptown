@@ -363,15 +363,14 @@ sub startup {
 
 	my $r = $app->routes;
 
-	$r->get(
-		'/.well-known/acme-challenge/:file' => sub {
-			my $c = shift;
-			my $path = path('/var/www/acme/', $c->param('file'));
-			if (-f $path) {
-				return $c->reply->file($path);
-			}
-			return $c->reply->not_found;
-		})->name('acme_challenge');
+	$r->get('/.well-known/acme-challenge/:file' => sub {
+		my $c = shift;
+		my $path = path('/var/www/acme/', $c->param('file'));
+		if (-f $path && -r $path) {
+			return $c->reply->file($path);
+		}
+		return $c->reply->not_found;
+	})->name('acme_challenge');
 
 	$r->post('/_login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
 	$r->post('/_generate_logout')->to(controller => 'Users', action => 'generate_logout')->name('generate_logout');
