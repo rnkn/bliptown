@@ -327,7 +327,8 @@ sub render_raw {
 	my $subdir = $c->stash('subdir');
 	$slug = "$subdir/" . $slug if $subdir;
 
-	return $c->reply->txt_not_found unless my $path = $c->get_file($slug);
+	my $path = $c->get_file($slug);
+	return $c->reply->txt_not_found unless $path;
 	my $chars = $path->slurp('UTF-8');
 	return $c->render(text => $chars, format => 'txt');
 }
