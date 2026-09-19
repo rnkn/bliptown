@@ -361,7 +361,15 @@ sub startup {
 		}
 	);
 
-	my $r = $app->routes;
+	my $r = $app->routes->under(sub {
+		my $c = shift;
+		my $path = $c->req->url->path;
+		if ($path =~ /[\x00-\x1F\x7F]/) {
+			$c->reply->not_found;
+			return;
+		}
+		return 1;
+	});
 
 	$r->get('/.well-known/acme-challenge/:file' => sub {
 		my $c = shift;
