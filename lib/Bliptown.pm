@@ -443,7 +443,7 @@ sub startup {
 			$c->render(
 				status => 403,
 				template => 'message',
-				title => 'Bliptown :: 403 Forbidden',
+				page_title => '403 Forbidden',
 				content => '403 Forbidden: demo user cannot perform this action.'
 			);
 			return;
