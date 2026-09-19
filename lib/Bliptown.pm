@@ -71,7 +71,8 @@ sub startup {
 			my $db = path($ENV{BLIPTOWN_DB});
 			state $sql = Mojo::SQLite->new("sqlite:$db");
 			return $sql;
-		});
+		}
+	);
 
 	my $migrations_path = $app->home->child('migrations.sql');
 	$app->sqlite->migrations->from_file($migrations_path)->migrate($ENV{BLIPTOWN_DB_SCHEMA});
@@ -82,7 +83,8 @@ sub startup {
 			state $db = $c->sqlite->db;
 			$db->query("PRAGMA busy_timeout = 10000");
 			return $db;
-		});
+		}
+	);
 
 	$app->helper(
 		geoip => sub {
@@ -92,13 +94,15 @@ sub startup {
 				locales => ['en']
 			);
 			return $reader;
-		});
+		}
+	);
 
 	$app->helper(
 		ipc => sub {
 			state $ipc = Bliptown::Model::IPC->new;
 			return $ipc;
-		});
+		}
+	);
 
 	$app->helper(
 		customer => sub {
@@ -106,7 +110,8 @@ sub startup {
 			return Bliptown::Model::Customer->new(
 				util => $c->util,
 			);
-		});
+		}
+	);
 
 	$app->helper(
 		checkout => sub {
@@ -114,7 +119,8 @@ sub startup {
 			return Bliptown::Model::Checkout->new(
 				util => $c->util,
 			);
-		});
+		}
+	);
 
 	$app->helper(
 		user => sub {
@@ -123,7 +129,8 @@ sub startup {
 				db => $c->db,
 				customer => $c->customer,
 			);
-		});
+		}
+	);
 
 	$app->helper(
 		page => sub {
@@ -134,12 +141,14 @@ sub startup {
 				mustache => $c->mustache,
 				util => $c->util
 			);
-		});
+		}
+	);
 
 	$app->helper(
 		metadata => sub {
 			return Bliptown::Model::Metadata->new;
-		});
+		}
+	);
 
 	$app->helper(
 		mustache => sub {
@@ -151,12 +160,14 @@ sub startup {
 				util => $c->util,
 				prettydate_fmt => $fmt,
 			);
-		});
+		}
+	);
 
 	$app->helper(
 		file => sub {
 			return Bliptown::Model::File->new;
-		});
+		}
+	);
 
 	$app->helper(
 		token => sub {
@@ -164,7 +175,8 @@ sub startup {
 			return Bliptown::Model::Token->new(
 				db => $c->db
 			);
-		});
+		}
+	);
 
 	$app->helper(
 		email => sub {
@@ -199,7 +211,8 @@ sub startup {
 			$slug = url_unescape($slug);
 			$slug =~ s{^/}{};
 			return $slug;
-		});
+		}
+	);
 
 	$app->helper(
 		get_req_user_path => sub {
@@ -220,7 +233,8 @@ sub startup {
 				$c->stash(req_user_path => $path);
 			};
 			return $path;
-		});
+		}
+	);
 
 	$app->helper(
 		get_req_username => sub {
@@ -233,7 +247,8 @@ sub startup {
 				$c->stash(req_username => $req_username);
 			}
 			return $req_username;
-		});
+		}
+	);
 
 	$app->helper(
 		get_user_custom_domain => sub {
@@ -245,7 +260,8 @@ sub startup {
 				return $domain if $domain =~ $domain_re;
 			}
 			return;
-		});
+		}
+	);
 
 	$app->helper(
 		get_user_prettydate_fmt => sub {
@@ -254,7 +270,8 @@ sub startup {
 			my $style = -f $path ? $c->util->read_file_line($path) : 'euro';
 			my $fmt = $c->app->config->{prettydate_fmts}->{$style};
 			return $fmt;
-		});
+		}
+	);
 
 	$app->helper(
 		get_file => sub {
