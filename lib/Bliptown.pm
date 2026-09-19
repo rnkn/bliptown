@@ -377,7 +377,8 @@ sub startup {
 		if (-f $path && -r $path) {
 			return $c->reply->file($path);
 		}
-		return $c->reply->not_found;
+		$c->reply->not_found;
+		return;
 	})->name('acme_challenge');
 
 	$r->post('/_login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
