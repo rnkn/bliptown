@@ -143,6 +143,7 @@ hr {
 table {
 	text-align: left;
 	margin-bottom: 1em;
+	width: 100%;
 }
 
 table td {
@@ -241,10 +242,6 @@ main:has(.cover) {
 
 .wide {
 	max-width: 100%;
-}
-
-.wide-table table {
-	width: 100%;
 }
 
 .gallery-grid {
