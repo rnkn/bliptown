@@ -8,6 +8,7 @@
 	--controls-color: rgb(240,240,240);
 	--controls-hover-color: var(--controls-color);
 	--controls-padding: 0.25em;
+	--row-hover-color: var(--controls-color);
 	--warning-color: rgb(200,0,0);
 	--warning-bg-color: rgba(200,0,0,0.2);
 	--warning-hover-color: rgba(200,0,0,0.3);
