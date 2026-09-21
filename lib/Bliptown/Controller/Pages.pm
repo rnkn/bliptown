@@ -83,33 +83,29 @@ sub render_page {
 		if -f $redirects_path;
 	return $c->redirect_to($redirect_url) if $redirect_url;
 
-	my $raw = path($user_path, $slug);
-	my $ext = $raw->extname;
-	if ($ext) {
-		if (-f $raw) {
-			my $cached = $c->app->config->{cdn_exts}->{$ext};
-			if ($c->app->mode eq 'production' && $cached) {
-				return $c->redirect_to("https://cdn.blip.town/$req_username/$slug");
-			}
-			return $c->reply->file($raw);
+	my $file = $c->get_file($slug, 1);
+
+	if ($file && (my $ext = $file->extname)) {
+		my $cached = $c->app->config->{cdn_exts}->{$ext};
+		if ($c->app->mode eq 'production' && $cached) {
+			return $c->redirect_to("https://cdn.blip.town/$req_username/$slug");
 		}
-		my $fallback = path($c->app->static->paths->[0], 'defaults', $slug);
-		return $c->reply->file($fallback) if -f $fallback;
+		return $c->reply->file($file);
 	}
 
-	my $file;
 	if (!$slug || $slug =~ m{/$}) {
-		unless ($file = $c->get_file("$slug/index")) {
+		$file = $c->get_file("$slug/index");
+		if (!$file) {
 			$slug =~ s{/$}{};
-			if ($file = $c->get_file($slug)) {
-				return $c->redirect_to('render_page', catchall => $slug);
-			}
-		};
-	} else {
-		unless ($file = $c->get_file($slug)) {
-			if ($file = $c->get_file("$slug/index")) {
-				return $c->redirect_to('render_page', catchall => "$slug/");
-			}
+			$file = $c->get_file($slug);
+			return $c->redirect_to('render_page', catchall => $slug) if $file;
+		}
+	}
+	else {
+		$file = $c->get_file($slug);
+		if (!$file) {
+			$file = $c->get_file("$slug/index");
+			return $c->redirect_to('render_page', catchall => "$slug/") if $file;
 		}
 	}
 
@@ -170,20 +166,20 @@ sub render_page {
 	}
 
 	$c->stash(
-		template => 'page',
-		site_title => $site_title,
-		page_title => $page_title,
-		description => $desc,
-		author => $author,
-		scripts => \@scripts,
-		theme => $c->param('theme')		// '',
-		customize => 1,
-		editable => 1,
-		header => $skel_html{header}	// '',
-		menu => $skel_html{menu}		// '',
-		footer => $skel_html{footer}	// '',
-		content => $page->{html}		// '',
-		redirect => $c->url_for('render_page'),
+		template	=> 'page',
+		site_title	=> $site_title,
+		page_title	=> $page_title,
+		description	=> $desc,
+		author		=> $author,
+		scripts		=> \@scripts,
+		theme		=> $c->param('theme')	// '',
+		customize	=> 1,
+		editable	=> 1,
+		header		=> $skel_html{header}	// '',
+		menu		=> $skel_html{menu}		// '',
+		footer		=> $skel_html{footer}	// '',
+		content		=> $page->{html}		// '',
+		redirect	=> $c->url_for('render_page'),
 	);
 	return $c->render;
 }
@@ -237,7 +233,7 @@ sub edit_page {
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
-	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'));
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'))->realpath;
 	my $path;
 	if (!$slug || $slug =~ m{/$}) {
 		unless ($path = $c->get_file("$slug/index")) {

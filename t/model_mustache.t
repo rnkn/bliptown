@@ -167,7 +167,23 @@ subtest 'process_partials excessive recursion' => sub {
         recur		=> 60,
     };
     my $out = $mustache->process_partials($text_1, $args);
-    like $out, qr/Error 508/, 'process_partials returns 508 for max recursion';
+    like $out, qr/Error 508/;
+};
+
+subtest 'process escapes literal tags' => sub {
+    my $text = 'Use {{ ! title }} for variables.';
+    my $args = { metadata => { title => 'Alice' } };
+    my $out = $mustache->process($text, $args);
+    is $out, 'Use {{ title }} for variables.',
+        'process outputs literal braces from {{ ! }}';
+};
+
+subtest 'process preserves entities in nested calls' => sub {
+    my $text = 'Use {{ ! title }} for variables.';
+    my $args = { metadata => { title => 'Alice' }, recur => 1 };
+    my $out = $mustache->process($text, $args);
+    is $out, 'Use &#123;&#123; title &#125;&#125; for variables.',
+        'process keeps entities within recursion';
 };
 
 done_testing;

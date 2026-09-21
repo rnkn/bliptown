@@ -71,18 +71,9 @@ sub send_magic_link {
 	my ($self, $args) = @_;
 	my $username = $args->{username};
 	return unless $username;
-
-	my $user_rec = $self->user->read_user({
-		key => 'username',
-		username => $username,
-	});
-	return unless $user_rec;
-
-	my $email = $user_rec->{email};
+	my $email = $args->{email};
 	return unless $email;
-
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
-	my $custom_domain = $self->util->read_file_line($path) if -f $path;
+	my $custom_domain = $args->{custom_domain} // '';
 
 	my $smtp = Mojo::SMTP::Client->new(
 		address => $ENV{BLIPTOWN_SMTP_ADDR},
