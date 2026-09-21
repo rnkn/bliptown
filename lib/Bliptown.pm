@@ -423,9 +423,9 @@ sub startup {
 	$r->get('/_auth')->to(controller => 'Users', action => 'user_auth')->name('user_auth');
 	$r->get('/_login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 
-	$r->get('/track/:rand')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');
+	$r->get('/_track/:rand')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');
 
-	$r->get('/mysite' => sub {
+	$r->get('/_mysite' => sub {
 		my $c = shift;
 		my $username = $c->session('username');
 
