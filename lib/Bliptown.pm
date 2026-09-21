@@ -387,10 +387,10 @@ sub startup {
 					return $c->reply->file($path);
 				}
 			}
-			elsif ($c->session('username') && $c->session('username') eq $c->get_req_username) {
+			elsif ($c->app->mode eq 'production' && $c->session('username') && $c->session('username') eq $c->get_req_username) {
 				$c->res->headers->cache_control('no-cache');
 			}
-			else {
+			elsif ($c->app->mode eq 'production') {
 				$c->res->headers->cache_control('public, max-age=60, stale-while-revalidate=600');
 			}
 			return;
