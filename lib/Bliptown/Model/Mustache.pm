@@ -156,8 +156,8 @@ sub error_not_found {
 EOF
 	return {
 		metadata => {
-			title => 'Bliptown :: Error 404: File Not Found',
 			status => 404,
+			page_title => 'File Not Found',
 		},
 		text => $html
 	}
@@ -170,7 +170,8 @@ sub error_max_recursion {
 EOF
 	return {
 		metadata => {
-			title => 'Bliptown :: Error 508: Recursion',
+			status => 508,
+			page_title => 'Recursion',
 			status => 508,
 		},
 		text => $html

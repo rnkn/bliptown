@@ -79,7 +79,7 @@ sub user_login {
 	my $c = shift;
 	$c->render(
 		template => 'message',
-		title => 'Bliptown :: Login',
+		page_title => 'Login',
 		content => 'Check your email for a login link. You can now close this window.',
 	);
 }
@@ -105,8 +105,8 @@ sub user_auth {
 		return $c->render(
 			status => 403,
 			template => 'message',
-			title => 'Bliptown',
-			content => '403 Forbidden: invalid or expired token',
+			page_title => 'Forbidden',
+			content => 'Sorry, that token is invalid or expired.',
 		);
 	}
 	else {
