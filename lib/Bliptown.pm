@@ -423,7 +423,7 @@ sub startup {
 	$r->get('/_auth')->to(controller => 'Users', action => 'user_auth')->name('user_auth');
 	$r->get('/_login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 
-	$r->get('/_track/:rand')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');
+	$r->post('/_track')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');
 
 	$r->get('/_mysite' => sub {
 		my $c = shift;

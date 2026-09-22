@@ -19,3 +19,4 @@
 <main>
 	%== $content
 </main>
+<div id="analytics" data-track-url="<%= url_for('track_visit')->query(ref => $c->req->headers->referrer) %>"></div>

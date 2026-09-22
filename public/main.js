@@ -1,3 +1,19 @@
+const trackEvents = ['pointermove', 'keydown', 'touchstart'];
+const trackUrl = document.querySelector('#analytics')?.dataset.trackUrl;
+
+let tracked = false;
+
+function track(url) {
+    if (tracked) return;
+    tracked = true;
+    navigator.sendBeacon(url);
+    for (const e of trackEvents)
+		window.removeEventListener(e, track);
+}
+
+for (const e of trackEvents)
+	window.addEventListener(e, track(trackUrl));
+
 const nav = document.querySelector('nav');
 const key = 'nav-scroll-pos';
 
