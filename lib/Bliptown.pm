@@ -75,6 +75,7 @@ sub startup {
 		. q{font-src 'self' https:; }
 		. q{style-src 'self' 'unsafe-inline' https:; }
 		. q{script-src 'self' unpkg.com; }
+		. q{frame-src 'self' https:; }
 		. q{connect-src 'self'; },
 	);
 
