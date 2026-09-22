@@ -86,7 +86,7 @@ check file usr/bin/su path /usr/bin/su
 check file script/bliptown path /usr/local/www/bliptown/script/bliptown
 	if failed perm 0755 then alert
 
-check file script/bliptown_helper path /usr/local/www/bin/bliptown_helper
+check file bin/bliptown_helper path /usr/local/www/bliptown/bin/bliptown_helper
 	if failed uid 1008 then alert
 	if failed gid 1008 then alert
 
