@@ -1,6 +1,6 @@
 % my $username = session('username') // '';
 % my $req_username = get_req_username() // '';
-% my $drawer_toggle_style = param('toggle') ? 'display: block' : '';
+% my $drawer_toggle_class = param('toggle') ? 'open' : '';
 <!DOCTYPE html>
 <html>
 	<head>
@@ -73,7 +73,7 @@
 		<div id="viewport">
 			<input type="checkbox" id="nav-toggle" hidden>
 			<label id="nav-toggle" class="button" for="nav-toggle"></label>
-			<label id="drawer-toggle" class="button" for="drawer-toggle" style="<%= $drawer_toggle_style %>">+</label>
+			<label id="drawer-toggle" class="button <%= $drawer_toggle_class %>" for="drawer-toggle">+</label>
 			%= content
 			% if (flash('info')) {
 			<dialog id="toast" open>

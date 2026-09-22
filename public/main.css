@@ -442,6 +442,10 @@ label#drawer-toggle {
 	right: 2rem;
 }
 
+label#drawer-toggle.open {
+	display: block;
+}
+
 input#drawer-toggle:checked ~ #drawer {
 	visibility: visible;
 	height: var(--drawer-height);
