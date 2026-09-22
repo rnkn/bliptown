@@ -425,7 +425,7 @@ sub startup {
 			my $csp = $c->app->config->{csp_default} // '';
 			my $endpoint_name = eval { $c->match->endpoint->name };
 
-			if ($endpoint_name && $endpoint_name eq 'render_page' || $endpoint_name eq 'render_private_page') {
+			if ($endpoint_name && ($endpoint_name eq 'render_page' || $endpoint_name eq 'render_private_page')) {
 				$csp = $c->app->config->{csp_pages} // '';
 			}
 
