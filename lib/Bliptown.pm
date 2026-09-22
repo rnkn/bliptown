@@ -70,6 +70,7 @@ sub startup {
 		  q{default-src 'self'; }
 		. q{object-src 'none'; }
 		. q{base-uri 'none'; }
+		. q{frame-ancestors blip.town; }
 		. q{img-src 'self' data: https:; }
 		. q{font-src 'self' data: https:; }
 		. q{style-src 'self' 'unsafe-inline' data: https:; }
