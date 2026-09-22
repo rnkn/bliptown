@@ -31,6 +31,18 @@ sub read_login_token {
 	return $token_rec if $token_rec;
 }
 
+sub read_recent_login_tokens {
+	my ($self, $args) = @_;
+	my $username = $args->{username} or return;
+
+	my $token_recs = $self->db->select(
+		'login_tokens', undef, { username => $username },
+        { order_by => { -desc => 'expires' }, limit => 3 }
+	)->hashes;
+
+	return $token_recs if $token_recs;
+}
+
 sub delete_login_token {
 	my ($self, $args) = @_;
 	my $token = $args->{token} or return;
@@ -38,6 +50,13 @@ sub delete_login_token {
 		'login_tokens', { token => $token }
 	);
 	return 1 if $ok;
+}
+
+sub validate_login_token_rec {
+	my ($self, $args) = @_;
+	my $token_rec = $args->{token_rec} or return;
+	return 1 if $token_rec->{username} && $token_rec->{expires} > time;
+	return;
 }
 
 sub create_logout_token {

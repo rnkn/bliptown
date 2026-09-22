@@ -12,16 +12,9 @@ has 'util';
 
 sub generate_magic_link_email {
 	my ($self, $args) = @_;
-	my $username = $args->{username};
-	my $email = $args->{email};
-	return unless $username and $email;
-	my $custom_domain = $args->{custom_domain} // '';
-
-	my $token = $self->token->create_login_token({
-		username => $username,
-		custom_domain => $custom_domain,
-	});
-	return unless $token;
+	my $username = $args->{username} or return;
+	my $email = $args->{email} or return;
+	my $token = $args->{token} or return;
 
 	my $url = Mojo::URL->new;
 	$url->host($ENV{BLIPTOWN_DOMAIN});
@@ -31,8 +24,8 @@ sub generate_magic_link_email {
 	$url->query(token => $token);
 
 	my %data = (
-		recipient => $args->{username},
-		recipient_email => $args->{email},
+		recipient => $username,
+		recipient_email => $email,
 		date => strftime("%a, %d %b %Y %H:%M:%S %z", localtime),
 		token => $token,
 		host => $ENV{BLIPTOWN_DOMAIN},
@@ -69,20 +62,9 @@ EOF
 
 sub send_magic_link {
 	my ($self, $args) = @_;
-	my $username = $args->{username};
-	return unless $username;
-
-	my $user_rec = $self->user->read_user({
-		key => 'username',
-		username => $username,
-	});
-	return unless $user_rec;
-
-	my $email = $user_rec->{email};
-	return unless $email;
-
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
-	my $custom_domain = $self->util->read_file_line($path) if -f $path;
+	my $username = $args->{username} or return;
+	my $email = $args->{email} or return;
+	my $custom_domain = $args->{custom_domain} // '';
 
 	my $smtp = Mojo::SMTP::Client->new(
 		address => $ENV{BLIPTOWN_SMTP_ADDR},
@@ -90,10 +72,16 @@ sub send_magic_link {
 		tls => 1,
 	);
 
+	my $token = $self->token->create_login_token({
+		username => $username,
+		custom_domain => $custom_domain,
+	});
+	return unless $token;
+
 	my $email_text = $self->generate_magic_link_email({
 		username => $username,
 		email => $email,
-		custom_domain => $custom_domain // '',
+		token => $token,
 	});
 
 	$smtp->send(

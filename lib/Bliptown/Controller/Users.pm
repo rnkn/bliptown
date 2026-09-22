@@ -1,6 +1,7 @@
 package Bliptown::Controller::Users;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::URL;
+use Mojo::File qw(path);
 
 sub validate_user {
 	my ($c, $args) = @_;
@@ -69,10 +70,50 @@ sub generate_login {
 		$c->session(username => $ENV{BLIPTOWN_DEMO_USER});
 		return $c->redirect_to($redirect);
 	}
-	else {
-		$c->email->send_magic_link({ username => $username });
-		return $c->redirect_to('user_login');
+
+	my $user = $c->user->read_user({
+		key => 'username',
+		username => $username,
+	});
+
+	unless ($user) {
+		return $c->render(
+			status => 404,
+			template => 'message',
+			page_title => 'Not Found',
+			content => 'User not found.',
+		);
 	}
+
+	my $cooldown = 600;
+	my @recent = $c->token->read_recent_login_tokens({
+		username => $username
+	})->each;
+
+	if (scalar @recent >= 3) {
+		my $created = $recent[0]->{expires} - 3600;
+		if (time - $created < $cooldown) {
+			return $c->render(
+				status => 429,
+				template => 'message',
+				page_title => 'Too Many Requests',
+				content => 'Too many login attempts for that user. Please try again in a moment.'
+			);
+		};
+	}
+
+	my $email = $user->{email};
+	return $c->reply->exception("No email associated with username $username") unless $email;
+
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
+	my $custom_domain = -f $path ? $c->util->read_file_line($path) : '';
+
+	$c->email->send_magic_link({
+		username => $username,
+		email => $email,
+		custom_domain => $custom_domain,
+	});
+	return $c->redirect_to('user_login');
 }
 
 sub user_login {
@@ -94,14 +135,8 @@ sub user_auth {
 	$host =~ s/^www\.//;
 
 	my $token_rec = $c->token->read_login_token({ token => $token });
-	my ($username, $custom_domain);
-	if ($token_rec) {
-		$username = $token_rec->{username};
-		$custom_domain = $token_rec->{custom_domain};
-	}
-
-	if (! $token_rec || ! $username || $token_rec->{expires} <= time) {
-		$c->token->delete_login_token({ token => $token }) if $token_rec;
+	
+	unless ($c->token->validate_login_token_rec({ token_rec => $token_rec })) {
 		return $c->render(
 			status => 403,
 			template => 'message',
@@ -109,9 +144,11 @@ sub user_auth {
 			content => 'Sorry, that token is invalid or expired.',
 		);
 	}
-	else {
-		$c->session(expiration => 30 * 24 * 60 * 60, username => $username);
-	}
+
+	my $username = $token_rec->{username};
+	my $custom_domain = $token_rec->{custom_domain};
+
+	$c->session(expiration => 30 * 24 * 60 * 60, username => $username);
 
 	if ($custom_domain) {
 		if ($host eq $custom_domain) {
