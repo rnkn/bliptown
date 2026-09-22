@@ -56,24 +56,25 @@ sub startup {
 			scrollreveal	=> 'https://unpkg.com/scrollreveal@4.0.9/dist/scrollreveal.js',
 			baguettebox		=> 'https://unpkg.com/baguettebox.js@1.13.0/dist/baguetteBox.js',
 		},
-		csp_default => join '; ',
-			q{default-src 'self'},
-			q{object-src 'none'},
-			q{base-uri 'none'},
-			q{frame-ancestors 'none'},
-			q{form-action 'self'},
-			q{img-src 'self'},
-			q{style-src 'self'},
-			q{script-src 'self'},
-			q{connect-src 'self'},
-		csp_pages => join '; ',
-			q{default-src 'self'},
-			q{object-src 'none'},
-			q{base-uri 'none'},
-			q{img-src 'self' data: https:},
-			q{style-src 'self' 'unsafe-inline'},
-			q{script-src 'self' 'unsafe-inline' https://unpkg.com},
-			q{connect-src 'self'},
+		csp_default =>
+		  q{default-src 'self'; }
+		. q{object-src 'none'; }
+		. q{base-uri 'none'; }
+		. q{frame-ancestors 'none'; }
+		. q{form-action 'self'; }
+		. q{img-src 'self'; }
+		. q{style-src 'self'; }
+		. q{script-src 'self'; }
+		. q{connect-src 'self'; },
+		csp_pages =>
+		  q{default-src 'self'; }
+		. q{object-src 'none'; }
+		. q{base-uri 'none'; }
+		. q{img-src 'self' data: https:; }
+		. q{font-src 'self' data: https:; }
+		. q{style-src 'self' 'unsafe-inline' data: https:; }
+		. q{script-src 'self' 'unsafe-inline' data: https:; }
+		. q{connect-src 'self'; },
 	);
 
 	$app->secrets([
@@ -420,15 +421,15 @@ sub startup {
 			my $c = shift;
 			my $res = $c->res;
 			return if $res->code && $res->code >= 300 && $res->code < 400;
+			
+			my $csp = $c->app->config->{csp_default} // '';
+			my $endpoint_name = eval { $c->match->endpoint->name };
 
-			my $csp = $c->app->config->{csp_default};
-			my $endpoint = eval { $c->match->endpoint };
-			my $name = $endpoint ? $endpoint->name : '';
-			$csp = $c->app->config->{csp_pages}
-				if $name eq 'render_page'
-				|| $name eq 'render_private_page';
+			if ($endpoint_name && $endpoint_name eq 'render_page' || $endpoint_name eq 'render_private_page') {
+				$csp = $c->app->config->{csp_pages} // '';
+			}
 
-			$res->headers->content_security_policy($csp) if $csp;
+			$res->headers->content_security_policy($csp);
 			return;
 		}
 	);
