@@ -34,7 +34,7 @@ sub list_settings {
 	my $create_backups = $user_rec->{create_backups} // 0;
 
 	$c->stash(
-		title => 'Settings',
+		page_title => 'Settings',
 		template => 'settings',
 		locked => $locked,
 		username => $username,
