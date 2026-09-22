@@ -13,9 +13,9 @@ ALTER TABLE users
 ALTER TABLE users
 	DROP COLUMN totp_secret;
 -- 9 down
-ALTER TABLE login_tokens
+ALTER TABLE users
 	ADD COLUMN password_hash TEXT;
-ALTER TABLE login_tokens
+ALTER TABLE users
 	ADD COLUMN totp_secret TEXT;
 -- 8 up
 ALTER TABLE login_tokens
