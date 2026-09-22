@@ -25,7 +25,7 @@ check process bliptown pidfile /tmp/bliptown.pid
 	if not exist for 3 cycles then alert
 	if not exist for 3 cycles then start
 
-check process bliptown_helper matching "perl:? /usr/local/www/bliptown/script/bliptown_helper\[master\]"
+check process bliptown_helper matching "perl:? /usr/local/www/bliptown/bin/bliptown_helper\[master\]"
 	start program = "/usr/sbin/rcctl start bliptown_helper"
 	if not exist for 3 cycles then alert
 	if not exist for 3 cycles then start
@@ -86,7 +86,7 @@ check file usr/bin/su path /usr/bin/su
 check file script/bliptown path /usr/local/www/bliptown/script/bliptown
 	if failed perm 0755 then alert
 
-check file script/bliptown_helper path /usr/local/www/bliptown/script/bliptown_helper
+check file script/bliptown_helper path /usr/local/www/bin/bliptown_helper
 	if failed uid 1008 then alert
 	if failed gid 1008 then alert
 

@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-daemon="/usr/local/www/bliptown/script/bliptown_helper"
+daemon="/usr/local/www/bliptown/bin/bliptown_helper"
 daemon_logger="daemon.info"
 
 rc_bg=YES
