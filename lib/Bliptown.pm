@@ -71,10 +71,10 @@ sub startup {
 		. q{object-src 'none'; }
 		. q{base-uri 'none'; }
 		. q{frame-ancestors blip.town; }
-		. q{img-src 'self' data: https:; }
-		. q{font-src 'self' data: https:; }
-		. q{style-src 'self' 'unsafe-inline' data: https:; }
-		. q{script-src 'self' 'unsafe-inline' data: https:; }
+		. q{img-src 'self' https:; }
+		. q{font-src 'self' https:; }
+		. q{style-src 'self' 'unsafe-inline' https:; }
+		. q{script-src 'self' unpkg.com; }
 		. q{connect-src 'self'; },
 	);
 
