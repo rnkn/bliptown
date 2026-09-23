@@ -83,6 +83,8 @@ sub startup {
 		$ENV{BLIPTOWN_SECRET}
 	]);
 
+	$app->sessions->encrypted(1);
+
 	$app->max_request_size(1024 * 1024 * 250);
 
 	delete $app->static->extra->{'favicon.ico'};
