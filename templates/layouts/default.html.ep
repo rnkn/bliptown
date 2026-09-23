@@ -44,7 +44,7 @@
 					% }
 					<li><a href="https://blip.town/faq">Help</a></li>
 					<li>
-						<form id="logout" method="POST" action="<%= url_for('generate_logout')->query(back_to => url_for) %>">
+						<form id="logout" method="POST" action="<%= url_for('generate_logout') %>">
 							<button type="submit">Logout</button>
 						</form>
 					</li>
