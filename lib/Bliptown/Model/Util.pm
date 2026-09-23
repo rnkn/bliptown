@@ -35,9 +35,9 @@ sub create_bliptown_url {
 	my $url = Mojo::URL->new;
 	$url->scheme($ENV{BLIPTOWN_SCHEME});
 	$url->port($ENV{BLIPTOWN_PORT});
-	$url->host($args->{host} // $ENV{BLIPTOWN_DOMAIN});
-	$url->path($args->{path} // '/');
-	$url->query(token => $args->{token}, back_to => $args->{redirect});
+	$url->host($args->{host} || $ENV{BLIPTOWN_DOMAIN});
+	$url->path($args->{path} || '/');
+	$url->query(%{$args->{query} || {}});
 	return $url;
 }
 
