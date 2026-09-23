@@ -11,20 +11,21 @@ use_ok qw(Bliptown::Controller::Health);
 
 my $t = Test::Mojo->new('Bliptown');
 my $app = $t->app;
+my $db = create_db;
 
 $app->helper(
-	db => sub { return create_db }
+	db => sub { return $db }
 );
 
 my $tempdir = tempdir;
-my $health_file = path($tempdir, 'server_health.txt');
-my $helper_health_file = path($tempdir, 'helper_health.txt');
+my $health_file = path($tempdir, 'bliptown.health');
+my $helper_health_file = path($tempdir, 'bliptown_helper.health');
 
 $health_file->spew('3');
 $helper_health_file->spew('2');
 
-local $ENV{BLIPTOWN_HEALTH_FILE} = $health_file;
-local $ENV{BLIPTOWN_HELPER_HEALTH_FILE} = $helper_health_file;
+$ENV{BLIPTOWN_HEALTH_FILE} = $health_file;
+$ENV{BLIPTOWN_HELPER_HEALTH_FILE} = $helper_health_file;
 
 $t->get_ok('/_health')->status_is(200)
 		->json_is('/BliptownServerWorkers', 3)
