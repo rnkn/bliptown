@@ -411,6 +411,7 @@ sub startup {
 			}
 			elsif ($c->app->mode eq 'production') {
 				$c->res->headers->cache_control('public, max-age=60, stale-while-revalidate=600');
+				$c->res->headers->vary('Cookie');
 			}
 			return;
 		}
