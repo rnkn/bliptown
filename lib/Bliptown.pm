@@ -455,7 +455,7 @@ sub startup {
 	})->name('acme_challenge');
 
 	$r->post('/_login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
-	$r->post('/_generate_logout')->to(controller => 'Users', action => 'generate_logout')->name('generate_logout');
+	$r->post('/_logout')->to(controller => 'Users', action => 'generate_logout')->name('generate_logout');
 	$r->get('/_logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
 	$r->get('/_auth')->to(controller => 'Users', action => 'user_auth')->name('user_auth');
 	$r->get('/_login')->to(controller => 'Users', action => 'user_login')->name('user_login');
