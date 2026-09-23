@@ -395,10 +395,6 @@ sub startup {
 
 			$host =~s/^www\.//;
 
-			$c->app->sessions->cookie_domain(
-				$host =~ /\Q$ENV{BLIPTOWN_DOMAIN}\E$/ ? $ENV{BLIPTOWN_DOMAIN} : $host
-			);
-
 			if ($host eq "cdn-origin.$ENV{BLIPTOWN_DOMAIN}") {
 				my $req_username = shift @{$req_url->path->parts};
 				return unless $req_username;
