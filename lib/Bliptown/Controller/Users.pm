@@ -1,6 +1,5 @@
 package Bliptown::Controller::Users;
 use Mojo::Base 'Mojolicious::Controller';
-use Mojo::URL;
 use Mojo::File qw(path);
 
 sub validate_user {
@@ -150,47 +149,47 @@ sub user_auth {
 
 	$c->session(expiration => 30 * 24 * 60 * 60, username => $username);
 
+	my $next_host;
 	if ($custom_domain) {
 		if ($host eq $custom_domain) {
-			$c->session(expiration => 30 * 24 * 60 * 60, username => $username);
 			$c->token->delete_login_token({ token => $token });
-			return $c->redirect_to('/');
+			return $c->redirect_to($redirect);
 		}
-		else {
-			my $url = Mojo::URL->new;
-			$url->host($custom_domain);
-			$url->scheme($ENV{BLIPTOWN_SCHEME});
-			$url->port($ENV{BLIPTOWN_PORT});
-			$url->path($c->url_for('user_auth'));
-			$url->query(token => $token);
-			return $c->redirect_to($url);
-		}
+		$next_host = $host eq "$username.$ENV{BLIPTOWN_DOMAIN}" ?
+			$custom_domain : "$username.$ENV{BLIPTOWN_DOMAIN}";
 	}
-	else {
+	elsif ($host eq "$username.$ENV{BLIPTOWN_DOMAIN}") {
 		$c->token->delete_login_token({ token => $token });
 		return $c->redirect_to($redirect);
 	}
+	else {
+		$next_host = "$username.$ENV{BLIPTOWN_DOMAIN}";
+	}
+
+	my %query;
+	$query{token} = $token if $token;
+	$query{back_to} = $redirect if $redirect;
+
+	my $url = $c->util->create_bliptown_url({
+		host => $next_host,
+		path => $c->url_for('user_auth'),
+		query => \%query,
+	});
+	return $c->redirect_to($url);
 }
 
 sub generate_logout {
 	my $c = shift;
 	my $username = $c->session('username');
 	return $c->redirect_to('/') unless $username;
-	my $redirect = $c->param('back_to');
+
+	$c->session(expires => 1);
+
 	my $custom_domain = $c->get_user_custom_domain($username);
 
-	my $token;
-	if ($custom_domain) {
-		$token = $c->token->create_logout_token({
-			username => $username,
-			custom_domain => $custom_domain,
-		});
-	}
-
 	my $url = $c->util->create_bliptown_url({
+		host => $custom_domain || "$username.$ENV{BLIPTOWN_DOMAIN}",
 		path => $c->url_for('user_logout'),
-		token => $token,
-		redirect => $redirect,
 	});
 
 	return $c->redirect_to($url);
@@ -198,36 +197,32 @@ sub generate_logout {
 
 sub user_logout {
 	my $c = shift;
-	my $token = $c->param('token') // '';
-	my $redirect = $c->param('back_to') // '/';
 
 	my $host = $c->req->url->to_abs->host;
+	return $c->redirect_to('/') unless $host;
 	$host =~ s/^www\.//;
 
-	$c->session(expires => 1);
+	$c->session(expires => 1) if $c->session('username');
 
-	my $token_rec = $c->token->read_logout_token({ token => $token });
-	my $custom_domain = $token_rec->{custom_domain} if $token_rec;
+	my $username = $c->session('username') || $c->get_req_username;
+	return $c->redirect_to('/') unless $username;
 
-	if ($custom_domain) {
-		if ($host eq $custom_domain) {
-			my $url = $c->create_bliptown_url({
-				path => $c->url_for('user_logout'),
-				redirect => $redirect,
-			});
-			return $c->redirect_to($url);
-		}
-		else {
-			my $url = $c->util->create_bliptown_url({
-				host => $custom_domain,
-				path => $c->url_for('user_logout'),
-				redirect => $redirect,
-			});
-			return $c->redirect_to($url);
-		}
+	my $next_host;
+	if ($host ne "$username.$ENV{BLIPTOWN_DOMAIN}" && $host ne $ENV{BLIPTOWN_DOMAIN}) {
+		$next_host = "$username.$ENV{BLIPTOWN_DOMAIN}";
+	}
+	elsif ($host eq "$username.$ENV{BLIPTOWN_DOMAIN}") {
+		$next_host = $ENV{BLIPTOWN_DOMAIN};
+	}
+	else {
+		return $c->redirect_to('/');
 	}
 
-	return $c->redirect_to($redirect);
+	my $url = $c->util->create_bliptown_url({
+		host => $next_host,
+		path => $c->url_for('user_logout'),
+	});
+	return $c->redirect_to($url);
 }
 
 sub billing_session {
