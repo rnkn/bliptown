@@ -1,3 +1,12 @@
+-- 11 up
+DROP TABLE logout_tokens;
+-- 11 down
+CREATE TABLE logout_tokens (
+	token TEXT,
+	username TEXT,
+	custom_domain TEXT,
+	expires INTEGER
+);
 -- 10 up
 CREATE TABLE logout_tokens (
 	token TEXT,
