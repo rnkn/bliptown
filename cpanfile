@@ -1,5 +1,6 @@
 requires 'Mojolicious';
 requires 'Mojo::SQLite';
+requires 'CryptX';
 requires 'Mojo::SMTP::Client';
 requires 'FFI::Platypus';
 requires 'YAML::Tiny';
