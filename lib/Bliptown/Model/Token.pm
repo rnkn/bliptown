@@ -58,40 +58,4 @@ sub validate_login_token_rec {
 	return 1 if $token_rec->{username} && $token_rec->{expires} > time;
 	return;
 }
-
-sub create_logout_token {
-	my ($self, $args)	= @_;
-	my $username		= $args->{username} or return;
-	my $custom_domain	= $args->{custom_domain} or return;
-	my $token			= substr(generate_secret, 0, 40);
-	my $expires			= time + 60;
-
-	my $ok = $self->db->insert(
-		'logout_tokens', {
-			username => $username,
-			token => $token,
-			custom_domain => $custom_domain,
-			expires => $expires,
-		}
-	);
-	return $token if $ok;
-}
-
-sub read_logout_token {
-	my ($self, $args) = @_;
-	my $token = $args->{token} or return;
-	my $token_rec = $self->db->select(
-		'logout_tokens', undef, { token => $token }
-	)->hash;
-	return $token_rec if $token_rec;
-}
-
-sub delete_logout_token {
-	my ($self, $args) = @_;
-	my $token = $args->{token} or return;
-	my $ok = $self->db->delete(
-		'logout_tokens', { token => $token }
-	);
-	return 1 if $ok;
-}
 return 1;
