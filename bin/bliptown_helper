@@ -3,60 +3,50 @@
 use strict;
 use warnings;
 use File::Basename;
-use constant THIS_DIR => dirname(__FILE__);
-use lib THIS_DIR . '/../lib', THIS_DIR . '/../local/lib/perl5';
+use lib dirname(__FILE__) . '/../local/lib/perl5';
 
-use IO::Socket::INET;
-use POSIX qw(setgid setuid pause WNOHANG);
 use Mojo::File qw(path tempfile);
 use Mojo::Util qw(trim b64_decode);
-use Mojo::JSON qw(encode_json decode_json);
+use Mojo::JSON qw(decode_json encode_json);
+use POSIX qw(setgid setuid);
 
-die "$0 must be run as root"					unless $> == 0;
+die "$0 must be run as root" unless $> == 0;
 
-$0 = $0 . '[master]';
+$ENV{PATH} = '/usr/pkg/bin:/usr/pkg/sbin:/bin:/sbin:/usr/bin:/usr/sbin';
 
-die 'BLIPTOWN_HELPER_HOST not defined'			unless defined $ENV{BLIPTOWN_HELPER_HOST};
-die 'BLIPTOWN_HELPER_PORT not defined'			unless defined $ENV{BLIPTOWN_HELPER_PORT};
-die 'BLIPTOWN_HELPER_PREFORK not defined'		unless defined $ENV{BLIPTOWN_HELPER_PREFORK};
-die 'BLIPTOWN_HELPER_HEALTH_FILE not defined'	unless defined $ENV{BLIPTOWN_HELPER_HEALTH_FILE};
+my $envrc = shift @ARGV || "$ENV{HOME}/.envrc";
+my @lines = split /\n/, path($envrc)->slurp;
+foreach my $line (@lines) {
+	next unless $line =~ /^export ([A-Za-z_][A-Za-z0-9_]*)=(.*)$/;
+	my ($key, $val) = ($1, $2);
+	$val = trim $val;
+	$val =~ s/^"(.*)"$/$1/;
+	$val =~ s{\$([A-Za-z_][A-Za-z0-9_]*)}{$ENV{$1} // ''}ge if $val;
+	$ENV{$key} = $val;
+}
 
-die 'BLIPTOWN_DATA_HOME not defined'			unless defined $ENV{BLIPTOWN_DATA_HOME};
-die 'BLIPTOWN_GID not defined'					unless defined $ENV{BLIPTOWN_GID};
-
-my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
-my %children;
-my $needs_reap;
-my $shutdown;
-
-my $health_file = path($ENV{BLIPTOWN_HELPER_HEALTH_FILE});
-$health_file->remove->touch or die "Cannot create health file: $health_file\n";
-
-my $host = $ENV{BLIPTOWN_HELPER_HOST};
-my $port = $ENV{BLIPTOWN_HELPER_PORT};
-
-my $sock = IO::Socket::INET->new(
-	Type => SOCK_STREAM,
-	LocalAddr => $host,
-	LocalPort => $port,
-	Listen => 128,
-	Reuse => 1,
-) or die "Cannot create TCP socket on: $host:$port ($!)";
-
-print "Listening on $host:$port\n";
+die "BLIPTOWN_DATA_HOME not defined" unless defined $ENV{BLIPTOWN_DATA_HOME};
+die "BLIPTOWN_GID not defined" unless defined $ENV{BLIPTOWN_GID};
 
 my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;
 
-sub chdir_home {
+sub chdir_site {
 	my $user = shift;
-	my $home = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
-	chdir $home or die "Cannot change directory: $home ($!)";
-	return $home->to_string;
+	my $site_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+	chdir $site_path or die "Cannot change directory: $site_path ($!)";
+	return $site_path->to_string;
+}
+
+sub chdir_repo {
+	my $user = shift;
+	my $repo_path = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
+	chdir $repo_path or die "Cannot change directory: $repo_path ($!)";
+	return $repo_path->to_string;
 }
 
 sub write_blob {
 	my $payload = shift;
-	my $home = chdir_home($payload->{system_user});
+	my $home = chdir_site($payload->{system_user});
 	my $filename = $payload->{filename};
 	my $b64_encoded = $payload->{blob};
 	my $blob = b64_decode($b64_encoded);
@@ -69,7 +59,7 @@ sub write_blob {
 
 sub backup_file {
 	my $payload = shift;
-	my $home = chdir_home($payload->{system_user});
+	my $home = chdir_site($payload->{system_user});
 	my $filename = $payload->{filename};
 	my $path = path $filename;
 	$path->copy_to("${filename}~") or die "Cannot backup file: $path ($!)";
@@ -78,7 +68,7 @@ sub backup_file {
 
 sub update_file {
 	my $payload = shift;
-	my $home = chdir_home($payload->{system_user});
+	my $home = chdir_site($payload->{system_user});
 	my $filename = $payload->{filename};
 	my $content = $payload->{content};
 	my $path = path $filename;
@@ -91,38 +81,46 @@ sub update_file {
 	return "Updated file: $filename"
 }
 
-sub rename_file {
+sub rename_files {
 	my $payload = shift;
-	my $home = chdir_home($payload->{system_user});
-	my $filename = $payload->{filename};
-	my $path = path $filename;
-	my $new_filename = $payload->{new_filename};
-	my $new_path = path $new_filename;
-	if (-d $new_path && $new_path->list > 0) {
-		return "Skipping nonempty directory: $new_path";
+	my $home = chdir_site($payload->{system_user});
+	my @messages;
+	foreach my $rename (@{$payload->{filenames} // []}) {
+		my $filename = $rename->{filename};
+		my $path = path $filename;
+		my $new_filename = $rename->{new_filename};
+		my $new_path = path $new_filename;
+		if (-d $new_path && $new_path->list > 0) {
+			push @messages, "Skipping nonempty directory: $new_path";
+			next;
+		}
+		my $dir = $new_path->dirname;
+		$dir->make_path or die "Cannot create path: $dir ($!)";
+		$path->move_to($new_path) or die "Cannot move file: $path ($!)";
+		push @messages, "Renamed file: $filename -> $new_filename";
 	}
-	my $dir = $new_path->dirname;
-	$dir->make_path or die "Cannot create path: $dir ($!)";
-	$path->move_to($new_path) or die "Cannot move file: $path ($!)";
-	return "Renamed file: $filename -> $new_filename";
+	return join ', ', @messages;
 }
 
-sub delete_file {
+sub delete_files {
 	my $payload = shift;
-	my $home = chdir_home($payload->{system_user});
-	my $filename = $payload->{filename};
-	if (-d $filename) {
-		path($filename)->remove_tree or die "Cannot delete directory: $filename ($!)";
+	my $home = chdir_site($payload->{system_user});
+	my @deleted;
+	foreach my $filename (@{$payload->{filenames} // []}) {
+		if (-d $filename) {
+			path($filename)->remove_tree or die "Cannot delete directory: $filename ($!)";
+		}
+		else {
+			path($filename)->remove or die "Cannot delete file: $filename ($!)";
+		}
+		push @deleted, $filename;
 	}
-	else {
-		path($filename)->remove or die "Cannot delete file: $filename ($!)";
-	}
-	return "Deleted: $filename"
+	return 'Deleted: ' . join ', ', @deleted;
 }
 
 sub make_directory {
 	my $payload = shift;
-	my $home = chdir_home($payload->{system_user});
+	my $home = chdir_site($payload->{system_user});
 	my $dir = $payload->{filename};
 	path($dir)->make_path or die "Cannot create directory: $dir ($!)";
 	return "Created directory: $dir";
@@ -158,13 +156,6 @@ EOF
 	}
 
 	return "Initialized Git repository: $repo";
-}
-
-sub chdir_repo {
-	my $user = shift;
-	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
-	chdir $repo or die "Cannot change directory: $repo ($!)";
-	return $repo->to_string;
 }
 
 sub git_log {
@@ -221,7 +212,7 @@ sub git_commit {
 
 sub git_checkout {
 	my $payload = shift;
-	my $home = chdir_home($payload->{system_user});
+	my $home = chdir_site($payload->{system_user});
 	my $hash = $payload->{hash};
 	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
 	my $dir = path($home, 'snapshots', $hash);
@@ -246,126 +237,56 @@ sub git_archive {
 }
 
 my %allowed_commands = (
-	write_blob				=> \&write_blob,
-	update_file				=> \&update_file,
-	rename_file				=> \&rename_file,
-	delete_file				=> \&delete_file,
-	backup_file				=> \&backup_file,
-	make_directory			=> \&make_directory,
-	git_commit				=> \&git_commit,
-	git_log					=> \&git_log,
-	git_show				=> \&git_show,
-	git_checkout			=> \&git_checkout,
-	git_archive				=> \&git_archive,
-	provision_cert			=> \&provision_cert,
-	update_acme_domains		=> \&update_acme_domains,
-	update_relayd_keypairs	=> \&update_relayd_keypairs,
+	write_blob		=> { func => \&write_blob,		fields => [qw(system_user filename blob)] },
+	update_file		=> { func => \&update_file,		fields => [qw(system_user filename content)] },
+	rename_files	=> { func => \&rename_files,	fields => [qw(system_user filenames)] },
+	delete_files	=> { func => \&delete_files,	fields => [qw(system_user filenames)] },
+	backup_file		=> { func => \&backup_file,		fields => [qw(system_user filename)] },
+	make_directory	=> { func => \&make_directory,	fields => [qw(system_user filename)] },
+	git_commit		=> { func => \&git_commit,		fields => [qw(system_user)] },
+	git_log			=> { func => \&git_log,			fields => [qw(system_user)] },
+	git_show		=> { func => \&git_show,		fields => [qw(system_user hash)] },
+	git_checkout	=> { func => \&git_checkout,	fields => [qw(system_user hash)] },
+	git_archive		=> { func => \&git_archive,		fields => [qw(system_user hash)] },
 );
 
-sub handle_conn {
-	my $conn = shift;
-
-	my $req_json;
-	while (read($conn, my $buf, 512)) {
-		$req_json .= $buf;
-	}
-
-	my $data = decode_json($req_json);
-	my $command = $data->{command};
-	my $payload = $data->{payload};
-
-	my ($res, $err);
-
-	eval {
-		my $user = $payload->{system_user};
-		my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
-		my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
-		my $private = path($root, 'private');
-
-		unless ($user eq 'root') {
-			my $uid = getpwnam($user) or die "Cannot find user: $user";
-			my $gid = $ENV{BLIPTOWN_GID};
-
-			setgid($gid) or die "Cannot set group: $gid ($!)";
-			setuid($uid) or die "Cannot set user: $uid ($!)";
-
-			$private->make_path->chmod(0750) or die "Cannot create path: $private";
-			$repo->make_path->chmod(0750) or die "Cannot create path: $repo";
-		}
-
-		my $func = $allowed_commands{$command} or
-			die "Command not permitted: $command";
-
-		$res = $func->($payload);
-	};
-	$err = $@;
-
-	my $res_json = encode_json(
-		{
-			info => $res,
-			error => $err,
-		});
-
-	$conn->send($res_json) or warn "Cannot send response ($!)";
-	return;
+my $req_json;
+while (read(STDIN, my $buf, 512)) {
+	$req_json .= $buf;
 }
 
-$SIG{CHLD} = sub { $needs_reap = 1 };
-$SIG{TERM} = $SIG{INT} = sub { $shutdown = 1 };
+my $data = decode_json($req_json);
+my $command = $data->{command};
+my $payload = $data->{payload};
 
-sub spawn_worker {
-	my $pid = fork;
-	die "Cannot fork process ($!)" unless defined $pid;
+my ($res, $err);
 
-	if ($pid == 0) {
-		$0 =~ s/master/worker/;
-		my $conn = $sock->accept;
+open(STDERR, '>', '/dev/null');
 
-		if (!$conn) {
-			next if $!{EINTR} && !$shutdown;
-			print "Worker $$ shutting down gracefully...\n";
-			exit 0;
-		}
+eval {
+	my $spec = $allowed_commands{$command} or die "Command not permitted: $command";
+	
+	my @missing = grep { !defined $payload->{$_} } @{$spec->{fields}};
+	die "Missing field(s) for $command: @missing" if @missing;
 
-		handle_conn $conn;
-		$conn->close;
-		exit 0;
+	my $user = $payload->{system_user};
+	my $site_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+	my $repo_path = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
+	my $private_path = path($site_path, 'private');
+
+	unless ($user eq 'root') {
+		my $uid = getpwnam($user) or die "Cannot find user: $user";
+		my $gid = $ENV{BLIPTOWN_GID};
+
+		setgid($gid) or die "Cannot set group: $gid ($!)";
+		setuid($uid) or die "Cannot set user: $uid ($!)";
+
+		$private_path->make_path->chmod(0750) or die "Cannot create path: $private_path";
+		$repo_path->make_path->chmod(0750) or die "Cannot create path: $repo_path";
 	}
 
-	$children{$pid} = 1;
-}
+	$res = $spec->{func}->($payload);
+};
+$err = $@;
 
-sub reap_children {
-	while ((my $pid = waitpid -1, WNOHANG) > 0) {
-		delete $children{$pid};
-	}
-}
-
-while (1) {
-	if ($needs_reap) {
-		reap_children;
-		$needs_reap = 0;
-	}
-
-	if ($shutdown) {
-		kill('TERM', keys %children);
-		last;
-	}
-
-	while (keys %children < $prefork && !$shutdown) {
-		spawn_worker;
-	}
-
-	my $ok = kill(0, keys %children);
-	$health_file->spew($ok);
-
-	while (!$needs_reap && !$shutdown) { pause }
-}
-
-while (%children) {
-	reap_children;
-	sleep 1;
-}
-
-print "Helper $$ exiting cleanly...\n";
-exit 0;
+print STDOUT encode_json({ info => $res, error => $err });
