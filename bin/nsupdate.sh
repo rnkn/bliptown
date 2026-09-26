@@ -1,34 +1,34 @@
 #!/bin/sh
 
-API_BASEURL="${API_BASEURL:-https://api.porkbun.com/api/json/v3}"
-KEYS_FILE="${PORKBUN_KEYS:-/etc/ssl/private/porkbun-keys.json}"
+api_baseurl="${API_BASEURL:-https://api.porkbun.com/api/json/v3}"
+keys_file="${PORKBUN_KEYS:-/etc/ssl/private/porkbun-keys.json}"
 
 if [ $# -ne 5 ]; then
 	echo "Usage: $(basename "$0") method type ident token auth" 1>&2
 	exit 85
 fi
 
-METHOD=$1
-TYPE=$2
-IDENT=$3
-AUTH=$5
+method=$1
+type=$2
+ident=$3
+auth=$5
 
-[ "$TYPE" = "dns-01" ] || exit 1
+[ "$type" = "dns-01" ] || exit 1
 
 send_api() {
 	endpoint=$1
 	shift
-	jq "$@" < "$KEYS_FILE" |
-		curl -sS -X POST -H 'Content-Type: application/json' -d @- -m 30 "$API_BASEURL/$endpoint"
+	jq "$@" < "$keys_file" |
+		curl -sS -X POST -H 'Content-Type: application/json' -d @- -m 30 "$api_baseurl/$endpoint"
 }
 
 check_record() {
-	dig +short TXT "_acme-challenge.$IDENT" | grep "$AUTH"
+	dig +short TXT "_acme-challenge.$ident" | grep "$auth"
 }
 
-case "$METHOD" in
+case "$method" in
 	(begin)
-		res=$(send_api "dns/create/$IDENT" --arg content "$AUTH" '. + { name: "_acme-challenge", type: "TXT", content: $content }')
+		res=$(send_api "dns/create/$ident" --arg content "$auth" '. + { name: "_acme-challenge", type: "TXT", content: $content }')
 
 		status=$(echo "$res" | jq -r .status)
 		[ "$status" = "SUCCESS" ] ||
@@ -44,7 +44,7 @@ case "$METHOD" in
 		;;
 
 	(done|failed)
-		res=$(send_api "dns/deleteByNameType/$IDENT/TXT/_acme-challenge")
+		res=$(send_api "dns/deleteByNameType/$ident/TXT/_acme-challenge")
 
 		status=$(echo "$res" | jq -r '.status')
 		[ "$status" = "SUCCESS" ] ||
