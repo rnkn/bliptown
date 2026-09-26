@@ -15,6 +15,12 @@ DISTRIBUTIONS
       perl 5.014
       utf8 0
       warnings 0
+  Canary-Stability-2013
+    pathname: M/ML/MLEHMANN/Canary-Stability-2013.tar.gz
+    provides:
+      Canary::Stability 2013
+    requirements:
+      ExtUtils::MakeMaker 0
   Capture-Tiny-0.50
     pathname: D/DA/DAGOLDEN/Capture-Tiny-0.50.tar.gz
     provides:
@@ -61,6 +67,22 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Storable 0
       perl 5.008001
+  Cpanel-JSON-XS-4.52
+    pathname: R/RU/RURBAN/Cpanel-JSON-XS-4.52.tar.gz
+    provides:
+      Cpanel::JSON::XS 4.52
+      Cpanel::JSON::XS::Type undef
+    requirements:
+      Carp 0
+      Config 0
+      Encode 1.9801
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Pod::Text 2.08
+      XSLoader 0
+      overload 0
+      strict 0
+      warnings 0
   CryptX-0.091
     pathname: M/MI/MIK/CryptX-0.091.tar.gz
     provides:
@@ -327,6 +349,15 @@ DISTRIBUTIONS
       Digest::SHA 1
       ExtUtils::MakeMaker 0
       perl 5.008001
+  EV-4.37
+    pathname: M/ML/MLEHMANN/EV-4.37.tar.gz
+    provides:
+      EV 4.37
+      EV::MakeMaker undef
+    requirements:
+      Canary::Stability 0
+      ExtUtils::MakeMaker 6.52
+      common::sense 0
   ExtUtils-CChecker-0.12
     pathname: P/PE/PEVANS/ExtUtils-CChecker-0.12.tar.gz
     provides:
@@ -1336,3 +1367,9 @@ DISTRIBUTIONS
       perl 5.008001
       strict 0
       warnings 0
+  common-sense-3.75
+    pathname: M/ML/MLEHMANN/common-sense-3.75.tar.gz
+    provides:
+      common::sense 3.75
+    requirements:
+      ExtUtils::MakeMaker 0
