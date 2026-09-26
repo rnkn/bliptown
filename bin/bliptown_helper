@@ -39,9 +39,6 @@ die 'BLIPTOWN_HELPER_HEALTH_FILE not defined'	unless defined $ENV{BLIPTOWN_HELPE
 die 'BLIPTOWN_DATA_HOME not defined'			unless defined $ENV{BLIPTOWN_DATA_HOME};
 die 'BLIPTOWN_GID not defined'					unless defined $ENV{BLIPTOWN_GID};
 
-die 'BLIPTOWN_KEYPAIR_FILE not defined'			unless defined $ENV{BLIPTOWN_KEYPAIR_FILE};
-die 'BLIPTOWN_ACME_FILE not defined'			unless defined $ENV{BLIPTOWN_ACME_FILE};
-
 my $prefork = $ENV{BLIPTOWN_HELPER_PREFORK} // 4;
 my %children;
 my $needs_reap;
