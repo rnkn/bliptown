@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $ip;
+
+while (my $line = <STDIN>) {
+	last if $line =~ /^\r?\n$/;
+	if ($line =~ /^X-Forwarded-For:\s*([0-9a-fA-F:.]+)/i) {
+		$ip = $1;
+	}
+}
+
+my $res = <<'EOF';
+HTTP/1.1 403 Forbidden
+Connection: close
+Content-Length: 0
+
+EOF
+$res =~ s/\n/\r\n/g;
+
+$| = 1;
+print $res;
+
+if ($ip) {
+	open(my $null, '>', '/dev/null') or die "open /dev/null: $!";
+	open(STDOUT, '>&', $null) or die "redirect stdout: $!";
+	open(STDERR, '>&', $null) or die "redirect stderr: $!";
+	system('npfctl', 'table', 'rate_limit', 'add', $ip);
+}
