@@ -12,21 +12,6 @@ use Mojo::File qw(path tempfile);
 use Mojo::Util qw(trim b64_decode);
 use Mojo::JSON qw(encode_json decode_json);
 
-my $has_unveil = eval {
-	require OpenBSD::Unveil;
-	OpenBSD::Unveil->import;
-	return 1;
-};
-
-my $has_pledge = eval {
-	require OpenBSD::Pledge;
-	OpenBSD::Pledge->import;
-	return 1;
-};
-
-pledge(qw(rpath wpath cpath chown fattr inet proc id unveil exec))
-	if $has_pledge;
-
 die "$0 must be run as root"					unless $> == 0;
 
 $0 = $0 . '[master]';
@@ -60,84 +45,7 @@ my $sock = IO::Socket::INET->new(
 
 print "Listening on $host:$port\n";
 
-my $safe_domain_regex = qr/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/;
 my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;
-
-sub update_acme_domains {
-	my $payload = shift;
-	my $domains = $payload->{domains};
-
-	my $acme_file = path($ENV{BLIPTOWN_ACME_FILE});
-
-	if ($has_unveil) {
-		unveil($acme_file, 'rwc');
-		unveil();
-	}
-
-	$acme_file->touch unless -f $acme_file;
-
-	my @safe_domains = grep { /$safe_domain_regex/ } @$domains;
-
-	my $acme_domains_str = '';
-	foreach my $domain (@safe_domains) {
-		$acme_domains_str .= <<"EOF";
-domain $domain {
-	alternative names { www.$domain }
-	domain full chain certificate "/etc/ssl/$domain.crt"
-	domain key "/etc/ssl/private/$domain.key"
-	sign with "letsencrypt"
-}
-EOF
-	}
-
-	my $acme_file_str = $acme_file->slurp('UTF-8');
-	unless ($acme_domains_str eq $acme_file_str) {
-		$acme_file->spew($acme_domains_str, 'UTF-8');
-	}
-	return 'ACME domain list up-to-date';
-}
-
-sub provision_cert {
-	my $payload = shift;
-	my $domain = $payload->{domain};
-	return unless $domain =~ $safe_domain_regex;
-	system('acme-client', $domain);
-	my $exit = $? >> 8;
-	return "Provisioned certificate: $domain" if $exit == 0;
-	return "Certificate already current: $domain" if $exit == 2;
-	die "Cannot provision certificate: $domain ($!)";
-}
-
-sub update_relayd_keypairs {
-	my $payload = shift;
-	my $domains = $payload->{domains};
-
-	my $keypair_file = path($ENV{BLIPTOWN_KEYPAIR_FILE});
-
-	if ($has_unveil) {
-		unveil($keypair_file, "rwc");
-		unveil();
-	}
-
-	$keypair_file->touch unless -f $keypair_file;
-
-	my @safe_domains = grep { /$safe_domain_regex/ } @$domains;
-
-	my $keypairs_str = '';
-	foreach my $domain (@safe_domains) {
-		next unless -f path('/etc/ssl', "$domain.crt");
-		$keypairs_str .= "tls keypair \"$domain\"\n";
-	}
-
-	my $keypair_file_str = $keypair_file->slurp('UTF-8');
-	unless ($keypairs_str eq $keypair_file_str) {
-		$keypair_file->spew($keypairs_str, 'UTF-8')
-			or die "Cannot write keypair file: $keypair_file ($!)";
-
-		system('rcctl reload relayd') == 0 or die "Cannot reload relayd ($!)";
-	}
-	return 'relayd keypairs up-to-date';
-}
 
 sub chdir_home {
 	my $user = shift;
@@ -368,13 +276,6 @@ sub handle_conn {
 
 	my ($res, $err);
 
-	if ($has_unveil) {
-		my @paths = split ':', $ENV{PATH};
-		map { unveil($_, 'x') or die "Cannot unveil path: $_ ($!)" } @paths;
-		unveil('/etc', 'r') or die "Cannot unveil path: /etc ($!)";
-		unveil('/tmp', 'rwc') or die "Cannot unveil path: /tmp ($!)";
-	}
-
 	eval {
 		my $user = $payload->{system_user};
 		my $root = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
@@ -382,12 +283,6 @@ sub handle_conn {
 		my $private = path($root, 'private');
 
 		unless ($user eq 'root') {
-			if ($has_unveil) {
-				unveil($root, 'rwc') or die "Cannot unveil path: $root ($!)";
-				unveil($repo, 'rwc') or die "Cannot unveil path: $repo ($!)";
-				unveil();
-			}
-
 			my $uid = getpwnam($user) or die "Cannot find user: $user";
 			my $gid = $ENV{BLIPTOWN_GID};
 
