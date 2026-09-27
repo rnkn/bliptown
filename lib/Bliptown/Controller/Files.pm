@@ -156,8 +156,8 @@ sub rename_files {
 	my $username = $c->session('username');
 	my $dir = $c->param('dir') // '';
 	my $old = $c->param('old');
-	my $new = $c->param('new');
-	return $c->reply->not_found unless $old and $new;
+	return $c->reply->not_found unless $old;
+	my $new = $c->param('new') // '';
 	my $redirect = $c->url_for('list_files')->query(search => $c->param('new'));
 
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
@@ -220,13 +220,8 @@ sub delete_files {
 	my @filenames_abs;
 	foreach my $rel_path (@rel_paths) {
 		my $filename_abs = path($dir_path, $rel_path)->to_abs->to_string;
-		if (-d $filename_abs && @{path($filename_abs)->list({ dir => 1 })} > 0) {
-			$c->flash(info => "Directory $rel_path not empty!");
-			return $c->redirect_to($redirect);
-		}
 		push @filenames_abs, $filename_abs;
 	}
-	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
 
 	my $res = $c->ipc->send_message({
 		command => 'delete_files',

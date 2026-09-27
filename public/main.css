@@ -715,6 +715,10 @@ nav #file-controls #additional-controls button {
 	margin: 4px 0;
 }
 
+nav #file-controls #additional-controls dialog button {
+	width: var(--minor-button-width);
+}
+
 nav #file-controls #additional-controls hr {
 	margin: 10px;
 }
