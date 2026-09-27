@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>Label</key>
+		<string>town.blip.helper</string>
+		<key>EnvironmentVariables</key>
+		<dict>
+			<key>HOME</key>
+			<string>/Users/rnkn</string>
+		</dict>
+		<key>ProgramArguments</key>
+		<array>
+			<string>/Users/rnkn/.local/lib/perl-5.42/bin/perl</string>
+			<string>/Users/rnkn/Developer/bliptown/bin/bliptown_helper</string>
+			<string>/Users/rnkn/Developer/bliptown/.envrc</string>
+		</array>
+		<key>inetdCompatibility</key>
+		<dict>
+			<key>Wait</key>
+			<false/>
+		</dict>
+		<key>Sockets</key>
+		<dict>
+			<key>Listeners</key>
+			<dict>
+				<key>SockNodeName</key>
+				<string>127.0.0.1</string>
+				<key>SockServiceName</key>
+				<integer>9000</integer>
+				<key>SockFamily</key>
+				<string>IPv4</string>
+			</dict>
+		</dict>
+	</dict>
+</plist>
