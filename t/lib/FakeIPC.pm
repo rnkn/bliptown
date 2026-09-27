@@ -31,14 +31,21 @@ sub send_message {
 
 	my $system_user		= $args->{system_user}	// '';
 	my $filename		= $args->{filename}		// '';
+	my $filenames		= $args->{filenames}	// [];
 	my $new_filename	= $args->{new_filename} // '';
 	my $domain			= $args->{domain}		// '';
+
+	# Only dereference as hashes when the elements are hashes; delete_files
+	# sends plain filenames in the same key
+	my $rename_info = $command eq 'rename_files'
+		? join(', ', map { "Renamed file: $_->{old} -> $_->{new}" } @{$filenames})
+		: '';
 
 	my %responses = (
 		'write_blob'				=> "Wrote file: $filename",
 		'update_file'				=> "Updated file: $filename",
-		'rename_file'				=> "Renamed file: $filename -> $new_filename",
-		'delete_file'				=> "Deleted: $filename",
+		'rename_files'				=> $rename_info,
+		'delete_files'				=> 'Deleted: ' . join(', ', @{$filenames}),
 		'backup_file'				=> "Created backup file: $filename~",
 		'make_directory'			=> "Created directory: $filename",
 		'git_commit'				=> $git_log[0]->{hash},
