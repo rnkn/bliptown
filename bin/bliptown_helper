@@ -105,8 +105,12 @@ sub rename_files {
 sub delete_files {
 	my $payload = shift;
 	my $home = chdir_site($payload->{system_user});
+	my @filenames = @{$payload->{filenames} // []};
+
+	@filenames = sort { length $b <=> length $a } @filenames;
+
 	my @deleted;
-	foreach my $filename (@{$payload->{filenames} // []}) {
+	foreach my $filename (@filenames) {
 		if (-d $filename) {
 			path($filename)->remove_tree or die "Cannot delete directory: $filename ($!)";
 		}
