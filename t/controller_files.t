@@ -58,15 +58,15 @@ $t->get_ok($app->url_for('list_files')->query(search => 'foo') => { Host => $use
 	->content_unlike(qr{<a href="/bar">bar.md</a>});
 
 $t->post_ok($app->url_for('delete_files') => { Host => $user_domain } => form => {
-	filename => 'foo.md',
+	filenames => 'foo.md',
 })->status_is(302);
 like $debug_messages, qr{Deleted:.*/foo\.md};
 
 $user_home->child('foo.md')->remove;
 
 $t->post_ok($app->url_for('rename_files') => { Host => $user_domain } => form => {
-	filename => 'bar.md',
-	new_filename => 'qux.md',
+	old => 'bar.md',
+	new => 'qux.md',
 })->status_is(302);
 like $debug_messages, qr{Renamed file:.*/bar\.md ->.*/qux\.md};
 
@@ -74,8 +74,9 @@ $user_home->child('bar.md')->remove;
 $user_home->child('qux.md')->touch;
 
 $t->post_ok($app->url_for('rename_files') => { Host => $user_domain } => form => {
-	search => 'ba',
-	replace => 'qu',
+	dir	=> 'subdir',
+	old	=> '*ba*',
+	new	=> 'quz.md',
 })->status_is(302);
 like $debug_messages, qr{Renamed file:.*/subdir/baz\.md ->.*/subdir/quz\.md};
 
@@ -83,7 +84,7 @@ $user_home->child('subdir/baz.md')->remove;
 $user_home->child('subdir/quz.md')->touch;
 
 $t->post_ok($app->url_for('delete_files') => { Host => $user_domain } => form => {
-	search => 'qu',
+	filenames => 'qu',
 })->status_is(302);
 like $debug_messages, qr{Deleted:.*/qux\.md};
 like $debug_messages, qr{Deleted:.*/subdir/quz\.md};
