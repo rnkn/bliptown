@@ -89,9 +89,9 @@ sub download_snapshot {
 	$c->on(
 		finish => sub {
 			my $res = $c->ipc->send_message({
-				command => 'delete_file',
+				command => 'delete_files',
 				system_user => $username,
-				filename => $filename,
+				filenames => [ $filename ],
 			});
 			return $c->log->error($res->{error}) if $res->{error};
 		});

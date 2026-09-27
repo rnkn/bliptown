@@ -155,57 +155,46 @@ sub rename_files {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $dir = $c->param('dir') // '';
-	my $filename = $c->param('filename');
-	my $new_filename = $c->param('new_filename');
-	my $search = $c->param('search');
-	my $replace = $c->param('replace');
-	my $redirect = $c->param('back_to') // $c->url_for('list_files');
+	my $old = $c->param('old');
+	my $new = $c->param('new');
+	return $c->reply->not_found unless $old and $new;
+	my $redirect = $c->url_for('list_files')->query(search => $c->param('new'));
+
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $dir_path = path($user_path, $dir);
+	return $c->reply->not_found unless -d $dir_path;
 
-	my %filename_pairs;
-	if ($search) {
-		return $c->reply->not_found unless $replace;
+	my $search_re = glob_to_regex_string($old);
+	my @tree = $dir_path->list_tree({ dir => 1 })->each;
+	my @old_rel_paths = grep { /$search_re/ } map { $_->to_rel($dir_path)->to_string } @tree;
+	return $c->reply->not_found unless @old_rel_paths;
 
-		my $search_re = glob_to_regex_string($search);
-		my $dir_path = path($user_path, $dir);
-		return $c->reply->not_found unless -d $dir_path;
-
-		my @tree = $dir_path->list_tree({ dir => 1 })->each;
-		my @old_rel_paths = grep { /$search_re/ } map { $_->to_rel($dir_path) } @tree;
-
-		foreach my $old_rel (@old_rel_paths) {
-			my $new_rel = $old_rel =~ s/$search_re/$replace/gr;
-			my $old_abs = path($dir_path, $old_rel)->to_abs->to_string;
-			my $new_abs = path($dir_path, $new_rel)->to_abs->to_string;
-			$filename_pairs{$old_abs} = $new_abs;
-		}
-	}
-	else {
-		my $old_abs_path = path($user_path, $filename)->to_abs;
-		return $c->reply->not_found unless -e $old_abs_path;
-
-		my $new_abs_path = path($user_path, $new_filename)->to_abs;
-
-		if (-d $new_abs_path && $new_abs_path =~ m{^\Q$old_abs_path\E(/|$)}) {
-			$c->flash(info => "Cannot move $filename into itself!");
+	my @rename_pairs;
+	foreach my $old_rel (@old_rel_paths) {
+		my $old_abs = path($dir_path, $old_rel)->to_abs->to_string;
+		my $new_rel = $old_rel =~ s/$search_re/$new/gr;
+		my $new_abs = path($dir_path, $new_rel)->to_abs->to_string;
+		if (-d $new_abs && $new_abs =~ m{^\Q$old_abs\E(/|$)}) {
+			$c->flash(info => "Cannot move $old into itself!");
 			return $c->redirect_to($redirect);
 		}
-
-		$filename_pairs{$old_abs_path->to_string} = $new_abs_path->to_string;
+		push @rename_pairs, {
+			old => $old_abs,
+			new => $new_abs,
+		}
 	}
 
-	foreach my $old_abs (sort { length $b <=> length $a } keys %filename_pairs) {
-		my $res = $c->ipc->send_message({
-			command => 'rename_file',
-			system_user => $username,
-			filename => $old_abs,
-			new_filename => $filename_pairs{$old_abs},
-		});
-		return $c->reply->exception($res->{error}) if $res->{error};
-		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
-	}
+	@rename_pairs = sort { length $b->{old} <=> length $a->{old} } @rename_pairs;
 
-	my $count = keys %filename_pairs;
+	my $res = $c->ipc->send_message({
+		command => 'rename_files',
+		system_user => $username,
+		filenames => \@rename_pairs,
+	});
+	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+
+	my $count = scalar @rename_pairs;
 	my $message = $count > 1 ? "$count files renamed" : "$count file renamed";
 	$c->flash(info => $message);
 	return $c->redirect_to($redirect);
@@ -215,38 +204,37 @@ sub delete_files {
 	my $c = shift;
 	my $username = $c->session('username');
 	my $dir = $c->param('dir') // '';
-	my $filename = $c->param('filename') // '';
-	my $search = $c->param('search');
-	my $redirect = $c->param('back_to') // $c->url_for('list_files');
+	my $filenames = $c->param('filenames');
+	return $c->reply->not_found unless $filenames;
+	my $redirect = $c->param('back_to') // $c->url_for('list_files', catchall => $dir)->query(search => $filenames);
+
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $dir_path = path($user_path, $dir);
+	return $c->reply->not_found unless -d $dir_path;
+
+	my $search_re = glob_to_regex_string($filenames);
+	my @tree = $dir_path->list_tree({ dir => 1 })->each;
+	my @rel_paths = grep { /$search_re/ } map { $_->to_rel($dir_path)->to_string } @tree;
+	return $c->reply->not_found unless @rel_paths;
 
 	my @filenames_abs;
-	if ($search) {
-		my $search_re = glob_to_regex_string($search);
-		my $dir_path = path($user_path, $dir);
-		my @tree = $dir_path->list_tree({ dir => 1 })->each;
-		my @filenames = grep { /$search_re/ } map { $_->to_rel($dir_path)->to_string } @tree;
-		@filenames_abs = map { path($dir_path, $_)->to_abs->to_string } @filenames;
-		@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
-	}
-	else {
-		my $path = path($user_path, $filename)->to_abs;
-		if (-d $path && @{$path->list({ dir => 1 })} > 0) {
-			$c->flash(info => "Directory $filename not empty!");
+	foreach my $rel_path (@rel_paths) {
+		my $filename_abs = path($dir_path, $rel_path)->to_abs->to_string;
+		if (-d $filename_abs && @{path($filename_abs)->list({ dir => 1 })} > 0) {
+			$c->flash(info => "Directory $rel_path not empty!");
 			return $c->redirect_to($redirect);
 		}
-		@filenames_abs = ($path->to_string);
+		push @filenames_abs, $filename_abs;
 	}
+	@filenames_abs = sort { length $b <=> length $a } @filenames_abs;
 
-	foreach my $filename (@filenames_abs) {
-		my $res = $c->ipc->send_message({
-			command => 'delete_file',
-			system_user => $username,
-			filename => $filename,
-		});
-		return $c->reply->exception($res->{error}) if $res->{error};
-		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
-	}
+	my $res = $c->ipc->send_message({
+		command => 'delete_files',
+		system_user => $username,
+		filenames => \@filenames_abs,
+	});
+	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
 
 	my $count = @filenames_abs;
 	my $message = $count > 1 ? "$count files deleted" : "$count file deleted";

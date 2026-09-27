@@ -86,9 +86,9 @@ sub rename_files {
 	my $home = chdir_site($payload->{system_user});
 	my @messages;
 	foreach my $rename (@{$payload->{filenames} // []}) {
-		my $filename = $rename->{filename};
+		my $filename = $rename->{old};
 		my $path = path $filename;
-		my $new_filename = $rename->{new_filename};
+		my $new_filename = $rename->{new};
 		my $new_path = path $new_filename;
 		if (-d $new_path && $new_path->list > 0) {
 			push @messages, "Skipping nonempty directory: $new_path";
