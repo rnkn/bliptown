@@ -20,7 +20,7 @@ fi
 if $ok
 then
 	echo "Restarting Bliptown:"
-	rcctl restart bliptown
+	service bliptown restart
 fi
 echo
 
@@ -31,8 +31,8 @@ ftp -Vo /etc/bunnycdn-ipv6.txt "$bunnycdn_ipv6_endpoint" || ok=false
 if $ok
 then
 	echo "Done"
-	echo "Reloading pf:"
-	pfctl -f /etc/pf.conf
+	echo "Reloading npf:"
+	npfctl reload
 	echo "Done"
 else
 	echo "Failed"
