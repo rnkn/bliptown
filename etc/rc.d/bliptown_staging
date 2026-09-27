@@ -1,28 +1,22 @@
-#!/bin/ksh
+#!/bin/sh
 
-pid_file="/tmp/bliptown-staging.pid"
+# PROVIDE: bliptown_staging
+# REQUIRE: LOGIN inetd
+# KEYWORD: shutdown
 
-daemon="perl -Ilocal/lib/perl5 script/bliptown"
-daemon_flags="prefork -p -m production -l http://127.0.0.1:8081 -P $pid_file"
-daemon_user="bliptown_staging"
-daemon_execdir="/usr/local/www/bliptown-staging"
-daemon_logger="daemon.info"
+$_rc_subr_loaded . /etc/rc.subr
 
-rc_bg=YES
-rc_reload=NO
+name="bliptown_staging"
+rcvar=$name
+pidfile="/tmp/${name}.pid"
+logfile="/var/log/bliptown-staging/info.log"
+errfile="/var/log/bliptown-staging/error.log"
+command="/usr/pkg/bin/perl"
+command_args="-Ilocal/lib/perl5 script/bliptown prefork -p -m production -l http://127.0.0.1:8081 -P $pidfile 1>$logfile 2>$errfile &"
+start_precmd=". /home/bliptown-staging/.envrc"
+bliptown_staging_user=$name
+bliptown_staging_chdir="/usr/local/www/bliptown-staging"
+sig_stop="QUIT"
 
-. /etc/rc.d/rc.subr
-
-rc_stop() {
-	rc_exec "kill -QUIT $(cat $pid_file)"
-}
-
-rc_configtest() {
-	rc_exec "$daemon eval"
-}
-
-rc_check() {
-	rc_exec "test -f $pid_file && kill -0 $(cat $pid_file)"
-}
-
-rc_cmd $1
+load_rc_config $name
+run_rc_command "$1"

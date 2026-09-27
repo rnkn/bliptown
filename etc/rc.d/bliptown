@@ -1,28 +1,22 @@
-#!/bin/ksh
+#!/bin/sh
 
-pid_file="/tmp/bliptown.pid"
+# PROVIDE: bliptown
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
 
-daemon="perl -Ilocal/lib/perl5 script/bliptown"
-daemon_flags="prefork -p -m production -l http://127.0.0.1:8080 -P $pid_file"
-daemon_user="bliptown"
-daemon_execdir="/usr/local/www/bliptown"
-daemon_logger="daemon.info"
+$_rc_subr_loaded . /etc/rc.subr
 
-rc_bg=YES
-rc_reload=NO
+name="bliptown"
+rcvar=$name
+pidfile="/tmp/${name}.pid"
+logfile="/var/log/bliptown/info.log"
+errfile="/var/log/bliptown/error.log"
+command="/usr/pkg/bin/perl"
+command_args="-Ilocal/lib/perl5 script/bliptown prefork -p -m production -l http://127.0.0.1:8080 -P $pidfile 1>$logfile 2>$errfile &"
+start_precmd=". /home/bliptown/.envrc"
+bliptown_user=$name
+bliptown_chdir="/usr/local/www/bliptown"
+sig_stop="QUIT"
 
-. /etc/rc.d/rc.subr
-
-rc_stop() {
-	rc_exec "kill -QUIT $(cat $pid_file)"
-}
-
-rc_configtest() {
-	rc_exec "$daemon eval"
-}
-
-rc_check() {
-	rc_exec "test -f $pid_file && kill -0 $(cat $pid_file)"
-}
-
-rc_cmd $1
+load_rc_config $name
+run_rc_command "$1"
