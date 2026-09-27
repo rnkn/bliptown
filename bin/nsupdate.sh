@@ -15,7 +15,7 @@ auth=$5
 
 [ "$type" = "dns-01" ] || exit 1
 
-send_api() {
+call_api() {
 	endpoint=$1
 	shift
 	jq "$@" < "$keys_file" |
@@ -23,7 +23,7 @@ send_api() {
 }
 
 check_record() {
-	dig +short TXT "_acme-challenge.$ident" | grep "$auth"
+	dig +short TXT "_acme-challenge.$ident" | grep -q "$auth"
 }
 
 case "$method" in
@@ -44,7 +44,7 @@ case "$method" in
 		;;
 
 	(done|failed)
-		res=$(send_api "dns/deleteByNameType/$ident/TXT/_acme-challenge")
+		res=$(call_api "dns/deleteByNameType/$ident/TXT/_acme-challenge")
 
 		status=$(echo "$res" | jq -r '.status')
 		[ "$status" = "SUCCESS" ] ||
