@@ -15,25 +15,11 @@ sub send_message {
 		PeerPort => $port,
 	) or die "Cannot connect to TCP socket: $host:$port ($!)";
 
-	my $b64_encoded = b64_encode($args->{blob}) if length $args->{blob};
+	my %payload = %{$args};
+	my $command = delete $payload{command};
+	$payload{blob} = b64_encode(delete $payload{blob}) if defined $payload{blob};
 
-	my $data = {
-		command => $args->{command},
-		payload => {
-			system_user		=> $args->{system_user}		// '',
-			username		=> $args->{username}		// '',
-			filename		=> $args->{filename}		// '',
-			new_filename	=> $args->{new_filename}	// '',
-			create_backup	=> $args->{create_backup}	// 0,
-			content			=> $args->{content}			// '',
-			blob			=> $b64_encoded				// '',
-			hash			=> $args->{hash}			// '',
-			domain			=> $args->{domain}			// '',
-			domains			=> $args->{domains}			// [],
-		},
-	};
-
-	my $req_json = encode_json($data);
+	my $req_json = encode_json({ command => $command, payload => \%payload });
 	my $res_json = '';
 
 	$client->send($req_json)	or die "Cannot send data to socket ($!)";
