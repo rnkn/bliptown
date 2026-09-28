@@ -28,4 +28,9 @@ if ($ip) {
 	open(STDOUT, '>&', $null) or die "redirect stdout: $!";
 	open(STDERR, '>&', $null) or die "redirect stderr: $!";
 	system('npfctl', 'table', 'rate_limit', 'add', $ip);
+
+	my $logpath = '/var/log/rate_limit.log';
+	open(my $log, '>>', $logpath) or die "open $logpath: $!";
+	my $time = time;
+	print $log "$time $ip\n";
 }
