@@ -335,8 +335,9 @@ sub startup {
 		}
 	);
 
-	my %accesslogs;
-	$SIG{USR1} = sub { undef %accesslogs };
+	my $accesslog;
+	my $accesslog_path = path($ENV{BLIPTOWN_LOG_HOME}, 'access.tsv');
+	$SIG{HUP} = sub { undef $accesslog };
 
 	$app->helper(
 		accesslog => sub {

@@ -6,7 +6,7 @@ test -f "$access_logfile" || install -m 600 -o bliptown -g bliptown /dev/null "$
 gzcat -f "$access_logfile"* | /usr/local/www/bliptown/bin/bliptown_analytics
 
 newsyslog
-pkill -USR1 -u bliptown -U bliptown -f script/bliptown prefork
+pkill -HUP -u bliptown -U bliptown -f script/bliptown prefork
 
 rate_limit_logfile="/var/log/rate_limit.log"
 cutoff=$(( $(date +%s) - 86400 ))
