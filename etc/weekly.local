@@ -9,8 +9,7 @@ ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint" || ok=false
 if $ok
 then
 	tar -C /var/db/GeoIP -xzf /tmp/geolite2-country.tar.gz
-	mv /var/db/GeoIP/GeoLite2-Country_*/*.mmdb \
-	   /var/db/GeoIP/geolite2-country-current.mmdb
+	mv /var/db/GeoIP/GeoLite2-Country_*/*.mmdb /var/db/GeoIP/geolite2-country-current.mmdb
 	rm -rf /var/db/GeoIP/GeoLite2-Country_*
 	echo "Done"
 else
@@ -30,9 +29,11 @@ ftp -Vo /etc/bunnycdn.txt "$bunnycdn_endpoint" || ok=false
 ftp -Vo /etc/bunnycdn-ipv6.txt "$bunnycdn_ipv6_endpoint" || ok=false
 if $ok
 then
+	tr -d '\r' < /tmp/bunnycdn.txt > /etc/bunnycdn.txt
+	tr -d '\r' < /tmp/bunnycdn-ipv6.txt > /etc/bunnycdn-ipv6.txt
 	echo "Done"
 	echo "Reloading npf:"
-	npfctl reload
+	service npf reload
 	echo "Done"
 else
 	echo "Failed"
