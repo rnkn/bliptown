@@ -336,28 +336,32 @@ sub startup {
 	);
 
 	my $accesslog;
-	my $accesslog_path = path($ENV{BLIPTOWN_LOG_HOME}, 'access.tsv');
+	my $accesslog_path = path($ENV{BLIPTOWN_LOG_HOME}, 'access.log');
 	$SIG{HUP} = sub { undef $accesslog };
 
 	$app->helper(
 		accesslog => sub {
-			my ($c, $logpath) = @_;
+			if ($accesslog) {
+				my @open = (stat $accesslog->handle)[0, 1];
+				my @disk = (stat $accesslog_path)[0, 1];
+				undef $accesslog unless "@open" eq "@disk";
+			}
 
-			return $accesslogs{$logpath} ||= do {
-				my $log = Mojo::Log->new(
+			unless ($accesslog) {
+				$accesslog = Mojo::Log->new(
 					level => 'info',
-					path => $logpath,
+					path => $accesslog_path,
 				);
-
-				$log->format(
+				$accesslog->format(
 					sub {
 						my ($time, $level, @lines) = @_;
 						$time = int($time);
 						return join("\t", $time, @lines) . "\n";
 					}
 				);
-				$log;
 			}
+
+			return $accesslog;
 		}
 	);
 

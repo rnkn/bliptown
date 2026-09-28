@@ -1,14 +1,14 @@
 # -*- mode: sh; -*-
 
-access_logfile="/var/log/bliptown/access.log"
-test -f "$access_logfile" || install -m 600 -o bliptown -g bliptown /dev/null "$log_file"
+accesslog="/var/log/bliptown/access.log"
+test -f "$accesslog" || install -m 600 -o bliptown -g bliptown /dev/null "$accesslog"
 
-gzcat -f "$access_logfile"* | /usr/local/www/bliptown/bin/bliptown_analytics
+gzcat -f "$accesslog"* | /usr/local/www/bliptown/bin/bliptown_analytics
 
 newsyslog
 pkill -HUP -u bliptown -U bliptown -f script/bliptown prefork
 
-rate_limit_logfile="/var/log/rate_limit.log"
+rate_limit_log="/var/log/rate_limit.log"
 cutoff=$(( $(date +%s) - 86400 ))
 tmpfile=$(mktemp)
 
@@ -23,4 +23,4 @@ while read -r ip time; do
     fi
 done < "$rate_limit_logfile"
 
-mv "$tmpfile" "$rate_limit_logfile"
+mv "$tmpfile" "$rate_limit_log"
