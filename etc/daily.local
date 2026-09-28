@@ -4,90 +4,46 @@ cleanup() {
 }
 trap cleanup EXIT
 
-fetch_cert() {
-	ok=true
-	porkbun_payload=/etc/ssl/private/porkbun-keys.json
-	expected_a_record=89.167.48.186
-	expected_aaaa_record=2a01:4f9:c014:ebe2::1
-	domain=$1
-	endpoint="https://api.porkbun.com/api/json/v3/ssl/retrieve/${domain}"
-	cert_chain="/etc/ssl/${domain}.crt"
-	cert_key="/etc/ssl/private/${domain}.key"
-	json_tmp=$(mktemp)
-	tmpfiles="$json_tmp $tmpfiles"
-
-	echo "Fetching certificate: $domain"
-	/usr/local/bin/curl -fsS -X POST -d "@$porkbun_payload" -m 30 "$endpoint" > "$json_tmp" || ok=false
-	$ok || { echo "Fetch failed" >&2; return 1; }
-
-	cert_chain_tmp=$(mktemp)
-	tmpfiles="$cert_chain_tmp $tmpfiles"
-	cert_key_tmp=$(mktemp)
-	tmpfiles="$cert_key_tmp $tmpfiles"
-
-	/usr/local/bin/jq -r .certificatechain < "$json_tmp" > "$cert_chain_tmp" || ok=false
-	/usr/local/bin/jq -r .privatekey       < "$json_tmp" > "$cert_key_tmp"   || ok=false
-	$ok || { echo "Malformed JSON response" >&2; return 1; }
-
-	cert_hash=$(openssl x509 -in "$cert_chain_tmp" -pubkey | openssl pkey -pubin | md5)
-	key_hash=$(openssl pkey -in "$cert_key_tmp" -pubout | md5)
-
-	echo "Matching certificate with key:"
-	[ "X$cert_hash" == "X$key_hash" ] || ok=false
-	$ok || { echo "Failed" >&2; return 1; }
-	echo "Succeeded"
-	echo
-	echo "Installing certificates:"
-
-	install -m 0644 -o root -g wheel "$cert_chain_tmp" "$cert_chain" && echo "$cert_chain installed" || ok=false
-	$ok || { echo "$cert_chain failed" >&2; return 1; }
-
-	install -m 0600 -o root -g wheel "$cert_key_tmp" "$cert_key" && echo "$cert_key installed" || ok=false
-	$ok || { echo "$cert_key failed" >&2; return 1; }
-
-	echo "Certificate end date:"
-	openssl x509 -in "$cert_chain" -enddate -noout | cut -d= -f2
-}
-
 renew_cert() {
 	domain=$1
-	test -n "$domain" || { echo "failed" >&2; return 1; }
+	test -n "$domain" || return 1
+
+	expected_A_record=46.225.163.173
+	expected_AAAA_record=2a01:4f8:1c19:6498::1
 
 	echo -n "$domain... "
-	$ok && test "$(dig "$domain" A    +short)" == "$expected_a_record"    || ok=false
-	$ok && test "$(dig "$domain" AAAA +short)" == "$expected_aaaa_record" || ok=false
-	$ok && $(dig "$domain" CAA +short)                                    || ok=false
+	$ok && test "$(dig "$domain" A    +short)" = "$expected_A_record"    || ok=false
+	$ok && test "$(dig "$domain" AAAA +short)" = "$expected_AAAA_record" || ok=false
+	$ok && $(dig "$domain" CAA +short)                                   || ok=false
 	$ok || { echo "failed" >&2; return 1; }
 
-	acme-client "$domain"
+	/usr/pkg/bin/uacme -c /etc/ssl -h /usr/local/www/bliptown/bin/nsupdate.sh $domain www.$domain
 	case $? in
-		(0)		echo "revoked/renewed" ;;
-		(1)		echo "failed" ;;
-		(2)		echo "up-to-date" ;;
+		(0)		echo "issued new certificate" ;;
+		(1)		echo "still current" ;;
+		(2)		echo "failed" ;;
 	esac
 }
 
 backup() {
 	ok=true
-	mnt=/mnt/beastie-box
-	dump_dir=${mnt}/dump
+	checksum_dir=/root/dump_checksums
+	mnt=/mnt/box
+	dump_dir=dumps
 	storage_box=u597578@u597578.your-storagebox.de
 
 	echo "Making backups:"
-	if [ ! -d "$dump_dir" ]
-	then
-		/usr/local/bin/sshfs "${storage_box}:" "$mnt" -p 23 || ok=false
-		$ok || { echo "SSHFS mount failed" >&2; return 1; }
-	fi
+
+	mkdir -p "$checksum_dir"
 
 	weekday=$(date +%u)
 	monthday=$(date +%e)
 
-	if [ $monthday == 1 ]
+	if [ $monthday = 1 ]
 	then
 		backup_type="monthly"
 		dump_level=0
-	elif [ $weekday == 7 ]
+	elif [ $weekday = 7 ]
 	then
 		 backup_type="weekly"
 		 dump_level=0
@@ -95,41 +51,53 @@ backup() {
 		backup_type="daily"
 		dump_level=1
 	fi
-
-	for d in daily weekly monthly
-	do
-		mkdir -p "${dump_dir}/${d}"
-	done
 	
-	for f in home var
+	for d in home var
 	do
-		dump -${dump_level}uaf "${dump_dir}/${backup_type}/${f}-$(date +%F).dump" "/$f" 2> /dev/null || ok=false
-		$ok || { echo "Dumping $f failed" >&2; return 1; }
+		dump = "${d}-$(date +%F).dump"
+		fifo = "/tmp/${dump}.fifo"
+		tmpfiles="$fifo Tmpfiles"
+
+		mkfifo "$fifo"
+		md5 < "$fifo" > "$checksum_dir/${dump}.md5" &
+
+		dump -${dump_level}uaf - 2>/dev/null | tee "$fifo" |
+			ssh -p23 "$storage_box" "dd of=${dump_dir}/${backup_type}/${dump}" || ok=false
+		$ok || { echo "Dumping $d failed" >&2; return 1; }
+
+		local_checksum=$(cat "$checksum_dir/${dump}.md5")
+		remote_checksum=$(ssh -p23 "$storage_box" "md5 -r ${dump_dir}/${backup_type}/${dump}" | cut -f1)
+		[ "$local_checksum" = "$remote_checksum" ] || ok=false
+		$ok || { echo "Dump $dump checksum does not match" >&2; return 1; }
 	done
 
-	find "${dump_dir}/daily" -name "*.dump" -mtime +7 -delete
-	find "${dump_dir}/weekly" -name "*.dump" -mtime +30 -delete
-	find "${dump_dir}/monthly" -name "*.dump" -mtime +365 -delete
+	echo "Done"
 
+	ok=true
+	echo "Deleting old backups:"
+
+	mount_psshfs -O Port=22 "${storage_box}:" "$mnt"
+
+	find "${mnt}/${dump_dir}/daily" -name "*.dump" -mtime +7 -delete || ok=false
+	find "${mnt}/${dump_dir}/weekly" -name "*.dump" -mtime +30 -delete || ok=false
+	find "${mnt}/${dump_dir}/monthly" -name "*.dump" -mtime +365 -delete || ok=false
+
+	umount "$mnt"
+	$ok || { echo "Failed" >&2; return 1; }
 	echo "Done"
 }
 
 backup
 echo
-fetch_cert blip.town
-echo
-fetch_cert bliptown-staging.com
-echo
 
-echo "Renewing user certificates:"
-grep "^domain" /etc/acme-domains.conf | cut -d' ' -f2 | while read -r domain
+echo "Renewing certificates:"
+renew_cert blip.town
+renew_cert bliptown-staging.com
+
+ls /home/bliptown/domains | while read -r domain
 do
 	renew_cert $domain
 done
-echo
-
-echo "Restarting relayd:"
-rcctl restart relayd
 echo
 
 echo "Expunging database dead tokens:"
@@ -157,8 +125,3 @@ ok=true
 find /var/db/bliptown -name '*.db.backup' -mtime +30 -delete || ok=false
 $ok && echo "Done" || echo "Failed"
 echo
-
-echo "Flushing rate-limited IPs:"
-ok=true
-pfctl -q -t rate_limit -T expire 86400 || ok=false
-$ok && echo "Done" || echo "Failed"
