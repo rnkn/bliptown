@@ -57,4 +57,3 @@ case "$method" in
 		exit 1
 		;;
 esac
-

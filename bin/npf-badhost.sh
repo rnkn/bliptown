@@ -2,7 +2,7 @@
 
 set -eu
 
-blacklist=/etc/blacklist.txt
+blocklist=/etc/blocklist.txt
 
 lists="
 https://www.binarydefense.com/banlist.txt
@@ -30,8 +30,8 @@ grep -Eo '((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]
 	grep -vE '^(0\.|10\.|100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\.|127\.|169\.254\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.0\.2\.|192\.168\.|198\.1[89]\.|22[4-9]\.|2[3-5][0-9]\.)' |
 	sort -u > "$clean"
 
-install -m 644 "$clean" "$blacklist"
-lines=$(wc -l < "$clean")
+install -m 644 "$clean" "$blocklist"
+lines=$(wc -l < "$clean" | xargs)
 
-npfctl reload
-echo "npf-badhost: $lines entries loaded into <blacklist>"
+npfctl table blacklist replace "$blocklist"
+echo "npf-badhost: $lines entries loaded into <blocklist>"
