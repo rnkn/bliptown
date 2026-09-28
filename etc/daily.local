@@ -17,7 +17,7 @@ renew_cert() {
 	$ok && $(dig "$domain" CAA +short)                                   || ok=false
 	$ok || { echo "failed" >&2; return 1; }
 
-	/usr/pkg/bin/uacme -c /etc/ssl -h /usr/local/www/bliptown/bin/nsupdate.sh $domain www.$domain
+	/usr/pkg/bin/uacme -c /etc/ssl -h /usr/local/www/bliptown/bin/nsupdate.sh issue $domain www.$domain
 	case $? in
 		(0)		echo "issued new certificate" ;;
 		(1)		echo "still current" ;;
