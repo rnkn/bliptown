@@ -216,7 +216,10 @@ sub startup {
 
 	$app->helper(
 		dns => sub {
-			return Bliptown::Model::DNS->new;
+			my $c = shift;
+			return Bliptown::Model::DNS->new(
+				util => $c->util,
+			);
 		}
 	);
 

@@ -2,9 +2,21 @@ package Bliptown::Model::Util;
 use Mojo::Base -base;
 use Mojo::URL;
 use Mojo::File qw(path);
+use Socket qw(AF_INET6 inet_pton);
 use POSIX qw(strftime);
 
 has 'user_path';
+
+sub ipv6_equal {
+	my ($self, $addr1, $addr2) = @_;
+
+	my $bin1 = inet_pton(AF_INET6, $addr1);
+	my $bin2 = inet_pton(AF_INET6, $addr2);
+
+	return unless ($bin1 && $bin2);
+	return 1 if $bin1 eq $bin2;
+	return;
+}
 
 sub format_human_size {
 	my ($self, $size) = @_;

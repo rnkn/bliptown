@@ -1,18 +1,8 @@
 package Bliptown::Model::DNS;
 use Mojo::Base -base;
-use Socket qw(AF_INET6 inet_pton);
 use Net::DNS;
 
-sub ipv6_equal {
-	my ($self, $addr1, $addr2) = @_;
-
-	my $bin1 = inet_pton(AF_INET6, $addr1);
-	my $bin2 = inet_pton(AF_INET6, $addr2);
-
-	return unless ($bin1 && $bin2);
-	return 1 if $bin1 eq $bin2;
-	return;
-}
+has 'util';
 
 sub check_domain_dns {
 	my ($self, $username, $domain) = @_;
@@ -42,7 +32,7 @@ sub check_domain_dns {
 
 	return unless (
 		$record_A eq $expected_ipv4 &&
-		$self->ipv6_equal($record_AAAA, $expected_ipv6) &&
+		$self->util->ipv6_equal($record_AAAA, $expected_ipv6) &&
 		$record_TXT eq $expected_txt
 	);
 	return 1;
