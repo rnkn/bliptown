@@ -83,6 +83,8 @@ sub startup {
 		$ENV{BLIPTOWN_SECRET}
 	]);
 
+	$app->sessions->cookie_name('bliptown');
+	$app->sessions->secure(1) if $app->mode eq 'production';
 	$app->sessions->encrypted(1);
 
 	$app->max_request_size(1024 * 1024 * 250);
