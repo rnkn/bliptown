@@ -16,7 +16,6 @@ renew_cert() {
 	echo -n "$domain... "
 	$ok && test "$(dig "$domain" A    +short)" = "$expected_A_record"    || ok=false
 	$ok && test "$(dig "$domain" AAAA +short)" = "$expected_AAAA_record" || ok=false
-	$ok && test -n "$(dig "$domain" CAA +short)"                         || ok=false
 	$ok || { echo "failed" >&2; return 1; }
 
 	if $wildcard
