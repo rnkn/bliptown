@@ -122,7 +122,9 @@ $ok && echo "Done" || echo "Failed"
 echo
 
 echo "Checking database integrity:"
-/usr/pkg/bin/sqlite3 /var/db/bliptown/users.db "PRAGMA integrity_check"
+ok=true
+/usr/pkg/bin/sqlite3 /var/db/bliptown/users.db "PRAGMA integrity_check" >/dev/null || ok=false
+$ok && echo "Done" || echo "Failed"
 echo
 
 echo "Creating database backup:"
