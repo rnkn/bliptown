@@ -125,3 +125,10 @@ ok=true
 find /var/db/bliptown -name '*.db.backup' -mtime +30 -delete || ok=false
 $ok && echo "Done" || echo "Failed"
 echo
+
+echo "Blocking malicious IPs:"
+ok=true
+/usr/local/www/bliptown/bin/npf-badhost.sh || ok=false
+npfctl reload || ok=false
+$ok && echo "Done" || echo "Failed"
+echo
