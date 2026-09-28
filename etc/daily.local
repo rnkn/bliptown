@@ -6,7 +6,7 @@ trap cleanup EXIT
 
 renew_cert() {
 	domain=$1
-	wildcard=$2
+	wildcard=${2:-false}
 	test -n "$domain" || return 1
 	ok=true
 
