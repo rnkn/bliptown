@@ -68,9 +68,9 @@ backup() {
 	
 	for d in home var
 	do
-		dump = "${d}-$(date +%F).dump"
-		fifo = "/tmp/${dump}.fifo"
-		tmpfiles="$fifo Tmpfiles"
+		dump="${d}-$(date +%F).dump"
+		fifo="/tmp/${dump}.fifo"
+		tmpfiles="$fifo $tmpfiles"
 
 		mkfifo "$fifo"
 		md5 < "$fifo" > "$checksum_dir/${dump}.md5" &
