@@ -6,6 +6,7 @@ trap cleanup EXIT
 
 renew_cert() {
 	domain=$1
+	dns=$2
 	test -n "$domain" || return 1
 
 	expected_A_record=46.225.163.173
@@ -17,7 +18,13 @@ renew_cert() {
 	$ok && $(dig "$domain" CAA +short)                                   || ok=false
 	$ok || { echo "failed" >&2; return 1; }
 
-	/usr/pkg/bin/uacme -c /etc/ssl -h /usr/local/www/bliptown/bin/nsupdate.sh issue $domain www.$domain
+	if $dns
+	then
+		hook=/usr/local/www/bliptown/bin/nsupdate.sh
+	else
+		hook=/usr/pkg/libexec/uacme/uacme.sh
+	fi
+	/usr/pkg/bin/uacme -c /etc/ssl -h "$hook" issue $domain
 	case $? in
 		(0)		echo "issued new certificate" ;;
 		(1)		echo "still current" ;;
@@ -91,8 +98,8 @@ backup
 echo
 
 echo "Renewing certificates:"
-renew_cert blip.town
-renew_cert bliptown-staging.com
+renew_cert blip.town true
+renew_cert bliptown-staging.com true
 
 ls /home/bliptown/domains | while read -r domain
 do
