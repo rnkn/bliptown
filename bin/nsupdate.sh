@@ -28,7 +28,7 @@ check_record() {
 
 case "$method" in
 	(begin)
-		res=$(send_api "dns/create/$ident" --arg content "$auth" '. + { name: "_acme-challenge", type: "TXT", content: $content }')
+		res=$(call_api "dns/create/$ident" --arg content "$auth" '. + { name: "_acme-challenge", type: "TXT", content: $content }')
 
 		status=$(echo "$res" | jq -r .status)
 		[ "$status" = "SUCCESS" ] ||
