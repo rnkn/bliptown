@@ -79,7 +79,7 @@ backup() {
 		$ok || { echo "Dumping $d failed" >&2; return 1; }
 
 		local_checksum=$(cat "$checksum_dir/${dump}.md5")
-		remote_checksum=$(ssh -p23 "$storage_box" "md5 -r ${dump_dir}/${backup_type}/${dump}" | cut -f1)
+		remote_checksum=$(ssh -p23 "$storage_box" "md5 -r ${dump_dir}/${backup_type}/${dump}" | cut -d''  -f1)
 		[ "$local_checksum" = "$remote_checksum" ] || ok=false
 		$ok || { echo "Dump $dump checksum does not match" >&2; return 1; }
 	done
