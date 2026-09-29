@@ -74,7 +74,7 @@ backup() {
 		mkfifo "$fifo"
 		md5 < "$fifo" > "$checksum_dir/${dump}.md5" &
 
-		dump -${dump_level}uaf - 2>/dev/null | tee "$fifo" |
+		dump -${dump_level}uaf - "/$d" 2>/dev/null | tee "$fifo" |
 			ssh -p23 "$storage_box" "dd of=${dump_dir}/${backup_type}/${dump}" || ok=false
 		$ok || { echo "Dumping $d failed" >&2; return 1; }
 
