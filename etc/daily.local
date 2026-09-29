@@ -143,6 +143,6 @@ echo
 
 echo "Blocking malicious IPs:"
 ok=true
-/usr/local/www/bliptown/bin/npf-badhost.sh || ok=false
+/usr/local/www/bliptown/bin/npf-badhost || ok=false
 $ok && echo "Done" || echo "Failed"
 echo

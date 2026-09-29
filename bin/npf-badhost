@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Copy qw(move);
+use File::Temp qw(tempfile);
+
+my $blocklist = '/etc/blocklist.txt';
+
+my @lists = (
+	'https://www.binarydefense.com/banlist.txt',
+	'https://rules.emergingthreats.net/blockrules/compromised-ips.txt',
+	'https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt',
+	'https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset',
+	'https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level2.netset',
+	'https://www.spamhaus.org/drop/drop.txt',
+	'https://www.spamhaus.org/drop/edrop.txt',
+	'https://isc.sans.edu/api/threatlist/shodan/?text',
+	'https://feodotracker.abuse.ch/downloads/ipblocklist.txt',
+	'https://sslbl.abuse.ch/blacklist/sslipblacklist.txt',
+);
+
+# Reserved or private networks, as [network, prefix length] pairs.
+my @reserved = (
+	[0, 8],
+	[10 << 24, 8],
+	[100 << 24 | 64 << 16, 10],
+	[127 << 24, 8],
+	[169 << 24 | 254 << 16, 16],
+	[172 << 24 | 16 << 16, 12],
+	[192 << 24 | 2 << 8, 24],
+	[192 << 24 | 168 << 16, 16],
+	[198 << 24 | 18 << 16, 15],
+	[224 << 24, 3],
+);
+
+sub mask_of
+{
+	my ($preflen) = @_;
+
+	return $preflen ? (0xFFFFFFFF << (32 - $preflen)) & 0xFFFFFFFF : 0;
+}
+
+sub is_reserved
+{
+	my ($addr) = @_;
+
+	for my $net (@reserved) {
+		return 1 if ($addr & mask_of($net->[1])) == $net->[0];
+	}
+	return;
+}
+
+sub fetch
+{
+	my ($url) = @_;
+
+	my $fh;
+	if (!open($fh, '-|', "ftp -o - '$url' 2>/dev/null")) {
+		die "npf-badhost: fork: $!\n";
+	}
+	my $data = do { local $/; <$fh> };
+	if (!close($fh)) {
+		warn "npf-badhost: WARNING: failed to fetch $url\n";
+	}
+	return defined($data) ? $data : '';
+}
+
+# An LPM table rejects any entry whose network address is already covered
+# by another entry (npf_table_insert returns EEXIST), which makes the whole
+# npf_table_replace fail with "File exists".  drop_subset() removes every
+# entry that is a subset of a broader one; blocked ranges are unchanged.
+sub drop_subset
+{
+	my ($tab) = @_;
+
+	for my $key (keys %$tab) {
+		my ($addr, $preflen) = split(m{/}, $key);
+		for my $q (1 .. $preflen - 1) {
+			if ($tab->{($addr & mask_of($q)) . "/$q"}) {
+				delete $tab->{$key};
+				last;
+			}
+		}
+	}
+}
+
+my $raw = '';
+$raw .= fetch($_) for @lists;
+
+my %tab;
+my $ip_re = qr/(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(?:\/[0-9]{1,2})?/;
+while ($raw =~ /($ip_re)/g) {
+	my $entry = $1;
+	my ($o1, $o2, $o3, $o4, $p) =
+	    $entry =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)(?:\/(\d+))?$/;
+	next if grep { $_ > 255 } ($o1, $o2, $o3, $o4);
+	$p = 32 unless defined $p;
+	next if $p < 1 || $p > 32;
+	my $addr = unpack('N', pack('C4', $o1, $o2, $o3, $o4)) & mask_of($p);
+	next if is_reserved($addr);
+	$tab{"$addr/$p"} = 1;
+}
+
+drop_subset(\%tab);
+
+my @entries = sort {
+	my ($a_addr) = $a =~ /^(\d+)/;
+	my ($b_addr) = $b =~ /^(\d+)/;
+	$a_addr <=> $b_addr;
+} keys %tab;
+
+die "npf-badhost: no entries fetched, leaving $blocklist untouched\n"
+    unless @entries;
+
+my $tmp;
+END { unlink $tmp if defined $tmp }
+my ($out, $tmpname) = tempfile('npf-badhost.XXXXXX');
+$tmp = $tmpname;
+for my $key (@entries) {
+	my ($addr, $p) = split(m{/}, $key);
+	print {$out} join('.', unpack('C4', pack('N', $addr)));
+	print {$out} "/$p" if $p != 32;
+	print {$out} "\n";
+}
+close($out) or die "npf-badhost: close $tmp: $!\n";
+
+chmod(0644, $tmp);
+move($tmp, $blocklist) or die "npf-badhost: move $blocklist: $!\n";
+
+if (system('npfctl', 'table', 'blocklist', 'replace', $blocklist) != 0) {
+	die "npf-badhost: npfctl failed\n";
+}
+
+my $n = scalar @entries;
+print "npf-badhost: $n entries loaded into <blocklist>\n";
