@@ -105,7 +105,7 @@ echo
 
 echo "Renewing certificates:"
 renew_cert blip.town true
-renew_cert bliptown-staging.com true
+renew_cert staging-blip.town true
 
 ls /home/bliptown/domains | while read -r domain
 do
