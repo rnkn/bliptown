@@ -86,7 +86,7 @@ backup() {
 	ok=true
 	echo "Deleting old backups:"
 
-	mount_psshfs -O Port=22 "${storage_box}:" "$mnt"
+	mount_psshfs -O Port=23 "${storage_box}:" "$mnt"
 
 	find "${mnt}/${dump_dir}/daily" -name "*.dump" -mtime +7 -delete || ok=false
 	find "${mnt}/${dump_dir}/weekly" -name "*.dump" -mtime +30 -delete || ok=false
