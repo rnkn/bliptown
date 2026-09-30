@@ -3,7 +3,8 @@
 api_baseurl="${API_BASEURL:-https://api.porkbun.com/api/json/v3}"
 keys_file="${PORKBUN_KEYS:-/etc/ssl/private/porkbun-keys.json}"
 
-if [ $# -ne 5 ]; then
+if [ $# -ne 5 ]
+then
 	echo "Usage: $(basename "$0") method type ident token auth" 1>&2
 	exit 85
 fi
@@ -31,8 +32,11 @@ case "$method" in
 		res=$(call_api "dns/create/$ident" --arg content "$auth" '. + { name: "_acme-challenge", type: "TXT", content: $content }')
 
 		status=$(echo "$res" | jq -r .status)
-		[ "$status" = "SUCCESS" ] ||
-			{ echo "DNS creation rejected ($status)" 1>&2; exit 1; }
+		if [ ! "$status" = "SUCCESS" ]
+		then
+			echo "$res" | jq
+			exit 1
+		fi
 
 		count=0
 		while sleep 5
