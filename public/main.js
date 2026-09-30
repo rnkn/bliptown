@@ -1,5 +1,5 @@
 const trackEvents = ['pointermove', 'keydown', 'touchstart'];
-const trackUrl = document.querySelector('#analytics')?.dataset.trackUrl;
+const trackUrl = '/_track';
 
 let tracked = false;
 
