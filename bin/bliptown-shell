@@ -68,8 +68,8 @@ my %allowed_commands = (
 	quota	=> '/usr/bin/quota',
 	touch	=> '/usr/bin/touch',
 	vi		=> '/usr/bin/vi -S',
-	tree	=> '/usr/local/bin/tree',
-	nano	=> '/usr/local/bin/nano -R',
+	tree	=> '/usr/pkg/bin/tree',
+	nano	=> '/usr/pkg/bin/nano -R',
 );
 
 my %builtins = (
