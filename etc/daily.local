@@ -1,4 +1,7 @@
 # -*- mode: sh; -*-
+PATH=/usr/local/www/bliptown/bin:/usr/pkg/bin:/usr/pkg/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+export PATH
+
 cleanup() {
 	rm -f $tmpfiles
 }
@@ -113,13 +116,13 @@ echo
 echo "Expunging database dead tokens:"
 ok=true
 now=$(date +%s)
-/usr/bin/sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now" || ok=false
+sqlite3 /var/db/bliptown/users.db "DELETE FROM login_tokens WHERE expires < $now" || ok=false
 $ok && echo "Done" || echo "Failed"
 echo
 
 echo "Checking database integrity:"
 ok=true
-/usr/pkg/bin/sqlite3 /var/db/bliptown/users.db "PRAGMA integrity_check" >/dev/null || ok=false
+sqlite3 /var/db/bliptown/users.db "PRAGMA integrity_check" >/dev/null || ok=false
 $ok && echo "Done" || echo "Failed"
 echo
 
@@ -128,7 +131,7 @@ ok=true
 date=$(date +%F)
 backup_db="/var/db/bliptown/users-${date}.db.backup"
 install -m 0600 -o root -g wheel /dev/null "$backup_db"
-/usr/pkg/bin/sqlite3 /var/db/bliptown/users.db ".backup $backup_db" || ok=false
+sqlite3 /var/db/bliptown/users.db ".backup $backup_db" || ok=false
 $ok && echo "Done" || echo "Failed"
 echo
 
@@ -140,6 +143,6 @@ echo
 
 echo "Blocking malicious IPs:"
 ok=true
-/usr/local/www/bliptown/bin/npf-badhost || ok=false
+npf-badhost || ok=false
 $ok && echo "Done" || echo "Failed"
 echo
