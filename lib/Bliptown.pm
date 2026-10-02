@@ -455,16 +455,6 @@ sub startup {
 		return 1;
 	});
 
-	$r->get('/.well-known/acme-challenge/:file' => sub {
-		my $c = shift;
-		my $path = path('/var/www/acme/', $c->param('file'));
-		if (-f $path && -r $path) {
-			return $c->reply->file($path);
-		}
-		$c->reply->not_found;
-		return;
-	})->name('acme_challenge');
-
 	$r->post('/_login')->to(controller => 'Users', action => 'generate_login')->name('generate_login');
 	$r->post('/_logout')->to(controller => 'Users', action => 'generate_logout')->name('generate_logout');
 	$r->get('/_logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
