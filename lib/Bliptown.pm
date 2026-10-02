@@ -93,11 +93,16 @@ sub startup {
 
 	delete $app->static->extra->{'favicon.ico'};
 
-	$app->log->on(message => sub {
-		my ($log, $level, @lines) = @_;
-		if ($app->mode eq 'production' && $level eq 'error') {
+	$app->hook(
+		after_dispatch => sub {
+			my $c = shift;
+			return unless $app->mode eq 'production';
+			return unless $c->res->code && $c->res->code == 500;
+
 			my %data = (
-				content => join("\n", @lines),
+				content => $c->stash('exception') // '500 internal server error',
+				method => $c->req->method,
+				url => $c->req->url->to_abs,
 				date => strftime("%a, %d %b %Y %H:%M:%S %z", localtime),
 				host => $ENV{BLIPTOWN_DOMAIN},
 				id => substr(generate_secret, 0, 32),
@@ -112,7 +117,9 @@ Message-ID: <%= $id %>@<%= $host %>
 Subject: Internal Server Error
 
 We regret to inform you that Bliptown has suffered an internal server
-error. Here is the log message:
+error. Here are the details:
+
+<%= $method %> <%= $url %>
 
 <%= $content %>
 EOF
@@ -123,7 +130,7 @@ EOF
 				content => $content,
 			})
 		}
-	});
+	);
 
 	$app->helper(
 		sqlite => sub {
