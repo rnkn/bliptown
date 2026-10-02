@@ -26,6 +26,7 @@ renew_cert() {
 		hook=/usr/local/www/bliptown/bin/nsupdate.sh
 		subdomain="*.$domain"
 	else
+		export UACME_CHALLENGE_PATH=/var/www/challenge
 		hook=/usr/pkg/libexec/uacme/uacme.sh
 		subdomain="www.$domain"
 	fi
