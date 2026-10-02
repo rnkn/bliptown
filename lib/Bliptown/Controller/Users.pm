@@ -90,7 +90,7 @@ sub generate_login {
 	})->each;
 
 	if (scalar @recent >= 3) {
-		my $created = $recent[0]->{expires} - 3600;
+		my $created = $recent[2]->{expires} - 3600;
 		if (time - $created < $cooldown) {
 			return $c->render(
 				status => 429,
