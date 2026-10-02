@@ -1,9 +1,11 @@
 package Bliptown;
 use Mojo::Base 'Mojolicious';
 use Mojo::File qw(path);
-use Mojo::Util qw(url_unescape);
+use Mojo::Util qw(url_unescape generate_secret);
 use Mojo::SQLite;
+use Mojo::Template;
 use lib '.';
+use POSIX qw(strftime);
 
 use Geo::Location::IP::Database::SimpleReader;
 
@@ -90,6 +92,38 @@ sub startup {
 	$app->max_request_size(1024 * 1024 * 250);
 
 	delete $app->static->extra->{'favicon.ico'};
+
+	$app->log->on(message => sub {
+		my ($log, $level, @lines) = @_;
+		if ($app->mode eq 'production' && $level eq 'error') {
+			my %data = (
+				content => join("\n", @lines),
+				date => strftime("%a, %d %b %Y %H:%M:%S %z", localtime),
+				host => $ENV{BLIPTOWN_DOMAIN},
+				id => substr(generate_secret, 0, 32),
+			);
+
+			my $template = Mojo::Template->new(vars => 1);
+			my $content = $template->render(<<'EOF', \%data);
+From: Bliptown Mayor <support@blip.town>
+To: Bliptown Mayor <support@blip.town>
+Date: <%= $date %>
+Message-ID: <%= $id %>@<%= $host %>
+Subject: Internal Server Error
+
+We regret to inform you that Bliptown has suffered an internal server
+error. Here is the log message:
+
+<%= $content %>
+EOF
+
+			my $email = Bliptown::Model::Email->new;
+			$email->send_email({
+				recipient => 'support@blip.town',
+				content => $content,
+			})
+		}
+	});
 
 	$app->helper(
 		sqlite => sub {
@@ -548,6 +582,11 @@ sub startup {
 	$protected->get('/_snapshots')->to(controller => 'Snapshots', action => 'list_snapshots')->name('list_snapshots');
 
 	$r->get('/_health')->to(controller => 'Health', action => 'health_check')->name('health_check');
+	$protected->get('/_error' => sub {
+		my $c = shift;
+		$c->reply->exception('500 internal server error test: everything has gone wrong!');
+		return;
+	})->name('error_check');
 
 	$r->get('/style.css')->to(controller => 'Pages', action => 'render_style')->name('render_style');
 
