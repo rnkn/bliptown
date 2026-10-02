@@ -78,11 +78,25 @@ sub send_magic_link {
 	});
 	return unless $token;
 
-	my $email_text = $self->generate_magic_link_email({
+	my $content = $self->generate_magic_link_email({
 		username => $username,
 		email => $email,
 		token => $token,
 	});
+
+	$self->send_email({
+		recipient => "$username <$email>",
+		content => $content,
+	});
+}
+
+sub send_email {
+	my ($self, $args) = @_;
+	my $smtp = Mojo::SMTP::Client->new(
+		address => $ENV{BLIPTOWN_SMTP_ADDR},
+		port => $ENV{BLIPTOWN_SMTP_PORT},
+		tls => 1,
+	);
 
 	$smtp->send(
 		auth => {
@@ -90,8 +104,8 @@ sub send_magic_link {
 			password => $ENV{BLIPTOWN_SMTP_PASS},
 		},
 		from => 'support@blip.town',
-		to => $email,
-		data => $email_text,
+		to => $args->{recipient},
+		data => $args->{content},
 		quit => 1,
 		sub {
 			my ($smtp, $res) = @_;
