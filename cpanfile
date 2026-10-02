@@ -3,7 +3,6 @@ requires 'Mojo::SQLite';
 requires 'Mojo::SMTP::Client';
 requires 'CryptX';
 requires 'Cpanel::JSON::XS';
-requires 'EV';
 requires 'FFI::Platypus';
 requires 'YAML::Tiny';
 requires 'Text::Glob';
