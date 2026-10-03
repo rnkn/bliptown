@@ -25,12 +25,13 @@ echo
 
 echo "Fetching Bunny CDN IPs:"
 ok=true
-ftp -Vo /etc/bunnycdn.txt "$bunnycdn_endpoint" || ok=false
-ftp -Vo /etc/bunnycdn-ipv6.txt "$bunnycdn_ipv6_endpoint" || ok=false
+ftp -Vo /tmp/bunnycdn.txt "$bunnycdn_endpoint" || ok=false
+ftp -Vo /tmp/bunnycdn-ipv6.txt "$bunnycdn_ipv6_endpoint" || ok=false
 if $ok
 then
 	tr -d '\r' < /tmp/bunnycdn.txt > /etc/bunnycdn.txt
 	tr -d '\r' < /tmp/bunnycdn-ipv6.txt > /etc/bunnycdn-ipv6.txt
+	rm -f  /tmp/bunnycdn*
 	echo "Done"
 	echo "Reloading npf:"
 	service npf reload
