@@ -15,6 +15,6 @@ do
     else
         echo "$time $ip" >> "$tmpfile"
     fi
-done < "$rate_limit_logfile"
+done < "$rate_limit_log"
 
 mv "$tmpfile" "$rate_limit_log"
