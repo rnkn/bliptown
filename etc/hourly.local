@@ -5,7 +5,7 @@ now=$(date +%s)
 cutoff=$(( now - 86400 ))
 tmpfile=$(mktemp)
 
-while read -r ip time
+while read -r time ip
 do
     [ -n "$ip" ] || continue
 
