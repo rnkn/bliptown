@@ -1,23 +1,17 @@
 # -*- mode: sh; -*-
 
-accesslog="/var/log/bliptown/access.log"
-test -f "$accesslog" || install -m 600 -o bliptown -g bliptown /dev/null "$accesslog"
-
-gzcat -f "$accesslog"* | /usr/local/www/bliptown/bin/bliptown_analytics
-
-newsyslog
-pkill -HUP -u bliptown -U bliptown -f script/bliptown prefork
-
 rate_limit_log="/var/log/rate_limit.log"
-cutoff=$(( $(date +%s) - 86400 ))
+now=$(date +%s)
+cutoff=$(( now - 86400 ))
 tmpfile=$(mktemp)
 
-while read -r ip time; do
+while read -r ip time
+do
     [ -n "$ip" ] || continue
 
     if [ "$time" -lt "$cutoff" ]
 	then
-        npfctl table rate_limit remove $ip 2>/dev/null
+        npfctl table rate_limit rem $ip 2>/dev/null
     else
         echo "$time $ip" >> "$tmpfile"
     fi
