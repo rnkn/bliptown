@@ -6,7 +6,7 @@ production=false
 staging=false
 
 [ $(hostname) = avalon.blip.town ] && production=true
-[ $(hostname) = epoch.blip.town ] && staging=true
+[ $(hostname) = epoch.staging-blip.town ] && staging=true
 
 cleanup() {
 	rm -f $tmpfiles
