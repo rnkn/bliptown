@@ -2,6 +2,12 @@
 PATH=/usr/local/www/bliptown/bin:/usr/pkg/bin:/usr/pkg/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 export PATH
 
+production=false
+staging=false
+
+[ $(hostname) = avalon.blip.town ] && production=true
+[ $(hostname) = epoch.blip.town ] && staging=true
+
 cleanup() {
 	rm -f $tmpfiles
 }
@@ -101,18 +107,26 @@ backup() {
 	echo "Done"
 }
 
-backup
+if $production
+then
+	backup
+fi
 echo
 
 echo "Renewing certificates:"
-renew_cert blip.town true
-renew_cert staging-blip.town true
+if $production
+then
+	renew_cert blip.town true
 
-ls /home/bliptown/domains | while read -r domain
-do
-	renew_cert $domain
-done
-echo
+	ls /home/bliptown/domains | while read -r domain
+	do
+		renew_cert $domain
+	done
+	echo
+elif $staging
+then
+	renew_cert staging-blip.town true
+fi
 
 echo "Expunging database dead tokens:"
 ok=true
