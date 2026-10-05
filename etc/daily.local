@@ -152,7 +152,7 @@ echo "Creating database backup:"
 ok=true
 date=$(date +%F)
 backup_db="/var/db/bliptown/users-${date}.db.backup"
-install -m 0600 -o root -g wheel /dev/null "$backup_db"
+install -m 0600 -o bliptown -g bliptown /dev/null "$backup_db"
 sqlite3 /var/db/bliptown/users.db ".backup $backup_db" || ok=false
 $ok && echo "Done" || echo "Failed"
 echo
