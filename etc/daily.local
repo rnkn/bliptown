@@ -19,8 +19,15 @@ renew_cert() {
 	test -n "$domain" || return 1
 	ok=true
 
+	if $production
+	then
 	expected_A_record=46.225.163.173
 	expected_AAAA_record=2a01:4f8:1c19:6498::1
+	elif $staging
+	then
+	expected_A_record=77.42.77.0
+	expected_AAAA_record=2a01:4f9:c013:4744::1
+	fi
 
 	echo -n "$domain... "
 	$ok && test "$(dig "$domain" A    +short)" = "$expected_A_record"    || ok=false
