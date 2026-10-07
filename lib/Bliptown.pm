@@ -376,24 +376,24 @@ EOF
 		}
 	);
 
-	my $accesslog;
-	my $accesslog_path = path($ENV{BLIPTOWN_LOG_HOME}, 'access.log');
-	$SIG{HUP} = sub { undef $accesslog };
+	my $visitor_log;
+	my $vistior_log_path = path($ENV{BLIPTOWN_LOG_HOME}, 'visitor.log');
+	$SIG{HUP} = sub { undef $visitor_log };
 
 	$app->helper(
-		accesslog => sub {
-			if ($accesslog) {
-				my @open = (stat $accesslog->handle)[0, 1];
-				my @disk = (stat $accesslog_path)[0, 1];
-				undef $accesslog unless "@open" eq "@disk";
+		visitor_log => sub {
+			if ($visitor_log) {
+				my @open = (stat $visitor_log->handle)[0, 1];
+				my @disk = (stat $vistior_log_path)[0, 1];
+				undef $visitor_log unless "@open" eq "@disk";
 			}
 
-			unless ($accesslog) {
-				$accesslog = Mojo::Log->new(
+			unless ($visitor_log) {
+				$visitor_log = Mojo::Log->new(
 					level => 'info',
-					path => $accesslog_path,
+					path => $vistior_log_path,
 				);
-				$accesslog->format(
+				$visitor_log->format(
 					sub {
 						my ($time, $level, @lines) = @_;
 						$time = int($time);
@@ -402,7 +402,7 @@ EOF
 				);
 			}
 
-			return $accesslog;
+			return $visitor_log;
 		}
 	);
 

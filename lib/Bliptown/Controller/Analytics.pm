@@ -41,7 +41,7 @@ sub track_visit {
 
 	if ($username ne $req_username) {
 		my $data = $c->get_data // [];
-		$c->accesslog->info($req_username, @$data);
+		$c->visitor_log->info($req_username, @$data);
 	}
 
 	return $c->render(data => '');
