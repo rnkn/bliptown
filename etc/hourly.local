@@ -11,7 +11,7 @@ do
 
     if [ "$time" -lt "$cutoff" ]
 	then
-        npfctl table rate_limit rem $ip >/dev/null
+        npfctl table rate_limit rem $ip >/dev/null 2>&1
     else
         echo "$time $ip" >> "$tmpfile"
     fi
