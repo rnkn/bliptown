@@ -14,6 +14,13 @@ type=$2
 ident=$3
 auth=$5
 
+case $ident in
+	(\*.*) ident=${ident#\*.} ;;
+esac
+
+record=_acme-challenge
+zone=$ident
+
 [ "$type" = "dns-01" ] || exit 1
 
 call_api() {
@@ -27,11 +34,39 @@ check_record() {
 	dig +short TXT "_acme-challenge.$ident" | grep -q "$auth"
 }
 
+find_zone() {
+	while true
+	do
+		res=$(call_api "dns/retrieve/$zone" .)
+		status=$(echo "$res" | jq -r .status)
+
+		if [ "$status" = SUCCESS ]
+		then
+			return 0
+		fi
+
+		case $zone in
+			(*.*.*)
+				record=$record.${zone%%.*}
+				zone=${zone#*.}
+				;;
+			(*)
+				return 1
+				;;
+		esac
+	done
+}
+
+find_zone || {
+	echo "No zone found for $ident ($status)" 1>&2
+	exit 1
+}
+
 case "$method" in
 	(begin)
-		res=$(call_api "dns/create/$ident" --arg content "$auth" '. + { name: "_acme-challenge", type: "TXT", content: $content }')
-
+		res=$(call_api "dns/create/$zone" --arg content "$auth" --arg name "$record" '. + { name: $name, type: "TXT", content: $content }')
 		status=$(echo "$res" | jq -r .status)
+
 		if [ ! "$status" = "SUCCESS" ]
 		then
 			echo "$res" | jq
@@ -48,7 +83,7 @@ case "$method" in
 		;;
 
 	(done|failed)
-		res=$(call_api "dns/deleteByNameType/$ident/TXT/_acme-challenge")
+		res=$(call_api "dns/deleteByNameType/$zone/TXT/$record")
 
 		status=$(echo "$res" | jq -r '.status')
 		[ "$status" = "SUCCESS" ] ||
