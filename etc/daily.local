@@ -141,11 +141,11 @@ then
 	do
 		renew_cert $domain
 	done
-	echo
 elif $staging
 then
 	renew_cert staging-blip.town true
 fi
+echo
 
 echo "Expunging database dead tokens:"
 ok=true
