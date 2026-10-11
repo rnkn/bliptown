@@ -4,6 +4,7 @@ use Mojo::File qw(path);
 use Mojo::Util qw(url_unescape generate_secret);
 use Mojo::SQLite;
 use Mojo::Template;
+use IO::Pipe;
 use lib '.';
 use POSIX qw(strftime);
 
@@ -377,32 +378,22 @@ EOF
 	);
 
 	my $visitor_log;
-	my $vistior_log_path = path($ENV{BLIPTOWN_LOG_HOME}, 'visitor.log');
-	$SIG{HUP} = sub { undef $visitor_log };
 
 	$app->helper(
 		visitor_log => sub {
-			if ($visitor_log) {
-				my @open = (stat $visitor_log->handle)[0, 1];
-				my @disk = (stat $vistior_log_path)[0, 1];
-				undef $visitor_log unless "@open" eq "@disk";
-			}
-
-			unless ($visitor_log) {
-				$visitor_log = Mojo::Log->new(
+			$visitor_log //= do {
+				my $logger = IO::Pipe->new;
+				$logger->writer('/usr/bin/logger', '-t', 'bliptown-visitor', '-p', 'local1.info');
+				$logger->autoflush(1);
+				Mojo::Log->new(
 					level => 'info',
-					path => $vistior_log_path,
-				);
-				$visitor_log->format(
-					sub {
+					handle => $logger,
+					format => sub {
 						my ($time, $level, @lines) = @_;
-						$time = int($time);
-						return join("\t", $time, @lines) . "\n";
-					}
+						return join("\t", int($time), @lines) . "\n";
+					},
 				);
-			}
-
-			return $visitor_log;
+			};
 		}
 	);
 
