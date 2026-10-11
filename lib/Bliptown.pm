@@ -1,7 +1,7 @@
 package Bliptown;
 use Mojo::Base 'Mojolicious';
 use Mojo::File qw(path);
-use Mojo::Util qw(url_unescape generate_secret);
+use Mojo::Util qw(url_unescape generate_secret encode);
 use Mojo::SQLite;
 use Mojo::Template;
 use IO::Pipe;
@@ -31,6 +31,14 @@ sub startup {
 
 	$app->config(
 		reverse_proxy => $app->mode eq 'production' ? 1 : 0,
+		log_priority => {
+			trace	=> 'local0.debug',
+			debug	=> 'local0.debug',
+			info	=> 'local0.info',
+			warn	=> 'local0.warning',
+			error	=> 'local0.err',
+			fatal	=> 'local0.crit',
+		},
 		render_exts => [ qw(md html css txt) ],
 		cdn_exts => {
 			eot		=> 1,
@@ -80,6 +88,26 @@ sub startup {
 		. q{script-src 'self' unpkg.com; }
 		. q{frame-src 'self' https:; }
 		. q{connect-src 'self'; },
+	);
+
+	my %log_pipe;
+	$app->log->handle(undef);
+	$app->log->format(sub {
+		my ($time, $level, @lines) = @_;
+		return "[$$] [$level] @lines\n";
+	});
+	$app->log->on(
+		message => sub {
+			my ($log, $level, @lines) = @_;
+			my $pipe = $log_pipe{$level} //= do {
+				my $logger = IO::Pipe->new;
+				$logger->writer('/usr/bin/logger', '-t', 'bliptown', '-p', $app->config->{log_priority}->{$level});
+				$logger->autoflush(1);
+				$logger;
+			};
+			$pipe->print(encode('UTF-8', $log->format->(time, $level, @lines)))
+				or undef $log_pipe{$level};
+		}
 	);
 
 	$app->secrets([
