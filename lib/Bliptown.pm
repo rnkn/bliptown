@@ -111,7 +111,8 @@ sub startup {
 	);
 
 	$app->secrets([
-		$ENV{BLIPTOWN_SECRET}
+		$ENV{BLIPTOWN_SECRET_OLD},
+		$ENV{BLIPTOWN_SECRET_NEW},
 	]);
 
 	$app->sessions->cookie_name('bliptown');
