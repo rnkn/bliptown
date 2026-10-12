@@ -3,7 +3,7 @@ use Mojo::Base -base;
 use Mojo::Template;
 use Mojo::URL;
 use Mojo::File qw(path);
-use Mojo::SMTP::Client;
+use IO::Pipe;
 use POSIX qw(strftime);
 
 has 'user';
@@ -86,25 +86,23 @@ sub send_magic_link {
 
 sub send_email {
 	my ($self, $args) = @_;
-	my $smtp = Mojo::SMTP::Client->new(
-		address => $ENV{BLIPTOWN_SMTP_ADDR},
-		port => $ENV{BLIPTOWN_SMTP_PORT},
-		tls => 1,
-	);
 
-	$smtp->send(
-		auth => {
-			login => $ENV{BLIPTOWN_SMTP_LOGIN},
-			password => $ENV{BLIPTOWN_SMTP_PASS},
-		},
-		from => 'support@blip.town',
-		to => $args->{recipient},
-		data => $args->{content},
-		quit => 1,
+	Mojo::IOLoop::Subprocess->new->run(
 		sub {
-			my ($smtp, $res) = @_;
-			warn $res->error if $res->error;
+			my $subprocess = shift;
+			my $pipe = IO::Pipe->new;
+			$pipe->writer($ENV{BLIPTOWN_MSMTP_PATH}, $args->{recipient})
+				or die "Failed to fork msmtp: $!";
+
+			$pipe->print($args->{content})
+				or die 'msmtp: broken pipe';
+			$pipe->close;
+
 			return 1;
+		},
+		sub {
+			my ($subprocess, $err, @results) = @_;
+			warn "$err" if $err;
 		}
 	);
 }

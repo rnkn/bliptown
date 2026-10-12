@@ -19,10 +19,6 @@ die 'BLIPTOWN_SCHEME not defined'				unless defined $ENV{BLIPTOWN_SCHEME};
 die 'BLIPTOWN_PORT not defined'					unless defined $ENV{BLIPTOWN_PORT};
 die 'BLIPTOWN_IPV4 not defined'					unless defined $ENV{BLIPTOWN_IPV4};
 die 'BLIPTOWN_IPV6 not defined'					unless defined $ENV{BLIPTOWN_IPV6};
-die 'BLIPTOWN_SMTP_ADDR not defined'			unless defined $ENV{BLIPTOWN_SMTP_ADDR};
-die 'BLIPTOWN_SMTP_PORT not defined'			unless defined $ENV{BLIPTOWN_SMTP_PORT};
-die 'BLIPTOWN_SMTP_LOGIN not defined'			unless defined $ENV{BLIPTOWN_SMTP_LOGIN};
-die 'BLIPTOWN_SMTP_PASS not defined'			unless defined $ENV{BLIPTOWN_SMTP_PASS};
 
 die 'BLIPTOWN_DATA_HOME not defined'			unless defined $ENV{BLIPTOWN_DATA_HOME};
 die 'BLIPTOWN_DB not defined'					unless defined $ENV{BLIPTOWN_DB};
@@ -31,6 +27,7 @@ die 'BLIPTOWN_GEOIP_DB not defined'				unless defined $ENV{BLIPTOWN_GEOIP_DB};
 die 'BLIPTOWN_LOG_HOME not defined'				unless defined $ENV{BLIPTOWN_LOG_HOME};
 
 die 'BLIPTOWN_MD4C_HTML_LIB not defined'		unless defined $ENV{BLIPTOWN_MD4C_HTML_LIB};
+die 'BLIPTOWN_MSMTP_PATH not defined'			unless defined $ENV{BLIPTOWN_MSMTP_PATH};
 
 die 'BLIPTOWN_CDN_API_HOST not defined'			unless defined $ENV{BLIPTOWN_CDN_API_HOST};
 die 'BLIPTOWN_CDN_API_KEY not defined'			unless defined $ENV{BLIPTOWN_CDN_API_KEY};
