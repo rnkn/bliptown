@@ -5,11 +5,9 @@ set statefile /var/monit/state
 
 set alert rnkn@rnkn.xyz
 
-include /etc/monitrc-mailserver
-
 set httpd port 2812 readonly
+	use address 127.0.0.1
 	allow localhost
-	unixsocket /var/run/monit.sock
 
 check host blip.town with address blip.town
 	if failed port 22 protocol ssh for 3 cycles then alert
@@ -21,85 +19,55 @@ check host rnkn.xyz with address rnkn.xyz
 	if failed port 443 protocol https for 3 cycles then alert
 
 check process bliptown pidfile /tmp/bliptown.pid
-	start program = "/usr/sbin/rcctl start bliptown"
-	if not exist for 3 cycles then alert
-	if not exist for 3 cycles then start
-
-check process bliptown_helper matching "perl:? /usr/local/www/bliptown/bin/bliptown_helper\[master\]"
-	start program = "/usr/sbin/rcctl start bliptown_helper"
+	start program = "/usr/sbin/service bliptown start"
 	if not exist for 3 cycles then alert
 	if not exist for 3 cycles then start
 
 check process sshd pidfile /var/run/sshd.pid
-	start program = "/usr/sbin/rcctl start sshd"
+	start program = "/usr/sbin/service sshd start"
 	if not exist for 3 cycles then alert
 	if not exist for 3 cycles then start
 
-check process relayd matching "/usr/sbin/relayd"
-	start program = "/usr/sbin/rcctl start relayd"
+check process syslogd pidfile /var/run/syslogd.pid
+	start program = "/usr/sbin/service syslogd start"
 	if not exist for 3 cycles then alert
 	if not exist for 3 cycles then start
-
-check process httpd matching "/usr/sbin/httpd"
-	start program = "/usr/sbin/rcctl start httpd"
-	if not exist for 3 cycles then alert
-	if not exist for 3 cycles then start
-
-check file doas.conf path /etc/doas.conf
-	if failed uid 0 then alert
-	if failed gid 0 then alert
-	if failed perm 0600 then alert
-	if failed md5 checksum expect cab8df0c860ce5696aeb4c9dac59ac7f then alert
 
 check file master.passwd path /etc/master.passwd
 	if failed uid 0 then alert
 	if failed gid 0 then alert
 	if failed perm 0600 then alert
 
-check file login.conf path /etc/login.conf
+check directory etc/ssl/private path /etc/ssl/private
 	if failed uid 0 then alert
-	if failed gid 0 then alert
-	if failed perm 0600 then alert
-	if failed md5 checksum expect 2c3de7a4124280c1eeae4070cf5ae0dc then alert
+	if failed gid 1000 then alert
+	if failed perm 0750 then alert
 
-check file letsencrypt.pem path /etc/acme/letsencrypt.pem
+check file etc/ssl/private/key.pem path /etc/ssl/private/key.pem
 	if failed uid 0 then alert
-	if failed gid 0 then alert
-	if failed perm 0400 then alert
-	if failed md5 checksum expect e1e9582810b46cdabd06d706f5f2bdf2 then alert
+	if failed gid 1000 then alert
+	if failed perm 0440 then alert
+	if failed md5 checksum expect a64a844b06a2bc039b3aed47863c06c4 then alert
 
 check file usr/bin/login path /usr/bin/login
 	if failed uid 0 then alert
-	if failed gid 7 then alert
-	if failed perm 555 then alert
+	if failed gid 0 then alert
+	if failed perm 4555 then alert
 
 check file usr/sbin/sshd path /usr/sbin/sshd
 	if failed uid 0 then alert
-	if failed gid 7 then alert
-	if failed perm 0511 then alert
+	if failed gid 0 then alert
+	if failed perm 0555 then alert
 
 check file usr/bin/su path /usr/bin/su
 	if failed uid 0 then alert
-	if failed gid 7 then alert
+	if failed gid 0 then alert
 	if failed perm 4555 then alert
 
 check file script/bliptown path /usr/local/www/bliptown/script/bliptown
 	if failed perm 0755 then alert
 
-check file bin/bliptown_helper path /usr/local/www/bliptown/bin/bliptown_helper
-	if failed uid 1008 then alert
-	if failed gid 1008 then alert
-
 check file users.db path /var/db/bliptown/users.db
-	if failed uid 1008 then alert
-	if failed gid 1008 then alert
+	if failed uid 1003 then alert
+	if failed gid 1001 then alert
 	if failed perm 0600 then alert
-
-check directory usr/local/www/bliptown path /usr/local/www/bliptown
-	if failed uid 1008 then alert
-	if failed gid 1008 then alert
-
-check directory etc/ssl/private path /etc/ssl/private
-	if failed uid 0 then alert
-	if failed gid 0 then alert
-	if failed perm 0700 then alert
