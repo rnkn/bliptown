@@ -10,7 +10,7 @@ use HTTP::BrowserDetect;
 use List::Util qw(max);
 use Mojo::File qw(path);
 use Mojo::JSON qw(encode_json);
-use Mojo::Util qw(url_unescape);
+use Mojo::Util qw(trim url_unescape);
 use POSIX qw(strftime);
 
 die "$0 must be run as root" unless $> == 0;
@@ -35,7 +35,7 @@ sub tally {
 }
 
 while (my $line = <STDIN>) {
-	chomp $line;
+	$line = trim $line;
 	next unless length $line;
 	my ($time, $user, $ip_hash, $host, $path_query, $referrer, $user_agent, $country, $vhost) =
 		split /\t/, $line;
