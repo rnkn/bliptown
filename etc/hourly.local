@@ -1,4 +1,14 @@
 # -*- mode: sh; -*-
+umask 0077;
+
+. /home/bliptown/.envrc
+
+visitor_log="/var/log/bliptown/visitor.log"
+test -f "$visitor_log" || touch "$visitor_log"
+
+gzcat -f "$visitor_log"* | /usr/local/www/bliptown/bin/bliptown_analytics
+
+newsyslog
 
 rate_limit_log="/var/log/rate_limit.log"
 now=$(date +%s)
