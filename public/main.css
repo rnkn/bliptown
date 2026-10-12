@@ -822,7 +822,11 @@ nav #file-controls #additional-controls a:hover {
 	appearance: none;
 }
 
-.stats progress::-moz-progress-bar, .stats progress::-webkit-progress-value {
+.stats progress::-moz-progress-bar {
+	background-color: black;
+}
+
+.stats progress::-webkit-progress-value {
 	background-color: black;
 }
 
