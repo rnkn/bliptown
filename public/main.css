@@ -818,8 +818,12 @@ nav #file-controls #additional-controls a:hover {
 	text-overflow: ellipsis;
 }
 
-.stats table td:last-child {
-	border-left: 1px solid;
+.stats progress {
+	appearance: none;
+}
+
+.stats progress::-moz-progress-bar, .stats progress::-webkit-progress-value {
+	background-color: black;
 }
 
 /* Tables */
