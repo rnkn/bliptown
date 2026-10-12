@@ -11,6 +11,7 @@ gzcat -f "$visitor_log"* | /usr/local/www/bliptown/bin/bliptown_analytics
 newsyslog
 
 rate_limit_log="/var/log/rate_limit.log"
+test -f "$rate_limit_log" || touch "$rate_limit_log"
 now=$(date +%s)
 cutoff=$(( now - 86400 ))
 tmpfile=$(mktemp)
