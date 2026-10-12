@@ -1,18 +1,18 @@
 const trackEvents = ['pointermove', 'keydown', 'touchstart'];
-const trackUrl = '/_track';
+const trackUrl = document.querySelector('#analytics')?.dataset.trackUrl;
 
 let tracked = false;
 
-function track(url) {
+function track() {
     if (tracked) return;
     tracked = true;
-    navigator.sendBeacon(url);
-    for (const e of trackEvents)
-		window.removeEventListener(e, track);
+    navigator.sendBeacon(trackUrl);
+    for (const e of trackEvents) window.removeEventListener(e, track);
 }
 
-for (const e of trackEvents)
-	window.addEventListener(e, track(trackUrl));
+if (trackUrl) {
+    for (const e of trackEvents) window.addEventListener(e, track);
+}
 
 const nav = document.querySelector('nav');
 const key = 'nav-scroll-pos';
