@@ -66,12 +66,6 @@ sub send_magic_link {
 	my $email = $args->{email} or return;
 	my $custom_domain = $args->{custom_domain} // '';
 
-	my $smtp = Mojo::SMTP::Client->new(
-		address => $ENV{BLIPTOWN_SMTP_ADDR},
-		port => $ENV{BLIPTOWN_SMTP_PORT},
-		tls => 1,
-	);
-
 	my $token = $self->token->create_login_token({
 		username => $username,
 		custom_domain => $custom_domain,
