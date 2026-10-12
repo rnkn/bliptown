@@ -88,6 +88,7 @@ my %builtins = (
 	}
 );
 
+$ENV{TERM} = 'dumb';
 my $term = Term::ReadLine->new('bliptown-shell');
 $term->ornaments(0);
 
