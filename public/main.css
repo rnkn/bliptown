@@ -823,11 +823,17 @@ nav #file-controls #additional-controls a:hover {
 }
 
 .stats progress::-moz-progress-bar {
+	border: 1px solid var(--border-color);
 	background-color: black;
 }
 
 .stats progress::-webkit-progress-value {
 	background-color: black;
+}
+
+.stats progress::-webkit-progress-bar {
+	border: 1px solid var(--border-color);
+	background-color: var(--controls-color);
 }
 
 /* Tables */
