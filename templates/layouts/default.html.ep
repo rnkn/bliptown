@@ -37,7 +37,7 @@
 					% }
 					<li><a href="<%= url_for('list_files', catchall => '') %>">Files</a></li>
 					<li><a href="/style">Style</a></li>
-					<li><a href="/private/stats">Stats</a></li>
+					<li><a href="<%= url_for('render_stats') %>">Stats</a></li>
 					<li><a href="<%= url_for('list_settings') %>">Settings</a></li>
 					% } else {
 					<li><a href="<%= url_for('my_site') %>" id="my-site">My Site</a></li>

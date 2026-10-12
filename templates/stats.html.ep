@@ -1,0 +1,61 @@
+% layout 'default';
+% use List::Util qw(max any);
+% my %table_names = (
+%	date => 'Date',
+%	path_query => 'Requested URLs',
+%	referrer => 'Referring URLs',
+%	system => 'Operating System',
+%	browser => 'Browser',
+%	mobile => 'Device',
+%	country => 'Country',
+% );
+<nav>
+	<header>
+		<h1><%= $page_title %></h1>
+	</header>
+	<menu>
+		<p>
+			<small>Stats are generated every hour. IP addresses are hashed using a
+				separately stored secret and deleted after 7 days.</small>
+		</p>
+		<ul>
+			<li><a href="/" class="exit">View Site</a></li>
+		</ul>
+	</menu>
+</nav>
+<main id="stats" class="backstage stats">
+	<section class="wide">
+		% foreach my $table (qw(date path_query referrer system browser mobile country)) {
+		% my $rows = $tables->{$table} // [];
+		% next unless @$rows;
+		% my $max_hits = max(map { $_->{hits} } @$rows) || 1;
+		<table>
+			<thead>
+				<tr>
+					<th><%= $table_names{$table} %></th>
+					<th>Hits</th>
+					<th>Visitors</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				% foreach my $row (@$rows) {
+				<tr>
+					% if ($table eq 'path_query' or $table eq 'referrer') {
+					<td><a href="<%= $row->{key} %>"><%= $row->{key} %></a></td>
+					% } else {
+					<td><%= $row->{key} %></td>
+					% }
+					<td><%= $row->{hits} %></td>
+					<td><%= $row->{visitors} %></td>
+					<td><progress max="<%= $max_hits %>" value="<%= $row->{hits} %>"></progress></td>
+				</tr>
+				% }
+			</tbody>
+		</table>
+		% }
+		% unless (any { @{$tables->{$_} // []} } qw(path_query referrer system browser mobile country)) {
+		<p>No stats yet, check back in an hour.</p>
+		% }
+	</section>
+</main>

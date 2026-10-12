@@ -600,6 +600,8 @@ EOF
 	$protected->under($block_demo)->post('/_settings')->to(controller => 'Settings', action => 'save_settings')->name('save_settings');
 	$protected->get('/_settings')->to(controller => 'Settings', action => 'list_settings')->name('list_settings');
 
+	$protected->get('/_stats')->to(controller => 'Analytics', action => 'render_stats')->name('render_stats');
+
 	$protected->under($block_demo)->get('/_billing')->to(controller => 'Users', action => 'billing_session')->name('billing_session');
 
 	$protected->post('/_snapshots/new')->to(controller => 'Snapshots', action => 'take_snapshot')->name('take_snapshot');
