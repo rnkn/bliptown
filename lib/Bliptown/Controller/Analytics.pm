@@ -2,6 +2,7 @@ package Bliptown::Controller::Analytics;
 use Mojo::Base 'Mojolicious::Controller';
 use Digest::SHA qw(hmac_sha1_hex);
 use Mojo::File qw(path);
+use Mojo::JSON qw(decode_json);
 
 sub get_data {
 	my $c			= shift;
@@ -45,6 +46,20 @@ sub track_visit {
 	}
 
 	return $c->render(data => '');
+}
+
+sub render_stats {
+	my $c = shift;
+	my $username = $c->session('username') // '';
+	my $stats_path = path($ENV{BLIPTOWN_DATA_HOME}, 'stats', "$username.json");
+
+	my $tables = eval { decode_json($stats_path->slurp) } if -f $stats_path;
+
+	return $c->render(
+		template => 'stats',
+		page_title => 'Stats',
+		tables => $tables // {},
+	);
 }
 
 return 1;
