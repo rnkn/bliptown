@@ -26,7 +26,6 @@ foreach my $line (@lines) {
 }
 
 die "BLIPTOWN_DATA_HOME not defined" unless defined $ENV{BLIPTOWN_DATA_HOME};
-die "BLIPTOWN_GID not defined" unless defined $ENV{BLIPTOWN_GID};
 
 my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;
 
@@ -280,7 +279,7 @@ eval {
 
 	unless ($user eq 'root') {
 		my $uid = getpwnam($user) or die "Cannot find user: $user";
-		my $gid = $ENV{BLIPTOWN_GID};
+		my $gid = getgrnam('bliptown') or die 'Cannot find group: bliptown';
 
 		setgid($gid) or die "Cannot set group: $gid ($!)";
 		setuid($uid) or die "Cannot set user: $uid ($!)";
