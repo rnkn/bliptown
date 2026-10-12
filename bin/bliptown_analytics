@@ -7,166 +7,97 @@ use constant THIS_DIR => dirname(__FILE__);
 use lib THIS_DIR . "/../lib", THIS_DIR . "/../local/lib/perl5";
 
 use HTTP::BrowserDetect;
-use POSIX qw(strftime);
-use Mojo::Util qw(url_unescape);
 use List::Util qw(max);
+use Mojo::File qw(path);
+use Mojo::JSON qw(encode_json);
+use Mojo::Util qw(url_unescape);
+use POSIX qw(strftime);
 
-sub stat_hits_visitors {
-	my ($key, $entries) = @_;
-	my %stats;
-	if ($key eq 'date') {
-		foreach (0..6) {
-			my $time = time - ($_ * 24 * 60 * 60);
-			my $date = strftime('%Y-%m-%d %a', localtime($time));
-			$stats{$date}{hits} = 0;
-		}
-	}
-	foreach my $e (@$entries) {
-		my $val = $e->{$key};
-		next unless length $val;
-		if ($key eq 'mobile') {
-			$val = $val == 1 ? 'Mobile' : 'Desktop';
-		}
-		if ($key eq 'referrer' && $val) {
-			my $vhost = $e->{vhost} // '';
-			next if $val =~ m{^https?://\Q$vhost\E(?:[:/]|$)};
-		}
-		$val = "[$val]($val)" if $key eq 'path_query' or $key eq 'referrer';
-		$stats{$val}{hits}++;
-		$stats{$val}{visitors}{$e->{ip_hash}} = 1;
-	}
-	return %stats;
+die "$0 must be run as root" unless $> == 0;
+
+my $uid = getpwnam('bliptown');
+my $gid = getgrnam('bliptown');
+
+die 'BLIPTOWN_DATA_HOME not defined' unless defined $ENV{BLIPTOWN_DATA_HOME};
+
+my $stats_home = path($ENV{BLIPTOWN_DATA_HOME}, 'stats')->make_path->chmod(0700);
+chown $uid, $gid, $stats_home;
+
+my @fields = qw(date path_query referrer system browser mobile country);
+my %ua_cache;
+my %stats;
+
+sub tally {
+	my ($user_stats, $field, $value, $ip_hash) = @_;
+	return unless length $value;
+	$user_stats->{$field}{$value}{hits}++;
+	$user_stats->{$field}{$value}{visitors}{$ip_hash} = 1;
 }
-
-sub stats_to_table {
-	my ($stats, $sort_date) = @_;
-	my @table;
-	my $max_hits = max(map { $stats->{$_}->{hits} } keys %$stats) || 1;
-
-	foreach my $key (keys %$stats) {
-		push @table, {
-			key => $key,
-			hits => $stats->{$key}->{hits},
-			visitors => scalar keys %{ $stats->{$key}->{visitors} },
-		}
-	}
-
-	if ($sort_date) {
-		@table = sort { $b->{key} cmp $a->{key} } @table;
-		@table = @table[0..6];
-	} else {
-		@table = sort { $b->{hits} <=> $a->{hits} } @table;
-		@table = @table[0..9] if @table > 10;
-	}
-
-	foreach my $row (@table) {
-		my $graph_val = $row->{hits} / $max_hits * 10;
-		$row->{graph} = '&#x2588;' x $graph_val;
-	}
-	return @table;
-}
-
-my @entries;
 
 while (my $line = <STDIN>) {
 	chomp $line;
-	next unless $line;
-	my ($time, $ip_hash, $host, $path_query, $referrer, $user_agent, $country, $vhost) =
+	next unless length $line;
+	my ($time, $user, $ip_hash, $host, $path_query, $referrer, $user_agent, $country, $vhost) =
 		split /\t/, $line;
-	my $week_ago = time - (7 * 24 * 60 * 60);
-	last if $time < $week_ago;
+	$time =~ s/.*bliptown-visitor: //;
+	next unless $time =~ /^\d+$/ && $user;
 
-	my $date = strftime('%Y-%m-%d %a', localtime($time));
+	my $stats_tally = $stats{$user} //= { map { $_ => {} } @fields };
+	my $ua = $ua_cache{$user_agent} //= HTTP::BrowserDetect->new($user_agent);
 
-	my $ua = HTTP::BrowserDetect->new($user_agent);
+	tally($stats_tally, 'date', strftime('%Y-%m-%d %a', localtime($time)), $ip_hash);
+	tally($stats_tally, 'path_query', url_unescape($path_query // ''), $ip_hash);
+	tally($stats_tally, 'system', $ua->os_string, $ip_hash);
+	tally($stats_tally, 'browser', $ua->browser_string, $ip_hash);
+	tally($stats_tally, 'mobile', $ua->mobile ? 'Mobile' : 'Desktop', $ip_hash);
+	tally($stats_tally, 'country', $country || 'unknown', $ip_hash);
 
-	push @entries, {
-		date		=> $date,
-		ip_hash		=> $ip_hash,
-		host		=> $host,
-		path_query	=> url_unescape($path_query),
-		referrer	=> url_unescape($referrer),
-		os			=> $ua->os_string,
-		browser		=> $ua->browser_string,
-		mobile		=> $ua->mobile,
-		country		=> $country || 'unknown',
-		vhost		=> $vhost,
+	if (length $referrer) {
+		unless ($referrer =~ m{^https?://\Q$vhost\E(?:[:/]|$)}) {
+			tally($stats_tally, 'referrer', url_unescape($referrer), $ip_hash);
+		}
 	}
 }
 
-my %date_stats = stat_hits_visitors('date', \@entries);
-my @date_table = stats_to_table(\%date_stats, 1);
+sub build_tables {
+	my $user_stats = shift;
+	my %tables;
 
-my %path_query_stats = stat_hits_visitors('path_query', \@entries);
-my @path_query_table = stats_to_table(\%path_query_stats);
-
-my %referrer_stats = stat_hits_visitors('referrer', \@entries);
-my @referrer_table = stats_to_table(\%referrer_stats);
-
-my %os_stats = stat_hits_visitors('os', \@entries);
-my @os_table = stats_to_table(\%os_stats);
-
-my %browser_stats = stat_hits_visitors('browser', \@entries);
-my @browser_table = stats_to_table(\%browser_stats);
-
-my %mobile_stats = stat_hits_visitors('mobile', \@entries);
-my @mobile_table = stats_to_table(\%mobile_stats);
-
-my %country_stats = stat_hits_visitors('country', \@entries);
-my @country_table = stats_to_table(\%country_stats);
-
-my $tables = {
-	date => {
-		name => 'Date',
-		data => \@date_table,
-	},
-	path_query => {
-		name => 'Requested URLs',
-		data => \@path_query_table,
-	},
-	referrer => {
-		name => 'Referring URLs',
-		data => \@referrer_table,
-	},
-	os => {
-		name => 'Operating System',
-		data => \@os_table,
-	},
-	browser => {
-		name => 'Browser',
-		data => \@browser_table,
-	},
-	mobile => {
-		name => 'Device',
-		data => \@mobile_table,
-	},
-	country => {
-		name => 'Country',
-		data => \@country_table,
+	foreach (0..6) {
+		my $date = strftime('%Y-%m-%d %a', localtime(time - ($_ * 24 * 60 * 60)));
+		$user_stats->{date}{$date}{hits} ||= 0;
 	}
-};
 
-print <<"EOF";
----
-title: Stats
-layout: wide stats table-hover
----
-# Stats
-
-<small>Stats are generated every hour. IP addresses are hashed using a
-separately stored secret and deleted after 7 days.</small>
-EOF
-
-foreach my $table (qw(date path_query referrer os browser mobile country)) {
-	my $name = $tables->{$table}->{name};
-	print <<"EOF";
-
-| $name | Hits | Visitors | |
-|-------|------|----------|-|
-EOF
-
-	my $data = $tables->{$table}->{data};
-	foreach my $row (@$data) {
-		print "| $row->{key} | $row->{hits} | $row->{visitors} | $row->{graph} |\n"
+	foreach my $field (@fields) {
+		my @rows;
+		foreach my $value (keys %{$user_stats->{$field}}) {
+			push @rows, {
+				key			=> $value,
+				hits		=> $user_stats->{$field}{$value}{hits},
+				visitors	=> scalar keys %{$user_stats->{$field}{$value}{visitors}},
+			};
+		}
+		if ($field eq 'date') {
+			@rows = sort { $b->{key} cmp $a->{key} } @rows;
+			@rows = splice(@rows, 0, 7);
+		}
+		else {
+			@rows = sort { $b->{hits} <=> $a->{hits} || $a->{key} cmp $b->{key} } @rows;
+			@rows = splice(@rows, 0, 10);
+		}
+		$tables{$field} = \@rows;
 	}
+
+	return \%tables;
 }
+
+foreach my $user (sort keys %stats) {
+	next unless getpwnam $user;
+	my $stats_path = path($stats_home, "$user.json")->touch->chmod(0600);
+	my $tables = build_tables($stats{$user});
+	my $json = encode_json $tables;
+	$stats_path->spew($json);
+}
+
+my @tree = $stats_home->list_tree({ dir => 1 })->each;
+chown $uid, $gid, @tree;
