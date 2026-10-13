@@ -12,8 +12,6 @@ use POSIX qw(setgid setuid);
 
 die "$0 must be run as root" unless $> == 0;
 
-$ENV{PATH} = '/usr/pkg/bin:/usr/pkg/sbin:/bin:/sbin:/usr/bin:/usr/sbin';
-
 my $envrc = shift @ARGV || "$ENV{HOME}/.envrc";
 my @lines = split /\n/, path($envrc)->slurp;
 foreach my $line (@lines) {
