@@ -19,4 +19,6 @@
 <main>
 	%== $content
 </main>
+% unless (url_for->path =~ /^\/_/) {
 <div id="analytics" data-track-url="<%= url_for('track_visit')->query(ref => $c->req->headers->referrer) %>"></div>
+% }
