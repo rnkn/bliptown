@@ -80,7 +80,7 @@ main {
 	padding-right: 4rem;
 	background-color: inherit;
 	scrollbar-width: none;
-	overflow: auto;
+	overflow-x: clip;
 }
 
 /* Generic Semantic Styles */
