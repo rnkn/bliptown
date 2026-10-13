@@ -1,6 +1,5 @@
 requires 'Mojolicious';
 requires 'Mojo::SQLite';
-requires 'Mojo::SMTP::Client';
 requires 'CryptX';
 requires 'Cpanel::JSON::XS';
 requires 'FFI::Platypus';

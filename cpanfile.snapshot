@@ -677,26 +677,6 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
-  Mojo-IOLoop-Delay-8.76
-    pathname: J/JB/JBERGER/Mojo-IOLoop-Delay-8.76.tar.gz
-    provides:
-      Mojo::IOLoop::Delay 8.76
-    requirements:
-      Module::Build::Tiny 0.034
-      Mojolicious 0
-  Mojo-SMTP-Client-0.20
-    pathname: O/OL/OLEG/Mojo-SMTP-Client-0.20.tar.gz
-    provides:
-      Mojo::SMTP::Client 0.20
-      Mojo::SMTP::Client::Exception undef
-      Mojo::SMTP::Client::Exception::Response undef
-      Mojo::SMTP::Client::Exception::Stream undef
-      Mojo::SMTP::Client::Response undef
-    requirements:
-      ExtUtils::MakeMaker 6.52
-      Mojo::IOLoop::Delay 0
-      Mojolicious 9
-      Test::More 0.88
   Mojo-SQLite-v4.0.0
     pathname: D/DB/DBOOK/Mojo-SQLite-v4.0.0.tar.gz
     provides:
