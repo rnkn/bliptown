@@ -61,4 +61,74 @@ subtest 'token expiry' => sub {
     cmp_ok $token_rec->{expires}, '<=', time, 'read_login_token returns expired token';
 };
 
+subtest 'create_logout_token token string' => sub {
+    my $tk = $token->create_logout_token({
+        username => 'alice',
+        custom_domain => 'alice.example.com',
+    });
+    ok defined $tk, 'create_logout_token returns a token';
+    is length($tk), 40, 'create_logout_token token has correct length';
+};
+
+subtest 'create_logout_token omits without username' => sub {
+    my $tk = $token->create_logout_token({
+        custom_domain => 'alice.example.com',
+    });
+    ok !defined $tk, 'create_logout_token omits token without username';
+};
+
+subtest 'create_logout_token omits without custom_domain' => sub {
+    my $tk = $token->create_logout_token({ username => 'alice' });
+    ok !defined $tk, 'create_logout_token omits token without custom_domain';
+};
+
+subtest 'create_logout_token short expiry' => sub {
+    my $tk = $token->create_logout_token({
+        username => 'bob',
+        custom_domain => 'bob.example.com',
+    });
+    my $token_rec = $token->read_logout_token({ token => $tk });
+    ok defined $token_rec, 'create_logout_token stores a readable record';
+    cmp_ok $token_rec->{expires}, '<=', time + 60, 'logout token expires within 60 seconds';
+    cmp_ok $token_rec->{expires}, '>', time, 'logout token has not already expired';
+    is $token_rec->{custom_domain}, 'bob.example.com', 'logout token stores custom_domain';
+};
+
+subtest 'read_logout_token retrieves record' => sub {
+    my $tk = $token->create_logout_token({
+        username => 'carol',
+        custom_domain => 'carol.example.com',
+    });
+    my $token_rec = $token->read_logout_token({ token => $tk });
+    ok defined $token_rec, 'read_logout_token retrieves record';
+    is $token_rec->{username}, 'carol', 'read_logout_token returns username';
+    is $token_rec->{token}, $tk, 'read_logout_token returns token';
+};
+
+subtest 'read_logout_token invalid token' => sub {
+    my $token_rec = $token->read_logout_token({ token => 'nonexistent' });
+    ok !defined $token_rec, 'read_logout_token omits record for invalid token';
+};
+
+subtest 'read_logout_token empty token' => sub {
+    my $token_rec = $token->read_logout_token;
+    ok !defined $token_rec, 'read_logout_token omits record for empty token';
+};
+
+subtest 'delete_logout_token' => sub {
+    my $tk = $token->create_logout_token({
+        username => 'dave',
+        custom_domain => 'dave.example.com',
+    });
+    my $ok = $token->delete_logout_token({ token => $tk });
+    ok $ok, 'delete_logout_token returns true';
+    my $token_rec = $token->read_logout_token({ token => $tk });
+    ok !defined $token_rec, 'delete_logout_token deletes token record';
+};
+
+subtest 'delete_logout_token abort' => sub {
+    my $ok = $token->delete_logout_token({ token => '' });
+    ok !defined $ok, 'delete_logout_token aborts with empty token';
+};
+
 done_testing;
