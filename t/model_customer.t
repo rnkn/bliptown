@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
-use Mojo::File qw(path curfile tempdir);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib');
+use Mojo::File qw(curfile);
+use lib curfile->dirname->sibling('lib');
 use Test::More;
 
 use Bliptown::Model::Util;
@@ -83,6 +82,7 @@ subtest 'delete_customer' => sub {
 	my $res = $customer->delete_customer({
 		customer_id => $customer_id,
 	});
+
 	is $res->{object}, 'customer', 'delete_customer object is customer';
 	is $res->{id}, $customer_id, 'delete_customer returns deleted customer ID';
 	ok $res->{deleted}, 'delete_customer returns deleted customer object';
