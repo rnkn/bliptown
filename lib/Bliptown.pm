@@ -327,7 +327,8 @@ EOF
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 				}
 				else {
-					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host)->realpath;
+					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host);
+					-l $path ? $path = $path->realpath : return;
 				}
 				$c->stash(req_user_path => $path);
 			};
