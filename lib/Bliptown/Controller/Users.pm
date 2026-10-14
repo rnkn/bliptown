@@ -109,7 +109,7 @@ sub generate_login {
 
 	$c->email->send_magic_link({
 		username => $username,
-		email => $email,
+		email_address => $email,
 		custom_domain => $custom_domain,
 	});
 	return $c->redirect_to('user_login');
