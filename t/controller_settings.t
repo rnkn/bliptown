@@ -1,45 +1,22 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile tempdir);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib'), path(THIS_DIR, 'lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 use Test::Mojo;
 
-use Bliptown::Model::User;
-use Bliptown::Model::Customer;
-use Bliptown::Model::Util;
-
-use FakeIPC;
-use FakeDNS;
-
-use BliptownTest qw(create_db);
+use BliptownTest qw(create_test create_app);
 
 use_ok qw(Bliptown::Controller::Settings);
 
-my $t			= Test::Mojo->new('Bliptown');
-my $app			= $t->app;
-my $db			= create_db;
-my $ipc			= FakeIPC->new;
-my $dns			= FakeDNS->new;
-
-$app->helper(
-	db => sub { return $db }
-);
-
-$app->helper(
-	ipc => sub { return $ipc }
-);
-
-$app->helper(
-	dns => sub { return $dns }
-);
+my $t			= create_test;
+my $app			= create_app;
 
 my $util		= Bliptown::Model::Util->new;
 my $customer	= Bliptown::Model::Customer->new(
 	util => $util,
 );
 my $user		= Bliptown::Model::User->new(
-	db => $db,
+	db => $app->db,
 	customer => $customer,
 );
 
@@ -50,7 +27,7 @@ my $email		= 'testuser@example.com';
 my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
-$t->app->hook(before_dispatch => sub {
+$app->hook(before_dispatch => sub {
 	my $c = shift;
 	$c->session(username => $username);
 	return 1;

@@ -1,26 +1,17 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile tempdir);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib'), path(THIS_DIR, 'lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 use Test::Mojo;
 
+use BliptownTest qw(create_test create_app);
 use FakeIPC;
 
 use_ok qw(Bliptown::Controller::Files);
 
-my $t				= Test::Mojo->new('Bliptown');
-my $app				= $t->app;
-my $log				= Mojo::Log->new;
-my $debug_messages	= $log->capture('debug');
-
-$app->log($log);
-
-my $ipc = FakeIPC->new;
-
-$app->helper(
-	ipc => sub { return $ipc }
-);
+my $t				= create_test;
+my $app				= create_app;
+my $debug_messages	= $app->log->capture('debug');
 
 $ENV{BLIPTOWN_DATA_HOME} = tempdir;
 
@@ -28,7 +19,7 @@ my $username	= 'testuser';
 my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
-$t->app->hook(before_dispatch => sub {
+$app->hook(before_dispatch => sub {
 	my $c = shift;
 	$c->session(username => $username);
 	return 1;
