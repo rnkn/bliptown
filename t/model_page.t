@@ -1,23 +1,25 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile tempdir);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib'), path(THIS_DIR, 'lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 
-use BliptownTest qw(create_db);
+use BliptownTest qw(create_app);
 
-use Bliptown::Model::User;
-use Bliptown::Model::Metadata;
-use Bliptown::Model::Mustache;
-use Bliptown::Model::Util;
+my $app = create_app;
 
-use_ok qw(Bliptown::Model::Page);
-
-my $db  = create_db;
-my $user = Bliptown::Model::User->new(db => $db);
+my $user = Bliptown::Model::User->new(
+	db => $app->db
+);
 my $metadata = Bliptown::Model::Metadata->new;
-my $util = Bliptown::Model::Util->new(req_user => undef, user => $user);
-my $mustache = Bliptown::Model::Mustache->new(user => $user, metadata => $metadata, util => $util);
+my $util = Bliptown::Model::Util->new(
+	req_user => undef,
+	user => $user
+);
+my $mustache = Bliptown::Model::Mustache->new(
+	user => $user,
+	metadata => $metadata,
+	util => $util
+);
 my $page = Bliptown::Model::Page->new(
 	req_user	=> undef,
 	user		=> $user,

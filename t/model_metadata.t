@@ -1,10 +1,9 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 
-use_ok qw(Bliptown::Model::Metadata);
+use BliptownTest;
 
 my $metadata = Bliptown::Model::Metadata->new;
 
@@ -22,13 +21,14 @@ EOF
 	is $data->{layout}, 'one-column', 'read_metadata parses layout';
 };
 
-subtest 'read_metadata returns hashref for empty YAML' => sub {
+subtest 'read_metadata empty YAML' => sub {
 	my $yaml = <<'EOF';
 ---
 ---
 EOF
 	my $data = $metadata->read_metadata($yaml);
-	isa_ok $data, 'HASH', 'read_metadata returns a hashref';
+	isa_ok $data, 'HASH', 'read_metadata returns a hashref for empty YAML';
+ 	not ok $data, 'read_metadata returns an empty hashref for empty YAML';
 };
 
 subtest 'read_metadata returns hashref for invalid YAML' => sub {
@@ -36,7 +36,8 @@ subtest 'read_metadata returns hashref for invalid YAML' => sub {
 zzz
 EOF
 	my $data = $metadata->read_metadata($yaml);
-	isa_ok $data, 'HASH', 'read_metadata returns a hashref';
+	isa_ok $data, 'HASH', 'read_metadata returns a hashref for invalid YAML';
+	not ok $data, 'read_metadata returns an empty hashref for invalid YAML';
 };
 
 done_testing;

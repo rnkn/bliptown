@@ -1,10 +1,9 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile tempdir);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 
-use_ok qw(Bliptown::Model::File);
+use BliptownTest;
 
 my $file = Bliptown::Model::File->new;
 

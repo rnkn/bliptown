@@ -2,6 +2,7 @@ package Bliptown::Model::Util;
 use Mojo::Base -base;
 use Mojo::URL;
 use Mojo::File qw(path);
+use Mojo::Util qw(trim);
 use Socket qw(AF_INET6 inet_pton);
 use POSIX qw(strftime);
 
@@ -59,7 +60,7 @@ sub read_file_line {
 	open(my $fh, '<', $filename);
 	my $line = <$fh>;
 	close $fh;
-	chomp $line;
+	$line = trim $line;
 	return $line;
 }
 

@@ -1,12 +1,10 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib'), path(THIS_DIR, 'lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 
+use BliptownTest;
 use FakeIPC;
-
-use_ok qw(Bliptown::Model::IPC);
 
 my $ipc = FakeIPC->new;
 

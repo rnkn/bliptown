@@ -1,14 +1,14 @@
 use Mojo::Base -strict;
 use Mojo::File qw(curfile);
-use lib curfile->dirname->sibling('lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 
-use Bliptown::Model::Util;
-
-use_ok qw(Bliptown::Model::Customer);
+use BliptownTest;
 
 my $util		= Bliptown::Model::Util->new;
-my $customer	= Bliptown::Model::Customer->new(util => $util);
+my $customer	= Bliptown::Model::Customer->new(
+	util => $util
+);
 my $customer_id	= '';
 
 subtest 'create_customer' => sub {

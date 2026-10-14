@@ -13,7 +13,7 @@ has 'util';
 sub generate_magic_link_email {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
-	my $email = $args->{email} or return;
+	my $email_address = $args->{email_address} or return;
 	my $token = $args->{token} or return;
 
 	my $url = Mojo::URL->new;
@@ -25,7 +25,7 @@ sub generate_magic_link_email {
 
 	my %data = (
 		recipient => $username,
-		recipient_email => $email,
+		recipient_email_address => $email_address,
 		date => strftime("%a, %d %b %Y %H:%M:%S %z", localtime),
 		token => $token,
 		host => $ENV{BLIPTOWN_DOMAIN},
@@ -35,7 +35,7 @@ sub generate_magic_link_email {
 	my $template = Mojo::Template->new(vars => 1);
 	my $email_text = $template->render(<<'EOF', \%data);
 From: Bliptown Mayor <support@blip.town>
-To: <%= $recipient %> <<%= $recipient_email %>>
+To: <%= $recipient %> <<%= $recipient_email_address %>>
 Date: <%= $date %>
 Message-ID: <%= $token %>@<%= $host %>
 Subject: Your Bliptown login link
@@ -63,7 +63,7 @@ EOF
 sub send_magic_link {
 	my ($self, $args) = @_;
 	my $username = $args->{username} or return;
-	my $email = $args->{email} or return;
+	my $email_address = $args->{email_address} or return;
 	my $custom_domain = $args->{custom_domain} // '';
 
 	my $token = $self->token->create_login_token({
@@ -74,12 +74,12 @@ sub send_magic_link {
 
 	my $content = $self->generate_magic_link_email({
 		username => $username,
-		email => $email,
+		email_address => $email_address,
 		token => $token,
 	});
 
 	$self->send_email({
-		recipient => "$username <$email>",
+		recipient => "$username <$email_address>",
 		content => $content,
 	});
 }

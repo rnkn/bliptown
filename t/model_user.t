@@ -1,25 +1,18 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile tempdir);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib'), path(THIS_DIR, 'lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 
-use BliptownTest qw(create_db);
+use BliptownTest qw(create_app);
 
-use Bliptown::Model::Util;
-use Bliptown::Model::Customer;
+my $app = create_app;
 
-use_ok qw(Bliptown::Model::User);
-
-my $db			= create_db;
-my $util		= Bliptown::Model::Util->new;
-
+my $util = Bliptown::Model::Util->new;
 my $customer = Bliptown::Model::Customer->new(
 	util => $util,
 );
-
 my $user = Bliptown::Model::User->new(
-	db => $db,
+	db => $app->db,
 	customer => $customer,
 );
 
@@ -29,7 +22,7 @@ subtest 'create_user' => sub {
 		email => 'newuser@example.com',
 	});
 
-	my $user_rec = $db->select('users', undef, { username => 'newuser' })->hash;
+	my $user_rec = $app->db->select('users', undef, { username => 'newuser' })->hash;
 	ok $user_rec, 'create_user creates a user in database';
 };
 
@@ -53,17 +46,17 @@ subtest 'read_user by email' => sub {
 	is $user_rec->{username}, 'newuser', 'read_user username matches';
 };
 
-subtest 'read_user with missing key returns undef' => sub {
+subtest 'read_user with missing key' => sub {
 	my $user_rec = $user->read_user({});
 	ok !defined $user_rec, 'read_user returns undef with missing key';
 };
 
-subtest 'read_user nonexistent user returns undef' => sub {
+subtest 'read_user nonexistent user' => sub {
 	my $user_rec = $user->read_user({
 		key => 'username',
 		username => 'nobody'
 	});
-	ok !defined $user_rec, 'returns undef for nonexistent user';
+	ok !defined $user_rec, 'read_user returns undef for nonexistent user';
 };
 
 subtest 'update_user email' => sub {

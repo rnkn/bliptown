@@ -1,14 +1,9 @@
 use Mojo::Base -strict;
 use Mojo::File qw(path curfile tempdir);
-use constant THIS_DIR => curfile->dirname;
-use lib path(THIS_DIR, '../lib');
+use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 
-use Bliptown::Model::User;
-use Bliptown::Model::Metadata;
-use Bliptown::Model::Util;
-
-use_ok qw(Bliptown::Model::Mustache);
+use BliptownTest;
 
 my $user		= Bliptown::Model::User->new;
 my $metadata	= Bliptown::Model::Metadata->new;
