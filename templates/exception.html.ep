@@ -1,18 +1,9 @@
-% layout 'default';
-<nav>
-	<header>
-		<h1>Bliptown</h1>
-	</header>
-	<menu>
-		<p><a href="/" class="exit">Home</a></p>
-	</menu>
-</nav>
-<main class="one-column">
-	<p>500 Internal Server Error</p>
-	<p>
-		Something went wrong, but don&rsquo;t worry, support has been
-		notified and will be looking into it!
-	</p>
-	<p>Request ID: <strong><%= $c->req->request_id %></strong></p>
-	<p>Please quote this ID with any support enquiries.</p>
-</main>
+<pre>
+500 Internal Server Error
+
+Something went wrong, but don&rsquo;t worry, support has been notified and will be looking into it!
+
+Request ID: <strong><%= $c->req->request_id %></strong>
+
+Please quote this ID with any support enquiries.
+</pre>
