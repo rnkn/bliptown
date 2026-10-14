@@ -2,29 +2,34 @@ package BliptownTest;
 use Mojo::Base -base;
 use Mojo::File qw(path curfile tempdir);
 use Mojo::SQLite;
-use lib curfile->dirname->dirname->sibling('lib');
+use lib curfile->dirname->dirname->sibling('lib'), curfile->dirname;
 use Exporter qw(import);
 use Test::More;
 use Test::Mojo;
 
-use_ok qw(Bliptown::Model::User);
-use_ok qw(Bliptown::Model::File);
-use_ok qw(Bliptown::Model::Page);
-use_ok qw(Bliptown::Model::Metadata);
-use_ok qw(Bliptown::Model::Mustache);
-use_ok qw(Bliptown::Model::DNS);
-use_ok qw(Bliptown::Model::Customer);
-use_ok qw(Bliptown::Model::Checkout);
-use_ok qw(Bliptown::Model::IPC);
-use_ok qw(Bliptown::Model::Email);
-use_ok qw(Bliptown::Model::Token);
-use_ok qw(Bliptown::Model::Util);
+use Bliptown::Model::User;
+use Bliptown::Model::File;
+use Bliptown::Model::Page;
+use Bliptown::Model::Metadata;
+use Bliptown::Model::Mustache;
+use Bliptown::Model::DNS;
+use Bliptown::Model::Customer;
+use Bliptown::Model::Checkout;
+use Bliptown::Model::IPC;
+use Bliptown::Model::Email;
+use Bliptown::Model::Token;
+use Bliptown::Model::Util;
 
-our @EXPORT_OK = qw(create_app create_db);
+use FakeIPC;
+use FakeDNS;
+use FakeEmail;
+
+our @EXPORT_OK = qw(create_test create_app create_db);
 
 $ENV{BLIPTOWN_DOMAIN} = 'blip.town';
 $ENV{BLIPTOWN_SCHEME} = 'https';
 $ENV{BLIPTOWN_PORT} = '443';
+$ENV{BLIPTOWN_DATA_HOME} = tempdir;
 
 sub create_db {
 	state $sql = Mojo::SQLite->new(':memory:');
@@ -42,12 +47,29 @@ sub create_db {
 	return $db;
 }
 
+sub create_test {
+	state $t = Test::Mojo->new('Bliptown');
+	return $t;
+}
+
 sub create_app {
-	state $app = Test::Mojo->new('Bliptown')->app;
+	state $app = create_test->app;
 	state $db = create_db;
+	state $ipc = FakeIPC->new;
+	state $dns = FakeDNS->new;
+	state $email = FakeEmail->new;
 
 	$app->helper(
 		db => sub { return $db }
+	);
+	$app->helper(
+		ipc => sub { return $ipc }
+	);
+	$app->helper(
+		dns => sub { return $dns }
+	);
+	$app->helper(
+		email => sub { return $email }
 	);
 
 	return $app;
