@@ -20,16 +20,18 @@ use Bliptown::Model::Email;
 use Bliptown::Model::Token;
 use Bliptown::Model::Util;
 
-use FakeIPC;
 use FakeDNS;
 use FakeEmail;
+use FakeIPC;
+use FakeVisitorLog;
 
 our @EXPORT_OK = qw(create_test create_app create_db);
 
-$ENV{BLIPTOWN_DOMAIN} = 'blip.town';
-$ENV{BLIPTOWN_SCHEME} = 'https';
-$ENV{BLIPTOWN_PORT} = '443';
-$ENV{BLIPTOWN_DATA_HOME} = tempdir;
+$ENV{BLIPTOWN_DOMAIN}		= 'blip.town';
+$ENV{BLIPTOWN_SCHEME}		= 'https';
+$ENV{BLIPTOWN_PORT}			= '443';
+$ENV{BLIPTOWN_DATA_HOME}	= tempdir;
+$ENV{BLIPTOWN_LOG_HOME}		= tempdir;
 
 sub create_db {
 	state $sql = Mojo::SQLite->new(':memory:');
