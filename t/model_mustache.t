@@ -177,7 +177,7 @@ subtest 'process preserves entities in nested calls' => sub {
     my $text = 'Use {{ ! title }} for variables.';
     my $args = { metadata => { title => 'Alice' }, recur => 1 };
     my $out = $mustache->process($text, $args);
-    is $out, 'Use &#123;&#123; title &#125;&#125; for variables.',
+    is $out, 'Use \{\{ title \}\} for variables.',
         'process keeps entities within recursion';
 };
 

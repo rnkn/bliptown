@@ -11,7 +11,7 @@ has 'prettydate_fmt';
 sub process {
 	my ($self, $text, $args) = @_;
 
-	$text =~ s/\{\{\ *!\ *([^\n]*?)\ *\}\}/&#123;&#123; $1 &#125;&#125;/g;
+	$text =~ s/\{\{\ *!\ *([^\n]*?)\ *\}\}/\\{\\{ $1 \\}\\}/g;
 
 	$text = $self->process_sections($text, $args);
 	$text = $self->process_partials($text, $args);
@@ -19,8 +19,8 @@ sub process {
 	$text = $self->process_variables($text, $args);
 
 	unless ($args->{recur}) {
-		$text =~ s/&#123;&#123;/{{/g;
-		$text =~ s/&#125;&#125;/}}/g;
+		$text =~ s/\\\{\\\{/{{/g;
+		$text =~ s/\\\}\\\}/}}/g;
 	}
 
 	return $text;
