@@ -90,25 +90,27 @@ sub startup {
 		. q{connect-src 'self'; },
 	);
 
-	my %log_pipe;
-	$app->log->handle(undef);
-	$app->log->format(sub {
-		my ($time, $level, @lines) = @_;
-		return "[$$] [$level] @lines\n";
-	});
-	$app->log->on(
-		message => sub {
-			my ($log, $level, @lines) = @_;
-			my $pipe = $log_pipe{$level} //= do {
-				my $logger = IO::Pipe->new;
-				$logger->writer('/usr/bin/logger', '-t', 'bliptown', '-p', $app->config->{log_priority}->{$level});
-				$logger->autoflush(1);
-				$logger;
-			};
-			$pipe->print(encode('UTF-8', $log->format->(time, $level, @lines)))
-				or undef $log_pipe{$level};
-		}
-	);
+	if ($app->mode eq 'production') {
+		my %log_pipe;
+		$app->log->handle(undef);
+		$app->log->format(sub {
+			my ($time, $level, @lines) = @_;
+			return "[$$] [$level] @lines\n";
+		});
+		$app->log->on(
+			message => sub {
+				my ($log, $level, @lines) = @_;
+				my $pipe = $log_pipe{$level} //= do {
+					my $logger = IO::Pipe->new;
+					$logger->writer('/usr/bin/logger', '-t', 'bliptown', '-p', $app->config->{log_priority}->{$level});
+					$logger->autoflush(1);
+					$logger;
+				};
+				$pipe->print(encode('UTF-8', $log->format->(time, $level, @lines)))
+					or undef $log_pipe{$level};
+			}
+		);
+	}
 
 	$app->secrets([
 		$ENV{BLIPTOWN_SECRET_OLD},
