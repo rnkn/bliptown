@@ -124,8 +124,8 @@ if $production
 then
 	echo "Syncing to staging:"
 	ok=true
-	rsync -a --delete /home/bliptown/users /home/bliptown/repos \
-		  /home/bliptown/domains bliptown@staging-blip.town: || ok=false
+	rsync -a --delete /home/bliptown/users /home/bliptown/domains \
+		  bliptown@staging-blip.town: || ok=false
 	rsync -a --delete /var/db/bliptown/* \
 		  bliptown@staging-blip.town:/var/db/bliptown/ || ok=false
 	$ok && echo "Done" || echo "Failed"
