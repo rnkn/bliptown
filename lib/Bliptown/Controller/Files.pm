@@ -297,4 +297,35 @@ sub upload_files {
 	return $c->redirect_to($redirect);
 }
 
+sub download_site {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $res = $c->ipc->send_message({
+		command => 'download_site',
+		system_user => $username,
+	});
+	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{info});
+
+	my $filename = $res->{info};
+	my $asset = Mojo::Asset::File->new(path => $filename);
+
+	$c->res->headers->content_type('application/gzip');
+	$c->res->headers->content_disposition(
+		"attachment; filename=${username}.$ENV{BLIPTOWN_DOMAIN}.tar.gz"
+	);
+
+	$c->on(
+		finish => sub {
+			my $res = $c->ipc->send_message({
+				command => 'delete_files',
+				system_user => $username,
+				filenames => [ $filename ],
+			});
+			return $c->log->error($res->{error}) if $res->{error};
+		});
+
+	return $c->reply->asset($asset);
+}
+
 return 1;

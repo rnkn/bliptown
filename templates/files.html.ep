@@ -36,6 +36,9 @@
 					</form>
 				</dialog>
 				% }
+				<form id="download" method="POST" action="<%= url_for('download_site') %>">
+					<button type="submit">Download Site</button>
+				</form>
 				<form id="snapshot" method="POST" action="<%= url_for('take_snapshot') %>">
 					<button type="submit">Take Snapshot</button>
 				</form>

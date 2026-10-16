@@ -237,6 +237,19 @@ sub git_archive {
 	return $tmpfile->to_string;
 }
 
+sub download_site {
+	my $payload = shift;
+	my $username = $payload->{system_user};
+	my $tmpfile = tempfile(UNLINK => 0)->chmod(0640);
+	my $site_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my @tree = $site_path->list_tree->each;
+	@tree = map { $_->to_rel($site_path) } @tree;
+	chdir_site($username);
+	system('tar', '-czf', $tmpfile, @tree) == 0
+		or die "Failed to create tarball: ($!)";
+	return $tmpfile->to_string;
+}
+
 my %allowed_commands = (
 	write_blob		=> { func => \&write_blob,		fields => [qw(system_user filename blob)] },
 	update_file		=> { func => \&update_file,		fields => [qw(system_user filename content)] },
@@ -244,6 +257,7 @@ my %allowed_commands = (
 	delete_files	=> { func => \&delete_files,	fields => [qw(system_user filenames)] },
 	backup_file		=> { func => \&backup_file,		fields => [qw(system_user filename)] },
 	make_directory	=> { func => \&make_directory,	fields => [qw(system_user filename)] },
+	download_site	=> { func => \&download_site,	fields => [qw(system_user)] },
 	git_commit		=> { func => \&git_commit,		fields => [qw(system_user)] },
 	git_log			=> { func => \&git_log,			fields => [qw(system_user)] },
 	git_show		=> { func => \&git_show,		fields => [qw(system_user hash)] },

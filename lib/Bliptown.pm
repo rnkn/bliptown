@@ -597,6 +597,7 @@ EOF
 	$protected->post('/_delete')->to(controller => 'Files', action => 'delete_files')->name('delete_files');
 	$protected->post('/_rename')->to(controller => 'Files', action => 'rename_files')->name('rename_files');
 	$protected->post('/_backup')->to(controller => 'Files', action => 'backup_file')->name('backup_file');
+	$protected->post('/_download_site')->to(controller => 'Files', action => 'download_site')->name('download_site');
 	$protected->under($block_demo)->post('/_upload')->to(controller => 'Files', action => 'upload_files')->name('upload_files');
 	$protected->get('/_files/*catchall')->to(controller => 'Files', action => 'list_files', catchall => '')->name('list_files');
 
