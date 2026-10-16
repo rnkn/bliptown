@@ -550,6 +550,18 @@ EOF
 		my $username = $c->session('username');
 		my $req_username = $c->get_req_username;
 		return unless $req_username;
+		if ($c->req->method ne 'GET') {
+			my $v = $c->validation;
+			if ($v->csrf_protect->has_error('csrf_token')) {
+				$c->render(
+					status => 403,
+					format => 'txt',
+					text => '403 Forbidden: bad or missing CSRF token.'
+				);
+				return;
+			}
+		}
+
 		if ($username && $username eq $req_username) {
 			return 1;
 		}
