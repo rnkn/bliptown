@@ -117,7 +117,7 @@ sub startup {
 		$ENV{BLIPTOWN_SECRET_NEW},
 	]);
 
-	$app->sessions->cookie_name('bliptown');
+	$app->sessions->cookie_name('__Host-bliptown');
 	$app->sessions->secure(1) if $app->mode eq 'production';
 	$app->sessions->encrypted(1);
 
