@@ -25,6 +25,7 @@
 			<div id="additional-controls" class="controls">
 				% if (param('search')) {
 				<form id="replace" method="POST" action="<%= url_for('rename_files')->query(dir => $dir, old => param('search'), back_to => url_for->query(search => param('new'))) %>">
+					<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 					<input type="text" name="new" placeholder="string" value="<%= param('new') %>">
 					<button type="submit">Replace Match in Filenames</button>
 				</form>
@@ -32,14 +33,17 @@
 				<dialog id="delete-files-popover" class="modal" popover>
 					<p>Really delete all matching files?</p>
 					<form id="delete" method="POST" action="<%= url_for('delete_files')->query(dir => $dir, filenames => param('search')) %>">
+						<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 						<button type="submit" class="warning">Delete</button>
 					</form>
 				</dialog>
 				% }
 				<form id="download" method="POST" action="<%= url_for('download_site') %>">
+					<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 					<button type="submit">Download Site</button>
 				</form>
 				<form id="snapshot" method="POST" action="<%= url_for('take_snapshot') %>">
+					<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 					<button type="submit">Take Snapshot</button>
 				</form>
 				<div><a href="<%= url_for('list_snapshots') %>">Browse Snapshots</a></div>
@@ -63,6 +67,7 @@
 				<button popovertarget="new-file-popover">New File</button>
 				<dialog id="new-file-popover" class="modal" popover>
 					<form id="new-file" method="POST" action="<%= url_for('new_file')->query(dir => $dir, back_to => url_for) %>">
+						<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 						<input type="text" name="name">
 						<select id="ext" name="ext">
 							% foreach my $render_ext (@{$c->app->config->{render_exts}}) {
@@ -75,6 +80,7 @@
 				<button popovertarget="new-directory-popover">New Directory</button>
 				<dialog id="new-directory-popover" class="modal" popover>
 					<form id="new-directory" method="POST" action="<%= url_for('new_directory')->query(dir => $dir, back_to => url_for) %>">
+						<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 						<input type="text" name="name">
 						<button type="submit">Create Directory</button>
 					</form>
@@ -82,6 +88,7 @@
 				<button popovertarget="upload-popover">Upload Files</button>
 				<dialog id="upload-popover" class="modal" popover>
 					<form id="upload" method="POST" action="<%= url_for('upload_files')->query(dir => $dir, back_to => url_for) %>" enctype="multipart/form-data">
+						<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 						<input type="file" accept="text/*,image/*,audio/*,video/*,font/*,application/pdf,application/zip,application/gzip"
 							   id="file-uploads" name="file-uploadss" multiple <%= $disabled %>>
 						<button type="submit" <%= $disabled %>>Upload</button>
@@ -126,6 +133,7 @@
 					% }
 					<li>
 						<form method="POST" action="<%= url_for('backup_file')->query(filename => $file->{abs_filename}, back_to => url_with) %>">
+							<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 							<button type="submit">Backup</button>
 						</form>
 					</li>
@@ -133,6 +141,7 @@
 						<button popovertarget="rename-popover-<%= $file->{rel_filename} %>">Rename</button>
 						<dialog id="rename-popover-<%= $file->{rel_filename} %>" class="modal" popover>
 							<form method="POST" action="<%= url_for('rename_files')->query(old => $file->{abs_filename}, back_to => url_with) %>">
+								<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 								<input type="text" name="new" value="<%= $file->{abs_filename} %>">
 								<button type="submit">Rename</button>
 							</form>
@@ -149,6 +158,7 @@
 							<pre><%= $file->{rel_filename} %></pre>
 							% }
 							<form method="POST" action="<%= url_for('delete_files')->query(filenames => $file->{abs_filename}, back_to => url_with) %>">
+								<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 								<button type="submit" class="warning">Delete</button>
 							</form>
 						</dialog>

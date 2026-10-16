@@ -43,6 +43,7 @@
 				<ul class="controls">
 					<li>
 						<form method="POST" action="<%= url_for('restore_snapshot')->query(hash => $_->{hash}) %>">
+							<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 							<button type="submit">Restore</button>
 						</form>
 					</li>

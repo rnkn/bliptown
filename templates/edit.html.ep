@@ -20,6 +20,7 @@
 <main id="edit" class="backstage">
 	<section class="one-column">
 		<form method="POST" action="<%= url_for('save_page')->query(back_to => $redirect) %>">
+			<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 			<div id="filename">
 				<input type="text" name="slug" value="<%= $slug %>" required>
 				<select id="ext" name="ext">

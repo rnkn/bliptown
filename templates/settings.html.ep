@@ -13,6 +13,7 @@
 <main id="settings" class="backstage">
 	<div class="one-column">
 		<form method="POST" action="<%= url_for('save_settings') %>">
+			<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 			<ul class="table">
 				<li class="row">
 					<label class="cell name" for="username">Username (cannot be changed)</label>
