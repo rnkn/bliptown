@@ -240,11 +240,11 @@ sub git_archive {
 sub download_site {
 	my $payload = shift;
 	my $username = $payload->{system_user};
-	my $tmpfile = tempfile(UNLINK => 0)->chmod(0640);
+	chdir_site($username);
+	my $tmpfile = tempfile(UNLINK => 0)->chmod(0644);
 	my $site_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my @tree = $site_path->list_tree->each;
 	@tree = map { $_->to_rel($site_path) } @tree;
-	chdir_site($username);
 	system('tar', '-czf', $tmpfile, @tree) == 0
 		or die "Failed to create tarball: ($!)";
 	return $tmpfile->to_string;
