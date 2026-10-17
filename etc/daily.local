@@ -171,14 +171,18 @@ sqlite3 /var/db/bliptown/users.db "PRAGMA integrity_check" >/dev/null || ok=fals
 $ok && echo "Done" || echo "Failed"
 echo
 
-echo "Creating database backup:"
-ok=true
-date=$(date +%F)
-backup_db="/var/db/bliptown/users-${date}.db.backup"
-install -m 0600 -o bliptown -g bliptown /dev/null "$backup_db"
-sqlite3 /var/db/bliptown/users.db ".backup $backup_db" || ok=false
-$ok && echo "Done" || echo "Failed"
-echo
+if $production
+then
+	echo "Creating database backup:"
+	ok=true
+	date=$(date +%F)
+	backup_db="/var/db/bliptown/backups/users-${date}.db"
+	sqlite3 /var/db/bliptown/users.db ".backup $backup_db" || ok=false
+	chown bliptown:bliptown "$backup_db"
+	chmod 0600 "$backup_db"
+	$ok && echo "Done" || echo "Failed"
+	echo
+fi
 
 echo "Deleting old database backups:"
 ok=true
