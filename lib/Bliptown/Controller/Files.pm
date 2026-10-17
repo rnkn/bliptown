@@ -29,7 +29,7 @@ sub new_file {
 	}
 
 	my $path = path($dir_path, "$basename.$ext");
-	my $content = $c->util->get_template($dir_path) // '';
+	my $content = $ext eq 'md' ? $c->util->get_template($dir_path) : '';
 
 	my $res = $c->ipc->send_message({
 		command => 'update_file',
