@@ -1,8 +1,7 @@
-public/
 snapshots/
-tmp/
-private/stats*
-*~
-._*
-.DS_Store
-.DS_Store?
+*
+!*.md
+!*.txt
+!*.html
+!*.css
+!*.js
