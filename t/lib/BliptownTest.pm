@@ -25,7 +25,9 @@ use FakeEmail;
 use FakeIPC;
 use FakeVisitorLog;
 
-our @EXPORT_OK = qw(create_test create_app create_db);
+use constant CSRF_TOKEN => '0' x 80;
+
+our @EXPORT_OK = qw(create_test create_app create_db CSRF_TOKEN);
 
 $ENV{BLIPTOWN_DOMAIN}		= 'blip.town';
 $ENV{BLIPTOWN_SCHEME}		= 'https';
@@ -73,6 +75,12 @@ sub create_app {
 	$app->helper(
 		email => sub { return $email }
 	);
+
+	$app->hook(before_dispatch => sub {
+		my $c = shift;
+		$c->session->{csrf_token} = '0' x 40;
+		return 1;
+	});
 
 	return $app;
 }
