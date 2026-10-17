@@ -80,7 +80,7 @@ sub startup {
 		. q{frame-ancestors blip.town staging-blip.town; }
 		. q{img-src 'self' https:; }
 		. q{font-src 'self' https:; }
-		. q{style-src 'self' https:; }
+		. q{style-src 'self' 'unsafe-inline' https:; }
 		. q{script-src 'self'; }
 		. q{frame-src 'self' https:; }
 		. q{connect-src 'self'; },
