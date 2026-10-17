@@ -156,7 +156,7 @@ sub render_page {
 
 	my $scripts_path = path($user_path, 'scripts');
 	my @scripts = $scripts_path->list_tree->each if -d $scripts_path;
-	@scripts = map { '/' . $_->to_rel($user_path)->to_string } grep { $_ =~ /\.js$/ } @scripts;
+	@scripts = map { '/' . $_->to_rel($user_path)->to_string } grep { $_->extname eq 'js' } @scripts;
 
 	$c->stash(
 		template	=> 'page',
