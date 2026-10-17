@@ -4,7 +4,7 @@ use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 use Test::Mojo;
 
-use BliptownTest qw(create_test create_app);
+use BliptownTest qw(create_test create_app CSRF_TOKEN);
 use FakeIPC;
 
 use_ok qw(Bliptown::Controller::Pages);
@@ -49,6 +49,7 @@ $t->get_ok($app->url_for('new_page', catchall => $slug) => { Host => $user_domai
 	->text_is('textarea#content', '');
 
 $t->post_ok($app->url_for('save_page') => { Host => $user_domain } => form => {
+	csrf_token	=> CSRF_TOKEN,
 	slug		=> $slug,
 	ext			=> $ext,
 	action		=> 'save',

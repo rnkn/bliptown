@@ -4,7 +4,7 @@ use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 use Test::Mojo;
 
-use BliptownTest qw(create_test create_app);
+use BliptownTest qw(create_test create_app CSRF_TOKEN);
 
 use_ok qw(Bliptown::Controller::Settings);
 
@@ -39,6 +39,7 @@ $t->get_ok($app->url_for('list_settings') => { Host => $user_domain })->status_i
 	->element_exists_not('input#create-backups[checked]');
 
 $t->post_ok($app->url_for('save_settings') => { Host => $user_domain } => form => {
+	csrf_token	=> CSRF_TOKEN,
 	email => 'newemail@mydomain.org',
 	create_backups => 1,
 })->status_is(302);

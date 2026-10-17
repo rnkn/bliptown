@@ -4,7 +4,7 @@ use lib curfile->dirname->sibling('lib'), curfile->sibling('lib');
 use Test::More;
 use Test::Mojo;
 
-use BliptownTest qw(create_test create_app);
+use BliptownTest qw(create_test create_app CSRF_TOKEN);
 
 use_ok qw(Bliptown::Controller::Snapshots);
 
@@ -39,7 +39,9 @@ $t->get_ok($app->url_for('list_snapshots') => { Host => $user_domain })->status_
 	->text_is('div#list details summary.row .commit.date', '2999-06-08 11:03 +0000', 'list_snapshots returns git commit date')
 	->text_is('div#list details pre.commit.body', 'A  blog/2999-06-08.md', 'list_snapshots returns git commit body');
 
-$t->post_ok($app->url_for('take_snapshot') => { Host => $user_domain })->status_is(302);
+$t->post_ok($app->url_for('take_snapshot') => { Host => $user_domain } => form => {
+	csrf_token	=> CSRF_TOKEN,
+})->status_is(302);
 
 subtest 'take_snapshot' => sub {
 	is $t->tx->res->headers->location, $app->url_for('list_snapshots'),
@@ -57,14 +59,18 @@ subtest 'download_snapshot' => sub {
 
 $t->get_ok($app->url_for('download_snapshot', hash => 'invalid') => { Host => $user_domain })->status_is(500);
 
-$t->post_ok($app->url_for('restore_snapshot')->query(hash => $hash) => { Host => $user_domain })->status_is(302);
+$t->post_ok($app->url_for('restore_snapshot')->query(hash => $hash) => { Host => $user_domain } => form => {
+	csrf_token	=> CSRF_TOKEN,
+})->status_is(302);
 
 subtest 'restore_snapshot' => sub {
 	is $t->tx->res->headers->location, $app->url_for('list_files')->query(search => "snapshots/$hash"),
 		'restore_snapshot redirects to search URL';
 };
 
-$t->post_ok($app->url_for('restore_snapshot')->query(hash => 'invalid') => { Host => $user_domain })->status_is(500);
+$t->post_ok($app->url_for('restore_snapshot')->query(hash => 'invalid') => { Host => $user_domain } => form => {
+	csrf_token	=> CSRF_TOKEN,
+})->status_is(500);
 
 $t->get_ok($app->url_for('render_diff', hash => $hash) => { Host => $user_domain })->status_is(200)
 	->text_is('nav header h1', "Snapshot $hash", 'render_diff renders title')
