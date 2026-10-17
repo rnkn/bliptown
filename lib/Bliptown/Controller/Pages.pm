@@ -154,16 +154,9 @@ sub render_page {
 		$desc = join ' ', split /\n/, $desc_chars;
 	}
 
-	my $scripts_path = path($user_path, '_scripts.txt');
-	my @scripts;
-	if (-f $scripts_path) {
-		my $script_chars = $scripts_path->slurp('UTF-8');
-		my @lines = split /\n/, $script_chars;
-		foreach my $line (@lines) {
-			my $url = $c->app->config->{scripts}->{$line};
-			push @scripts, $url if $url;
-		}
-	}
+	my $scripts_path = path($user_path, 'scripts');
+	my @scripts = $scripts_path->list_tree->each if -d $scripts_path;
+	@scripts = map { '/' . $_->to_rel($user_path)->to_string } grep { $_ =~ /\.js$/ } @scripts;
 
 	$c->stash(
 		template	=> 'page',

@@ -39,7 +39,7 @@ sub startup {
 			error	=> 'local0.err',
 			fatal	=> 'local0.crit',
 		},
-		render_exts => [ qw(md html css txt) ],
+		render_exts => [ qw(md html css txt js) ],
 		cdn_exts => {
 			eot		=> 1,
 			ttf		=> 1,
@@ -63,10 +63,6 @@ sub startup {
 			year		=> '%Y',
 			iso			=> '%F',
 		},
-		scripts => {
-			scrollreveal	=> 'https://unpkg.com/scrollreveal@4.0.9/dist/scrollreveal.js',
-			baguettebox		=> 'https://unpkg.com/baguettebox.js@1.13.0/dist/baguetteBox.js',
-		},
 		csp_default =>
 		  q{default-src 'self'; }
 		. q{object-src 'none'; }
@@ -85,7 +81,7 @@ sub startup {
 		. q{img-src 'self' https:; }
 		. q{font-src 'self' https:; }
 		. q{style-src 'self' https:; }
-		. q{script-src 'self' unpkg.com; }
+		. q{script-src 'self'; }
 		. q{frame-src 'self' https:; }
 		. q{connect-src 'self'; },
 	);
