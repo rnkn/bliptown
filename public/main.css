@@ -52,10 +52,11 @@ nav {
 	position: sticky;
 	top: 0;
 	z-index: 80;
-	width: 24rem;
+	width: 20rem;
 	height: 100vh;
 	display: flex;
 	flex-direction: column;
+	flex-shrink: 0;
 	overflow-y: scroll;
 	background-color: inherit;
 	transition: top 0.3s ease;
@@ -75,7 +76,8 @@ nav footer {
 }
 
 main {
-	width: 100%;
+	flex-grow: 1;
+	min-width: 0;
 	padding: 2rem;
 	padding-right: 4rem;
 	background-color: inherit;
