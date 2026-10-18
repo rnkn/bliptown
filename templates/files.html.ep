@@ -42,11 +42,6 @@
 					<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 					<button type="submit">Download Site</button>
 				</form>
-				<form id="snapshot" method="POST" action="<%= url_for('take_snapshot') %>">
-					<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
-					<button type="submit">Take Snapshot</button>
-				</form>
-				<div><a href="<%= url_for('list_snapshots') %>">Browse Snapshots</a></div>
 			</div>
 		</div>
 		<ul>

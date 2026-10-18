@@ -617,12 +617,6 @@ EOF
 
 	$protected->under($block_demo)->get('/_billing')->to(controller => 'Users', action => 'billing_session')->name('billing_session');
 
-	$protected->post('/_snapshots/new')->to(controller => 'Snapshots', action => 'take_snapshot')->name('take_snapshot');
-	$protected->post('/_snapshots/restore')->to(controller => 'Snapshots', action => 'restore_snapshot')->name('restore_snapshot');
-	$protected->get('/_snapshots/download/:hash')->to(controller => 'Snapshots', action => 'download_snapshot')->name('download_snapshot');
-	$protected->get('/_snapshots/diff/:hash')->to(controller => 'Snapshots', action => 'render_diff')->name('render_diff');
-	$protected->get('/_snapshots')->to(controller => 'Snapshots', action => 'list_snapshots')->name('list_snapshots');
-
 	$r->get('/_health')->to(controller => 'Health', action => 'health_check')->name('health_check');
 	$protected->get('/_error' => sub {
 		my $c = shift;
