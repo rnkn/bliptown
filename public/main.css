@@ -632,7 +632,6 @@ dialog#toast p {
 	list-style: none;
 	padding: var(--controls-gap);
 	margin: 0 var(--controls-gap);
-	font-size: 0.9em;
 	overflow-x: auto;
 }
 
@@ -670,6 +669,7 @@ dialog#toast p {
 /* Controls */
 
 .controls {
+	font-size: 0.9em;
 	background-color: var(--controls-color);
 	margin: 8px 0;
 	padding: 8px;
@@ -678,7 +678,6 @@ dialog#toast p {
 /* Files Sidebar Controls */
 
 nav #file-controls {
-	font-size: 0.9em;
 	margin: 1em 0;
 }
 
