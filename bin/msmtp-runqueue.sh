@@ -32,7 +32,7 @@ fi
 # because /bin/sh marks exec-opened fds close-on-exec and flock
 # would fail with EBADF (see the example in flock(1))
 (
-	flock -w "$maxwait" 100 || {
+	flock -w "$maxwait" 9 || {
 		cat <<EOF
 Cannot use $queuedir: waited $maxwait seconds for the queue lock
 to be released, giving up.
@@ -57,6 +57,6 @@ EOF
 			echo "FAILED"
 		fi
 	done
-) 100> "$lockfile" || exit 1
+) 9> "$lockfile" || exit 1
 
 exit 0
