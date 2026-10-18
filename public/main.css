@@ -4,7 +4,7 @@
 	--inactive-text-color: rgb(155,155,155);
 	--button-bg-color: var(--bg-color);
 	--button-hover-color: rgb(250,250,250);
-	--shadow-color: rgba(0,0,0,0.03);
+	--shadow-color: rgba(0,0,0,0.05);
 	--controls-color: rgb(240,240,240);
 	--controls-hover-color: var(--controls-color);
 	--controls-padding: 0.25em;
