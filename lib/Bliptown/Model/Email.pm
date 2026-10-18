@@ -91,7 +91,7 @@ sub send_email {
 		sub {
 			my $subprocess = shift;
 			my $pipe = IO::Pipe->new;
-			$pipe->writer($ENV{BLIPTOWN_MSMTP_PATH}, $args->{recipient})
+			$pipe->writer($ENV{BLIPTOWN_SENDMAIL_PATH}, $args->{recipient})
 				or die "Failed to fork msmtp: $!";
 
 			$pipe->print($args->{content})
