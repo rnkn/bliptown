@@ -4,8 +4,6 @@ queuedir=/var/db/msmtp/queue
 lockfile="$queuedir/.lock"
 maxwait=120
 
-trap 'rm -f $lockfile' EXIT
-
 options=$*
 
 # eat some options that would cause msmtp to return 0 without sendmail mail
@@ -21,47 +19,44 @@ case "$options" in
 		;;
 esac
 
-# wait for a lock that another instance has set
-wait=0
-while [ -e "$lockfile" ] && [ "$wait" -lt "$maxwait" ]; do
-	sleep 1
-	wait=$((wait + 1))
-done
-if [ -e "$lockfile" ]; then
-	cat <<EOF
-Cannot use $queuedir: waited $maxwait seconds for lockfile
-$lockfile to vanish, giving up.
-If you are sure that no other instance of this script is running, then
-delete the lock file.
-EOF
-	exit 1
-fi
-
 # check for empty queuedir
 if ! ls "$queuedir"/*.mail 2>/dev/null; then
 	echo "No mail in $queuedir"
 	exit 0
 fi
 
-# lock the $queuedir
-touch "$lockfile" || exit 1
+# wait up to $maxwait seconds for an exclusive lock on the queue;
+# the kernel releases it when the subshell exits, so there is no
+# lock file to clean up and no stale lock possible.
+# The lock is opened with a subshell redirection, not `exec 9>`,
+# because /bin/sh marks exec-opened fds close-on-exec and flock
+# would fail with EBADF (see the example in flock(1))
+(
+	flock -w "$maxwait" 100 || {
+		cat <<EOF
+Cannot use $queuedir: waited $maxwait seconds for the queue lock
+to be released, giving up.
+EOF
+		exit 1
+	}
 
-# process all mails
-for mailfile in "$queuedir"/*.mail; do
-	msmtpfile="${mailfile%.mail}.msmtp"
-	recipient=$(sed -E 's/^.*-- (.*)$/\1/' "$msmtpfile")
-	echo "=> Sending $mailfile to $recipient..."
-	if [ ! -f "$msmtpfile" ]; then
-		echo "No corresponding file $msmtpfile found"
-		echo "FAILED"
-		continue
-	fi
-	if msmtp $options $(cat "$msmtpfile") < "$mailfile"; then
-		rm "$mailfile" "$msmtpfile"
-		echo "$mailfile sent successfully"
-	else
-		echo "FAILED"
-	fi
-done
+	# process all mails
+	for mailfile in "$queuedir"/*.mail; do
+		msmtpfile="${mailfile%.mail}.msmtp"
+		recipient=$(sed -E 's/^.*-- (.*)$/\1/' "$msmtpfile")
+		echo "=> Sending $mailfile to $recipient..."
+		if [ ! -f "$msmtpfile" ]; then
+			echo "No corresponding file $msmtpfile found"
+			echo "FAILED"
+			continue
+		fi
+		if msmtp $options $(cat "$msmtpfile") < "$mailfile"; then
+			rm "$mailfile" "$msmtpfile"
+			echo "$mailfile sent successfully"
+		else
+			echo "FAILED"
+		fi
+	done
+) 100> "$lockfile" || exit 1
 
 exit 0
