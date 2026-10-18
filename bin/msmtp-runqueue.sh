@@ -4,33 +4,22 @@ queuedir=/var/db/msmtp/queue
 lockfile="$queuedir/.lock"
 maxwait=120
 
-options=$*
-
 # eat some options that would cause msmtp to return 0 without sendmail mail
-case "$options" in 
-	(*--help*)
-		echo "$0: send mail in $queuedir"
-		echo "Options are passed to msmtp"
-		exit 0
-		;;
-	(*--version*)
-		echo "$0: unknown version"
-		exit 0
-		;;
-esac
+for i; do
+	case "$i" in 
+		(--help)
+			echo "$0: send mail in $queuedir"
+			echo "Options are passed to msmtp"
+			exit 0
+			;;
+		(--version)
+			echo "$0: unknown version"
+			exit 0
+			;;
+	esac
+done
 
-# check for empty queuedir
-if ! ls "$queuedir"/*.mail 2>/dev/null; then
-	echo "No mail in $queuedir"
-	exit 0
-fi
-
-# wait up to $maxwait seconds for an exclusive lock on the queue;
-# the kernel releases it when the subshell exits, so there is no
-# lock file to clean up and no stale lock possible.
-# The lock is opened with a subshell redirection, not `exec 9>`,
-# because /bin/sh marks exec-opened fds close-on-exec and flock
-# would fail with EBADF (see the example in flock(1))
+# wait up to $maxwait seconds for an exclusive lock on the queue
 (
 	flock -w "$maxwait" 9 || {
 		cat <<EOF
@@ -42,6 +31,11 @@ EOF
 
 	# process all mails
 	for mailfile in "$queuedir"/*.mail; do
+        if [ "$mailfile" = "$queuedir/*.mail" ]; then
+			echo "No mail in $queuedir"
+			continue
+        fi
+
 		msmtpfile="${mailfile%.mail}.msmtp"
 		recipient=$(sed -E 's/^.*-- (.*)$/\1/' "$msmtpfile")
 		echo "=> Sending $mailfile to $recipient..."
@@ -50,7 +44,8 @@ EOF
 			echo "FAILED"
 			continue
 		fi
-		if msmtp $options $(cat "$msmtpfile") < "$mailfile"; then
+
+		if msmtp "$@" $(cat "$msmtpfile") < "$mailfile"; then
 			rm "$mailfile" "$msmtpfile"
 			echo "$mailfile sent successfully"
 		else
