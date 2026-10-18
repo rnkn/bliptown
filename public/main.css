@@ -735,6 +735,7 @@ nav #file-controls #additional-controls a:hover {
 	top: 0;
 	background-color: inherit;
 	border-bottom: 1px solid;
+	padding: var(--controls-gap);
 }
 
 #files #breadcrumbs #current-directory-controls {
