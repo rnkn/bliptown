@@ -4,7 +4,7 @@ queuedir=/var/db/msmtp/queue
 runqueue=/usr/local/www/bliptown/bin/msmtp-runqueue.sh
 
 # Set secure permissions on created directories and files
-umask 077
+umask 007
 
 # Create queue directory if necessary
 if [ ! -d "$queuedir" ]; then
