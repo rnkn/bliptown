@@ -2,6 +2,10 @@
 
 queuedir=/var/db/msmtp/queue
 
-for i in "$queuedir"/*.mail; do
-	(grep -EsH '(^From:|^To:|^Subject:)' "$i" | sed 's|$queuedir/||') || echo "No mail in queue";
+for mail in "$queuedir"/*.mail; do
+	if [ "$mail" = "$queuedir/*.mail" ]; then
+		echo "No mail in queue"		
+		continue
+	fi
+	grep -EsH '(^From:|^To:|^Subject:)' "$mail" | sed 's|$queuedir/||'
 done
