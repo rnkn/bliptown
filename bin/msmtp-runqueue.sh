@@ -2,7 +2,6 @@
 
 queuedir=/var/db/msmtp/queue
 lockfile="$queuedir/.lock"
-maxwait=120
 
 # eat some options that would cause msmtp to return 0 without sendmail mail
 for i; do
@@ -19,15 +18,12 @@ for i; do
 	esac
 done
 
-# wait up to $maxwait seconds for an exclusive lock on the queue
+# take the queue lock without blocking: if it is held, another runner
+# is already flushing the queue, so there is nothing to report or do
 (
-	flock -w "$maxwait" 9 || {
-		cat <<EOF
-Cannot use $queuedir: waited $maxwait seconds for the queue lock
-to be released, giving up.
-EOF
-		exit 1
-	}
+	if ! flock -n 9; then
+		exit 0
+	fi
 
 	# process all mails
 	for mailfile in "$queuedir"/*.mail; do
