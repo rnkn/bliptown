@@ -39,8 +39,7 @@ done
 	# process all mails
 	for mailfile in "$queuedir"/*.mail; do
         if [ "$mailfile" = "$queuedir/*.mail" ]; then
-			log "No mail in $queuedir"
-			continue
+			exit 0
         fi
 
 		msmtpfile="${mailfile%.mail}.msmtp"
