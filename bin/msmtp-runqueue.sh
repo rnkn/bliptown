@@ -51,7 +51,7 @@ done
 
 		recipient=$(sed -E 's/^.*-- (.*)$/\1/' "$msmtpfile")
 		log "=> Sending $mailfile to $recipient..."
-		if msmtp --syslog "$@" $(cat "$msmtpfile") < "$mailfile"; then
+		if /usr/pkg/bin/msmtp "$@" $(cat "$msmtpfile") < "$mailfile"; then
 			rm "$mailfile" "$msmtpfile"
 			log "$mailfile sent successfully"
 		else
