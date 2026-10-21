@@ -320,7 +320,7 @@ EOF
 				my $host = $c->req->url->to_abs->host;
 				return unless $host;
 				$host =~ s/^www\.//;
-				if ($host =~ /\Q$ENV{BLIPTOWN_DOMAIN}\E$/ || $host eq 'localhost') {
+				if ($host =~ /(?:^|\.)\Q$ENV{BLIPTOWN_DOMAIN}\E$/ || $host eq 'localhost') {
 					my @host_parts = split(/\./, $host);
 					my $username = @host_parts >= 3 ? $host_parts[-3] : 'mayor';
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
