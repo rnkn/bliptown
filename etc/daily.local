@@ -137,7 +137,7 @@ then
 	ok=true
 	for d in /home/bliptown/repos/*.git
 	do
-		git -C "$d" fetch origin master
+		/usr/pkg/bin/git -C "$d" fetch origin master >/dev/null
 	done
 	$ok && echo "Done" || echo "Failed"
 echo
