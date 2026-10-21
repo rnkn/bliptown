@@ -42,6 +42,7 @@ Available commands:
     quota     print disk quota usage
     tree      print directory file structure
     vi        edit files in vi
+    mg        edit files in mg
     nano      edit files in nano
     quit      exit the shell
 
@@ -70,6 +71,7 @@ my %allowed_commands = (
 	vi		=> '/usr/bin/vi -S',
 	tree	=> '/usr/pkg/bin/tree',
 	nano	=> '/usr/pkg/bin/nano -R',
+	mg		=> '/usr/local/bin/mg -S',
 );
 
 my %builtins = (
