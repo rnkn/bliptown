@@ -19,12 +19,10 @@ renew_cert() {
 	test -n "$domain" || return 1
 	ok=true
 
-	if $production
-	then
+	if $production; then
 	expected_A_record=46.225.163.173
 	expected_AAAA_record=2a01:4f8:1c19:6498::1
-	elif $staging
-	then
+	elif $staging; then
 	expected_A_record=77.42.77.0
 	expected_AAAA_record=2a01:4f9:c013:4744::1
 	fi
@@ -34,8 +32,7 @@ renew_cert() {
 	$ok && test "$(dig "$domain" AAAA +short)" = "$expected_AAAA_record" || ok=false
 	$ok || { echo "failed" >&2; return 1; }
 
-	if $wildcard
-	then
+	if $wildcard; then
 		hook=/usr/local/www/bliptown/bin/nsupdate.sh
 		subdomain="*.$domain"
 	else
@@ -69,12 +66,10 @@ backup() {
 	weekday=$(date +%u)
 	monthday=$(date +%e)
 
-	if [ $monthday = 1 ]
-	then
+	if [ $monthday = 1 ]; then
 		backup_type="monthly"
 		dump_level=0
-	elif [ $weekday = 7 ]
-	then
+	elif [ $weekday = 7 ]; then
 		 backup_type="weekly"
 		 dump_level=0
 	else
@@ -114,18 +109,15 @@ backup() {
 	echo "Done"
 }
 
-if $production
-then
+if $production; then
 	backup
 fi
 echo
 
-if $staging
-then
+if $staging; then
 	echo "Syncing from production:"
 	ok=true
-	for d in /home/bliptown/users/ /home/bliptown/domains/ /var/db/bliptown/backups/
-	do
+	for d in /home/bliptown/users/ /home/bliptown/domains/ /var/db/bliptown/backups/; do
 		rsync -a --delete bliptown@blip.town:$d $d || ok=false
 		chown -Rh bliptown:bliptown $d
 	done
@@ -135,8 +127,7 @@ then
 
 	echo "Pulling repo changes:"
 	ok=true
-	for d in /home/bliptown/repos/*.git
-	do
+	for d in /home/bliptown/repos/*.git; do
 		/usr/pkg/bin/git -C "$d" fetch origin master >/dev/null
 	done
 	$ok && echo "Done" || echo "Failed"
@@ -144,16 +135,13 @@ echo
 fi
 
 echo "Renewing certificates:"
-if $production
-then
+if $production; then
 	renew_cert blip.town true
 
-	ls /home/bliptown/domains | while read -r domain
-	do
+	ls /home/bliptown/domains | while read -r domain; do
 		renew_cert $domain
 	done
-elif $staging
-then
+elif $staging; then
 	renew_cert staging-blip.town true
 fi
 echo
@@ -171,8 +159,7 @@ sqlite3 /var/db/bliptown/users.db "PRAGMA integrity_check" >/dev/null || ok=fals
 $ok && echo "Done" || echo "Failed"
 echo
 
-if $production
-then
+if $production; then
 	echo "Creating database backup:"
 	ok=true
 	date=$(date +%F)

@@ -3,8 +3,7 @@
 api_baseurl="${API_BASEURL:-https://api.porkbun.com/api/json/v3}"
 keys_file="${PORKBUN_KEYS:-/etc/ssl/private/porkbun-keys.json}"
 
-if [ $# -ne 5 ]
-then
+if [ $# -ne 5 ]; then
 	echo "Usage: $(basename "$0") method type ident token auth" 1>&2
 	exit 85
 fi
@@ -35,13 +34,11 @@ check_record() {
 }
 
 find_zone() {
-	while true
-	do
+	while true; do
 		res=$(call_api "dns/retrieve/$zone" .)
 		status=$(echo "$res" | jq -r .status)
 
-		if [ "$status" = SUCCESS ]
-		then
+		if [ "$status" = SUCCESS ]; then
 			return 0
 		fi
 
@@ -67,15 +64,13 @@ case "$method" in
 		res=$(call_api "dns/create/$zone" --arg content "$auth" --arg name "$record" '. + { name: $name, type: "TXT", content: $content }')
 		status=$(echo "$res" | jq -r .status)
 
-		if [ ! "$status" = "SUCCESS" ]
-		then
+		if [ ! "$status" = "SUCCESS" ]; then
 			echo "$res" | jq
 			exit 1
 		fi
 
 		count=0
-		while sleep 5
-		do
+		while sleep 5; do
 			check_record && exit 0
 			[ $count -le 12 ] || exit 1
 			count=$((count + 1))

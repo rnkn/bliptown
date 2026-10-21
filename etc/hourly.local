@@ -16,12 +16,10 @@ now=$(date +%s)
 cutoff=$(( now - 86400 ))
 tmpfile=$(mktemp)
 
-while read -r time ip
-do
+while read -r time ip; do
     [ -n "$ip" ] || continue
 
-    if [ "$time" -lt "$cutoff" ]
-	then
+    if [ "$time" -lt "$cutoff" ]; then
         npfctl table rate_limit rem $ip >/dev/null 2>&1
     else
         echo "$time $ip" >> "$tmpfile"

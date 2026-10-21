@@ -6,8 +6,7 @@ bunnycdn_ipv6_endpoint="https://bunnycdn.com/api/system/edgeserverlist/IPv6/plai
 echo "Fetching GeoLite2 database:"
 ok=true
 ftp -Vo /tmp/geolite2-country.tar.gz "$geolite2_endpoint" || ok=false
-if $ok
-then
+if $ok; then
 	tar -C /var/db/GeoIP -xzf /tmp/geolite2-country.tar.gz
 	mv /var/db/GeoIP/GeoLite2-Country_*/*.mmdb /var/db/GeoIP/geolite2-country-current.mmdb
 	rm -rf /var/db/GeoIP/GeoLite2-Country_*
@@ -16,8 +15,7 @@ else
 	echo "Failed"
 fi
 
-if $ok
-then
+if $ok; then
 	echo "Restarting Bliptown:"
 	service bliptown restart
 fi
@@ -27,8 +25,7 @@ echo "Fetching Bunny CDN IPs:"
 ok=true
 ftp -Vo /tmp/bunnycdn.txt "$bunnycdn_endpoint" || ok=false
 ftp -Vo /tmp/bunnycdn-ipv6.txt "$bunnycdn_ipv6_endpoint" || ok=false
-if $ok
-then
+if $ok; then
 	tr -d '\r' < /tmp/bunnycdn.txt > /etc/bunnycdn.txt
 	tr -d '\r' < /tmp/bunnycdn-ipv6.txt > /etc/bunnycdn-ipv6.txt
 	rm -f  /tmp/bunnycdn*
