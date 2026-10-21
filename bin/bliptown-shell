@@ -38,6 +38,7 @@ Available commands:
     cp        copy files
     mv        move (rename) files
     cat       print (concatenate) files
+    id        print user info
     grep      file pattern searcher
     quota     print disk quota usage
     tree      print directory file structure
@@ -65,6 +66,7 @@ my %allowed_commands = (
 	cp		=> '/bin/cp',
 	mv		=> '/bin/mv',
 	cat		=> '/bin/cat',
+	id		=> '/usr/bin/id',
 	grep	=> '/usr/bin/grep',
 	quota	=> '/usr/bin/quota',
 	touch	=> '/usr/bin/touch',
