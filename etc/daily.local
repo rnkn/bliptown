@@ -94,6 +94,7 @@ backup() {
 	$ok || { echo "Dump $dump checksum does not match" >&2; return 1; }
 
 	echo "Done"
+	echo
 
 	ok=true
 	echo "Deleting old backups:"
