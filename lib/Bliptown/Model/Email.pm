@@ -79,7 +79,7 @@ sub send_magic_link {
 	});
 
 	$self->send_email({
-		recipient => "$username <$email_address>",
+		recipient => "$email_address",
 		content => $content,
 	});
 }
