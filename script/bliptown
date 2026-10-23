@@ -24,7 +24,6 @@ die 'BLIPTOWN_DATA_HOME not defined'			unless defined $ENV{BLIPTOWN_DATA_HOME};
 die 'BLIPTOWN_DB not defined'					unless defined $ENV{BLIPTOWN_DB};
 die 'BLIPTOWN_DB_SCHEMA not defined'			unless defined $ENV{BLIPTOWN_DB_SCHEMA};
 die 'BLIPTOWN_GEOIP_DB not defined'				unless defined $ENV{BLIPTOWN_GEOIP_DB};
-die 'BLIPTOWN_LOG_HOME not defined'				unless defined $ENV{BLIPTOWN_LOG_HOME};
 
 die 'BLIPTOWN_MD4C_HTML_LIB not defined'		unless defined $ENV{BLIPTOWN_MD4C_HTML_LIB};
 die 'BLIPTOWN_SENDMAIL_PATH not defined'		unless defined $ENV{BLIPTOWN_SENDMAIL_PATH};
