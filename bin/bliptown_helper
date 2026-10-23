@@ -28,15 +28,15 @@ die "BLIPTOWN_DATA_HOME not defined" unless defined $ENV{BLIPTOWN_DATA_HOME};
 my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;
 
 sub chdir_site {
-	my $user = shift;
-	my $site_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
+	my $payload = shift;
+	my $site_path = path($payload->{data_home}, 'users', $payload->{system_user});
 	chdir $site_path or die "Cannot change directory: $site_path ($!)";
 	return $site_path->to_string;
 }
 
 sub write_blob {
 	my $payload = shift;
-	my $home = chdir_site($payload->{system_user});
+	my $home = chdir_site($payload);
 	my $filename = $payload->{filename};
 	my $b64_encoded = $payload->{blob};
 	my $blob = b64_decode($b64_encoded);
@@ -49,7 +49,7 @@ sub write_blob {
 
 sub backup_file {
 	my $payload = shift;
-	my $home = chdir_site($payload->{system_user});
+	my $home = chdir_site($payload);
 	my $filename = $payload->{filename};
 	my $path = path $filename;
 	$path->copy_to("${filename}~") or die "Cannot backup file: $path ($!)";
@@ -58,7 +58,7 @@ sub backup_file {
 
 sub update_file {
 	my $payload = shift;
-	my $home = chdir_site($payload->{system_user});
+	my $home = chdir_site($payload);
 	my $filename = $payload->{filename};
 	my $content = $payload->{content};
 	my $path = path $filename;
@@ -73,7 +73,7 @@ sub update_file {
 
 sub rename_files {
 	my $payload = shift;
-	my $home = chdir_site($payload->{system_user});
+	my $home = chdir_site($payload);
 	my @messages;
 	foreach my $rename (@{$payload->{filenames} // []}) {
 		my $filename = $rename->{old};
@@ -94,7 +94,7 @@ sub rename_files {
 
 sub delete_files {
 	my $payload = shift;
-	my $home = chdir_site($payload->{system_user});
+	my $home = chdir_site($payload);
 	my @filenames = @{$payload->{filenames} // []};
 
 	@filenames = sort { length $b <=> length $a } @filenames;
@@ -114,7 +114,7 @@ sub delete_files {
 
 sub make_directory {
 	my $payload = shift;
-	my $home = chdir_site($payload->{system_user});
+	my $home = chdir_site($payload);
 	my $dir = $payload->{filename};
 	path($dir)->make_path or die "Cannot create directory: $dir ($!)";
 	return "Created directory: $dir";
@@ -123,7 +123,7 @@ sub make_directory {
 sub download_site {
 	my $payload = shift;
 	my $username = $payload->{system_user};
-	chdir_site($username);
+	chdir_site($payload);
 	my $tmpfile = tempfile(UNLINK => 0)->chmod(0644);
 	my $site_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my @tree = $site_path->list_tree->each;
