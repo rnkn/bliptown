@@ -638,7 +638,7 @@ Bliptown - A portfolio platform for artists and creatives.
 
 Bliptown is a a flat-file CMS using the Perl Mojolicious web framework
 and Markdown files. There is a small SQLite database for user settings
-and credentials. The server runs OpenBSD.
+and credentials. The server runs NetBSD.
 
 =head1 DESCRIPTION
 
@@ -654,10 +654,20 @@ and credentials. The server runs OpenBSD.
 
 =item * Syntax check a file: C<carmel exec perl -w -c lib/Bliptown.pm>
 
+=item * Run a development server: C<carmel exec morbo script/bliptown>
+
+=item * On macOS, run the helper locally under launchd with
+  F<etc/town.blip.helper.plist> in inetd compatibility mode
+
+=item * Inspect the outgoing mail queue: F<bin/msmtp-listqueue.sh>
+
+=item * Send outgoing mail: F<bin/msmtp-runqueue.sh>
+
 =item * The deployed app starts with C<perl -Ilocal/lib/perl5/script/bliptown>
 
-=item * Generate an analytics report from access logs:
-  F<script/bliptown_analytics>
+=item * Generate F<stats.json> per user from the shared visitor log
+  F</var/log/bliptown/visitor.log>: F<bin/bliptown_analytics> (run hourly
+  by F</etc/hourly.local>)
 
 =back
 
@@ -670,12 +680,24 @@ and credentials. The server runs OpenBSD.
 =item * Controllers live in F<lib/Bliptown/Controller/>; models/helpers live
   in F<lib/Bliptown/Model/>.
 
-=item * User content under each user's home directory F<~/site>, while
-  account state lives in SQLite via C<Mojo::SQLite>.
+=item * User content under C<BLIPTOWN_DATA_HOME/users/<username>>
+  symlinked to user's home directory F<~/site>, while account state
+  lives in SQLite via C<Mojo::SQLite>.
 
-=item * Privileged filesystem, B<git>, and certificate operations are
-  not done directly in controllers. They go through
-  F<script/bliptown_helper> over a Unix socket using JSON.
+=item * Logging goes through syslogd. C<Mojo::Log> levels are
+  dispatched per level to logger(1) (facility local0, exact-severity
+  routes in F</etc/syslog.conf> give F<info.log> and F<error.log>);
+  raw fd 1/2 output is caught by F<etc/rc.d/bliptown> as local0.notice
+  into F<daemon.log>. The visitor log writes to facility local1 and
+  gives F<visitor.log> which is consumed hourly by
+  F<bin/bliptown_analytics>.
+
+=item * Privileged filesystem operations are not done directly in
+  controllers. They go through F<bin/bliptown_helper>, an inetd(8)
+  service listening on 127.0.0.1:9000, over a TCP socket using JSON
+  (C<Model::IPC>). Allowed commands: C<write_blob>, C<update_file>,
+  C<rename_files>, C<delete_files>, C<backup_file>, C<make_directory>,
+  C<download_site>.
 
 =item * Markdown page rendering is handled by C<Model::Page>, which combines
   YAML frontmatter, Mustache-style templating, md4c rendering, and DOM
@@ -683,24 +705,71 @@ and credentials. The server runs OpenBSD.
 
 =item * Routing is host-aware: C<get_req_username> maps subdomains/custom
   domains to a user, and the page/file helpers always resolve paths
-  relative to that user's home.
-
-=item * Site versioning (history, restore, diff) is implemented as
-  B<git> operations (C<git_commit>, C<git_log>, C<git_show>,
-  C<git_checkout>, C<git_archive>) run by F<script/bliptown_helper>
-  and surfaced through C<Controller::Snapshots>, reusing the same
-  privileged-IPC mechanism as filesystem operations.
+  relative to C<BLIPTOWN_DATA_HOME/users>.
 
 =item * Custom domains are verified in C<Model::DNS>, which checks that a
   domain's A/AAAA records point at the server and that a C<_bliptown>
   TXT record matches the owning user.
 
 =item * User login is passwordless: C<Controller::Users> and C<Model::Email>
-  implement a magic-link flow (one-time tokens in SQLite, emailed via
-  C<Mojo::SMTP::Client>).
+  implement a magic-link flow (one-time tokens in SQLite, emailed as
+  RFC 822 messages piped to C<$BLIPTOWN_SENDMAIL_PATH>).
+
+=item * Outgoing mail has no local MTA: C<BLIPTOWN_SENDMAIL_PATH>
+ points to s sendmail compatible binary, triggering
+ F<bin/msmtp-enqueue.sh>, which spools messages in
+ F</var/db/msmtp/queue> and hands them to msmtp through
+ F<bin/msmtp-runqueue.sh> when the smarthost is reachable.
+ F<etc/msmtprc> holds the smarthost account configuration and
+ F</etc/msmtp.passwd> holds the password.
 
 =item * Billing (C<Model::Checkout>, C<Model::Customer>) talks to the Stripe
   REST API directly via C<Mojo::UserAgent>.
+
+=item * Static assets are served through Bunny CDN (C<cdn.blip.town>):
+  the C<cdn-origin.BLIPTOWN_DOMAIN> route serves user files for the
+  CDN to pull, and file deletions purge the CDN through its API
+  (C<Model::File>, C<BLIPTOWN_CDN_API_HOST>/C<BLIPTOWN_CDN_API_KEY>).
+
+=item * F<etc/weekly.local> refreshes the Bunny CDN edge-server IP
+  allowlists and the GeoLite2 country database.
+
+=item * nginx terminates TLS (uacme certificates), proxies to the
+  Mojolicious prefork server on 127.0.0.1:8080, rate-limits per IP,
+  and sends obvious probes (F<.php> requests, control characters) to
+  F<bin/rate_limit>, an inetd(8) service on 127.0.0.1:9666 that adds
+  the offender to the npf C<rate_limit> table; F<etc/hourly.local>
+  expires entries after 24 hours.
+
+=item * F<bin/npf-badhost> (run by F<etc/daily.local>) rebuilds
+  F</etc/blocklist.txt> from public IP blocklists and loads it into
+  the npf C<blocklist> table.
+
+=item * F<etc/blocklistd.conf> defines rules for C<blocklistd> to track
+  and block brute-force SSH login attempts.
+
+=item * Daily maintenance (F<etc/daily.local>): dump(8) backups to a
+  remote storage box with checksum verification, SQLite C<.backup>
+  snapshots to F</var/db/bliptown/backups> with 30-day retention,
+  expired login-token cleanup, database integrity check, and
+  certificate renewal (uacme with the F<bin/nsupdate.sh> dns-01 hook
+  for internal wildcard certificates,
+  F</usr/pkg/libexec/uacme/uacme.sh> http-01 for user certificates).
+  The staging instance syncs users, domains, and backups from
+  production.
+
+=item * Users also have SSH access to their site directory:
+  F<bin/bliptown-dispatch.sh> as the forced command dispatches
+  sftp/git-shell/rsync and drops other logins into F<bin/bliptown-shell>,
+  a restricted interactive shell.
+
+=item * F<skel/site/> is the skeleton for a new user's site
+  (F<index.md>, F<_template.md>, F<style.css>, F<_header.md>, etc.).
+
+=item * Shared page themes are served from the C<BLIPTOWN_THEME_USER>.
+  F<style.css> parameter C<theme> selects theme from
+  F<users/BLIPTOWN_THEME_USER/THEME.css>, otherwise serves user's
+  style.css.
 
 =back
 
@@ -712,172 +781,255 @@ and credentials. The server runs OpenBSD.
   with C<return 1;>, and prefer small controller actions that delegate
   work to models or IPC helpers.
 
-=item * Keep file access constrained to the user root and reuse C<get_file>,
-  C<get_slug>, and C<ipc->send_message> instead of open-coding path
-  resolution or helper calls.
+=item * Keep file access constrained to the user root and reuse
+  C<get_file>, C<get_slug>, and C<ipc-E<gt>send_message> instead of
+  open-coding path resolution or helper calls.
 
 =item * Preserve the existing page syntax: C<---> YAML frontmatter,
   C<{{ }}> variables, C<{{ # ... }}> sections, and C<{{ E<gt> ... }}>
   partials.
 
 =item * Preserve the current error flow: helper failures are surfaced
-  with C<reply->exception>, while user-facing validation issues use
+  with C<reply-E<gt>exception>, while user-facing validation issues use
   flash messages and redirects.
 
 =item * C<demo> is treated as a restricted account for destructive
   actions.
 
-=item * Controller/model tests avoid the real F<bliptown_helper>
-  socket by swapping in F<t/lib/FakeIPC.pm> for the C<ipc> helper.
+=item * Tests use F<t/lib/BliptownTest.pm> to a initialize test
+  environment.
+
+=item * Tests avoid the real F<bliptown_helper> socket by swapping in
+  F<t/lib/FakeIPC.pm> for the C<ipc> helper.
+
+=item * Tests avoid production operations with F<t/lib/FakeDNS.pm> for
+  DNS resolution, F<t/lib/FakeEmail.pm> for sending email, and
+  F<t/lib/FakeVisitorLog.pm> for visitor logs.
 
 =item * Prefer simple, pragmatic, clear, elegant code. Follow the I<12
   Factor App> methodology, except for "Twelve-factor apps also do not
   rely on the implicit existence of any system tools" as Bliptown is
-  deeply integrated with OpenBSD.
+  deeply integrated with NetBSD.
 
 =back
 
-=head2 Configuration
+=head2 Environment Variables
 
-Initial system setup:
+All runtime configuration comes from the environment, sourced from
+F<$HOME/.envrc> by F<script/bliptown>. See F<.envrc.def> for the full
+list.
 
-  # syspatch
+=over
+
+=item * C<BLIPTOWN_SECRET_OLD>, C<BLIPTOWN_SECRET_NEW>: application
+  secrets for sessions and CSRF tokens; old first so rotated secrets
+  keep validating existing cookies.
+
+=item * C<BLIPTOWN_HEALTH_FILE>: file touched by the prefork heartbeat
+  hook and read by the C<_health> route.
+
+=item * C<BLIPTOWN_HELPER_HOST>, C<BLIPTOWN_HELPER_PORT>: TCP endpoint
+  of the privileged helper (F<bin/bliptown_helper> via inetd).
+
+=item * C<BLIPTOWN_DOMAIN>: the primary domain; used for subdomain to
+  username mapping, custom-domain checks, CSP frame-ancestors, and
+  outgoing email.
+
+=item * C<BLIPTOWN_SCHEME>, C<BLIPTOWN_PORT>: scheme and optional port
+  used when generating URLs (magic links, C<_mysite> redirect).
+
+=item * C<BLIPTOWN_IPV4>, C<BLIPTOWN_IPV6>: the server addresses that a
+  custom domain's A/AAAA records must match (C<Model::DNS>).
+
+=item * C<BLIPTOWN_DATA_HOME>: root of all per-instance data:
+  F<users/>, F<domains/>, F<repos/>, F<stats/>.
+
+=item * C<BLIPTOWN_DB>, C<BLIPTOWN_DB_SCHEMA>: SQLite database path and
+  migration version to migrate to (F<migrations.sql>).
+
+=item * C<BLIPTOWN_GEOIP_DB>: GeoLite2 country database (F<.mmdb>) used
+  by the C<geoip> helper for visitor stats.
+
+=item * C<BLIPTOWN_LOG_HOME>: log directory for instance logs.
+
+=item * C<BLIPTOWN_MD4C_HTML_LIB>: paths to the md4c shared libraries
+  used via FFI by C<Model::Page>.
+
+=item * C<BLIPTOWN_SENDMAIL_PATH>: sendmail-compatible binary used to
+  send outgoing mail; points at F</usr/sbin/sendmail>.
+
+=item * C<BLIPTOWN_CDN_API_HOST>, C<BLIPTOWN_CDN_API_KEY>: Bunny CDN
+  purge API endpoint and access key (C<Model::File>).
+
+=item * C<BLIPTOWN_STRIPE_API_KEY>, C<BLIPTOWN_STRIPE_PRICE_ID>: Stripe
+  REST API credentials and subscription price (C<Model::Checkout>,
+  C<Model::Customer>).
+
+=item * C<BLIPTOWN_DEMO_USER>: the restricted demo account, blocked from
+  destructive actions.
+
+=item * C<BLIPTOWN_THEME_USER>: the account serving shared theme CSS.
+
+=back
+
+=head2 System Installation
+
+NetBSD installation:
+
+  > vesa on
+  > boot
+
+Follow installation prompts.
+
+Ensure boot without black screen:
+
+  # cat <<EOF > /boot.cfg
+  menu=Boot normally:rndseed /var/db/entropy-file; vesa on; boot
+  menu=Boot single user:rndseed /var/db/entropy-file; vesa on; boot -s
+  menu=Drop to boot prompt: vesa on; prompt
+  default=1
+  timeout=5
+  clear=1
+
+Set up system user su privileges:
+
+  # pkgin install priv
+  # cat <<EOF > /usr/pkg/etc/rnkn
+  0:root:0100000
+  # cd /usr/pkg/bin
+  # ln -s priv su-root
+  # passwd root
+
+Set up mail aliases:
+
   # cat <<EOF >> /etc/mail/aliases
-  root: rnkn
-  mayor: rnkn
-  # newaliases
-  # cat <<EOF > /etc/doas.conf
-  permit persist keepenv :wheel
-  # usermod -G wheel,wsrc rnkn
+  root: rnkn@rnkn.xyz
+  mayor: support@blip.town
+
+Set up bliptown user and _pubkeys.txt:
+
+  # useradd -m bliptown
+  # mkdir -p /home/bliptown/users/rnkn/
+  # cat <<EOF > /home/bliptown/users/rnkn/_pubkeys.txt
+  ssh-ed25519 AAAA... rnkn@sevastopol
+
+Secure SSH:
+
   # cat <<EOF > /etc/ssh/sshd_config
   PermitRootLogin no
   StrictModes no
   DenyUsers demo
   AuthorizedKeysFile /home/bliptown/users/%u/_pubkeys.txt
   PasswordAuthentication no
-  # rcctl restart sshd
-  # cat <<EOF > /etc/hostname.vio0
-  inet autoconf
-  inet alias **.***.**.*** 255.255.255.255
-  # cat <<EOT > /etc/fstab
-  ***********.b none swap sw
-  ***********.a / ffs rw 1 1
-  ***********.l /home ffs rw,nodev,nosuid,userquota=/var/quotas/home.user 1 2
-  ***********.d /tmp ffs rw,nodev,nosuid,userquota=/var/quotas/tmp.user 1 2
-  ***********.f /usr ffs ro,nodev 1 2
-  ***********.g /usr/X11R6 ffs rw,nodev 1 2
-  ***********.h /usr/local ffs rw,wxallowed,nodev 1 2
-  ***********.k /usr/obj ffs rw,nodev,nosuid 1 2
-  ***********.j /usr/src ffs rw,nodev,nosuid 1 2
-  ***********.e /var ffs rw,nodev,nosuid 1 2
-  # quotacheck -a
-  # quotaon /home /tmp
-  # ln -s /usr/bin/openrsync rsync
-  # crontab -l | head -2
-  MAXMIND_ID=*******
-  MAXMIND_KEY=************************************_mmk
+  UsePAM no
+  DenyUsers demo
+  ForceCommand /usr/local/www/bliptown/bin/bliptown-dispatch.sh
+  Match User bliptown
+    AuthorizedKeysFile .ssh/authorized_keys
+    ForceCommand none
+  Match Group wheel
+    ForceCommand none
+  # service sshd reload
 
-=head2 Installation
+=head2 Configure Networking
+
+Set up IPv6:
+
+  # cat <<EOF > /etc/ifconfig.vioif0
+  inet6 2a01:4f8:1c19:6498::1/64
+  up
+  # cat <<EOF >> /etc/rc.conf
+  defaultroute6="fe80::1%vioif0"
+  # service network restart
+
+=head2 Package Installation
 
 Install required packages:
 
-  # pkg_add sqlite3 libffi md4c git sqlports libmaxminddb jq monit \
-    p5-DBI p5-DBD-SQLite pkglocatedb
+  # pkgin install curl git-base git-docs jq libffi libmaxminddb md4c \
+	mksh monit msmtp nano nginx perl p5-Carton pkgconf rlwrap rsync sqlite3 \
+	sysupgrade tree uacme
 
-Build and install [Carmel](https://metacpan.org/pod/Carmel):
-
-  $ cd /tmp
-  $ ftp https://cdn.openbsd.org/pub/OpenBSD/$(uname -r)/{ports.tar.gz,SHA256.sig}
-  $ signify -Cp /etc/signify/openbsd-$(uname -r | cut -c 1,3)-base.pub -x SHA256.sig ports.tar.gz
-  # cd /usr
-  # tar xzf /tmp/ports.tar.gz
-  # chown -R :wsrc ports
-  # chmod -R g+w ports
-  $ /usr/ports/infrastructure/bin/portgen p5 Carmel
-  $ cd /usr/ports/mystuff/cpan/p5-Carmel
-  # make install
+=head2 Installation
 
 Install Bliptown app:
 
-  $ git init --bare /home/rnkn/git/bliptown.git
-  $ cd /usr/local/www
-  $ git clone /home/rnkn/git/bliptown.git
+  # mkdir -p /usr/local/www/bliptown
+  # chown -R bliptown /usr/local/www/bliptown
+  $ cd /usr/local/www/bliptown
+  $ git clone /home/rnkn/git/bliptown.git .
   $ cd bliptown
-  # carmel install
-  # carmel rollout
+  $ cp .envrc.def $HOME/.envrc
+
+Add environemtn to F<.envrc>.
+
+  $ cd /usr/local/www/bliptown
+  $ carton install --deployment
+
   # cd etc
   # cp hourly.local daily.local weekly.local \
-    httpd.conf pf.conf relayd.conf rc.local newsyslog.conf \
-    gitignore monitrc motd usermgmt.conf /etc
-  # mv /tmp/syslog.conf.tmp /etc/syslog.conf
-  # cat newsyslog.conf >> /etc/newsyslog.conf
-  # install -m 755 -o root -g bin etc/rc.d/bliptown_helper /etc/rc.d/
-  # install -m 755 -o root -g bin etc/rc.d/bliptown /etc/rc.d/
-  # install -m 755 -o root -g bin etc/rc.d/block_php /etc/rc.d/
-  # cat <<EOF >> /etc/login.conf
-  bliptown:\
-    :setenv=\
-  BLIPTOWN_SECRET=***********,\
-  BLIPTOWN_HEALTH_FILE=
-  BLIPTOWN_HELPER_HEALTH_FILE=
-  BLIPTOWN_HELPER_SOCKET=
-  BLIPTOWN_DOMAIN=blip.town,\
-  BLIPTOWN_IPV4=**.***.**.***,\
-  BLIPTOWN_IPV6=****:****:****:****::*,\
-  BLIPTOWN_USER_HOME=/home/bliptown/users,\
-  BLIPTOWN_DB=/var/db/bliptown/users.db,\
-  BLIPTOWN_LOG_HOME=/var/log/bliptown,\
-  BLIPTOWN_GEOIP_DB=/var/db/GeoIP/geolite2-country-current.mmdb,\
-  BLIPTOWN_MD4C_LIB=/usr/local/lib/libmd4c-html.so.0.0,\
-  BLIPTOWN_MD4C_HTML_LIB=/usr/local/lib/libmd4c-html.so.0.0,\
+    inetd.conf npf.conf blocklistd.conf newsyslog.conf usermgmt.conf \
+	gitignore /etc/
+  # cp monitrc /usr/pkg/etc/monit/
+  # cp msmtprc /usr/pkg/etc/
+  # umask 0077
+  # echo ************* > /etc/msmtp.passwd
+  # umask 0022
+  # cat syslog.conf >> /etc/syslog.conf
+  local0.none,local1.none  /var/log/messag
+  local0.<=info  /var/log/bliptown/info.log
+  local0.>=err  /var/log/bliptown/error.log
+  local0.=notice  /var/log/bliptown/daemon.log
+  local1.info  /var/log/bliptown/visitor.log
+  # service syslogd restart
+  # cat motd >> /etc/motd
+  # cp nginx.conf /usr/pkg/etc/nginx/
+  # install -m 555 -o root -g bin rc.d/bliptown /etc/rc.d/
 
-  BLIPTOWN_SECRET=*************,\
-  BLIPTOWN_HEALTH_FILE=/tmp/bliptown.health,\
-  BLIPTOWN_HELPER_HEALTH_FILE=/tmp/bliptown_helper.health,\
-  BLIPTOWN_HELPER_SOCKET=/var/run/bliptown_helper.sock,\
-  BLIPTOWN_DOMAIN=blip.town,\
-  BLIPTOWN_SCHEME=https,\
-  BLIPTOWN_PORT=,\
-  BLIPTOWN_IPV4=**.**.**.**,\
-  BLIPTOWN_IPV6=****\c****\c****\c****\c\c1,\
-  BLIPTOWN_SMTP_ADDR=*************,\
-  BLIPTOWN_SMTP_PORT=465,\
-  BLIPTOWN_SMTP_LOGIN=*************,\
-  BLIPTOWN_SMTP_PASS=*************,\
-  BLIPTOWN_DATA_HOME=/home/bliptown,\
-  BLIPTOWN_DB=/var/db/bliptown/users.db,\
-  BLIPTOWN_DB_SCHEMA=**,\
-  BLIPTOWN_LOG_HOME=/var/log/bliptown,\
-  BLIPTOWN_GEOIP_DB=/var/db/GeoIP/geolite2-country-current.mmdb,\
-  BLIPTOWN_MD4C_HTML_LIB=/usr/local/lib/libmd4c-html.so.0.0,\
-  BLIPTOWN_CDN_API_HOST=*************,\
-  BLIPTOWN_CDN_API_KEY=*************,\
-  BLIPTOWN_STRIPE_API_KEY=sk_live_*************,\
-  BLIPTOWN_STRIPE_PRICE_ID=price_*************,\
-  BLIPTOWN_DEMO_USER=demo,\
-  BLIPTOWN_THEME_USER=themes,\
+=head2 Services
 
-  bliptown_helper:\
-        :setenv=\
-  BLIPTOWN_HELPER_HEALTH_FILE=/tmp/bliptown_helper.health,\
-  BLIPTOWN_HELPER_SOCKET=/var/run/bliptown_helper.sock,\
-  BLIPTOWN_HELPER_PREFORK=4,\
-  BLIPTOWN_GID=****,\
-  BLIPTOWN_DATA_HOME=/home/bliptown,\
-  BLIPTOWN_KEYPAIR_FILE=/etc/relayd-keypairs.conf,\
-  BLIPTOWN_ACME_FILE=/etc/acme-domains.conf:
-  EOF
+Start required services:
+
+  # echo inetd=YES >> /etc/rc.conf
+  # echo inetd_env="PATH=/usr/pkg/bin:/usr/pkg/sbin:/bin:/sbin:/usr/bin:/usr/sbin" >> /etc/rc.conf
+  # echo npf=YES >> /etc/rc.conf
+  # echo blocklistd=YES >> /etc/rc.conf
+  # echo nginx=YES >> /etc/rc.conf
+  # echo bliptown=YES >> /etc/rc.conf
+  # echo monit=YES >> /etc/rc.conf
+  # echo fetch_pkg_vulnerabilities=YES >> /etc/daily.conf
+  # mkdir -p /var/log/bliptown
+  # chown -R bliptown /var/log/bliptown
+  # service nginx start
+  # service bliptown start
+
+=head2 SSL
+
+  # umask 0037
+  # mkdir -p /etc/ssl/private
+  # chown -R root:nginx /etc/ssl/private
+  # cat <<EOF > /etc/ssl/private/porkbun-keys.json
+  {
+    "apikey": "...",
+    "secretapikey": "..."
+  }
+  # uacme -c /etc/ssl new support@blip.town
+
+=head2 Periodic Scripts
+
+Run periodic scripts:
+
   # sh /etc/hourly.local
   # sh /etc/daily.local
   # sh /etc/weekly.local
-  # rcctl enable httpd relayd bliptown_helper bliptown monit
-  # rcctl start httpd relayd bliptown_helper bliptown monit
+  # crontab -e
+  0 * * * * /bin/sh /etc/hourly.local
 
-C<etc/rc.d/bliptown_staging> and C<bliptown_staging_helper> run a second,
-separate instance of the app (as the C<bliptown_staging> user, on
-C<127.0.0.1:8081>) for testing changes before they go live; install and
-enable them the same way as the production C<bliptown>/C<bliptown_helper>
-scripts if a staging instance is needed.
+=head2 Set up GeoLite2
+
+  # crontab -l | head -2
+  MAXMIND_ID=...
+  MAXMIND_KEY=..._mmk
 
 =head1 COPYRIGHT & LICENSE
 
