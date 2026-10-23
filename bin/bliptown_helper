@@ -34,13 +34,6 @@ sub chdir_site {
 	return $site_path->to_string;
 }
 
-sub chdir_repo {
-	my $user = shift;
-	my $repo_path = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
-	chdir $repo_path or die "Cannot change directory: $repo_path ($!)";
-	return $repo_path->to_string;
-}
-
 sub write_blob {
 	my $payload = shift;
 	my $home = chdir_site($payload->{system_user});
@@ -127,116 +120,6 @@ sub make_directory {
 	return "Created directory: $dir";
 }
 
-sub git_init {
-	my $payload = shift;
-	my $user = $payload->{system_user};
-	my $repo = chdir_repo($user);
-	my $worktree = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
-	my $excludes_file = '/etc/gitignore';
-
-	system(qw(git init --bare -q)) == 0
-		or die "Cannot initialize repository: $repo ($!)";
-	system('git', 'config', 'set', 'user.name', $user) == 0
-		or die "Cannot configure repository user name ($!)";
-	system('git', 'config', 'set', 'user.email', "${user}\@blip.town") == 0
-		or die "Cannot configure repository user email ($!)";
-	system('git', 'config', 'set', 'core.excludesFile', $excludes_file) == 0
-		or die "Cannot configure repository ignore file ($!)";
-
-	my $post_update = <<"EOF";
-#!/bin/sh
-git --work-tree=$worktree reset --hard
-EOF
-
-	my $hook_path = path($repo, 'hooks', 'post-update');
-	my $hook_file = Mojo::File->new($hook_path);
-
-	unless (-f $hook_file) {
-		$hook_file->spew($post_update, 'UTF-8');
-		$hook_file->chmod(0755);
-	}
-
-	return "Initialized Git repository: $repo";
-}
-
-sub git_log {
-	my $payload = shift;
-	chdir_repo($payload->{system_user});
-	my $out = `git log --date=format:"%Y-%m-%d %H:%M %z" --pretty=format:"%h%x00%s%x00%ad%x00%b%x01" --max-count=50`;
-
-	my @commits;
-	foreach my $commit (split /\x01/, $out) {
-		my $commit = trim $commit;
-		my ($hash, $subject, $date, $body) = split(/\x00/, $commit, 4);
-		push @commits, {
-			hash => $hash,
-			subject => $subject,
-			date => $date,
-			body => $body,
-		};
-	}
-	return \@commits;
-}
-
-sub git_show {
-	my $payload = shift;
-	chdir_repo($payload->{system_user});
-	my $hash = $payload->{hash};
-	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $out = `git show $hash`;
-	return unless length $out;
-	return $out;
-}
-
-sub git_commit {
-	my $payload = shift;
-	my $user = $payload->{system_user};
-	chdir_repo($user);
-	my $worktree = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
-	my $repo = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
-	git_init($payload);
-
-	system('git', "--work-tree=$worktree", 'add', '-A') == 0
-		or die "Cannot add files to $repo";
-
-	my $subject = 'Full snapshot on Bliptown';
-	my $body = `git --work-tree=$worktree status --porcelain`;
-	return unless length $body;
-
-	system('git', "--work-tree=$worktree", 'commit', '-q', '-m', $subject, '-m', $body) == 0
-		or die "Cannot commit files to repo: $repo ($!)";
-
-	my $commits = git_log($payload);
-	my $hash = $commits->[0]->{hash};
-	return $hash;
-}
-
-sub git_checkout {
-	my $payload = shift;
-	my $home = chdir_site($payload->{system_user});
-	my $hash = $payload->{hash};
-	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $dir = path($home, 'snapshots', $hash);
-	$dir->make_path or die "Cannot make path: $dir ($!)";
-	my $tarball = git_archive($payload);
-	system('tar', '-xzf', $tarball, '-C', $dir) == 0
-		or die "Failed to extract files from tarball ($!)";
-	unlink $tarball;
-	return $hash;
-}
-
-sub git_archive {
-	my $payload = shift;
-	chdir_repo($payload->{system_user});
-	my $hash = $payload->{hash};
-	die "Invalid hash: $hash" unless $hash =~ $safe_hash_regex;
-	my $tmpfile = tempfile(UNLINK => 0)->chmod(0644);
-	git_init($payload);
-	system('git', 'archive', '--format=tar.gz', '-o', $tmpfile, $hash) == 0
-		or die "Failed to extract archive from hash: $hash ($!)";
-	return $tmpfile->to_string;
-}
-
 sub download_site {
 	my $payload = shift;
 	my $username = $payload->{system_user};
@@ -258,11 +141,6 @@ my %allowed_commands = (
 	backup_file		=> { func => \&backup_file,		fields => [qw(system_user filename)] },
 	make_directory	=> { func => \&make_directory,	fields => [qw(system_user filename)] },
 	download_site	=> { func => \&download_site,	fields => [qw(system_user)] },
-	git_commit		=> { func => \&git_commit,		fields => [qw(system_user)] },
-	git_log			=> { func => \&git_log,			fields => [qw(system_user)] },
-	git_show		=> { func => \&git_show,		fields => [qw(system_user hash)] },
-	git_checkout	=> { func => \&git_checkout,	fields => [qw(system_user hash)] },
-	git_archive		=> { func => \&git_archive,		fields => [qw(system_user hash)] },
 );
 
 my $req_json;
