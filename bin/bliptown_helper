@@ -12,19 +12,6 @@ use POSIX qw(setgid setuid);
 
 die "$0 must be run as root" unless $> == 0;
 
-my $envrc = shift @ARGV || "$ENV{HOME}/.envrc";
-my @lines = split /\n/, path($envrc)->slurp;
-foreach my $line (@lines) {
-	next unless $line =~ /^export ([A-Za-z_][A-Za-z0-9_]*)=(.*)$/;
-	my ($key, $val) = ($1, $2);
-	$val = trim $val;
-	$val =~ s/^"(.*)"$/$1/;
-	$val =~ s{\$([A-Za-z_][A-Za-z0-9_]*)}{$ENV{$1} // ''}ge if $val;
-	$ENV{$key} = $val;
-}
-
-die "BLIPTOWN_DATA_HOME not defined" unless defined $ENV{BLIPTOWN_DATA_HOME};
-
 my $safe_hash_regex = qr/^[0-9a-f]{7,40}$/;
 
 sub chdir_site {
@@ -125,7 +112,7 @@ sub download_site {
 	my $username = $payload->{system_user};
 	chdir_site($payload);
 	my $tmpfile = tempfile(UNLINK => 0)->chmod(0644);
-	my $site_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $site_path = path($payload->{data_home}, 'users', $username);
 	my @tree = $site_path->list_tree->each;
 	@tree = map { $_->to_rel($site_path) } @tree;
 	system('tar', '-czf', $tmpfile, @tree) == 0
@@ -148,23 +135,23 @@ while (read(STDIN, my $buf, 512)) {
 	$req_json .= $buf;
 }
 
-my $data = decode_json($req_json);
-my $command = $data->{command};
-my $payload = $data->{payload};
-
+my $payload = decode_json($req_json);
 my ($res, $err);
 
 open(STDERR, '>', '/dev/null');
 
 eval {
+	die 'Malformed request' unless ref $payload eq 'HASH';
+	my $command = $payload->{command};
 	my $spec = $allowed_commands{$command} or die "Command not permitted: $command";
 	
 	my @missing = grep { !defined $payload->{$_} } @{$spec->{fields}};
 	die "Missing field(s) for $command: @missing" if @missing;
 
+	my $data_home = $payload->{data_home} or die 'Missing data_home';
 	my $user = $payload->{system_user};
-	my $site_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $user);
-	my $repo_path = path($ENV{BLIPTOWN_DATA_HOME}, 'repos', "$user.git");
+	my $site_path = path($data_home, 'users', $user);
+	my $repo_path = path($data_home, 'repos', "$user.git");
 	my $private_path = path($site_path, 'private');
 
 	unless ($user eq 'root') {

@@ -16,10 +16,10 @@ sub send_message {
 	) or die "Cannot connect to TCP socket: $host:$port ($!)";
 
 	my %payload = %{$args};
-	my $command = delete $payload{command};
+	$payload{data_home} = $ENV{BLIPTOWN_DATA_HOME};
 	$payload{blob} = b64_encode(delete $payload{blob}) if defined $payload{blob};
 
-	my $req_json = encode_json({ command => $command, payload => \%payload });
+	my $req_json = encode_json(\%payload);
 	my $res_json = '';
 
 	$client->send($req_json)	or die "Cannot send data to socket ($!)";
