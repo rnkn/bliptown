@@ -25,7 +25,7 @@ sub new_file {
 			filename => $dir_path->to_string,
 		});
 		return $c->reply->exception($res->{error}) if $res->{error};
-		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+		$c->log->debug($res->{info});
 	}
 
 	my $path = path($dir_path, "$basename.$ext");
@@ -38,7 +38,7 @@ sub new_file {
 		content => $content,
 	});
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	return $c->redirect_to($redirect);
 }
@@ -145,7 +145,7 @@ sub new_directory {
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	$c->flash(info => "Created directory $name");
 	return $c->redirect_to($redirect);
@@ -192,7 +192,7 @@ sub rename_files {
 		filenames => \@rename_pairs,
 	});
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	my $count = scalar @rename_pairs;
 	my $message = $count > 1 ? "$count files renamed" : "$count file renamed";
@@ -229,7 +229,7 @@ sub delete_files {
 		filenames => \@filenames_abs,
 	});
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	my $count = @filenames_abs;
 	my $message = $count > 1 ? "$count files deleted" : "$count file deleted";
@@ -252,7 +252,7 @@ sub backup_file {
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	$c->flash(info => "File ${filename}~ created");
 	return $c->redirect_to($redirect);
@@ -285,7 +285,7 @@ sub upload_files {
 			blob => $blob,
 		});
 		return $c->reply->exception($res->{error}) if $res->{error};
-		$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+		$c->log->debug($res->{info});
 
 		if ($c->app->mode eq 'production') {
 			my $res = $c->file->purge_cdn_file({
@@ -323,6 +323,7 @@ sub download_site {
 				filenames => [ $filename ],
 			});
 			return $c->log->error($res->{error}) if $res->{error};
+			$c->log->debug($res->{info});
 		});
 
 	return $c->reply->asset($asset);

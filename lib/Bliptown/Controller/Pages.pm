@@ -300,7 +300,7 @@ sub save_page {
 		create_backup => $backup,
 	});
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	if ($action eq 'save') {
 		return $c->redirect_to($c->url_for('edit_page', catchall => $slug));

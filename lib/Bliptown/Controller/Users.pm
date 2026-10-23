@@ -54,7 +54,7 @@ sub user_join {
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	return $c->redirect_to($redirect);
 }
