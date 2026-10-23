@@ -31,14 +31,15 @@ sub startup {
 
 	$app->config(
 		reverse_proxy => $app->mode eq 'production' ? 1 : 0,
-		log_priority => {
-			trace	=> 'local0.debug',
-			debug	=> 'local0.debug',
-			info	=> 'local0.info',
-			warn	=> 'local0.warning',
-			error	=> 'local0.err',
-			fatal	=> 'local0.crit',
+		app_log_priority => {
+			trace	=> 'local1.debug',
+			debug	=> 'local1.debug',
+			info	=> 'local1.info',
+			warn	=> 'local1.warning',
+			error	=> 'local1.err',
+			fatal	=> 'local1.crit',
 		},
+		visitor_log_priority => 'local2.info',
 		render_exts => [ qw(md html css txt js) ],
 		cdn_exts => {
 			eot		=> 1,
@@ -98,7 +99,7 @@ sub startup {
 				my ($log, $level, @lines) = @_;
 				my $pipe = $log_pipe{$level} //= do {
 					my $logger = IO::Pipe->new;
-					$logger->writer('/usr/bin/logger', '-t', 'bliptown', '-p', $app->config->{log_priority}->{$level});
+					$logger->writer('/usr/bin/logger', '-t', 'bliptown', '-p', $app->config->{app_log_priority}->{$level});
 					$logger->autoflush(1);
 					$logger;
 				};
@@ -412,7 +413,7 @@ EOF
 		visitor_log => sub {
 			$visitor_log //= do {
 				my $logger = IO::Pipe->new;
-				$logger->writer('/usr/bin/logger', '-t', 'bliptown-visitor', '-p', 'local1.info');
+				$logger->writer('/usr/bin/logger', '-t', 'bliptown-visitor', '-p', $app->config->{visitor_log_priority});
 				$logger->autoflush(1);
 				Mojo::Log->new(
 					level => 'info',
