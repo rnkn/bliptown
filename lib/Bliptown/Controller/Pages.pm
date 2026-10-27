@@ -295,7 +295,7 @@ sub save_page {
 	my $res = $c->ipc->send_message({
 		command => 'update_file',
 		system_user => $username,
-		filename => $path->to_string,
+		filenames => [ $path->to_string ],
 		content => $content,
 		create_backup => $backup,
 	});

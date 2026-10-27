@@ -22,7 +22,7 @@ sub new_file {
 		my $res = $c->ipc->send_message({
 			command => 'make_directory',
 			system_user => $username,
-			filename => $dir_path->to_string,
+			filenames => [ $dir_path->to_string ],
 		});
 		return $c->reply->exception($res->{error}) if $res->{error};
 		$c->log->debug($res->{info});
@@ -34,7 +34,7 @@ sub new_file {
 	my $res = $c->ipc->send_message({
 		command => 'update_file',
 		system_user => $username,
-		filename => $path->to_string,
+		filenames => [ $path->to_string ],
 		content => $content,
 	});
 	return $c->reply->exception($res->{error}) if $res->{error};
@@ -141,7 +141,7 @@ sub new_directory {
 	my $res = $c->ipc->send_message({
 		command => 'make_directory',
 		system_user => $username,
-		filename => $path->to_string,
+		filenames => [ $path->to_string ],
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
@@ -248,7 +248,7 @@ sub backup_file {
 	my $res = $c->ipc->send_message({
 		command => 'backup_file',
 		system_user => $username,
-		filename => $path->to_string,
+		filenames => [ $path->to_string ],
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
@@ -281,7 +281,7 @@ sub upload_files {
 		my $res = $c->ipc->send_message({
 			command => 'write_blob',
 			system_user => $username,
-			filename => $path->to_abs->to_string,
+			filenames => [ $path->to_abs->to_string ],
 			blob => $blob,
 		});
 		return $c->reply->exception($res->{error}) if $res->{error};

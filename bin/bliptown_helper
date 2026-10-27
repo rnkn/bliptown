@@ -24,7 +24,7 @@ sub chdir_site {
 sub write_blob {
 	my $payload = shift;
 	my $home = chdir_site($payload);
-	my $filename = $payload->{filename};
+	my $filename = $payload->{filenames}->[0];
 	my $b64_encoded = $payload->{blob};
 	my $blob = b64_decode($b64_encoded);
 	my $path = path($filename);
@@ -36,8 +36,7 @@ sub write_blob {
 
 sub backup_file {
 	my $payload = shift;
-	my $home = chdir_site($payload);
-	my $filename = $payload->{filename};
+	my $filename = $payload->{filenames}->[0];
 	my $path = path $filename;
 	$path->copy_to("${filename}~") or die "Cannot backup file: $path ($!)";
 	return "Created backup file: ${filename}~"
@@ -45,8 +44,7 @@ sub backup_file {
 
 sub update_file {
 	my $payload = shift;
-	my $home = chdir_site($payload);
-	my $filename = $payload->{filename};
+	my $filename = $payload->{filenames}->[0];
 	my $content = $payload->{content};
 	my $path = path $filename;
 	my $dir = $path->dirname;
@@ -102,7 +100,7 @@ sub delete_files {
 sub make_directory {
 	my $payload = shift;
 	my $home = chdir_site($payload);
-	my $dir = $payload->{filename};
+	my $dir = $payload->{filenames}->[0];
 	path($dir)->make_path or die "Cannot create directory: $dir ($!)";
 	return "Created directory: $dir";
 }
@@ -121,12 +119,12 @@ sub download_site {
 }
 
 my %allowed_commands = (
-	write_blob		=> { func => \&write_blob,		fields => [qw(system_user filename blob)] },
-	update_file		=> { func => \&update_file,		fields => [qw(system_user filename content)] },
+	write_blob		=> { func => \&write_blob,		fields => [qw(system_user filenames blob)] },
+	update_file		=> { func => \&update_file,		fields => [qw(system_user filenames content)] },
 	rename_files	=> { func => \&rename_files,	fields => [qw(system_user filenames)] },
 	delete_files	=> { func => \&delete_files,	fields => [qw(system_user filenames)] },
-	backup_file		=> { func => \&backup_file,		fields => [qw(system_user filename)] },
-	make_directory	=> { func => \&make_directory,	fields => [qw(system_user filename)] },
+	backup_file		=> { func => \&backup_file,		fields => [qw(system_user filenames)] },
+	make_directory	=> { func => \&make_directory,	fields => [qw(system_user filenames)] },
 	download_site	=> { func => \&download_site,	fields => [qw(system_user)] },
 );
 
