@@ -8,11 +8,11 @@ use Text::Glob qw(glob_to_regex_string);
 sub new_file {
 	my $c = shift;
 	my $username = $c->session('username');
-	my $name = $c->param('name');
+	my $filename = $c->param('name');
 	my $ext = $c->param('ext');
 	my $dir = $c->param('dir');
-	my $basename = path($name)->basename;
-	my $dir_path = path($dir, $name)->dirname // '';
+	my $basename = path($filename)->basename;
+	my $dir_path = path($dir, $filename)->dirname // '';
 	my $redirect = $c->param('back_to') // $c->url_for('list_files');
 
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->to_abs;
@@ -131,9 +131,9 @@ sub list_files {
 sub new_directory {
 	my $c = shift;
 	my $dir = $c->param('dir') // '';
-	my $name = $c->param('name');
+	my $dirname = $c->param('name');
 	my $username = $c->session('username');
-	my $rel_path = path($dir, $name);
+	my $rel_path = path($dir, $dirname);
 	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $rel_path)->to_abs;
 	my $redirect = $c->url_for('list_files', catchall => $rel_path);
 	return $c->redirect_to($redirect) if -d $path;
@@ -147,7 +147,7 @@ sub new_directory {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info});
 
-	$c->flash(info => "Created directory $name");
+	$c->flash(info => "Created directory $dirname");
 	return $c->redirect_to($redirect);
 }
 
