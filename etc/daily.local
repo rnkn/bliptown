@@ -38,7 +38,6 @@ renew_cert() {
 	else
 		export UACME_CHALLENGE_PATH=/var/www/challenge
 		hook=/usr/pkg/libexec/uacme/uacme.sh
-		subdomain="www.$domain"
 	fi
 	/usr/pkg/bin/uacme -c /etc/ssl -h "$hook" issue "$domain" "$subdomain"
 	case $? in
