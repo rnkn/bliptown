@@ -203,10 +203,10 @@ sub user_logout {
 	return $c->redirect_to('/') unless $host;
 	$host =~ s/^www\.//;
 
-	$c->session(expires => 1) if $c->session('username');
-
 	my $username = $c->session('username') || $c->get_req_username;
 	return $c->redirect_to('/') unless $username;
+
+	$c->session(expires => 1);
 
 	my $next_host;
 	if ($host ne "$username.$ENV{BLIPTOWN_DOMAIN}" && $host ne $ENV{BLIPTOWN_DOMAIN}) {
