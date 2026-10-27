@@ -320,7 +320,6 @@ EOF
 			unless ($path) {
 				my $host = $c->req->url->to_abs->host;
 				return unless $host;
-				$host =~ s/^www\.//;
 				if ($host =~ /(?:^|\.)\Q$ENV{BLIPTOWN_DOMAIN}\E$/ || $host eq 'localhost') {
 					my @host_parts = split(/\./, $host);
 					my $username = @host_parts >= 3 ? $host_parts[-3] : 'mayor';
@@ -351,15 +350,13 @@ EOF
 	);
 
 	$app->helper(
-		get_user_custom_domain => sub {
+		get_user_custom_domains => sub {
 			my ($c, $username) = @_;
 			my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
-			if (-f $path) {
-				my $domain = $c->util->read_file_line($path) // '';
-				my $domain_re = qr/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-				return $domain if $domain =~ $domain_re;
-			}
-			return;
+			return unless -f $path;
+			my $domain_re = qr/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+			my @domains = grep { $_ =~ $domain_re } split("\n", $path->slurp);
+			return @domains;
 		}
 	);
 
@@ -459,13 +456,30 @@ EOF
 	);
 
 	$app->hook(
+		before_dispatch => sub {
+			my $c = shift;
+			my $req_url = $c->req->url->to_abs;
+			my $host = $req_url->host;
+			return unless $host;
+			return if $host =~ /(?:^|\.)\Q$ENV{BLIPTOWN_DOMAIN}\E$/;
+			return if $host eq 'localhost';
+			my $username = $c->get_req_username;
+			return unless $username;
+			my @domains = $c->get_user_custom_domains($username);
+			return unless grep { $_ eq $host } @domains;
+			return if $host eq $domains[0];
+			my $url = $req_url->host($domains[0]);
+			$c->redirect_to($url);
+			return;
+		}
+	);
+
+	$app->hook(
 		before_routes => sub {
 			my $c = shift;
 			my $req_url = $c->req->url->to_abs;
 			my $host = $req_url->host;
 			return unless $host;
-
-			$host =~s/^www\.//;
 
 			if ($host eq "cdn-origin.$ENV{BLIPTOWN_DOMAIN}") {
 				my $req_username = shift @{$req_url->path->parts};
@@ -534,7 +548,8 @@ EOF
 			return $c->redirect_to('/');
 		}
 
-		my $host = $c->get_user_custom_domain($username) // "$username.$ENV{BLIPTOWN_DOMAIN}";
+		my @custom_domains = $c->get_user_custom_domains($username);
+		my $host = @custom_domains ? $custom_domains[0] : "$username.$ENV{BLIPTOWN_DOMAIN}";
 		my $url = $c->util->create_bliptown_url({
 			host => $host,
 		});
