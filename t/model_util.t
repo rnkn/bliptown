@@ -143,7 +143,7 @@ subtest 'create_bliptown_url defaults from env' => sub {
 };
 
 subtest 'read_file_line' => sub {
-	my $file = $user_path->child('_domain.txt');
+	my $file = $user_path->child('_domains.txt');
 	$file->spew("alice.example.com\nsecond line\n");
 	is $util->read_file_line($file), 'alice.example.com', 'read_file_line returns trimmed first line';
 };

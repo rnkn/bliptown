@@ -78,7 +78,7 @@ $username  = 'bob';
 my $custom_domain = 'mydomain.org';
 
 my $user_home = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
-$user_home->child('_domain.txt')->spew($custom_domain);
+$user_home->child('_domains.txt')->spew($custom_domain);
 my $domain_home = path($ENV{BLIPTOWN_DATA_HOME}, 'domains')->make_path;
 symlink $user_home->to_string, $domain_home->child($custom_domain)->to_string;
 

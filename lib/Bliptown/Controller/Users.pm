@@ -104,7 +104,7 @@ sub generate_login {
 	my $email = $user->{email};
 	return $c->reply->exception("No email associated with username $username") unless $email;
 
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domains.txt');
 	my $custom_domain = -f $path ? $c->util->read_file_line($path) : '';
 
 	$c->email->send_magic_link({

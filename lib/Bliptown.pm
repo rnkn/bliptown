@@ -352,7 +352,7 @@ EOF
 	$app->helper(
 		get_user_custom_domains => sub {
 			my ($c, $username) = @_;
-			my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domain.txt');
+			my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, '_domains.txt');
 			return unless -f $path;
 			my $domain_re = qr/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 			my @domains = grep { $_ =~ $domain_re } split("\n", $path->slurp);

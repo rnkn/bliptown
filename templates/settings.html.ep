@@ -25,7 +25,7 @@
 				</li>
 				<li class="row">
 					<span>
-						<a href="<%= url_for('edit_page', catchall => '_domain.txt' )->query(back_to => url_for)%>">Custom domain</a>
+						<a href="<%= url_for('edit_page', catchall => '_domains.txt' )->query(back_to => url_for)%>">Custom domain</a>
 						<a href="https://blip.town/faq/custom_domain" target="_blank" class="help-q">?</a>
 					</span>
 				</li>
