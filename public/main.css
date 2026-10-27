@@ -525,6 +525,10 @@ textarea {
 
 /* Backstage */
 
+.backstage header {
+	font-size: 1.5rem;
+}
+
 main.backstage a {
 	border-bottom: 1px solid transparent;
 }
