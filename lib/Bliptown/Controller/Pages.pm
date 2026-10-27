@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Controller';
 use YAML::Tiny;
 use Mojo::DOM;
 use Mojo::File qw(path);
-use Mojo::Util qw(url_unescape);
+use Mojo::Util qw(url_unescape decode);
 use Text::Glob qw(glob_to_regex_string);
 use List::Util qw(any);
 
@@ -246,6 +246,7 @@ sub edit_page {
 	my $ext = $c->param('ext') || $path->extname || 'md';
 	return $c->reply->not_found unless grep { $ext eq $_} @{$c->app->config->{render_exts}};
 	my $rel_filename = $path->to_rel($user_path)->to_string;
+	$rel_filename = decode('UTF-8', $rel_filename);
 	my $basename = $rel_filename =~ s/\.[^.]+?$//r;
 	my $content;
 	my @includes;
