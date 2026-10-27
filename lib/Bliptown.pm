@@ -473,7 +473,7 @@ EOF
 				my $slug = join '/', @{$req_url->path->parts};
 				my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $req_username, $slug);
 				if (-f $path) {
-					my $max_age = 30 * 24 * 60 * 60;
+					my $max_age = 365 * 24 * 60 * 60;
 					$c->res->headers->cache_control("public, must-revalidate, max-age=$max_age");
 					return $c->reply->file($path);
 				}
