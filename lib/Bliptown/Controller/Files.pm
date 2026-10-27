@@ -1,7 +1,7 @@
 package Bliptown::Controller::Files;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::File qw(path);
-use Mojo::Util qw(decode);
+use Mojo::Util qw(encode decode);
 use POSIX qw(strftime);
 use Text::Glob qw(glob_to_regex_string);
 
@@ -51,7 +51,7 @@ sub list_files {
 	my $dir = $c->param('catchall') // '';
 	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $dir_path = $dir ? path($user_path, $dir) : $user_path;
+	my $dir_path = $dir ? path($user_path, encode('UTF-8', $dir)) : $user_path;
 	return $c->reply->not_found unless -d $dir_path;
 
 	my $search_re = glob_to_regex_string($search) if $search;
