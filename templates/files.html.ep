@@ -52,13 +52,13 @@
 <main id="files" class="backstage">
 	<section class="one-column">
 		<div id="breadcrumbs">
-			<input type="checkbox" id="current-directory-controls-toggle" hidden>
 			<span class="directories">
 				<a href="<%= url_for('list_files', catchall => '') %>">home</a> /
 				% foreach my $crumb (@$breadcrumbs) {
 				<a href="<%= url_for('list_files', catchall => $crumb->{dirnames}) %>"><%= $crumb->{dirname} %></a> /
 			</span>
 			% }
+			<input type="checkbox" id="current-directory-controls-toggle" hidden>
 			<label id="current-directory-controls-toggle" for="current-directory-controls-toggle">+</label>
 			<div id="current-directory-controls" class="controls">
 				<button popovertarget="new-file-popover">New File</button>
