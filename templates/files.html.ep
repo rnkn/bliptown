@@ -84,6 +84,7 @@
 				</dialog>
 				<button popovertarget="upload-popover">Upload Files</button>
 				<dialog id="upload-popover" class="modal" popover>
+					<div>You can drag files onto the button.</div>
 					<form id="upload" method="POST" action="<%= url_for('upload_files')->query(dir => $dir, back_to => url_for) %>" enctype="multipart/form-data">
 						<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 						<input type="file" accept="text/*,image/*,audio/*,video/*,font/*,application/pdf,application/zip,application/gzip"
