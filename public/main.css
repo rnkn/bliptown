@@ -626,6 +626,11 @@ dialog#toast p {
 	padding: 2px 4px;
 }
 
+#list details summary.row {
+	font-family: monospace;
+	font-size: 0.9em;
+}
+
 #list details:hover, #list details[open] {
 	background-color: var(--controls-color);
 }
@@ -740,6 +745,11 @@ nav #file-controls #additional-controls a:hover {
 	background-color: inherit;
 	border-bottom: 1px solid;
 	padding: var(--controls-gap);
+}
+
+#files #breadcrumbs .directories {
+	font-family: monospace;
+	font-size: 0.9em;
 }
 
 #files #breadcrumbs #current-directory-controls {
