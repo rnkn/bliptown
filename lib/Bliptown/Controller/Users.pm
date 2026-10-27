@@ -185,10 +185,11 @@ sub generate_logout {
 
 	$c->session(expires => 1);
 
-	my $custom_domain = $c->get_user_custom_domain($username);
+	my @custom_domains = $c->get_user_custom_domains($username);
+	my $host = @custom_domains ? $custom_domains[0] : "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 	my $url = $c->util->create_bliptown_url({
-		host => $custom_domain || "$username.$ENV{BLIPTOWN_DOMAIN}",
+		host => $host,
 		path => $c->url_for('user_logout'),
 	});
 
