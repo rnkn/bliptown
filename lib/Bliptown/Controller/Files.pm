@@ -51,19 +51,21 @@ sub list_files {
 	my $dir = $c->param('catchall') // '';
 	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
-	my $dir_path = $dir ? path($user_path, encode('UTF-8', $dir)) : $user_path;
+	my $dir_path = $dir ? path($user_path, $dir) : $user_path;
+	my $dir_path_utf8 = $dir ? path($user_path, encode('UTF-8', $dir)) : $user_path;
 	return $c->reply->not_found unless -d $dir_path;
 
 	my $search_re = glob_to_regex_string($search) if $search;
 
 	my @files;
 	my $max_depth = $search_re ? undef : 1;
-	my @tree = $dir_path->list_tree({ dir => 1, max_depth => $max_depth })->each;
-	foreach my $path (@tree) {
+	my @tree = $dir_path_utf8->list_tree({ dir => 1, max_depth => $max_depth })->each;
+	foreach my $path_utf8 (@tree) {
+		my $path = path(decode('UTF-8', $path_utf8));
 		my $stats = $path->stat;
-		my $filename = decode('UTF-8', $path->to_string);
-		my $filename_rel_user_path = decode('UTF-8', $path->to_rel($user_path)->to_string);
-		my $filename_rel_dir_path = decode('UTF-8', $path->to_rel($dir_path)->to_string);
+		my $filename = $path->to_string;
+		my $filename_rel_user_path = $path->to_rel($user_path)->to_string;
+		my $filename_rel_dir_path = $path->to_rel($dir_path)->to_string;
 		my $is_dir = -d $filename;
 		my $exts_re = join '|', @{$c->app->config->{render_exts}};
 		my $url = $filename_rel_user_path =~ s/\.($exts_re)$//r;
@@ -164,9 +166,11 @@ sub rename_files {
 	my $dir_path = path($user_path, $dir);
 	return $c->reply->not_found unless -d $dir_path;
 
+	my $dir_path_utf8 = path($user_path, encode('UTF-8', $dir));
+
 	my $search_re = glob_to_regex_string($old);
-	my @tree = $dir_path->list_tree({ dir => 1 })->each;
-	my @old_rel_paths = grep { /$search_re/ } map { $_->to_rel($dir_path)->to_string } @tree;
+	my @tree = $dir_path_utf8->list_tree({ dir => 1 })->each;
+	my @old_rel_paths = grep { /$search_re/ } map { decode('UTF-8', $_->to_rel($dir_path_utf8)) } @tree;
 	return $c->reply->not_found unless @old_rel_paths;
 
 	my @rename_pairs;
@@ -212,9 +216,11 @@ sub delete_files {
 	my $dir_path = path($user_path, $dir);
 	return $c->reply->not_found unless -d $dir_path;
 
+	my $dir_path_utf8 = path($user_path, encode('UTF-8', $dir));
+
 	my $search_re = glob_to_regex_string($filenames);
-	my @tree = $dir_path->list_tree({ dir => 1 })->each;
-	my @rel_paths = grep { /$search_re/ } map { $_->to_rel($dir_path)->to_string } @tree;
+	my @tree = $dir_path_utf8->list_tree({ dir => 1 })->each;
+	my @rel_paths = grep { /$search_re/ } map { decode('UTF-8', $_->to_rel($dir_path_utf8)) } @tree;
 	return $c->reply->not_found unless @rel_paths;
 
 	my @filenames_abs;
