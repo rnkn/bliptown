@@ -13,44 +13,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-renew_cert() {
-	domain=$1
-	wildcard=${2:-false}
-	test -n "$domain" || return 1
-	ok=true
-
-	if $production; then
-	expected_A_record=46.225.163.173
-	expected_AAAA_record=2a01:4f8:1c19:6498::1
-	elif $staging; then
-	expected_A_record=77.42.77.0
-	expected_AAAA_record=2a01:4f9:c013:4744::1
-	fi
-
-	echo -n "$domain... "
-	$ok && test "$(dig "$domain" A    +short)" = "$expected_A_record"    || ok=false
-	$ok && test "$(dig "$domain" AAAA +short)" = "$expected_AAAA_record" || ok=false
-	$ok || { echo "failed" >&2; return 1; }
-
-	if $wildcard; then
-		hook=/usr/local/www/bliptown/bin/nsupdate.sh
-		subdomain="*.$domain"
-	else
-		export UACME_CHALLENGE_PATH=/var/www/challenge
-		hook=/usr/pkg/libexec/uacme/uacme.sh
-	fi
-	/usr/pkg/bin/uacme -c /etc/ssl -h "$hook" issue "$domain" "$subdomain"
-	case $? in
-		(0)		echo "issued new certificate" ;;
-		(1)		echo "still current" ;;
-		(2)		echo "failed" ;;
-	esac
-
-	chown -R :nginx "/etc/ssl/private/${domain}"
-	chmod -R g+r "/etc/ssl/private/${domain}"
-	chmod g+x "/etc/ssl/private/${domain}"
-}
-
 backup() {
 	ok=true
 	checksum_dir=/root/dump_checksums
@@ -133,18 +95,6 @@ if $staging; then
 	$ok && echo "Done" || echo "Failed"
 echo
 fi
-
-echo "Renewing certificates:"
-if $production; then
-	renew_cert blip.town true
-
-	ls /home/bliptown/domains | while read -r domain; do
-		renew_cert $domain
-	done
-elif $staging; then
-	renew_cert staging-blip.town true
-fi
-echo
 
 echo "Expunging database dead tokens:"
 ok=true
