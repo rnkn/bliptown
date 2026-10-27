@@ -105,11 +105,11 @@ sub list_files {
 		my @breadcrumb_dirs = @{$dir_path->to_rel($user_path)};
 
 		while (@breadcrumb_dirs) {
-			my $path_to_string = join '/', @breadcrumb_dirs;
+			my $dirnames = join '/', @breadcrumb_dirs;
 			my $dirname = pop @breadcrumb_dirs;
 			my %crumb = (
 				dirname => $dirname,
-				path => $path_to_string,
+				dirnames => $dirnames,
 			);
 			push @breadcrumbs, \%crumb;
 		}

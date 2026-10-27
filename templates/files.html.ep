@@ -53,9 +53,11 @@
 	<section class="one-column">
 		<div id="breadcrumbs">
 			<input type="checkbox" id="current-directory-controls-toggle" hidden>
-			<a href="<%= url_for('list_files', catchall => '') %>">home</a> /
-			% foreach my $crumb (@$breadcrumbs) {
-			<a href="<%= url_for('list_files', catchall => $crumb->{path}) %>"><%= $crumb->{dirname} %></a> /
+			<span class="directories">
+				<a href="<%= url_for('list_files', catchall => '') %>">home</a> /
+				% foreach my $crumb (@$breadcrumbs) {
+				<a href="<%= url_for('list_files', catchall => $crumb->{dirnames}) %>"><%= $crumb->{dirname} %></a> /
+			</span>
 			% }
 			<label id="current-directory-controls-toggle" for="current-directory-controls-toggle">+</label>
 			<div id="current-directory-controls" class="controls">
