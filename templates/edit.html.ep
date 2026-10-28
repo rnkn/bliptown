@@ -39,7 +39,7 @@
 				<button type="submit" name="action" value="save">Save</button>
 				<button type="submit" name="action" value="save-exit">Save & Exit</button>
 				<a href="<%= param('back_to') || '/' %>">Cancel</a>
-				<a href="https://blip.town/faq/editing" class="help-q">?</a>
+				<a href="https://blip.town/faq/editing" target="_blank" class="help-q">?</a>
 			</div>
 		</form>
 	</section>
