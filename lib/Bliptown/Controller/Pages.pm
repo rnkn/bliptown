@@ -283,9 +283,9 @@ sub save_page {
 	my $slug = $c->param('slug');
 	$slug =~ s{^/}{};
 	my $ext = $c->param('ext');
-	my $action = $c->param('action');
 	my $path = path($user_path, "$slug.$ext");
 	my $content = $c->param('content');
+	my $redirect = $c->param('back_to');
 	$content =~ s/\r\n/\n/g;
 
 	my $user_rec = $c->user->read_user({
@@ -304,12 +304,7 @@ sub save_page {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info});
 
-	if ($action eq 'save') {
-		return $c->redirect_to($c->url_for('edit_page', catchall => $slug));
-	}
-	elsif ($action eq 'save-exit') {
-		return $c->redirect_to($c->url_for('render_page', catchall => $slug));
-	}
+	return $c->redirect_to($c->url_for('edit_page', catchall => $slug)->query(back_to => $redirect));
 }
 
 sub render_raw {
