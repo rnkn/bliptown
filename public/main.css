@@ -537,13 +537,21 @@ main.backstage a:hover {
 	border-bottom-color: currentcolor;
 }
 
-a.exit {
+.backstage a.exit, .backstage a.view-page {
 	font-size: 0.9em;
 	border: none;
 }
 
-a.exit:before {
+.backstage a.exit:before {
 	content: "\2190\00A0";
+}
+
+.backstage a.view-page {
+	margin-left: auto;
+}
+
+.backstage a.view-page:after {
+	content: "\00A0\2192";
 }
 
 /* Dialogs */
@@ -597,6 +605,12 @@ dialog#toast p {
 }
 
 /* Edit */
+
+#edit form #filename, #edit form #controls {
+	display: flex;
+	gap: var(--controls-gap);
+	align-items: baseline;
+}
 
 #edit form #filename input {
 	width: var(--text-input-width);

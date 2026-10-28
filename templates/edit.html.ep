@@ -1,14 +1,7 @@
 % layout 'default';
 <nav class="backstage">
 	<header>
-		<h1>
-			% if (current_route eq 'new_page') {
-			<%= $page_title %>
-			% } elsif (current_route eq 'edit_page') {
-			<%= $page_title %>
-			<a href="/<%= $slug %>"><%= $slug %></a>
-			% }
-		</h1>
+		<h1><%= $page_title %></h1>
 	</header>
 	<menu>
 		<ul>
@@ -28,6 +21,9 @@
 					<option value="<%= $render_ext %>" <%= 'selected' if $ext eq $render_ext %>><%= ".$render_ext" %></option>
 					% }
 				</select>
+				% if (current_route eq 'edit_page') {
+				<a class="view-page" href="/<%= $slug %>" target="_blank">View Page</a>
+				% }
 			</div>
 			<textarea id="content" name="content"><%= $content %></textarea>
 			% if (@$includes) {
