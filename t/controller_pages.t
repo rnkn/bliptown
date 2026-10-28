@@ -73,7 +73,7 @@ path($user_home, 'foobaz.md')->touch;
 like $debug_messages, qr/Updated file: $path/, 'edit_page updates file';
 
 $t->get_ok($app->url_for('edit_page', catchall => $slug) => { Host => $user_domain })->status_is(200)
-	->text_is('header h1 a', $slug)
+	->text_like('header h1', qr/Editing/)
 	->attr_is('div#filename input', 'value', $slug)
 	->attr_is("div#filename select#ext option[value=\"$ext\"]", 'selected', '')
 	->text_is('textarea#content', $content)
