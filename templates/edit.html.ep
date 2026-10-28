@@ -1,5 +1,5 @@
 % layout 'default';
-<nav>
+<nav class="backstage">
 	<header>
 		<h1>
 			% if (current_route eq 'new_page') {

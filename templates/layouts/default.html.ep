@@ -26,7 +26,7 @@
 		<input type="radio" id="drawer-switch-join" name="drawer-switch" hidden>
 		<input type="radio" id="drawer-switch-login" name="drawer-switch" hidden checked>
 		<input type="checkbox" id="drawer-toggle" hidden>
-		<div id="drawer">
+		<div id="drawer" class="backstage">
 			% if ($username) {
 			<div id="user" class="panel">
 				<ul>

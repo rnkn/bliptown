@@ -9,7 +9,7 @@
 %	mobile => 'Device',
 %	country => 'Country',
 % );
-<nav>
+<nav class="backstage">
 	<header>
 		<h1><%= $page_title %></h1>
 	</header>

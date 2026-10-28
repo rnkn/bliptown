@@ -1,6 +1,6 @@
 % layout 'default';
 % my $disabled = $locked ? 'disabled' : '';
-<nav>
+<nav class="backstage">
 	<header>
 		<h1><%= $page_title %></h1>
 	</header>
