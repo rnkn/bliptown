@@ -160,7 +160,7 @@ sub rename_files {
 	my $old = $c->param('old');
 	return $c->reply->not_found unless $old;
 	my $new = $c->param('new') // '';
-	my $redirect = $c->url_for('list_files')->query(search => $c->param('new'));
+	my $redirect = $c->param('back_to') // $c->url_for('list_files', catchall => $dir)->query(search => $new);
 
 	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
 	my $dir_path = path($user_path, $dir);

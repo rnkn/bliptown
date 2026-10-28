@@ -24,7 +24,7 @@
 			</fieldset>
 			<div id="additional-controls" class="controls">
 				% if (param('search')) {
-				<form id="replace" method="POST" action="<%= url_for('rename_files')->query(dir => $dir, old => param('search'), back_to => url_for->query(search => param('new'))) %>">
+				<form id="replace" method="POST" action="<%= url_for('rename_files')->query(dir => $dir, old => param('search')) %>">
 					<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 					<input type="text" name="new" placeholder="string" value="<%= param('new') %>">
 					<button type="submit">Replace Match in Filenames</button>
