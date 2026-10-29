@@ -191,7 +191,7 @@ nav details summary::before {
 }
 
 main a {
-	border-bottom: 1px solid var(--link-color);
+	border-bottom: 1px solid currentcolor;
 }
 
 main a:has(img) {
