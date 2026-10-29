@@ -2,6 +2,8 @@
 PATH=/usr/local/www/bliptown/bin:/usr/pkg/bin:/usr/pkg/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 export PATH
 
+umask 0077
+
 production=false
 staging=false
 
@@ -83,7 +85,6 @@ if $staging; then
 		rsync -a --delete bliptown@blip.town:$d $d || ok=false
 		chown -Rh bliptown:bliptown $d
 	done
-	chmod -R 600 /var/db/bliptown/backups
 	$ok && echo "Done" || echo "Failed"
 	echo
 
@@ -116,7 +117,6 @@ if $production; then
 	backup_db="/var/db/bliptown/backups/users-${date}.db"
 	sqlite3 /var/db/bliptown/users.db ".backup $backup_db" || ok=false
 	chown bliptown:bliptown "$backup_db"
-	chmod 0600 "$backup_db"
 	$ok && echo "Done" || echo "Failed"
 	echo
 fi
