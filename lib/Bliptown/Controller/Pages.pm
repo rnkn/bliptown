@@ -75,8 +75,8 @@ sub render_page {
 	my $is_cur_user = $username && $username eq $req_username;
 
 	my $slug = url_unescape $c->param('catchall');
-	my $subdir = $c->stash('subdir');
-	$slug = "$subdir/" . $slug if $subdir;
+	my $prefix = $c->stash('prefix');
+	$slug = "$prefix/" . $slug if $prefix;
 
 	my $redirects_path = path($user_path, '_redirects.txt');
 	my $redirect_url = process_redirects($redirects_path, $slug)
@@ -310,8 +310,8 @@ sub save_page {
 sub render_raw {
 	my $c = shift;
 	my $slug = url_unescape $c->param('catchall');
-	my $subdir = $c->stash('subdir');
-	$slug = "$subdir/" . $slug if $subdir;
+	my $prefix = $c->stash('prefix');
+	$slug = "$prefix/" . $slug if $prefix;
 
 	my $path = $c->get_file($slug);
 	return $c->reply->txt_not_found unless $path;

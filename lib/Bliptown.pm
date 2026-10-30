@@ -591,7 +591,7 @@ EOF
 
 	my $private = $protected->under(sub {
 		my $c = shift;
-		$c->stash(subdir => 'private');
+		$c->stash(prefix => 'private');
 		return 1;
 	});
 
