@@ -160,7 +160,6 @@ eval {
 		setuid($uid) or die "Cannot set user: $uid ($!)";
 
 		$private_path->make_path->chmod(0750) or die "Cannot create path: $private_path";
-		$repo_path->make_path->chmod(0750) or die "Cannot create path: $repo_path";
 	}
 
 	$res = $spec->{func}->($payload);
