@@ -16,7 +16,7 @@ my $debug_messages	= $app->log->capture('debug');
 $ENV{BLIPTOWN_DATA_HOME} = tempdir;
 
 my $username	= 'testuser';
-my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path->realpath;
+my $user_path	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path->realpath;
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 $app->hook(before_dispatch => sub {
@@ -26,16 +26,16 @@ $app->hook(before_dispatch => sub {
 });
 
 $t->post_ok($app->url_for('new_directory') => { Host => $user_domain } => form => {
-	dir		=> '',
+	dir			=> '',
 	csrf_token	=> CSRF_TOKEN,
-	name	=> 'fakedir',
+	name		=> 'fakedir',
 })->status_is(302);
-like $debug_messages, qr{Created directory: $user_home/fakedir};
+like $debug_messages, qr{Created directory: $user_path/fakedir};
 
-$user_home->child('foo.md')->touch;
-$user_home->child('bar.md')->touch;
-$user_home->child('subdir')->make_path;
-$user_home->child('subdir/baz.md')->touch;
+$user_path->child('foo.md')->touch;
+$user_path->child('bar.md')->touch;
+$user_path->child('subdir')->make_path;
+$user_path->child('subdir/baz.md')->touch;
 
 $t->get_ok($app->url_for('list_files') => { Host => $user_domain })->status_is(200)
 	->content_like(qr{<a href="/foo">foo.md</a>})
@@ -55,7 +55,7 @@ $t->post_ok($app->url_for('delete_files') => { Host => $user_domain } => form =>
 })->status_is(302);
 like $debug_messages, qr{Deleted:.*/foo\.md};
 
-$user_home->child('foo.md')->remove;
+$user_path->child('foo.md')->remove;
 
 $t->post_ok($app->url_for('rename_files') => { Host => $user_domain } => form => {
 	csrf_token	=> CSRF_TOKEN,
@@ -64,8 +64,8 @@ $t->post_ok($app->url_for('rename_files') => { Host => $user_domain } => form =>
 })->status_is(302);
 like $debug_messages, qr{Renamed file:.*/bar\.md ->.*/qux\.md};
 
-$user_home->child('bar.md')->remove;
-$user_home->child('qux.md')->touch;
+$user_path->child('bar.md')->remove;
+$user_path->child('qux.md')->touch;
 
 $t->post_ok($app->url_for('rename_files') => { Host => $user_domain } => form => {
 	csrf_token	=> CSRF_TOKEN,
@@ -75,8 +75,8 @@ $t->post_ok($app->url_for('rename_files') => { Host => $user_domain } => form =>
 })->status_is(302);
 like $debug_messages, qr{Renamed file:.*/subdir/baz\.md ->.*/subdir/quz\.md};
 
-$user_home->child('subdir/baz.md')->remove;
-$user_home->child('subdir/quz.md')->touch;
+$user_path->child('subdir/baz.md')->remove;
+$user_path->child('subdir/quz.md')->touch;
 
 $t->post_ok($app->url_for('delete_files') => { Host => $user_domain } => form => {
 	csrf_token	=> CSRF_TOKEN,
@@ -85,7 +85,7 @@ $t->post_ok($app->url_for('delete_files') => { Host => $user_domain } => form =>
 like $debug_messages, qr{Deleted:.*/qux\.md};
 like $debug_messages, qr{Deleted:.*/subdir/quz\.md};
 
-$user_home->child('backup_test.md')->touch;
+$user_path->child('backup_test.md')->touch;
 
 $t->post_ok($app->url_for('backup_file') => { Host => $user_domain } => form => {
 	csrf_token	=> CSRF_TOKEN,
