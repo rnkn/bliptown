@@ -853,20 +853,22 @@ nav #file-controls #additional-controls a:hover {
 	text-overflow: ellipsis;
 }
 
-.stats progress {
+progress {
+	margin: var(--controls-gap) 0;
 	appearance: none;
+	width: 100%;
 }
 
-.stats progress::-moz-progress-bar {
+progress::-moz-progress-bar {
 	border: 1px solid var(--border-color);
 	background-color: black;
 }
 
-.stats progress::-webkit-progress-value {
+progress::-webkit-progress-value {
 	background-color: black;
 }
 
-.stats progress::-webkit-progress-bar {
+progress::-webkit-progress-bar {
 	border: 1px solid var(--border-color);
 	background-color: var(--controls-color);
 }

@@ -69,3 +69,24 @@ document.querySelectorAll('.js-clipboard pre').forEach((pre) => {
         button.textContent = 'Copy';
     });
 });
+
+const uploadForm = document.querySelector('#upload');
+
+uploadForm?.addEventListener('submit', (e) => {
+    const files = uploadForm.querySelector('input[type=file]');
+    if (!files.files.length) return;
+
+    e.preventDefault();
+    const progress = uploadForm.querySelector('progress');
+    progress.hidden = false;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open(uploadForm.method, uploadForm.action);
+    xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) progress.value = e.loaded / e.total;
+    });
+    xhr.addEventListener('load', () => {
+        window.location.href = xhr.responseURL;
+    });
+    xhr.send(new FormData(uploadForm));
+});
