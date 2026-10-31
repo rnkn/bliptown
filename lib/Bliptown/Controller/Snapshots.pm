@@ -12,7 +12,7 @@ sub take_snapshot {
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	my $res_hash = $res->{info};
 	if ($res_hash) {
@@ -33,7 +33,7 @@ sub list_snapshots {
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	my $snapshots = $res->{info};
 	$c->stash(
@@ -57,7 +57,7 @@ sub restore_snapshot {
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	my $res_hash = $res->{info};
 	$c->flash(info => "Snapshot $res_hash restored");
@@ -76,7 +76,7 @@ sub download_snapshot {
 	});
 
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	my $filename = $res->{info};
 	my $asset = Mojo::Asset::File->new(path => $filename);
@@ -145,7 +145,7 @@ sub render_diff {
 		hash => $hash,
 	});
 	return $c->reply->exception($res->{error}) if $res->{error};
-	$c->log->debug($res->{info}) unless $c->app->mode eq 'production';
+	$c->log->debug($res->{info});
 
 	my $diff = $res->{info};
 
