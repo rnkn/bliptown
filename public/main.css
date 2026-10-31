@@ -14,6 +14,7 @@
 	--warning-hover-color: rgba(200,0,0,0.3);
 	--drawer-height: 3.5rem;
 	--controls-gap: 0.3em;
+	--monospace-font: "SF Mono", "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", monospace;
 	--text-input-width: 18em;
 	--major-button-width: 9em;
 	--minor-button-width: 6em;
@@ -515,7 +516,7 @@ button:hover, select:hover {
 }
 
 textarea, input {
-	font-family: monospace;
+	font-family: var(--monospace-font);
 	font-size: 14px;
 }
 
@@ -641,7 +642,7 @@ dialog#toast p {
 }
 
 #list details summary.row {
-	font-family: monospace;
+	font-family: var(--monospace-font);
 	font-size: 0.9em;
 }
 
@@ -766,7 +767,7 @@ nav #file-controls #additional-controls a:hover {
 }
 
 #files #breadcrumbs .directories {
-	font-family: monospace;
+	font-family: var(--monospace-font);
 	font-size: 0.9em;
 }
 
