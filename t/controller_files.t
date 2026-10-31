@@ -16,7 +16,7 @@ my $debug_messages	= $app->log->capture('debug');
 $ENV{BLIPTOWN_DATA_HOME} = tempdir;
 
 my $username	= 'testuser';
-my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
+my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path->realpath;
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 $app->hook(before_dispatch => sub {
