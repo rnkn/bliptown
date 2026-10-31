@@ -45,12 +45,10 @@ sub new_file {
 
 sub list_files {
 	my $c = shift;
-	my $username = $c->session('username');
 	my $search = $c->param('search');
 	my $sort = $c->param('sort') // 'name';
 	my $dir = $c->param('catchall') // '';
-	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
-	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $user_path = $c->get_cur_user_path;
 	my $dir_path = $dir ? path($user_path, $dir) : $user_path;
 	my $dir_path_utf8 = $dir ? path($user_path, encode('UTF-8', $dir)) : $user_path;
 	return $c->reply->not_found unless -d $dir_path;
@@ -62,18 +60,22 @@ sub list_files {
 	my @tree = $dir_path_utf8->list_tree({ dir => 1, max_depth => $max_depth })->each;
 	foreach my $path_utf8 (@tree) {
 		my $path = path(decode('UTF-8', $path_utf8));
-		my $stats = $path->stat;
-		my $filename = $path->to_string;
-		my $filename_rel_user_path = $path->to_rel($user_path)->to_string;
-		my $filename_rel_dir_path = $path->to_rel($dir_path)->to_string;
-		my $is_dir = -d $filename;
-		my $exts_re = join '|', @{$c->app->config->{render_exts}};
-		my $url = $filename_rel_user_path =~ s/\.($exts_re)$//r;
+		my $is_link = -l $path;
+		my $is_dir = -d $path;
+		my $stats = $is_link ? $path->lstat : $path->stat;
+		my $path_rel_user_path = $path->to_rel($user_path);
+		my $path_rel_dir_path = $path->to_rel($dir_path);
+		my $link_path_rel_dir_path = $path->realpath->to_rel($dir_path);
+		my $url = $path->realpath->to_rel($user_path);
+		map { $url =~ s/\.$_$// } @{$c->app->config->{render_exts}};
+		$url =~ s/index$//;
 
 		push @files, {
-			abs_filename => $filename_rel_user_path,
-			rel_filename => $filename_rel_dir_path,
+			abs_filename => $path_rel_user_path->to_string,
+			rel_filename => $path_rel_dir_path->to_string,
+			link_filename => $is_link ? $link_path_rel_dir_path->to_string : undef,
 			is_dir => $is_dir,
+			is_link => $is_link,
 			url => $url,
 			size => $stats->size,
 			mtime => $stats->mtime,
@@ -121,7 +123,6 @@ sub list_files {
 	$c->stash(
 		template => 'files',
 		page_title => 'Files',
-		locked => $locked,
 		dir => $dir,
 		redirect => $c->url_for,
 		breadcrumbs => \@breadcrumbs,
