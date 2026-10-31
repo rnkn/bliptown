@@ -756,6 +756,12 @@ nav #file-controls #additional-controls a:hover {
 	border-bottom: 1px solid;
 }
 
+/* Modals */
+
+#upload-progress {
+	margin: var(--controls-gap) 0;
+}
+
 /* Breadcrumbs & Current Directory Controls */
 
 #files #breadcrumbs {
