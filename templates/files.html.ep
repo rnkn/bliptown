@@ -1,5 +1,5 @@
 % layout 'default';
-% my $disabled = $locked ? 'disabled' : '';
+% my $disabled = session('username') eq $ENV{BLIPTOWN_DEMO_USER} ? 'disabled' : '';
 % my $render_exts_re = join '|', @{$c->app->config->{render_exts}};
 <nav class="backstage">
 	<header>
