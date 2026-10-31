@@ -1,5 +1,5 @@
 % layout 'default';
-% my $disabled = $locked ? 'disabled' : '';
+% my $disabled = session('username') eq $ENV{BLIPTOWN_DEMO_USER} ? 'disabled' : '';
 <nav class="backstage">
 	<header>
 		<h1><%= $page_title %></h1>
@@ -41,7 +41,7 @@
 					<input type="checkbox" class="right" id="create-backups" name="create_backups" value="1" <%= 'checked' if $create_backups == 1 %>>
 				</li>
 				<hr>
-				% unless($locked) {
+				% unless($disabled) {
 				<li class="row">
 					<a href="<%= url_for('billing_session')->query(customer_id => $customer_id) %>" target="_blank">Manage subscription and payment details</a>
 				</li>
