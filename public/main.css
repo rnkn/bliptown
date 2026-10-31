@@ -854,7 +854,6 @@ nav #file-controls #additional-controls a:hover {
 }
 
 progress {
-	margin: var(--controls-gap) 0;
 	appearance: none;
 	width: 100%;
 }
