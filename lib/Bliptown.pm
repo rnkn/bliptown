@@ -336,6 +336,17 @@ EOF
 	);
 
 	$app->helper(
+		get_cur_user_path => sub {
+			my $c = shift;
+			my $username = $c->session('username');
+			return unless $username;
+			my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+			return unless -d $path;
+			return $path->realpath;
+		}
+	);
+
+	$app->helper(
 		get_req_username => sub {
 			my $c = shift;
 			my $req_username = $c->stash('req_username');
