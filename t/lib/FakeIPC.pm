@@ -30,9 +30,7 @@ sub send_message {
     });
 
 	my $system_user		= $args->{system_user}	// '';
-	my $filename		= $args->{filename}		// '';
 	my $filenames		= $args->{filenames}	// [];
-	my $new_filename	= $args->{new_filename} // '';
 	my $domain			= $args->{domain}		// '';
 
 	# Only dereference as hashes when the elements are hashes; delete_files
@@ -42,20 +40,12 @@ sub send_message {
 		: '';
 
 	my %responses = (
-		'write_blob'				=> "Wrote file: $filename",
-		'update_file'				=> "Updated file: $filename",
+		'write_blob'				=> "Wrote file: $filenames->[0]",
+		'update_file'				=> "Updated file: $filenames->[0]",
 		'rename_files'				=> $rename_info,
 		'delete_files'				=> 'Deleted: ' . join(', ', @{$filenames}),
-		'backup_file'				=> "Created backup file: $filename~",
-		'make_directory'			=> "Created directory: $filename",
-		'git_commit'				=> $git_log[0]->{hash},
-		'git_log'					=> \@git_log,
-		'git_show'					=> 'commit df783099b67902754eb482aaf01c4eaee922fb33',
-		'git_checkout'				=> $git_log[0]->{hash},
-		'git_archive'				=> '/tmp/tmp.XXXXXX',
-		'provision_cert'			=> "Provisioned certificate: $domain",
-		'update_acme_domains'		=> 'ACME domain list up-to-date',
-		'update_relayd_keypairs'	=> 'relayd keypairs up-to-date',
+		'backup_file'				=> "Created backup file: $filenames->[0]~",
+		'make_directory'			=> "Created directory: $filenames->[0]",
 	);
 
 	my @git_hash_commands = qw(git_show git_checkout git_archive);
