@@ -134,10 +134,11 @@ sub list_files {
 sub new_directory {
 	my $c = shift;
 	my $dir = $c->param('dir') // '';
-	my $dirname = $c->param('name');
+	my $name = $c->param('name');
 	my $username = $c->session('username');
-	my $rel_path = path($dir, $dirname);
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username, $rel_path)->to_abs;
+	my $rel_path = path($dir, $name);
+	my $user_path = $c->get_cur_user_path;
+	my $path = path($user_path, $rel_path)->to_abs;
 	my $redirect = $c->url_for('list_files', catchall => $rel_path);
 	return $c->redirect_to($redirect) if -d $path;
 
@@ -150,7 +151,7 @@ sub new_directory {
 	return $c->reply->exception($res->{error}) if $res->{error};
 	$c->log->debug($res->{info});
 
-	$c->flash(info => "Created directory $dirname");
+	$c->flash(info => "Created directory $name");
 	return $c->redirect_to($redirect);
 }
 
