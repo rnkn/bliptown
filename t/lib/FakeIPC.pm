@@ -30,20 +30,24 @@ sub send_message {
     });
 
 	my $system_user		= $args->{system_user}	// '';
-	my $filenames		= $args->{filenames}	// [];
+	my $filenames		= $args->{filenames}	// [ qw(foo bar baz) ];
 	my $domain			= $args->{domain}		// '';
 
-	# Only dereference as hashes when the elements are hashes; delete_files
-	# sends plain filenames in the same key
-	my $rename_info = $command eq 'rename_files'
-		? join(', ', map { "Renamed file: $_->{old} -> $_->{new}" } @{$filenames})
-		: '';
+	my $rename_res = '';
+	if ($command eq 'rename_files') {
+		$rename_res = join ', ', map { "Renamed file: $_->{old} -> $_->{new}" } @{$filenames};
+	}
+
+	my $delete_res = '';
+	if ($command eq 'delete_files') {
+		$delete_res = join ', ', map { "Deleted file: $_" } @{$filenames};
+	}
 
 	my %responses = (
 		'write_blob'				=> "Wrote file: $filenames->[0]",
 		'update_file'				=> "Updated file: $filenames->[0]",
-		'rename_files'				=> $rename_info,
-		'delete_files'				=> 'Deleted: ' . join(', ', @{$filenames}),
+		'rename_files'				=> $rename_res,
+		'delete_files'				=> $delete_res,
 		'backup_file'				=> "Created backup file: $filenames->[0]~",
 		'make_directory'			=> "Created directory: $filenames->[0]",
 	);

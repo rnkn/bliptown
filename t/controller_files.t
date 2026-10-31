@@ -53,7 +53,7 @@ $t->post_ok($app->url_for('delete_files') => { Host => $user_domain } => form =>
 	csrf_token	=> CSRF_TOKEN,
 	filenames => 'foo.md',
 })->status_is(302);
-like $debug_messages, qr{Deleted:.*/foo\.md};
+like $debug_messages, qr{Deleted file:.*/foo\.md};
 
 $user_path->child('foo.md')->remove;
 
@@ -82,8 +82,8 @@ $t->post_ok($app->url_for('delete_files') => { Host => $user_domain } => form =>
 	csrf_token	=> CSRF_TOKEN,
 	filenames => 'qu',
 })->status_is(302);
-like $debug_messages, qr{Deleted:.*/qux\.md};
-like $debug_messages, qr{Deleted:.*/subdir/quz\.md};
+like $debug_messages, qr{Deleted file:.*/qux\.md};
+like $debug_messages, qr{Deleted file:.*/subdir/quz\.md};
 
 $user_path->child('backup_test.md')->touch;
 
@@ -92,5 +92,33 @@ $t->post_ok($app->url_for('backup_file') => { Host => $user_domain } => form => 
 	filename => 'backup_test.md',
 })->status_is(302);
 like $debug_messages, qr{Created backup file:.*/backup_test\.md~};
+
+# # Filenames with non-ASCII UTF-8 characters (bytes c3 a9) must not break
+# # the listing: list_tree returns raw bytes, so the directory path has to be
+# # a byte string as well, or the name gets double-encoded on stat.
+# $user_path->child('images')->make_path;
+# $user_path->child('images/plain.jpg')->spew('x');
+# $user_path->child("images/caf\xC3\xA9.jpg")->spew('x');
+
+# $t->get_ok($app->url_for('list_files', catchall => 'images') => { Host => $user_domain })
+# 	->status_is(200)
+# 	->content_like(qr{<a href="/images/plain\.jpg">plain\.jpg</a>})
+# 	->content_like(qr{<a href="/images/caf%C3%A9\.jpg">caf\x{E9}\.jpg</a>});
+
+# # Rename and delete by glob must match non-ASCII filenames: the pattern is
+# # decoded characters, so the rel paths have to be decoded before matching.
+# $t->post_ok($app->url_for('rename_files') => { Host => $user_domain } => form => {
+# 	csrf_token	=> CSRF_TOKEN,
+# 	dir		=> 'images',
+# 	old		=> "caf\xC3\xA9.jpg",
+# 	new		=> 'cafe.jpg',
+# })->status_is(302);
+# like $debug_messages, qr{Renamed file:.*caf\x{E9}\.jpg -> .*cafe\.jpg};
+
+# $t->post_ok($app->url_for('delete_files') => { Host => $user_domain } => form => {
+# 	csrf_token	=> CSRF_TOKEN,
+# 	filenames	=> "caf\xC3\xA9.jpg",
+# })->status_is(302);
+# like $debug_messages, qr{Deleted:.*caf\x{E9}\.jpg};
 
 done_testing;

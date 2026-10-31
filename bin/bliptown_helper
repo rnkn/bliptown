@@ -84,7 +84,7 @@ sub delete_files {
 
 	@filenames = sort { length $b <=> length $a } @filenames;
 
-	my @deleted;
+	my @messages;
 	foreach my $filename (@filenames) {
 		if (-d $filename) {
 			path($filename)->remove_tree or die "Cannot delete directory: $filename ($!)";
@@ -92,9 +92,9 @@ sub delete_files {
 		else {
 			path($filename)->remove or die "Cannot delete file: $filename ($!)";
 		}
-		push @deleted, $filename;
+		push @messages, 'Deleted file: ' . $filename;
 	}
-	return 'Deleted: ' . join ', ', @deleted;
+	return join ', ', @messages;
 }
 
 sub make_directory {
