@@ -649,6 +649,10 @@ dialog#toast p {
 	background-color: var(--controls-color);
 }
 
+#list details summary.row .arrow {
+	font-family: initial;
+}
+
 #list details ul.controls {
 	display: flex;
 	gap: var(--controls-gap);
