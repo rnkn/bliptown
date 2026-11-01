@@ -27,8 +27,8 @@ sub purge_cdn_file {
 	$purge_url->query(url => $cdn_url);
 
 	my $ua = Mojo::UserAgent->new;
-	my $res = $ua->post($purge_url => { 'AccessKey' => $ENV{BLIPTOWN_CDN_API_KEY} })->result;
-	return $res;
+	my $tx = $ua->post($purge_url => { 'AccessKey' => $ENV{BLIPTOWN_CDN_API_KEY} });
+	return $tx->res;
 }
 
 return 1;
