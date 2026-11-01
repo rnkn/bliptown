@@ -16,7 +16,6 @@ sub list_settings {
 	my $c = shift;
 	my $username = $c->session('username');
 	return unless $username;
-	my $locked = $username eq $ENV{BLIPTOWN_DEMO_USER} ? 1 : 0;
 	my $user_rec = $c->user->read_user({
 		key => 'username',
 		username => $username
@@ -27,7 +26,7 @@ sub list_settings {
 		unless $email;
 
 	my $customer_id = $user_rec->{customer_id} // '';
-	unless ($customer_id || $locked) {
+	unless ($customer_id) {
 		return $c->reply->exception("User $username customer_id not found");
 	}
 
@@ -36,7 +35,6 @@ sub list_settings {
 	$c->stash(
 		page_title => 'Settings',
 		template => 'settings',
-		locked => $locked,
 		username => $username,
 		email => $email,
 		customer_id => $customer_id,
