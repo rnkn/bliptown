@@ -156,7 +156,7 @@
 					<li>
 						<button popovertarget="delete-popover-<%= $file->{rel_filename} %>">Delete</button>
 						<dialog id="delete-popover-<%= $file->{rel_filename} %>" class="modal" popover>
-							% if ($file->{is_dir}) {
+							% if ($file->{is_dir} && ! $file->{is_link}) {
 							<p>Really delete this directory and all of its contents?</p>
 							<pre><%= $file->{rel_filename} %>/</pre>
 							% } else {
