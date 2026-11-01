@@ -23,7 +23,7 @@ subtest 'read_file' => sub {
 subtest 'purge_cdn_file' => sub {
 	my $path = path($user_path, $filename)->to_abs;
 	my $res = $file->purge_cdn_file({ filename => $path->to_string });
-	ok $res = 404;
+	ok $res->{code} == 200, 'purge_cdn_file returns 200';
 };
 
 done_testing;
