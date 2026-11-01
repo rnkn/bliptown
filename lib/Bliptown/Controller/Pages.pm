@@ -7,24 +7,6 @@ use Mojo::Util qw(url_unescape decode);
 use Text::Glob qw(glob_to_regex_string);
 use List::Util qw(any);
 
-sub process_redirects {
-	my ($path, $slug) = @_;
-	$slug =~ s{^/?}{/};
-	$slug =~ s{/?$}{};
-	my $chars = $path->slurp('UTF-8');
-	my $y = YAML::Tiny->new;
-	my $redirects = eval { $y->read_string($chars)->[0] };
-
-	foreach my $glob (keys %$redirects) {
-		my $re = glob_to_regex_string($glob);
-		if ($slug =~ qr/$re/) {
-			my $url = $redirects->{$glob};
-			return $url;
-		}
-	}
-	return;
-}
-
 sub postprocess_skel {
 	my ($html, $slug) = @_;
 	$slug =~ s{^/?}{/};
