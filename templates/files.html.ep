@@ -107,9 +107,16 @@
 			<details name="files">
 				<summary class="row">
 					<span class="cell name">
-						% if ($file->{is_dir}) {
+						% if ($file->{is_link} && $file->{is_dir}) {
+						<%= $file->{rel_filename} %> <span class="arrow">&rarr;</span> <a href="<%= url_for('list_files', catchall => $file->{link_filename}) %>"><%= $file->{link_filename} %></a>
+						% }
+						% elsif ($file->{is_link}) {
+						<%= $file->{rel_filename} %> <span class="arrow">&rarr;</span> <a href="<%= url_for('render_page', catchall => $file->{url}) %>"><%= $file->{link_filename} %></a>
+						% }
+						% elsif ($file->{is_dir}) {
 						<a href="<%= url_for('list_files', catchall => $file->{abs_filename}) %>"><%= $file->{rel_filename} %></a>/
-						% } else {
+						% }
+						% else {
 						<a href="<%= url_for('render_page', catchall => $file->{url}) %>"><%= $file->{rel_filename} %></a>
 						% }
 					</span>
