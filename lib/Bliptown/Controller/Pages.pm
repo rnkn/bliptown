@@ -70,51 +70,45 @@ sub render_page {
 	my $req_username = $c->get_req_username;
 	return $c->reply->not_found unless $req_username;
 	my $user_path = $c->get_req_user_path;
-	my $username = $c->session('username');
-
-	my $is_cur_user = $username && $username eq $req_username;
+	return $c->reply->not_found unless $user_path;
 
 	my $slug = url_unescape $c->param('catchall');
 	my $prefix = $c->stash('prefix');
 	$slug = "$prefix/" . $slug if $prefix;
 
-	my $redirects_path = path($user_path, '_redirects.txt');
-	my $redirect_url = process_redirects($redirects_path, $slug)
-		if -f $redirects_path;
-	return $c->redirect_to($redirect_url) if $redirect_url;
-
-	my $file = $c->get_file($slug, 1);
-
-	if ($file && (my $ext = $file->extname)) {
-		my $cached = $c->app->config->{cdn_exts}->{$ext};
-		if ($c->app->mode eq 'production' && $cached) {
+	my $raw = path($user_path, $slug)->to_abs;
+	if (-f $raw && -r $raw && index($raw->realpath->to_abs, $user_path) == 0) {
+		my $ext = $raw->extname;
+		if ($ext && $c->app->config->{cdn_exts}->{$ext} && $c->app->mode eq 'production') {
 			return $c->redirect_to("https://cdn.blip.town/$req_username/$slug");
 		}
-		return $c->reply->file($file);
+		return $c->reply->file($raw);
 	}
 
-	if (!$slug || $slug =~ m{/$}) {
-		$file = $c->get_file("$slug/index");
-		if (!$file) {
-			$slug =~ s{/$}{};
-			$file = $c->get_file($slug);
-			return $c->redirect_to('render_page', catchall => $slug) if $file;
-		}
+	my $defaults_path = path($c->app->static->paths->[0], 'defaults')->to_abs;
+	my $fallback_path = path($defaults_path, $slug)->to_abs;
+	if (-f $fallback_path && -r $fallback_path) {
+		return unless index($fallback_path->realpath, $defaults_path) == 0;
+		return $c->reply->file($fallback_path);
 	}
-	else {
-		$file = $c->get_file($slug);
-		if (!$file) {
-			$file = $c->get_file("$slug/index");
-			return $c->redirect_to('render_page', catchall => "$slug/") if $file;
-		}
-	}
+
+	my $file = $c->get_file($slug);
+	my $canonical_file = $file->realpath if $file;
 
 	if (!$file) {
-		if ($is_cur_user) {
+		my $username = $c->session('username');
+		if ($username && $username eq $req_username) {
 			return $c->redirect_to('new_page', catchall => $slug);
 		} else {
 			return $c->reply->not_found;
 		}
+	}
+
+	if ($file && $file ne $canonical_file && index($canonical_file, $user_path) == 0) {
+		my $rel = $canonical_file->to_rel($user_path)->to_string;
+		map { $rel =~ s/\.$_// } @{$c->app->config->{render_exts}};
+		$rel =~ s{/index$}{};
+		return $c->redirect_to("/$rel");
 	}
 
 	if (${$file}[-1] eq 'index.html') {
@@ -148,13 +142,13 @@ sub render_page {
 		|| $c->app->defaults('author');
 
 	my $desc = $c->app->defaults('description');
-	my $desc_path = path($user_path, '_description.txt');
+	my $desc_path = path($user_path, '_description.txt')->to_abs;
 	if (-f $desc_path) {
 		my $desc_chars = $desc_path->slurp('UTF-8');
 		$desc = join ' ', split /\n/, $desc_chars;
 	}
 
-	my $scripts_path = path($user_path, 'scripts');
+	my $scripts_path = path($user_path, 'scripts')->to_abs;
 	my @scripts = $scripts_path->list_tree->each if -d $scripts_path;
 	@scripts = map { '/' . $_->to_rel($user_path)->to_string } grep { $_->extname eq 'js' } @scripts;
 
