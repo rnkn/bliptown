@@ -324,10 +324,13 @@ EOF
 					my @host_parts = split(/\./, $host);
 					my $username = @host_parts >= 3 ? $host_parts[-3] : 'mayor';
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+					return unless -d $path;
+					return $path->realpath;
 				}
 				else {
 					$path = path($ENV{BLIPTOWN_DATA_HOME}, 'domains', $host);
-					-l $path ? $path = $path->realpath : return;
+					return unless -l $path;
+					return $path->realpath;
 				}
 				$c->stash(req_user_path => $path);
 			};
