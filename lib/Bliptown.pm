@@ -387,12 +387,11 @@ EOF
 	$app->helper(
 		get_file => sub {
 			my ($c, $slug, $ext) = @_;
-			my $user_path = $c->get_req_user_path->realpath;
+			my $user_path = $c->get_req_user_path;
 			return unless $user_path;
 			my $path = path($user_path, $slug)->to_abs;
 			if (-f $path && -r $path) {
-				$path = $path->realpath;
-				return unless index($path, $user_path) == 0;
+				return unless index($path->realpath, $user_path) == 0;
 				return $path;
 			}
 
