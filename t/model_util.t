@@ -117,8 +117,8 @@ subtest 'create_bliptown_url' => sub {
 			back_to => '/',
 		},
 	});
-	is $url->scheme, 'https', 'create_bliptown_url uses BLIPTOWN_SCHEME';
-	is $url->host, 'blip.town', 'create_bliptown_url falls back to BLIPTOWN_DOMAIN';
+	is $url->scheme, $ENV{BLIPTOWN_SCHEME}, 'create_bliptown_url uses BLIPTOWN_SCHEME';
+	is $url->host, $ENV{BLIPTOWN_DOMAIN}, 'create_bliptown_url falls back to BLIPTOWN_DOMAIN';
 	is $url->path, '/_auth', 'create_bliptown_url sets path';
 	is $url->query->param('token'), 'abc123', 'create_bliptown_url sets token query';
 	is $url->query->param('back_to'), '/', 'create_bliptown_url sets back_to query';

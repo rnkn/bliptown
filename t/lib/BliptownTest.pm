@@ -29,9 +29,6 @@ use constant CSRF_TOKEN => '0' x 80;
 
 our @EXPORT_OK = qw(create_test create_app create_db CSRF_TOKEN);
 
-$ENV{BLIPTOWN_DOMAIN}		= 'blip.town';
-$ENV{BLIPTOWN_SCHEME}		= 'https';
-$ENV{BLIPTOWN_PORT}			= '443';
 $ENV{BLIPTOWN_DATA_HOME}	= tempdir;
 $ENV{BLIPTOWN_LOG_HOME}		= tempdir;
 

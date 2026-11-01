@@ -41,7 +41,7 @@ subtest 'generate_magic_link' => sub {
 	like $email_text, qr/To: testuser <testuser\@example\.com>/, 'email has correct To header';
 	like $email_text, qr/Subject: Your Bliptown login link/, 'email has correct Subject';
 	like $email_text, qr/Hi testuser!/, 'email personalizes greeting';
-	like $email_text, qr{https://blip\.town:443/_auth\?token=$tk}, 'email contains magic link';
+	like $email_text, qr{\Q$ENV{BLIPTOWN_SCHEME}\E://\Q$ENV{BLIPTOWN_DOMAIN}\E:?\Q$ENV{BLIPTOWN_PORT}\E/_auth\?token=$tk}, 'email contains magic link';
 };
 
 subtest 'generate_magic_link_email without email' => sub {
