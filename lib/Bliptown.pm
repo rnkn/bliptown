@@ -395,22 +395,16 @@ EOF
 				return $path;
 			}
 
-			my $defaults_path = path($c->app->static->paths->[0], 'defaults')->realpath;
-			my $fallback_path = path($defaults_path, $slug)->to_abs;
-			if (-f $fallback_path && -r $fallback_path) {
-				$fallback_path = $fallback_path->realpath;
-				return unless index($fallback_path, $defaults_path) == 0;
-				return $fallback_path;
-			}
-
-			return if $ext;
-
 			foreach my $ext (@{$c->app->config->{render_exts}}) {
 				my $path_ext = path($user_path, "$slug.$ext")->to_abs;
 				if (-f $path_ext && -r $path_ext) {
-					$path_ext = $path_ext->realpath;
-					next unless index($path_ext, $user_path) == 0;
+					next unless index($path_ext->realpath, $user_path) == 0;
 					return $path_ext;
+				}
+				my $path_index = path($user_path, $slug, "index.$ext")->to_abs;
+				if (-f $path_index && -r $path_index) {
+					next unless index($path_index->realpath, $user_path) == 0;
+					return $path_index;
 				}
 			}
 			return;
