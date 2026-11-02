@@ -83,7 +83,6 @@ sub process_sections {
 			my ($yaml, undef) = $self->util->split_frontmatter($chars);
 			my $metadata = $yaml ? $self->metadata->read_metadata($yaml) : {};
 			my %item_metadata = %$metadata;
-			next unless %item_metadata && $item_metadata{date};
 
 			my %parent_metadata = %{$args->{metadata}};
 			%item_metadata = (%parent_metadata, %item_metadata);
