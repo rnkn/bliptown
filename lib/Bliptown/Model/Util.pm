@@ -105,7 +105,7 @@ sub glob_path {
 
 	my @filenames = glob $glob;
 	@filenames = grep { $_ ne $cur_filename } @filenames;
-	@filenames = grep { (split '/', $_)[-1] !~ qr{^_} } @filenames;
+	@filenames = grep { (split '/', $_)[-1] !~ qr/^_/ } @filenames;
 	return @filenames;
 }
 
