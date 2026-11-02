@@ -89,8 +89,13 @@ sub render_page {
 	if ($file && $file ne $canonical_file && index($canonical_file, $user_path) == 0) {
 		my $rel = $canonical_file->to_rel($user_path)->to_string;
 		map { $rel =~ s/\.$_// } @{$c->app->config->{render_exts}};
-		$rel =~ s{/index$}{};
+		$rel =~ s{/index$}{/};
 		return $c->redirect_to("/$rel");
+	}
+
+	if ($slug && $slug !~ m{/$} && $file->basename =~ /^index\./
+		&& $file->dirname->realpath eq path($user_path, $slug)->realpath) {
+		return $c->redirect_to("/$slug/");
 	}
 
 	if (${$file}[-1] eq 'index.html') {
