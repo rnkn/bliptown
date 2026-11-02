@@ -65,7 +65,7 @@
 				<dialog id="new-file-popover" class="modal" popover>
 					<form id="new-file" method="POST" action="<%= url_for('new_file')->query(dir => $dir, back_to => url_for) %>">
 						<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
-						<input type="text" name="name">
+						<input type="text" name="name" placeholder="filename">
 						<select id="ext" name="ext">
 							% foreach my $render_ext (@{$c->app->config->{render_exts}}) {
 							<option value="<%= $render_ext %>" <%= 'selected' if $ext eq $render_ext %>><%= ".$render_ext" %></option>
@@ -78,7 +78,7 @@
 				<dialog id="new-directory-popover" class="modal" popover>
 					<form id="new-directory" method="POST" action="<%= url_for('new_directory')->query(dir => $dir, back_to => url_for) %>">
 						<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
-						<input type="text" name="name">
+						<input type="text" name="name" placeholder="directory">
 						<button type="submit">Create Directory</button>
 					</form>
 				</dialog>
