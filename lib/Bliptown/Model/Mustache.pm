@@ -110,8 +110,7 @@ sub process_partials {
 		my $slug = $1;
 		my @filenames = $self->util->glob_path($slug, $args->{filename});
 
-		my $partial = '';
-		my @partials;
+		my ($partial, @partials);
 		foreach my $filename (@filenames) {
 			if (!-f $filename) {
 				$partial = $self->error_not_found($slug);
@@ -125,26 +124,22 @@ sub process_partials {
 			push @partials, $partial if $partial;
 		}
 
-		@partials = @{$self->collect_partials(\@partials)} if scalar @partials > 1;
+		@partials = @{$self->sort_partials(\@partials)} if scalar @partials > 1;
 		$partial = join "\n", map { $_->{text} } @partials;
 		$text =~ s/$partial_re/$partial/;
 	}
 	return $text;
 }
 
-sub collect_partials {
-	my ($self, $partial_list_ref) = @_;
-	my @partials = @$partial_list_ref;
-	@partials = grep { defined $_->{metadata}->{date} } @partials;
-	@partials = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @partials;
-	map { $_->{text} = <<"EOF"
-<div class="post">
+sub sort_partials {
+	my ($self, $partials) = @_;
+	my @partials = @$partials;
 
-$_->{text}
+	my @dated_partials = grep { defined $_->{metadata}->{date} } @partials;
+	my @undated_partials = grep { !defined $_->{metadata}->{date} } @partials;
 
-</div>
-EOF
-	} @partials;
+	@dated_partials = sort { $b->{metadata}->{date} cmp $a->{metadata}->{date} } @dated_partials;
+	@partials = (@dated_partials, @undated_partials);
 	return \@partials;
 }
 
