@@ -242,7 +242,7 @@ sub edit_page {
 	}
 	$c->stash(
 		template => 'edit',
-		page_title => 'Editing ',
+		page_title => "Editing $basename",
 		slug => $basename,
 		ext => $ext,
 		redirect => $redirect,
