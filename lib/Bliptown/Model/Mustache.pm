@@ -146,7 +146,7 @@ sub sort_partials {
 sub error_not_found {
 	my ($self, $slug) = @_;
 	my $html = <<"EOF";
-<p class="error">Error 404: "<a href="$slug">$slug</a>" not found</p>
+<p class="error">Error 404: <a href="$slug">$slug</a> not found</p>
 EOF
 	return {
 		metadata => {
