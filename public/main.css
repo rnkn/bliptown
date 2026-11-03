@@ -68,10 +68,6 @@ nav header, nav menu, nav footer {
 	padding: 2rem;
 }
 
-nav header {
-	height: 5rem;
-}
-
 nav footer {
 	margin-top: auto;
 }
@@ -1012,7 +1008,6 @@ details[open] > summary::before {
 		position: sticky;
 		text-align: center;
 		visibility: visible;
-		height: auto;
 	}
 
 	nav header > * {
