@@ -1,41 +1,54 @@
 package Bliptown::Model::DNS;
 use Mojo::Base -base;
+use List::Util qw(any first);
 use Net::DNS;
+use NetAddr::IP;
 
 has 'util';
 
-sub check_domain_dns {
-	my ($self, $username, $domain) = @_;
-	my $txt_cname		= "_bliptown.$domain";
-	my $expected_ipv4	= $ENV{BLIPTOWN_IPV4};
-	my $expected_ipv6	= $ENV{BLIPTOWN_IPV6};
-	my $expected_txt	= "$username.blip.town";
-	my $resolver		= Net::DNS::Resolver->new;
-	my $query_A			= $resolver->query($domain, 'A') or return;
-	my $query_AAAA		= $resolver->query($domain, 'AAAA') or return;
-	my $query_TXT		= $resolver->query($txt_cname, 'TXT') or return;
+sub in_zone {
+    my ($domain, $zone) = @_;
+    foreach ($domain, $zone) { s/\.$//; $_ = lc $_ }
+    return $domain eq $zone || $domain =~ /\.\Q$zone\E$/ ? 1 : 0;
+}
 
-	my ($record_A, $record_AAAA, $record_TXT);
+sub get_domain_zone {
+    my $domain = shift;
+    $domain =~ s/\.$//;
+    my @rr = rr($domain, 'SOA');
+	return unless @rr;
+	my $rr = first { $_->type eq 'SOA' } @rr;
+	my $zone = $rr->owner if $rr;
+	return lc $zone if $zone;
+}
 
-	foreach my $record ($query_A->answer) {
-		next unless $record->type eq 'A';
-		$record_A = $record->address;
-	}
-	foreach my $record ($query_AAAA->answer) {
-		next unless $record->type eq 'AAAA';
-		$record_AAAA = $record->address;
-	}
-	foreach my $record ($query_TXT->answer) {
-		next unless $record->type eq 'TXT';
-		$record_TXT = $record->txtdata;
-	}
+sub check_domain_txt {
+	my ($self, $domain, $username) = @_;
+	my $zone = get_domain_zone($domain);
+	return unless $zone;
+	return unless in_zone($domain, $zone);
+	my $txt_expected = "$username.blip.town";
+	my @rr = rr("_bliptown.$zone", 'TXT');
+	my $txt_valid = any { $_->type eq 'TXT' && lc $_->txtdata eq $txt_expected } @rr;
+	return $txt_valid;
+}
 
-	return unless (
-		$record_A eq $expected_ipv4 &&
-		$self->util->ipv6_equal($record_AAAA, $expected_ipv6) &&
-		$record_TXT eq $expected_txt
-	);
-	return 1;
+sub check_domain_ipv4 {
+	my ($self, $domain) = @_;
+	my $ipv4_expected = NetAddr::IP->new($ENV{BLIPTOWN_IPV4});
+	my @rr = rr($domain, 'A');
+	return unless @rr;
+	my $ipv4_valid = any { $_->type eq 'A' && NetAddr::IP->new($_->address) == $ipv4_expected } @rr;
+	return $ipv4_valid;
+}
+
+sub check_domain_ipv6 {
+	my ($self, $domain) = @_;
+	my $ipv6_expected = NetAddr::IP->new($ENV{BLIPTOWN_IPV6});
+	my @rr = rr($domain, 'AAAA');
+	return unless @rr;
+	my $ipv6_valid = any { $_->type eq 'AAAA' && NetAddr::IP->new($_->address) == $ipv6_expected } @rr;
+	return $ipv6_valid;
 }
 
 return 1;
