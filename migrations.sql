@@ -1,3 +1,9 @@
+-- 12 up
+DROP INDEX email_index;
+CREATE INDEX email_index ON users(email);
+-- 12 down
+DROP INDEX email_index;
+CREATE UNIQUE INDEX email_index ON users(email);
 -- 11 up
 DROP TABLE logout_tokens;
 -- 11 down
