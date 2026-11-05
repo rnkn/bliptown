@@ -7,6 +7,7 @@ requires 'YAML::Tiny';
 requires 'Text::Glob';
 requires 'IO::Socket::SSL';
 requires 'Net::DNS';
+requires 'NetAddr::IP';
 requires 'Geo::Location::IP::Database::SimpleReader';
 requires 'HTTP::BrowserDetect';
 requires 'Term::ReadLine::Perl';

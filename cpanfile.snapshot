@@ -998,6 +998,19 @@ DISTRIBUTIONS
       Text::Wrap 0
       constant 0
       perl 5.008001
+  NetAddr-IP-4.079
+    pathname: M/MI/MIKER/NetAddr-IP-4.079.tar.gz
+    provides:
+      NetAddr::IP 4.079
+      NetAddr::IP::InetBase 0.08
+      NetAddr::IP::Lite 1.57
+      NetAddr::IP::Util 1.53
+      NetAddr::IP::UtilPP 1.09
+      NetAddr::IP::UtilPolluted 1.53
+      NetAddr::IP::Util_IS 1
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
   Object-Pad-0.825
     pathname: P/PE/PEVANS/Object-Pad-0.825.tar.gz
     provides:
