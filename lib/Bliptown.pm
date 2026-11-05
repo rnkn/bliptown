@@ -182,6 +182,9 @@ EOF
 		}
 	);
 
+	my $schema = $app->db->select('mojo_migrations', 'version')->array->[0];
+	$app->log->debug("Database schema: $schema");
+
 	$app->helper(
 		geoip => sub {
 			my $db = path($ENV{BLIPTOWN_GEOIP_DB});
