@@ -134,6 +134,7 @@ sub render_page {
 	@scripts = map { '/' . $_->to_rel($user_path)->to_string } grep { $_->extname eq 'js' } @scripts;
 
 	$c->stash(
+		csp			=> $c->app->config->{csp_pages},
 		template	=> 'page',
 		site_title	=> $site_title,
 		page_title	=> $page_title,

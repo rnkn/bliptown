@@ -433,6 +433,7 @@ EOF
 	);
 
 	$app->defaults(
+		csp => $app->config->{csp_default},
 		site_title => 'Bliptown',
 		page_title => 'Untitled',
 		description => 'A very talented artist',
@@ -514,17 +515,7 @@ EOF
 	$app->hook(
 		after_dispatch => sub {
 			my $c = shift;
-			my $res = $c->res;
-			return if $res->code && $res->code >= 300 && $res->code < 400;
-			
-			my $csp = $c->app->config->{csp_default} // '';
-			my $endpoint_name = eval { $c->match->endpoint->name };
-
-			if ($endpoint_name && ($endpoint_name eq 'render_page' || $endpoint_name eq 'render_private_page')) {
-				$csp = $c->app->config->{csp_pages} // '';
-			}
-
-			$res->headers->content_security_policy($csp);
+			$c->res->headers->content_security_policy($c->stash('csp'));
 			return;
 		}
 	);
