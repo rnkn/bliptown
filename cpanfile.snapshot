@@ -1,9 +1,9 @@
 # carton snapshot format: version 1.0
 DISTRIBUTIONS
-  Alien-libmaxminddb-2.003
-    pathname: V/VO/VOEGELAS/Alien-libmaxminddb-2.003.tar.gz
+  Alien-libmaxminddb-2.005
+    pathname: V/VO/VOEGELAS/Alien-libmaxminddb-2.005.tar.gz
     provides:
-      Alien::libmaxminddb 2.003
+      Alien::libmaxminddb 2.005
     requirements:
       ExtUtils::CBuilder 0
       ExtUtils::MakeMaker 0
@@ -61,11 +61,12 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Storable 0
       perl 5.008001
-  Cpanel-JSON-XS-4.52
-    pathname: R/RU/RURBAN/Cpanel-JSON-XS-4.52.tar.gz
+  Cpanel-JSON-XS-4.80
+    pathname: R/RU/RURBAN/Cpanel-JSON-XS-4.80.tar.gz
     provides:
-      Cpanel::JSON::XS 4.52
-      Cpanel::JSON::XS::Type undef
+      Cpanel::JSON::XS 4.80
+      Cpanel::JSON::XS::Boolean 4.80
+      Cpanel::JSON::XS::Type 4.80
     requirements:
       Carp 0
       Config 0
@@ -229,80 +230,35 @@ DISTRIBUTIONS
       Test::More 0.88
       Tie::Hash 0
       perl 5.006
-  DBI-1.651
-    pathname: H/HM/HMBRAND/DBI-1.651.tgz
+  DBI-1.656
+    pathname: H/HM/HMBRAND/DBI-1.656.tgz
     provides:
       Bundle::DBI 12.008696
-      DBD::DBM 0.08
-      DBD::DBM::Statement 0.08
-      DBD::DBM::Table 0.08
-      DBD::DBM::db 0.08
-      DBD::DBM::dr 0.08
-      DBD::DBM::st 0.08
+      DBD::DBM 1.656
       DBD::ExampleP 12.014311
-      DBD::ExampleP::db 12.014311
-      DBD::ExampleP::dr 12.014311
-      DBD::ExampleP::st 12.014311
-      DBD::File 0.45
-      DBD::File::DataSource::File 0.45
-      DBD::File::DataSource::Stream 0.45
-      DBD::File::Statement 0.45
-      DBD::File::Table 0.45
-      DBD::File::TableSource::FileSystem 0.45
-      DBD::File::db 0.45
-      DBD::File::dr 0.45
-      DBD::File::st 0.45
+      DBD::File 1.656
       DBD::Gofer 0.015327
       DBD::Gofer::Policy::Base 0.010088
       DBD::Gofer::Policy::classic 0.010088
       DBD::Gofer::Policy::pedantic 0.010088
       DBD::Gofer::Policy::rush 0.010088
       DBD::Gofer::Transport::Base 0.014121
-      DBD::Gofer::Transport::corostream undef
+      DBD::Gofer::Transport::corostream 2.165300
       DBD::Gofer::Transport::null 0.010088
       DBD::Gofer::Transport::pipeone 0.010088
       DBD::Gofer::Transport::stream 0.014599
-      DBD::Gofer::db 0.015327
-      DBD::Gofer::dr 0.015327
-      DBD::Gofer::st 0.015327
       DBD::Mem 0.001
-      DBD::Mem::DataSource 0.001
-      DBD::Mem::Statement 0.001
-      DBD::Mem::Table 0.001
-      DBD::Mem::db 0.001
-      DBD::Mem::dr 0.001
-      DBD::Mem::st 0.001
       DBD::NullP 12.014715
-      DBD::NullP::db 12.014715
-      DBD::NullP::dr 12.014715
-      DBD::NullP::st 12.014715
       DBD::Proxy 0.2004
-      DBD::Proxy::RPC::PlClient 0.2004
-      DBD::Proxy::db 0.2004
-      DBD::Proxy::dr 0.2004
-      DBD::Proxy::st 0.2004
       DBD::Sponge 12.010003
-      DBD::Sponge::db 12.010003
-      DBD::Sponge::dr 12.010003
-      DBD::Sponge::st 12.010003
-      DBDI 12.015129
-      DBI 1.651
+      DBI 1.656
       DBI::Const::GetInfo::ANSI 2.008697
       DBI::Const::GetInfo::ODBC 2.011374
       DBI::Const::GetInfoReturn 2.008697
       DBI::Const::GetInfoType 2.008697
       DBI::DBD 12.015129
       DBI::DBD::Metadata 2.014214
-      DBI::DBD::SqlEngine 0.06
-      DBI::DBD::SqlEngine::DataSource 0.06
-      DBI::DBD::SqlEngine::Statement 0.06
-      DBI::DBD::SqlEngine::Table 0.06
-      DBI::DBD::SqlEngine::TableSource 0.06
-      DBI::DBD::SqlEngine::TieMeta 0.06
-      DBI::DBD::SqlEngine::TieTables 0.06
-      DBI::DBD::SqlEngine::db 0.06
-      DBI::DBD::SqlEngine::dr 0.06
-      DBI::DBD::SqlEngine::st 0.06
+      DBI::DBD::SqlEngine 1.656
       DBI::Gofer::Execute 0.014283
       DBI::Gofer::Request 0.012537
       DBI::Gofer::Response 0.011566
@@ -318,20 +274,14 @@ DISTRIBUTIONS
       DBI::ProfileDumper::Apache 2.014121
       DBI::ProfileSubs 0.009396
       DBI::ProxyServer 0.3005
-      DBI::ProxyServer::db 0.3005
-      DBI::ProxyServer::dr 0.3005
-      DBI::ProxyServer::st 0.3005
+      DBI::PurePerl 2.014286
       DBI::SQL::Nano 1.015544
-      DBI::SQL::Nano::Statement_ 1.015544
-      DBI::SQL::Nano::Table_ 1.015544
       DBI::Util::CacheMemory 0.010315
-      DBI::Util::_accessor 0.009479
-      DBI::common 1.651
     requirements:
       ExtUtils::MakeMaker 6.48
       Module::Load 0.22
       Test::Simple 0.96
-      perl 5.008001
+      perl 5.012000
   Digest-HMAC-1.05
     pathname: A/AR/ARODLAND/Digest-HMAC-1.05.tar.gz
     provides:
@@ -401,58 +351,58 @@ DISTRIBUTIONS
       File::Which 0
       List::Util 1.33
       perl 5.006
-  FFI-Platypus-2.11
-    pathname: P/PL/PLICEASE/FFI-Platypus-2.11.tar.gz
+  FFI-Platypus-2.12
+    pathname: P/PL/PLICEASE/FFI-Platypus-2.12.tar.gz
     provides:
-      FFI::Build 2.11
-      FFI::Build::File::Base 2.11
-      FFI::Build::File::C 2.11
-      FFI::Build::File::CXX 2.11
-      FFI::Build::File::Library 2.11
-      FFI::Build::File::Object 2.11
-      FFI::Build::MM 2.11
-      FFI::Build::MM::FBX 2.11
-      FFI::Build::Platform 2.11
-      FFI::Build::Plugin 2.11
+      FFI::Build 2.12
+      FFI::Build::File::Base 2.12
+      FFI::Build::File::C 2.12
+      FFI::Build::File::CXX 2.12
+      FFI::Build::File::Library 2.12
+      FFI::Build::File::Object 2.12
+      FFI::Build::MM 2.12
+      FFI::Build::MM::FBX 2.12
+      FFI::Build::Platform 2.12
+      FFI::Build::Plugin 2.12
       FFI::Build::Plugin::Foo1 undef
       FFI::Build::Plugin::Foo2 undef
-      FFI::Build::PluginData 2.11
-      FFI::Platypus 2.11
-      FFI::Platypus::API 2.11
-      FFI::Platypus::Buffer 2.11
-      FFI::Platypus::Bundle 2.11
-      FFI::Platypus::Closure 2.11
-      FFI::Platypus::ClosureData 2.11
-      FFI::Platypus::Constant 2.11
-      FFI::Platypus::DL 2.11
-      FFI::Platypus::Function 2.11
-      FFI::Platypus::Function::Function 2.11
-      FFI::Platypus::Function::Wrapper 2.11
-      FFI::Platypus::Internal 2.11
-      FFI::Platypus::Lang 2.11
-      FFI::Platypus::Lang::ASM 2.11
-      FFI::Platypus::Lang::C 2.11
-      FFI::Platypus::Lang::Win32 2.11
-      FFI::Platypus::Legacy 2.11
-      FFI::Platypus::Memory 2.11
-      FFI::Platypus::Record 2.11
-      FFI::Platypus::Record::Meta 2.11
-      FFI::Platypus::Record::TieArray 2.11
-      FFI::Platypus::ShareConfig 2.11
-      FFI::Platypus::Type 2.11
-      FFI::Platypus::Type::PointerSizeBuffer 2.11
-      FFI::Platypus::Type::StringArray 2.11
-      FFI::Platypus::Type::StringPointer 2.11
-      FFI::Platypus::Type::WideString 2.11
-      FFI::Platypus::TypeParser 2.11
-      FFI::Platypus::TypeParser::Version0 2.11
-      FFI::Platypus::TypeParser::Version1 2.11
-      FFI::Platypus::TypeParser::Version2 2.11
-      FFI::Probe 2.11
-      FFI::Probe::Runner 2.11
-      FFI::Probe::Runner::Builder 2.11
-      FFI::Probe::Runner::Result 2.11
-      FFI::Temp 2.11
+      FFI::Build::PluginData 2.12
+      FFI::Platypus 2.12
+      FFI::Platypus::API 2.12
+      FFI::Platypus::Buffer 2.12
+      FFI::Platypus::Bundle 2.12
+      FFI::Platypus::Closure 2.12
+      FFI::Platypus::ClosureData 2.12
+      FFI::Platypus::Constant 2.12
+      FFI::Platypus::DL 2.12
+      FFI::Platypus::Function 2.12
+      FFI::Platypus::Function::Function 2.12
+      FFI::Platypus::Function::Wrapper 2.12
+      FFI::Platypus::Internal 2.12
+      FFI::Platypus::Lang 2.12
+      FFI::Platypus::Lang::ASM 2.12
+      FFI::Platypus::Lang::C 2.12
+      FFI::Platypus::Lang::Win32 2.12
+      FFI::Platypus::Legacy 2.12
+      FFI::Platypus::Memory 2.12
+      FFI::Platypus::Record 2.12
+      FFI::Platypus::Record::Meta 2.12
+      FFI::Platypus::Record::TieArray 2.12
+      FFI::Platypus::ShareConfig 2.12
+      FFI::Platypus::Type 2.12
+      FFI::Platypus::Type::PointerSizeBuffer 2.12
+      FFI::Platypus::Type::StringArray 2.12
+      FFI::Platypus::Type::StringPointer 2.12
+      FFI::Platypus::Type::WideString 2.12
+      FFI::Platypus::TypeParser 2.12
+      FFI::Platypus::TypeParser::Version0 2.12
+      FFI::Platypus::TypeParser::Version1 2.12
+      FFI::Platypus::TypeParser::Version2 2.12
+      FFI::Probe 2.12
+      FFI::Probe::Runner 2.12
+      FFI::Probe::Runner::Builder 2.12
+      FFI::Probe::Runner::Result 2.12
+      FFI::Temp 2.12
     requirements:
       Capture::Tiny 0
       ExtUtils::CBuilder 0
@@ -700,8 +650,8 @@ DISTRIBUTIONS
       URI::db 0.15
       URI::file 4.21
       perl 5.010001
-  Mojolicious-9.48
-    pathname: S/SR/SRI/Mojolicious-9.48.tar.gz
+  Mojolicious-9.53
+    pathname: S/SR/SRI/Mojolicious-9.53.tar.gz
     provides:
       Mojo undef
       Mojo::Asset undef
@@ -771,7 +721,7 @@ DISTRIBUTIONS
       Mojo::UserAgent::Transactor undef
       Mojo::Util undef
       Mojo::WebSocket undef
-      Mojolicious 9.48
+      Mojolicious 9.53
       Mojolicious::Command undef
       Mojolicious::Command::Author::cpanify undef
       Mojolicious::Command::Author::generate undef
@@ -847,10 +797,10 @@ DISTRIBUTIONS
       Sub::Defer 2.006006
       Sub::Quote 2.006006
       perl 5.006
-  Net-DNS-1.56
-    pathname: N/NL/NLNETLABS/Net-DNS-1.56.tar.gz
+  Net-DNS-1.57
+    pathname: N/NL/NLNETLABS/Net-DNS-1.57.tar.gz
     provides:
-      Net::DNS 1.56
+      Net::DNS 1.57
       Net::DNS::Domain 2002
       Net::DNS::DomainName 2054
       Net::DNS::DomainName1035 2054
@@ -861,7 +811,7 @@ DISTRIBUTIONS
       Net::DNS::Mailbox2535 2002
       Net::DNS::Nameserver 2002
       Net::DNS::Packet 2003
-      Net::DNS::Parameters 2054
+      Net::DNS::Parameters 2059
       Net::DNS::Question 2002
       Net::DNS::RR 2037
       Net::DNS::RR::A 2003
@@ -879,8 +829,8 @@ DISTRIBUTIONS
       Net::DNS::RR::DELEG 2053
       Net::DNS::RR::DHCID 2003
       Net::DNS::RR::DNAME 2003
-      Net::DNS::RR::DNSKEY 2042
-      Net::DNS::RR::DS 2042
+      Net::DNS::RR::DNSKEY 2059
+      Net::DNS::RR::DS 2059
       Net::DNS::RR::DSYNC 2003
       Net::DNS::RR::EUI48 2003
       Net::DNS::RR::EUI64 2003
@@ -909,26 +859,28 @@ DISTRIBUTIONS
       Net::DNS::RR::NSEC3PARAM 2003
       Net::DNS::RR::NULL 2002
       Net::DNS::RR::OPENPGPKEY 2003
-      Net::DNS::RR::OPT 2054
-      Net::DNS::RR::OPT::CHAIN 2054
-      Net::DNS::RR::OPT::CLIENT_SUBNET 2054
-      Net::DNS::RR::OPT::COOKIE 2054
-      Net::DNS::RR::OPT::DAU 2054
-      Net::DNS::RR::OPT::DHU 2054
-      Net::DNS::RR::OPT::EXPIRE 2054
-      Net::DNS::RR::OPT::EXTENDED_ERROR 2054
-      Net::DNS::RR::OPT::KEY_TAG 2054
-      Net::DNS::RR::OPT::N3U 2054
-      Net::DNS::RR::OPT::NSID 2054
-      Net::DNS::RR::OPT::PADDING 2054
-      Net::DNS::RR::OPT::REPORT_CHANNEL 2054
-      Net::DNS::RR::OPT::TCP_KEEPALIVE 2054
-      Net::DNS::RR::OPT::ZONEVERSION 2054
+      Net::DNS::RR::OPT 2059
+      Net::DNS::RR::OPT::CHAIN 2059
+      Net::DNS::RR::OPT::CLIENT_SUBNET 2059
+      Net::DNS::RR::OPT::COOKIE 2059
+      Net::DNS::RR::OPT::DAU 2059
+      Net::DNS::RR::OPT::DHU 2059
+      Net::DNS::RR::OPT::EXPIRE 2059
+      Net::DNS::RR::OPT::EXTENDED_ERROR 2059
+      Net::DNS::RR::OPT::KEY_TAG 2059
+      Net::DNS::RR::OPT::MQTYPE_QUERY 2059
+      Net::DNS::RR::OPT::MQTYPE_RESPONSE 2059
+      Net::DNS::RR::OPT::N3U 2059
+      Net::DNS::RR::OPT::PADDING 2059
+      Net::DNS::RR::OPT::REPORT_CHANNEL 2059
+      Net::DNS::RR::OPT::TCP_KEEPALIVE 2059
+      Net::DNS::RR::OPT::UPDATE_LEASE 2059
+      Net::DNS::RR::OPT::ZONEVERSION 2059
       Net::DNS::RR::PTR 2002
       Net::DNS::RR::PX 2003
       Net::DNS::RR::RESINFO 2003
       Net::DNS::RR::RP 2002
-      Net::DNS::RR::RRSIG 2057
+      Net::DNS::RR::RRSIG 2059
       Net::DNS::RR::RT 2003
       Net::DNS::RR::SIG 2057
       Net::DNS::RR::SMIMEA 2003
@@ -939,7 +891,7 @@ DISTRIBUTIONS
       Net::DNS::RR::SVCB 2043
       Net::DNS::RR::TKEY 2035
       Net::DNS::RR::TLSA 2003
-      Net::DNS::RR::TSIG 2003
+      Net::DNS::RR::TSIG 2060
       Net::DNS::RR::TXT 2003
       Net::DNS::RR::URI 2003
       Net::DNS::RR::X25 2002
@@ -948,7 +900,7 @@ DISTRIBUTIONS
       Net::DNS::Resolver::Base 2057
       Net::DNS::Resolver::MSWin32 2002
       Net::DNS::Resolver::Recurse 2002
-      Net::DNS::Resolver::UNIX 2053
+      Net::DNS::Resolver::UNIX 2059
       Net::DNS::Resolver::android 2007
       Net::DNS::Resolver::cygwin 2002
       Net::DNS::Resolver::os2 2007
@@ -1065,10 +1017,10 @@ DISTRIBUTIONS
       Test::Deep 0.101
       Text::Balanced 2.00
       perl 5.006
-  SQL-Abstract-Pg-1.0
-    pathname: S/SR/SRI/SQL-Abstract-Pg-1.0.tar.gz
+  SQL-Abstract-Pg-1.01
+    pathname: S/SR/SRI/SQL-Abstract-Pg-1.01.tar.gz
     provides:
-      SQL::Abstract::Pg 1.0
+      SQL::Abstract::Pg 1.01
     requirements:
       ExtUtils::MakeMaker 0
       SQL::Abstract 2.0
@@ -1163,66 +1115,66 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       constant 0
       perl 5.005030
-  URI-5.35
-    pathname: O/OA/OALDERS/URI-5.35.tar.gz
+  URI-5.40
+    pathname: O/OA/OALDERS/URI-5.40.tar.gz
     provides:
-      URI 5.35
-      URI::Escape 5.35
-      URI::Heuristic 5.35
-      URI::IRI 5.35
-      URI::QueryParam 5.35
-      URI::Split 5.35
-      URI::URL 5.35
-      URI::WithBase 5.35
-      URI::data 5.35
-      URI::file 5.35
-      URI::file::Base 5.35
-      URI::file::FAT 5.35
-      URI::file::Mac 5.35
-      URI::file::OS2 5.35
-      URI::file::QNX 5.35
-      URI::file::Unix 5.35
-      URI::file::Win32 5.35
-      URI::ftp 5.35
-      URI::ftpes 5.35
-      URI::ftps 5.35
-      URI::geo 5.35
-      URI::gopher 5.35
-      URI::http 5.35
-      URI::https 5.35
-      URI::icap 5.35
-      URI::icaps 5.35
-      URI::irc 5.35
-      URI::ircs 5.35
-      URI::ldap 5.35
-      URI::ldapi 5.35
-      URI::ldaps 5.35
-      URI::mailto 5.35
-      URI::mms 5.35
-      URI::news 5.35
-      URI::nntp 5.35
-      URI::nntps 5.35
-      URI::otpauth 5.35
-      URI::pop 5.35
-      URI::rlogin 5.35
-      URI::rsync 5.35
-      URI::rtsp 5.35
-      URI::rtspu 5.35
-      URI::scp 5.35
-      URI::sftp 5.35
-      URI::sip 5.35
-      URI::sips 5.35
-      URI::smb 5.35
-      URI::smtp 5.35
-      URI::snews 5.35
-      URI::ssh 5.35
-      URI::telnet 5.35
-      URI::tn3270 5.35
-      URI::urn 5.35
-      URI::urn::isbn 5.35
-      URI::urn::oid 5.35
-      URI::ws 5.35
-      URI::wss 5.35
+      URI 5.40
+      URI::Escape 5.40
+      URI::Heuristic 5.40
+      URI::IRI 5.40
+      URI::QueryParam 5.40
+      URI::Split 5.40
+      URI::URL 5.40
+      URI::WithBase 5.40
+      URI::data 5.40
+      URI::file 5.40
+      URI::file::Base 5.40
+      URI::file::FAT 5.40
+      URI::file::Mac 5.40
+      URI::file::OS2 5.40
+      URI::file::QNX 5.40
+      URI::file::Unix 5.40
+      URI::file::Win32 5.40
+      URI::ftp 5.40
+      URI::ftpes 5.40
+      URI::ftps 5.40
+      URI::geo 5.40
+      URI::gopher 5.40
+      URI::http 5.40
+      URI::https 5.40
+      URI::icap 5.40
+      URI::icaps 5.40
+      URI::irc 5.40
+      URI::ircs 5.40
+      URI::ldap 5.40
+      URI::ldapi 5.40
+      URI::ldaps 5.40
+      URI::mailto 5.40
+      URI::mms 5.40
+      URI::news 5.40
+      URI::nntp 5.40
+      URI::nntps 5.40
+      URI::otpauth 5.40
+      URI::pop 5.40
+      URI::rlogin 5.40
+      URI::rsync 5.40
+      URI::rtsp 5.40
+      URI::rtspu 5.40
+      URI::scp 5.40
+      URI::sftp 5.40
+      URI::sip 5.40
+      URI::sips 5.40
+      URI::smb 5.40
+      URI::smtp 5.40
+      URI::snews 5.40
+      URI::ssh 5.40
+      URI::telnet 5.40
+      URI::tn3270 5.40
+      URI::urn 5.40
+      URI::urn::isbn 5.40
+      URI::urn::oid 5.40
+      URI::ws 5.40
+      URI::wss 5.40
     requirements:
       Carp 0
       Cwd 0
@@ -1234,6 +1186,7 @@ DISTRIBUTIONS
       MIME::Base64 2
       Net::Domain 0
       Scalar::Util 0
+      Unicode::Normalize 0
       constant 0
       integer 0
       overload 0
@@ -1251,68 +1204,68 @@ DISTRIBUTIONS
       Test::More 0.88
       URI 1.40
       perl 5.008001
-  URI-db-0.23
-    pathname: D/DW/DWHEELER/URI-db-0.23.tar.gz
+  URI-db-0.24
+    pathname: D/DW/DWHEELER/URI-db-0.24.tar.gz
     provides:
-      URI::cassandra 0.23
-      URI::clickhouse 0.20
-      URI::cockroach 0.23
-      URI::cockroachdb 0.23
-      URI::couch 0.23
-      URI::couchdb 0.23
-      URI::cubrid 0.23
-      URI::db 0.23
-      URI::db2 0.23
-      URI::derby 0.23
-      URI::exasol 0.23
-      URI::firebird 0.23
-      URI::hive 0.23
-      URI::impala 0.23
-      URI::informix 0.23
-      URI::ingres 0.23
-      URI::interbase 0.23
-      URI::ldapdb 0.23
-      URI::maria 0.23
-      URI::mariadb 0.23
-      URI::max 0.23
-      URI::maxdb 0.23
-      URI::monet 0.23
-      URI::monetdb 0.23
-      URI::mongo 0.23
-      URI::mongodb 0.23
-      URI::mssql 0.23
-      URI::mysql 0.23
-      URI::oracle 0.23
-      URI::pg 0.23
-      URI::pgsql 0.23
-      URI::pgxc 0.23
-      URI::postgres 0.23
-      URI::postgresql 0.23
-      URI::postgresxc 0.23
-      URI::redshift 0.23
-      URI::snowflake 0.23
-      URI::sqlite 0.23
-      URI::sqlite3 0.23
-      URI::sqlserver 0.23
-      URI::sybase 0.23
-      URI::teradata 0.23
-      URI::unify 0.23
-      URI::vertica 0.23
-      URI::yugabyte 0.23
-      URI::yugabytedb 0.23
+      URI::cassandra 0.24
+      URI::clickhouse 0.24
+      URI::cockroach 0.24
+      URI::cockroachdb 0.24
+      URI::couch 0.24
+      URI::couchdb 0.24
+      URI::cubrid 0.24
+      URI::db 0.24
+      URI::db2 0.24
+      URI::derby 0.24
+      URI::exasol 0.24
+      URI::firebird 0.24
+      URI::hive 0.24
+      URI::impala 0.24
+      URI::informix 0.24
+      URI::ingres 0.24
+      URI::interbase 0.24
+      URI::ldapdb 0.24
+      URI::maria 0.24
+      URI::mariadb 0.24
+      URI::max 0.24
+      URI::maxdb 0.24
+      URI::monet 0.24
+      URI::monetdb 0.24
+      URI::mongo 0.24
+      URI::mongodb 0.24
+      URI::mssql 0.24
+      URI::mysql 0.24
+      URI::oracle 0.24
+      URI::pg 0.24
+      URI::pgsql 0.24
+      URI::pgxc 0.24
+      URI::postgres 0.24
+      URI::postgresql 0.24
+      URI::postgresxc 0.24
+      URI::redshift 0.24
+      URI::snowflake 0.24
+      URI::sqlite 0.24
+      URI::sqlite3 0.24
+      URI::sqlserver 0.24
+      URI::sybase 0.24
+      URI::teradata 0.24
+      URI::unify 0.24
+      URI::vertica 0.24
+      URI::yugabyte 0.24
+      URI::yugabytedb 0.24
     requirements:
       Module::Build 0.30
       Test::More 0.88
       URI 1.40
       URI::Nested 0.10
       perl 5.008001
-  XS-Parse-Keyword-0.49
-    pathname: P/PE/PEVANS/XS-Parse-Keyword-0.49.tar.gz
+  XS-Parse-Keyword-0.51
+    pathname: P/PE/PEVANS/XS-Parse-Keyword-0.51.tar.gz
     provides:
-      XS::Parse::Infix 0.49
-      XS::Parse::Infix::Builder 0.49
-      XS::Parse::Keyword 0.49
-      XS::Parse::Keyword::Builder 0.49
+      XS::Parse::Infix 0.51
+      XS::Parse::Infix::Builder 0.51
+      XS::Parse::Keyword 0.51
+      XS::Parse::Keyword::Builder 0.51
     requirements:
       ExtUtils::CBuilder 0
       ExtUtils::CChecker 0.11
@@ -1320,12 +1273,12 @@ DISTRIBUTIONS
       File::ShareDir 1.00
       Module::Build 0.4004
       perl 5.014
-  XS-Parse-Sublike-0.41
-    pathname: P/PE/PEVANS/XS-Parse-Sublike-0.41.tar.gz
+  XS-Parse-Sublike-0.42
+    pathname: P/PE/PEVANS/XS-Parse-Sublike-0.42.tar.gz
     provides:
-      Sublike::Extended 0.41
-      XS::Parse::Sublike 0.41
-      XS::Parse::Sublike::Builder 0.41
+      Sublike::Extended 0.42
+      XS::Parse::Sublike 0.42
+      XS::Parse::Sublike::Builder 0.42
     requirements:
       ExtUtils::CBuilder 0
       File::ShareDir 1.00
