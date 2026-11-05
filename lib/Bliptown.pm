@@ -640,14 +640,14 @@ EOF
 
 	$protected->under($block_demo)->get('/_billing')->to(controller => 'Users', action => 'billing_session')->name('billing_session');
 
+	$r->get('/_theme/<theme>.css')->to(controller => 'Pages', action => 'render_theme')->name('render_theme');
+
 	$r->get('/_health')->to(controller => 'Health', action => 'health_check')->name('health_check');
 	$protected->get('/_error' => sub {
 		my $c = shift;
 		$c->reply->exception('500 internal server error test: everything has gone wrong!');
 		return;
 	})->name('error_check');
-
-	$r->get('/style.css')->to(controller => 'Pages', action => 'render_style')->name('render_style');
 
 	$r->get('/_raw/*catchall')->to(controller => 'Pages', action => 'render_raw', catchall => '')->name('render_raw');
 	$r->get('/*catchall')->to(controller => 'Pages', action => 'render_page', catchall => '')->name('render_page');

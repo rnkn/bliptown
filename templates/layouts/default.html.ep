@@ -1,6 +1,7 @@
 % my $username = session('username') // '';
 % my $req_username = get_req_username() // '';
 % my $drawer_toggle_class = param('toggle') ? 'open' : '';
+% my $stylesheet = $theme ? "/_theme/$theme.css" : '/style.css';
 <!DOCTYPE html>
 <html>
 	<head>
@@ -15,7 +16,7 @@
 		<link rel="icon" type="image/png" sizes="128x128" href="/favicon.png" />
 		<link rel="icon" type="image/x-icon" sizes="32x32" href="/favicon.ico" />
 		% if ($customize) {
-		<link href="/style.css?theme=<%= $theme %>" rel="stylesheet" sandbox>
+		<link href="<%= $stylesheet %>" rel="stylesheet" sandbox>
 		% foreach my $url (@$scripts) {
 		<script src="<%= $url %>" defer></script>
 		% }

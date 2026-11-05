@@ -31,16 +31,10 @@ sub postprocess_skel {
 	return $dom->to_string;
 }
 
-sub render_style {
+sub render_theme {
 	my $c = shift;
 	my $theme = $c->param('theme');
-	my $path;
-	if ($theme) {
-		$path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $ENV{BLIPTOWN_THEME_USER}, "$theme.css");
-	}
-	else {
-		$path = path($c->get_req_user_path, 'style.css');
-	}
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $ENV{BLIPTOWN_THEME_USER}, "$theme.css");
 	if (-f $path) {
 		return $c->reply->file($path);
 	}
