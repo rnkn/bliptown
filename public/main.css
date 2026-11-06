@@ -76,6 +76,10 @@ nav footer {
 	margin-top: auto;
 }
 
+nav a {
+	color: initial;
+}
+
 main {
 	flex-grow: 1;
 	min-width: 0;
@@ -93,7 +97,6 @@ h1, h2, h3, p {
 }
 
 a {
-	color: var(--link-color);
 	text-decoration: none;
 }
 
