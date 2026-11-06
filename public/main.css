@@ -22,6 +22,9 @@
 
 * {
 	box-sizing: border-box;
+}
+
+body {
 	margin: 0;
 	padding: 0;
 }
@@ -65,6 +68,7 @@ nav {
 }
 
 nav header, nav menu, nav footer {
+	margin: 0;
 	padding: 2rem;
 }
 
@@ -84,8 +88,8 @@ main {
 
 /* Generic Semantic Styles */
 
-p {
-	margin-bottom: 1em;
+h1, h2, h3, p {
+	margin-top: 0;
 }
 
 a {
@@ -100,7 +104,6 @@ pre, code {
 }
 
 pre {
-	margin-bottom: 1em;
 	padding: 1em;
 	overflow-x: auto;
 }
@@ -112,21 +115,6 @@ img {
 
 label {
 	cursor: pointer;
-}
-
-ul, ol {
-	margin-bottom: 1em;
-}
-
-ul ul {
-	margin: 0;
-	padding-left: 1em;
-}
-
-blockquote {
-	margin: 1em 0;
-	padding: 0 2em;
-	border-left: 1px solid var(--border-color);
 }
 
 details summary:hover {
@@ -141,7 +129,6 @@ hr {
 
 table {
 	text-align: left;
-	margin-bottom: 1em;
 	width: 100%;
 }
 
@@ -159,7 +146,6 @@ iframe {
 
 h1 {
 	font-size: 1em;
-	margin-bottom: 1em;
 }
 
 h2 {
@@ -176,6 +162,7 @@ h3 {
 
 nav ul {
 	margin: 0;
+	padding: 0;
 	list-style: none;
 }
 
@@ -197,10 +184,6 @@ main a:has(img) {
 
 main ul {
 	list-style: circle;
-}
-
-main ul, main ol {
-	padding-left: 2em;
 }
 
 /* Layouts */
@@ -387,6 +370,7 @@ input#drawer-switch-login:checked ~ #drawer #login {
 }
 
 #drawer .panel button {
+	margin: 0;
 	width: 6em;
 }
 
@@ -401,8 +385,8 @@ input#drawer-switch-login:checked ~ #drawer #login {
 #drawer .panel > ul {
 	flex-shrink: 0;
 	display: flex;
+	margin: 0;
 	margin-left: auto;
-	margin-right: 1em;
 	list-style: none;
 	gap: 1em;
 }
