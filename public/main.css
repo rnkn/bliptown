@@ -27,6 +27,7 @@
 body {
 	margin: 0;
 	padding: 0;
+	background-color: var(--bg-color);
 }
 
 /**** User Customizable Styles ****/
@@ -39,15 +40,6 @@ body {
 	--bg-color: white;
 	--code-bg-color: rgb(240,240,240);
 	--border-color: rgb(140,140,140);
-}
-
-body {
-	font-family: sans-serif;
-	font-size: 16px;
-	color: var(--text-color);
-	background-color: var(--bg-color);
-	line-height: 1.5;
-	tab-size: 4;
 }
 
 /* Structural Semantic Styles */
