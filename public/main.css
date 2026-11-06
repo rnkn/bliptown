@@ -177,10 +177,6 @@ main a:has(img) {
 	border: none;
 }
 
-main ul {
-	list-style: circle;
-}
-
 /* Layouts */
 
 section {
