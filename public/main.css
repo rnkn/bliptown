@@ -532,6 +532,7 @@ textarea {
 
 dialog {
 	position: fixed;
+	margin: 0;
 	padding: 2em;
 	border: 1px solid black;
 	box-shadow: 0 0 10px 10px var(--shadow-color);
