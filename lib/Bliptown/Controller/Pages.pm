@@ -34,7 +34,7 @@ sub postprocess_skel {
 sub render_theme {
 	my $c = shift;
 	my $theme = $c->param('theme');
-	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $ENV{BLIPTOWN_THEME_USER}, "$theme.css");
+	my $path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', 'mayor', 'themes', "$theme.css");
 	if (-f $path) {
 		return $c->reply->file($path);
 	}
