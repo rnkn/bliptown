@@ -533,6 +533,10 @@ textarea {
 	padding: 0;
 }
 
+.backstage a:hover {
+	border-bottom-color: currentcolor;
+}
+
 /* Dialogs */
 
 dialog {
