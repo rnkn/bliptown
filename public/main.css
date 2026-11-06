@@ -506,12 +506,9 @@ textarea {
 	font-size: 1.5rem;
 }
 
-main.backstage a {
+.backstage a {
+	color: initial;
 	border-bottom: 1px solid transparent;
-}
-
-main.backstage a:hover {
-	border-bottom-color: currentcolor;
 }
 
 .backstage a.exit, .backstage a.view-page {
