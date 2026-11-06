@@ -641,8 +641,8 @@ dialog#toast p {
 	display: flex;
 	gap: var(--controls-gap);
 	list-style: none;
+	margin: 0;
 	padding: var(--controls-gap);
-	margin: 0 var(--controls-gap);
 	overflow-x: auto;
 }
 
