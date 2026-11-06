@@ -528,6 +528,11 @@ textarea {
 	content: "\00A0\2192";
 }
 
+.backstage fieldset {
+	margin: 0;
+	padding: 0;
+}
+
 /* Dialogs */
 
 dialog {
