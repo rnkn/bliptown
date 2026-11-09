@@ -632,6 +632,8 @@ EOF
 
 	$protected->under($block_demo)->get('/_billing')->to(controller => 'Users', action => 'billing_session')->name('billing_session');
 
+	$r->post('/_forms/:form')->to(controller => 'Forms', action => 'submit_form')->name('submit_form');
+
 	$r->get('/_theme/<theme>.css')->to(controller => 'Pages', action => 'render_theme')->name('render_theme');
 
 	$r->get('/_health')->to(controller => 'Health', action => 'health_check')->name('health_check');

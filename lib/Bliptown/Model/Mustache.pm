@@ -8,6 +8,15 @@ has 'metadata';
 has 'util';
 has 'prettydate_fmt';
 
+my $contact_form = <<'EOF';
+<form class="contact" method="POST" action="/_forms/contact">
+	<input type="text" placeholder="name" name="name"/>
+	<input type="email" placeholder="email" name="email"/>
+	<textarea placeholder="message" name="message"></textarea>
+	<button type="submit">Submit</button>
+</form>
+EOF
+
 sub process {
 	my ($self, $text, $args) = @_;
 
@@ -57,7 +66,10 @@ sub process_variables {
 		my $val;
 		my $date = $metadata->{date};
 
-		if ($date && $key eq 'prettydate') {
+		if ($key eq 'contactform') {
+			$val = $contact_form;
+		}
+		elsif ($date && $key eq 'prettydate') {
 			$val = $self->process_prettydate($date);
 		}
 		else {

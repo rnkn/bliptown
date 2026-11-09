@@ -3,6 +3,7 @@ use Mojo::Base -base;
 use Mojo::Template;
 use Mojo::URL;
 use Mojo::File qw(path);
+use Mojo::Util qw(generate_secret);
 use IO::Pipe;
 use POSIX qw(strftime);
 
@@ -10,10 +11,14 @@ has 'user';
 has 'token';
 has 'util';
 
+sub generate_message_id {
+	return sprintf '<%s@%s>', substr(generate_secret, 0, 40), $ENV{BLIPTOWN_DOMAIN};
+}
+
 sub generate_magic_link_email {
 	my ($self, $args) = @_;
-	my $username = $args->{username} or return;
-	my $email_address = $args->{email_address} or return;
+	my $recipient_name = $args->{recipient_name} or return;
+	my $recipient_email_address = $args->{recipient_email_address} or return;
 	my $token = $args->{token} or return;
 
 	my $url = Mojo::URL->new;
@@ -24,23 +29,24 @@ sub generate_magic_link_email {
 	$url->query(token => $token);
 
 	my %data = (
-		recipient => $username,
-		recipient_email_address => $email_address,
+		recipient_name => $recipient_name,
+		recipient_email_address => $recipient_email_address,
 		date => strftime("%a, %d %b %Y %H:%M:%S %z", localtime),
 		token => $token,
 		host => $ENV{BLIPTOWN_DOMAIN},
 		magic_link => $url,
+		message_id => generate_message_id,
 	);
 
 	my $template = Mojo::Template->new(vars => 1);
 	my $email_text = $template->render(<<'EOF', \%data);
-From: Bliptown Mayor <support@blip.town>
-To: <%= $recipient %> <<%= $recipient_email_address %>>
+From: Bliptown Mayor <mayor@blip.town>
+To: <%= $recipient_name %> <<%= $recipient_email_address %>>
 Date: <%= $date %>
-Message-ID: <%= $token %>@<%= $host %>
+Message-ID: <%= $message_id %>
 Subject: Your Bliptown login link
 
-Hi <%= $recipient %>!
+Hi <%= $recipient_name %>!
 
 Use this link to log in to your account:
 
@@ -53,11 +59,62 @@ If you did not request a login for blip.town you can safely discard this email.
 Kind regards,
 
 Bliptown Mayor
-support@blip.town
+mayor@blip.town
 https://blip.town
 EOF
 
 	return $email_text;
+}
+
+sub send_contact_form {
+	my ($self, $args) = @_;
+	my $recipient_name = $args->{recipient_name} or return;
+	my $recipient_email_address = $args->{recipient_email_address} or return;
+	my $sender_name = $args->{sender_name} || '';
+	my $sender_email_address = $args->{sender_email_address} || '';
+	my $message = $args->{message} || '';
+
+	my %data = (
+		recipient_name => $recipient_name,
+		recipient_email_address => $recipient_email_address,
+		date => strftime("%a, %d %b %Y %H:%M:%S %z", localtime),
+		sender_name => $sender_name,
+		sender_email_address => $sender_email_address,
+		message => $message,
+		message_id => generate_message_id,
+	);
+
+	my $template = Mojo::Template->new(vars => 1);
+	my $content = $template->render(<<'EOF', \%data);
+From: Bliptown Mayor <mayor@blip.town>
+To: <%= $recipient_name %> <<%= $recipient_email_address %>>
+Date: <%= $date %>
+Message-ID: <%= $message_id %>
+Subject: You have received a message from your contact form
+
+Hi <%= $recipient_name %>!
+
+You have received a message from your contact form.
+
+Name: <%= $sender_name %>
+
+Email: <%= $sender_email_address %>
+
+Message:
+
+<%= $message %>
+
+Kind regards,
+
+Bliptown Mayor
+mayor@blip.town
+https://blip.town
+EOF
+
+	$self->send_email({
+		recipient => $recipient_email_address,
+		content => $content,
+	});
 }
 
 sub send_magic_link {
@@ -73,8 +130,8 @@ sub send_magic_link {
 	return unless $token;
 
 	my $content = $self->generate_magic_link_email({
-		username => $username,
-		email_address => $email_address,
+		recipient_name => $username,
+		recipient_email_address => $email_address,
 		token => $token,
 	});
 
