@@ -534,7 +534,6 @@ EOF
 	$r->post('/_logout')->to(controller => 'Users', action => 'generate_logout')->name('generate_logout');
 	$r->get('/_logout')->to(controller => 'Users', action => 'user_logout')->name('user_logout');
 	$r->get('/_auth')->to(controller => 'Users', action => 'user_auth')->name('user_auth');
-	$r->get('/_login')->to(controller => 'Users', action => 'user_login')->name('user_login');
 
 	$r->post('/_track')->to(controller => 'Analytics', action => 'track_visit')->name('track_visit');
 
@@ -580,9 +579,8 @@ EOF
 			$c->flash(info => 'Login required');
 			$c->render(
 				status => 403,
-				template => 'message',
-				page_title => '403 Forbidden',
-				content => '403 Forbidden: sorry, this page requires a login.'
+				format => 'txt',
+				text => '403 Forbidden: sorry, this page requires a login.'
 			);
 			return;
 		}
@@ -600,9 +598,8 @@ EOF
 		if ($username eq $ENV{BLIPTOWN_DEMO_USER}) {
 			$c->render(
 				status => 403,
-				template => 'message',
-				page_title => '403 Forbidden',
-				content => '403 Forbidden: demo user cannot perform this action.'
+				format => 'txt',
+				text => '403 Forbidden: demo user cannot perform this action.'
 			);
 			return;
 		}

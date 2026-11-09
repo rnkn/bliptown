@@ -78,9 +78,8 @@ sub generate_login {
 	unless ($user) {
 		return $c->render(
 			status => 404,
-			template => 'message',
-			page_title => 'Not Found',
-			content => 'User not found.',
+			format => 'txt',
+			text => '404 Not Found: user not found.',
 		);
 	}
 
@@ -94,9 +93,8 @@ sub generate_login {
 		if (time - $created < $cooldown) {
 			return $c->render(
 				status => 429,
-				template => 'message',
-				page_title => 'Too Many Requests',
-				content => 'Too many login attempts for that user. Please try again in a moment.'
+				format => 'txt',
+				text => '429 Too Many Requests: too many login attempts for that user, please try again in a moment.'
 			);
 		};
 	}
@@ -112,15 +110,9 @@ sub generate_login {
 		email_address => $email,
 		custom_domain => $custom_domain,
 	});
-	return $c->redirect_to('user_login');
-}
-
-sub user_login {
-	my $c = shift;
-	$c->render(
-		template => 'message',
-		page_title => 'Login',
-		content => 'Check your email for a login link. You can now close this window.',
+	return $c->render(
+		format => 'txt',
+		text => 'Check your email for a login link. You can now close this window.',
 	);
 }
 
@@ -138,9 +130,8 @@ sub user_auth {
 	unless ($c->token->validate_login_token_rec({ token_rec => $token_rec })) {
 		return $c->render(
 			status => 403,
-			template => 'message',
-			page_title => 'Forbidden',
-			content => 'Sorry, that token is invalid or expired.',
+			format => 'txt',
+			text => '403 Forbidden: sorry, that token is invalid or expired.',
 		);
 	}
 
