@@ -201,7 +201,6 @@ sub user_logout {
 
 	my $host = $c->req->url->to_abs->host;
 	return $c->redirect_to('/') unless $host;
-	$host =~ s/^www\.//;
 
 	my $username = $c->session('username') || $c->get_req_username;
 	return $c->redirect_to('/') unless $username;
