@@ -31,13 +31,13 @@ my $tk = $token->create_login_token({
 
 subtest 'generate_magic_link' => sub {
 	my $email_text = $email->generate_magic_link_email({
-		username => $username,
-		email_address => 'testuser@example.com',
+		recipient_name => $username,
+		recipient_email_address => 'testuser@example.com',
 		token => $tk,
 	});
 	
 	ok defined $email_text, 'generate_magic_link_email returns email text';
-	like $email_text, qr/From: Bliptown Mayor <support\@blip\.town>/, 'email has correct From header';
+	like $email_text, qr/From: Bliptown Mayor <mayor\@blip\.town>/, 'email has correct From header';
 	like $email_text, qr/To: testuser <testuser\@example\.com>/, 'email has correct To header';
 	like $email_text, qr/Subject: Your Bliptown login link/, 'email has correct Subject';
 	like $email_text, qr/Hi testuser!/, 'email personalizes greeting';
