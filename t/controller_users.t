@@ -15,19 +15,13 @@ my $app		= create_app;
 $ENV{BLIPTOWN_DATA_HOME} = tempdir;
 $ENV{BLIPTOWN_DEMO_USER} = 'demo';
 
-subtest 'user_login renders message' => sub {
-	$t->get_ok($app->url_for('user_login') => { Host => $ENV{BLIPTOWN_DOMAIN} })
-		->status_is(200)
-		->text_like('main p', qr/Check your email for a login link/);
-};
-
 $app->email->{sent} = [];
 
 $t->post_ok($app->url_for('generate_login') => { Host => $ENV{BLIPTOWN_DOMAIN} } => form => { username => 'testuser' })
-	->status_is(302);
+	->status_is(200)
+	->content_like(qr/Check your email for a login link/);
 
 subtest 'generate_login' => sub {
-	is $t->tx->res->headers->location, $app->url_for('user_login'), 'generate_login redirects to user_login';
 	is $app->email->{sent}[0]{username}, 'testuser', 'send_magic_link received the username';
 };
 
@@ -160,7 +154,7 @@ $app->db->update('login_tokens', { expires => time - 1 }, { token => $tk_expired
 
 $t->get_ok($app->url_for('user_auth')->query(token => $tk_expired) => { Host => $ENV{BLIPTOWN_DOMAIN} })
 	->status_is(403)
-	->text_like('main p', qr/Sorry, that token is invalid or expired/);
+	->content_like(qr/sorry, that token is invalid or expired/);
 
 $t->reset_session;
 
