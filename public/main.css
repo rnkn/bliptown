@@ -597,6 +597,10 @@ dialog#toast p {
 
 /* Edit */
 
+#edit form textarea {
+	margin: 1em 0;
+}
+
 #edit form #filename, #edit form #controls {
 	display: flex;
 	gap: var(--controls-gap);
