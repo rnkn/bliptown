@@ -87,6 +87,7 @@ sub send_contact_form {
 	my $template = Mojo::Template->new(vars => 1);
 	my $content = $template->render(<<'EOF', \%data);
 From: Bliptown Mayor <mayor@blip.town>
+Reply-To: "$sender_name" <<%= $sender_email_address %>>
 To: <%= $recipient_name %> <<%= $recipient_email_address %>>
 Date: <%= $date %>
 Message-ID: <%= $message_id %>
