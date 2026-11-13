@@ -53,7 +53,8 @@ sub render_page {
 	$slug = "$prefix/$slug" if $prefix;
 
 	my $raw = path($user_path, $slug)->to_abs;
-	if (-f $raw && -r $raw && index($raw->realpath->to_abs, $user_path) == 0) {
+
+	if (-f $raw && -r $raw && index($raw->realpath, $user_path) == 0) {
 		my $ext = $raw->extname;
 		if ($ext && $c->app->config->{cdn_exts}->{$ext} && $c->app->mode eq 'production') {
 			return $c->redirect_to("https://cdn.blip.town/$req_username/$slug");
@@ -68,8 +69,15 @@ sub render_page {
 		return $c->reply->file($fallback_path);
 	}
 
+	my $path = path($user_path, $slug);
+	my $realpath = $path->realpath;
+
+	if ($slug && $path ne $realpath) {
+		my $redirect_slug = $realpath->to_rel($user_path);
+		return $c->redirect_to('render_page', catchall => $redirect_slug);
+	}
+
 	my $file = $c->get_file($slug);
-	my $canonical_file = $file->realpath if $file;
 
 	if (!$file) {
 		my $username = $c->session('username');
@@ -80,16 +88,13 @@ sub render_page {
 		}
 	}
 
-	if ($file && $file ne $canonical_file && index($canonical_file, $user_path) == 0) {
-		my $rel = $canonical_file->to_rel($user_path)->to_string;
-		map { $rel =~ s/\.$_// } @{$c->app->config->{render_exts}};
-		$rel =~ s{/index$}{/};
-		return $c->redirect_to("/$rel");
+	if ($slug && $file->basename =~ /^index\./ && $slug !~ m{/$}) {
+		return $c->redirect_to('render_page', catchall => "$slug/");
 	}
 
-	if ($slug && $slug !~ m{/$} && $file->basename =~ /^index\./
-		&& $file->dirname->realpath eq path($user_path, $slug)->realpath) {
-		return $c->redirect_to("/$slug/");
+	if ($slug && $slug =~ m{/$} && $file->basename !~ /^index\./) {
+		$slug =~ s{/$}{};
+		return $c->redirect_to('render_page', catchall => $slug);
 	}
 
 	if (${$file}[-1] eq 'index.html') {
@@ -157,31 +162,17 @@ sub new_page {
 	my $c = shift;
 	my $slug = $c->param('catchall');
 	my $ext = $c->param('ext') || 'md';
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'));
 	if ($slug =~ /(.+)\.([^.]+)$/) {
-		 $slug = $1;
-		 $ext = $2;
+		$slug = $1;
+		$ext = $2;
 	};
 	return $c->reply->not_found unless any { $ext eq $_} @{$c->app->config->{render_exts}};
 
-	if (!$slug || $slug =~ m{/$}) {
-		unless ($c->get_file("$slug/index")) {
-			$slug =~ s{/$}{};
-			if ($c->get_file($slug)) {
-				return $c->redirect_to('edit_page', catchall => $slug);
-			}
-		}
-	} else {
-		if ($c->get_file($slug)) {
-			return $c->redirect_to('edit_page', catchall => "$slug");
-		}
-		elsif ($c->get_file("$slug/index")) {
-			return $c->redirect_to('edit_page', catchall => "$slug/");
-		}
-	}
+	$c->redirect_to('edit_page', catchall => $slug) if $c->get_file($slug);
 
 	my $content;
 	if ($ext eq 'md') {
-		my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'))->to_abs;
 		my $search_path = path($user_path, $slug);
 		$content = $c->util->get_template($search_path);
 	}
@@ -199,47 +190,44 @@ sub new_page {
 
 sub edit_page {
 	my $c = shift;
-	my $username = $c->session('username');
 	my $slug = $c->param('catchall');
 	my $redirect = $c->param('back_to');
 	my $partial_re = qr/^\{\{ *> *(.*?) *\}\}$/;
-	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->realpath;
-	my $path;
-	if (!$slug || $slug =~ m{/$}) {
-		unless ($path = $c->get_file("$slug/index")) {
-			$slug =~ s{/$}{};
-			if ($path = $c->get_file($slug)) {
-				return $c->redirect_to('edit_page', catchall => $slug);
-			}
-		};
-	} else {
-		unless ($path = $c->get_file($slug)) {
-			if ($path = $c->get_file("$slug/index")) {
-				return $c->redirect_to('edit_page', catchall => "$slug/");
-			}
-		}
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $c->session('username'));
+
+	my $path = path($user_path, $slug);
+	my $realpath = $path->realpath;
+
+	if ($slug && $path ne $realpath) {
+		return $c->redirect_to('edit_page', catchall => $realpath->to_rel($user_path));
 	}
-	return $c->redirect_to('new_page', catchall => $slug) unless -f $path;
-	my $ext = $c->param('ext') || $path->extname || 'md';
+
+	my $file = $c->get_file($slug);
+	return $c->redirect_to('new_page', catchall => $slug) unless -f $file;
+
+	my $ext = $c->param('ext') || $file->extname || 'md';
 	return $c->reply->not_found unless grep { $ext eq $_} @{$c->app->config->{render_exts}};
-	my $rel_filename = $path->to_rel($user_path)->to_string;
+
+	my $rel_filename = $file->to_rel($user_path)->to_string;
 	$rel_filename = decode('UTF-8', $rel_filename);
 	my $basename = $rel_filename =~ s/\.[^.]+?$//r;
+
 	my $content;
 	my @includes;
-	if (-f $path) {
-		$content = $c->file->read_file({ filename => $path->to_string })->{chars};
+	if (-f $file) {
+		$content = $c->file->read_file({ filename => $file->to_string })->{chars};
 		my @lines = split /\n/, $content;
 		foreach my $line (@lines) {
 			if ($line =~ $partial_re) {
 				my $include = $1;
-				foreach my $f ($c->util->glob_path($include, $path->to_string)) {
+				foreach my $f ($c->util->glob_path($include, $file->to_string)) {
 					$f = path($f)->to_rel($user_path);
 					push @includes, $f;
 				}
 			}
 		}
 	}
+
 	$c->stash(
 		template => 'edit',
 		page_title => "Editing $basename",

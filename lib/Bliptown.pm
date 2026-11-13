@@ -387,24 +387,24 @@ EOF
 
 	$app->helper(
 		get_file => sub {
-			my ($c, $slug, $ext) = @_;
-			my $user_path = $c->get_req_user_path;
-			return unless $user_path;
-			my $path = path($user_path, $slug)->to_abs;
+			my ($c, $slug) = @_;
+			my $user_path = $c->get_req_user_path or return;
+			my $path = path($user_path, $slug)->realpath;
 			if (-f $path && -r $path) {
-				return unless index($path->realpath, $user_path) == 0;
+				return unless index($path, $user_path) == 0;
 				return $path;
 			}
 
 			foreach my $ext (@{$c->app->config->{render_exts}}) {
-				my $path_ext = path($user_path, "$slug.$ext")->to_abs;
+				my $path_ext = path("$path.$ext");
 				if (-f $path_ext && -r $path_ext) {
-					next unless index($path_ext->realpath, $user_path) == 0;
+					next unless index($path_ext, $user_path) == 0;
 					return $path_ext;
 				}
-				my $path_index = path($user_path, $slug, "index.$ext")->to_abs;
+
+				my $path_index = path($path, "index.$ext");
 				if (-f $path_index && -r $path_index) {
-					next unless index($path_index->realpath, $user_path) == 0;
+					next unless index($path_index, $user_path) == 0;
 					return $path_index;
 				}
 			}
