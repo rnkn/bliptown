@@ -50,7 +50,7 @@ sub render_page {
 
 	my $slug = url_unescape $c->param('catchall');
 	my $prefix = $c->stash('prefix');
-	$slug = "$prefix/" . $slug if $prefix;
+	$slug = "$prefix/$slug" if $prefix;
 
 	my $raw = path($user_path, $slug)->to_abs;
 	if (-f $raw && -r $raw && index($raw->realpath->to_abs, $user_path) == 0) {
