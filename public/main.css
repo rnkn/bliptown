@@ -36,7 +36,6 @@ body {
 :root {
 	--text-color: rgb(64,64,64);
 	--secondary-text-color: rgb(128,128,128);
-	--link-color: black;
 	--bg-color: white;
 	--code-bg-color: rgb(240,240,240);
 	--border-color: rgb(140,140,140);
