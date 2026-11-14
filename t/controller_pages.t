@@ -16,7 +16,7 @@ my $debug_messages	= $app->log->capture('debug');
 $ENV{BLIPTOWN_DATA_HOME} = tempdir->realpath;
 
 my $username	= 'testuser';
-my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
+my $user_path	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
 my $user_domain = "$username.$ENV{BLIPTOWN_DOMAIN}";
 
 $t->app->hook(before_dispatch => sub {
@@ -25,7 +25,7 @@ $t->app->hook(before_dispatch => sub {
 	return 1;
 });
 
-my $titlefile = path($user_home, '_title.txt');
+my $titlefile = path($user_path, '_title.txt');
 $titlefile->spew('My Site');
 
 my $slug	= 'foo';
@@ -56,7 +56,7 @@ $t->post_ok($app->url_for('save_page') => { Host => $user_domain } => form => {
 	content		=> $content,
 })->status_is(302);
 
-my $path = path($user_home, "$slug.$ext");
+my $path = path($user_path, "$slug.$ext");
 $path->spew($content);
 
 my $include_content = <<'EOF';
@@ -64,13 +64,13 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
 EOF
 chomp $include_content;
 
-my $include = path($user_home, 'exists.md');
+my $include = path($user_path, 'exists.md');
 $include->spew($include_content);
 
-path($user_home, 'foobar.md')->touch;
-path($user_home, 'foobaz.md')->touch;
+path($user_path, 'foobar.md')->touch;
+path($user_path, 'foobaz.md')->touch;
 
-like $debug_messages, qr/Updated file: $path/, 'edit_page updates file';
+like $debug_messages, qr/Updated file: \Q$path\E/, 'edit_page updates file';
 
 $t->get_ok($app->url_for('edit_page', catchall => $slug) => { Host => $user_domain })->status_is(200)
 	->text_is('header h1', 'Edit')
