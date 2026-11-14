@@ -60,7 +60,8 @@ sub rename_files {
 	my $payload = shift;
 	my $home = chdir_site($payload);
 	my @messages;
-	foreach my $rename (@{$payload->{filenames} // []}) {
+	my @filenames = @{$payload->{filenames} // []};
+	foreach my $rename (@filenames) {
 		my $filename = $rename->{old};
 		my $path = path $filename;
 		my $new_filename = $rename->{new};
