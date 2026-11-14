@@ -77,7 +77,7 @@
 			<label id="drawer-toggle" class="button <%= $drawer_toggle_class %>" for="drawer-toggle">+</label>
 			%= content
 			% if (flash('info')) {
-			<dialog id="toast" open>
+			<dialog class="backstage" id="toast" open>
 				<p><%= flash('info') %></p>
 			</dialog>
 			% }
