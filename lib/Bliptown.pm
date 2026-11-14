@@ -389,7 +389,7 @@ EOF
 		get_file => sub {
 			my ($c, $slug) = @_;
 			my $user_path = $c->get_req_user_path or return;
-			my $path = path($user_path, $slug)->realpath;
+			my $path = path($user_path, $slug);
 			if (-f $path && -r $path) {
 				return unless index($path, $user_path) == 0;
 				return $path;
