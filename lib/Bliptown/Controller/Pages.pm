@@ -169,7 +169,9 @@ sub new_page {
 	};
 	return $c->reply->not_found unless any { $ext eq $_} @{$c->app->config->{render_exts}};
 
-	$c->redirect_to('edit_page', catchall => $slug) if $c->get_file($slug);
+	if ($slug && $c->get_file($slug)) {
+		return $c->redirect_to('edit_page', catchall => $slug);
+	}
 
 	my $content;
 	if ($ext eq 'md') {
