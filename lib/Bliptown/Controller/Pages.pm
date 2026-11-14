@@ -70,9 +70,9 @@ sub render_page {
 	}
 
 	my $path = path($user_path, $slug);
-	my $realpath = $path->realpath;
+	my $realpath = eval { $path->realpath };
 
-	if ($slug && $path ne $realpath) {
+	if ($slug && $realpath && $path ne $realpath) {
 		my $redirect_slug = $realpath->to_rel($user_path);
 		return $c->redirect_to('render_page', catchall => $redirect_slug);
 	}
