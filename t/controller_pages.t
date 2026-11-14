@@ -13,7 +13,7 @@ my $t				= create_test;
 my $app				= create_app;
 my $debug_messages	= $app->log->capture('debug');
 
-$ENV{BLIPTOWN_DATA_HOME} = tempdir;
+$ENV{BLIPTOWN_DATA_HOME} = tempdir->realpath;
 
 my $username	= 'testuser';
 my $user_home	= path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username)->make_path;
