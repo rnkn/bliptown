@@ -204,6 +204,9 @@ sub edit_page {
 
 	my $file = $c->get_file($slug);
 	return $c->redirect_to('new_page', catchall => $slug) unless -f $file;
+	unless ($slug && $slug eq $file->to_rel($user_path)) {
+		return $c->redirect_to('edit_page', catchall => $file->to_rel($user_path));
+	}
 
 	my $ext = $c->param('ext') || $file->extname || 'md';
 	return $c->reply->not_found unless grep { $ext eq $_} @{$c->app->config->{render_exts}};
