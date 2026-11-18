@@ -299,7 +299,9 @@ sub upload_files {
 			my $res = $c->file->purge_cdn_file({
 				filename => $path->to_abs->to_string,
 			});
-			$c->log->error("CDN Purge failed: $path") unless $res->code == 200;
+			if ($res) {
+				$c->log->error("CDN Purge failed: $path") unless $res->code == 200;
+			}
 		}
 	}
 	return $c->redirect_to($redirect);
