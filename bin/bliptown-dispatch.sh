@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 case "$SSH_ORIGINAL_COMMAND" in
-	(sftp*)
+	(*sftp*)
 		exec /usr/libexec/sftp-server
 		;;
 	(git*)
