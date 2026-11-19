@@ -29,7 +29,11 @@ sub new_file {
 	}
 
 	my $path = path($dir_path, "$basename.$ext");
-	my $content = $ext eq 'md' ? $c->util->get_template($dir_path) : '';
+	my $content = '';
+	if ($ext eq 'md') {
+		my $template = $c->util->get_template($dir_path);
+		$content = $template if $template;
+	}
 
 	my $res = $c->ipc->send_message({
 		command => 'update_file',
