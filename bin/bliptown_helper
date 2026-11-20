@@ -97,7 +97,6 @@ sub link_files {
 
 sub delete_files {
 	my $payload = shift;
-	my $home = chdir_site($payload);
 	my @filenames = @{$payload->{filenames} // []};
 
 	@filenames = sort { length $b <=> length $a } @filenames;
@@ -105,14 +104,14 @@ sub delete_files {
 	my @messages;
 	foreach my $filename (@filenames) {
 		if (-d $filename) {
-			path($filename)->remove_tree or die "Cannot delete directory: $filename ($!)";
+			path($filename)->remove_tree or die "cannot delete directory: $filename ($!)";
 		}
 		else {
-			path($filename)->remove or die "Cannot delete file: $filename ($!)";
+			unlink $filename or die "cannot delete file: $filename ($!)";
 		}
-		push @messages, 'Deleted file: ' . $filename;
+		push @messages, 'deleted file: ' . $filename;
 	}
-	return join ', ', @messages;
+	return 'delete_files: ' . join ', ', @messages;
 }
 
 sub make_directory {
