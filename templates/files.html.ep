@@ -82,6 +82,16 @@
 						<button type="submit">Create Directory</button>
 					</form>
 				</dialog>
+				<button popovertarget="new-redirect-popover">New Redirect</button>
+				<dialog id="new-redirect-popover" class="modal" popover>
+					<form id="new-redirect" method="POST" action="<%= url_for('link_files')->query(dir => $dir, back_to => url_for) %>">
+						<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
+						<input type="text" name="link" placeholder="from">
+						&rarr;
+						<input type="text" name="target" placeholder="to">
+						<button type="submit">Create Redirect</button>
+					</form>
+				</dialog>
 				<button popovertarget="upload-popover">Upload Files</button>
 				<dialog id="upload-popover" class="modal" popover>
 					<div>You can drag files onto the file picker.</div>
@@ -107,17 +117,17 @@
 			<details name="files">
 				<summary class="row">
 					<span class="cell name">
-						% if ($file->{is_link} && $file->{is_dir}) {
-						<%= $file->{rel_filename} %> <span class="arrow">&rarr;</span> <a href="<%= url_for('list_files', catchall => $file->{link_filename}) %>"><%= $file->{link_filename} %></a>
+						% if ($file->{link_target} && $file->{is_dir}) {
+						<%= $file->{rel_filename} %> <span class="arrow">&rarr;</span> <a href="<%= url_for('list_files', catchall => join '/', $dir, $file->{link_target}) %>"><%= $file->{link_target} %></a>
 						% }
-						% elsif ($file->{is_link}) {
-						<%= $file->{rel_filename} %> <span class="arrow">&rarr;</span> <a href="<%= url_for('render_page', catchall => $file->{url}) %>"><%= $file->{link_filename} %></a>
+						% elsif ($file->{link_target}) {
+						<%= $file->{rel_filename} %> <span class="arrow">&rarr;</span> <a href="<%= $file->{url} %>"><%= $file->{link_target} %></a>
 						% }
 						% elsif ($file->{is_dir}) {
 						<a href="<%= url_for('list_files', catchall => $file->{abs_filename}) %>"><%= $file->{rel_filename} %></a>/
 						% }
 						% else {
-						<a href="<%= url_for('render_page', catchall => $file->{url}) %>"><%= $file->{rel_filename} %></a>
+						<a href="<%= $file->{url} %>"><%= $file->{rel_filename} %></a>
 						% }
 					</span>
 					<span class="cell size">
@@ -129,7 +139,7 @@
 				</summary>
 				<ul class="controls">
 					% unless ($file->{is_dir}) {
-					<li><a href="<%= url_for('render_page', catchall => $file->{url}) %>">View</a></li>
+					<li><a href="<%= $file->{url} %>">View</a></li>
 					% }
 					% if ($file->{rel_filename} =~ /\.($render_exts_re)$/) {
 					<li><a href="<%= url_for('edit_page', catchall => $file->{rel_filename})->query(back_to => url_for) %>">Edit</a></li>
@@ -137,12 +147,14 @@
 					% if ($file->{rel_filename} =~ /\.($render_exts_re)~?$/) {
 					<li><a href="<%= url_for('render_raw', catchall => $file->{url}) %>">Raw</a></li>
 					% }
+					% unless ($file->{link_target}) {
 					<li>
 						<form method="POST" action="<%= url_for('backup_file')->query(filename => $file->{abs_filename}, back_to => url_with) %>">
 							<input type="hidden" name="csrf_token" value="<%= csrf_token %>">
 							<button type="submit">Backup</button>
 						</form>
 					</li>
+					% }
 					<li>
 						<button popovertarget="rename-popover-<%= $file->{rel_filename} %>">Rename</button>
 						<dialog id="rename-popover-<%= $file->{rel_filename} %>" class="modal" popover>

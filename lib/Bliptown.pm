@@ -612,6 +612,7 @@ EOF
 	$protected->get('/_new/*catchall')->to(controller => 'Pages', action => 'new_page', catchall => '')->name('new_page');
 	$protected->get('/_edit/*catchall')->to(controller => 'Pages', action => 'edit_page', catchall => '')->name('edit_page');
 
+	$protected->post('/_new_redirect')->to(controller => 'Files', action => 'link_files')->name('link_files');
 	$protected->post('/_new_directory')->to(controller => 'Files', action => 'new_directory')->name('new_directory');
 	$protected->post('/_new')->to(controller => 'Files', action => 'new_file')->name('new_file');
 	$protected->post('/_delete')->to(controller => 'Files', action => 'delete_files')->name('delete_files');

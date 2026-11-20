@@ -64,22 +64,22 @@ sub list_files {
 	my @tree = $dir_path_utf8->list_tree({ dir => 1, max_depth => $max_depth })->each;
 	foreach my $path_utf8 (@tree) {
 		my $path = path(decode('UTF-8', $path_utf8));
-		my $is_link = -l $path;
 		my $is_dir = -d $path;
-		my $stats = $is_link ? $path->lstat : $path->stat;
 		my $path_rel_user_path = $path->to_rel($user_path);
 		my $path_rel_dir_path = $path->to_rel($dir_path);
-		my $link_path_rel_dir_path = $path->realpath->to_rel($dir_path);
-		my $url = $path->realpath->to_rel($user_path);
+		my $link_target = eval { readlink $path };
+		my $stats = $link_target ? $path->lstat : $path->stat;
+		my $url = Mojo::URL->new('/');
+		$link_target ? $url->path(join '/', ($dir, $link_target)) : $url->path($path_rel_user_path->to_string);
+
 		map { $url =~ s/\.$_$// } @{$c->app->config->{render_exts}};
 		$url =~ s/index$//;
 
 		push @files, {
 			abs_filename => $path_rel_user_path->to_string,
 			rel_filename => $path_rel_dir_path->to_string,
-			link_filename => $is_link ? $link_path_rel_dir_path->to_string : undef,
+			link_target => $link_target,
 			is_dir => $is_dir,
-			is_link => $is_link,
 			url => $url,
 			size => $stats->size,
 			mtime => $stats->mtime,
@@ -157,6 +157,32 @@ sub new_directory {
 
 	$c->flash(info => "Created directory $name");
 	return $c->redirect_to($redirect);
+}
+
+sub link_files {
+	my $c = shift;
+	my $username = $c->session('username');
+	my $user_path = path($ENV{BLIPTOWN_DATA_HOME}, 'users', $username);
+	my $link = $c->param('link');
+	return $c->reply->not_found unless $link;
+	my $target = $c->param('target');
+	return $c->reply->not_found unless $target;
+	my $dir = $c->param('dir') || '';
+
+	my $link_path = path($user_path, $dir, $link);
+	my $target_path = path($user_path, $dir, $target);
+
+	my $res = $c->ipc->send_message({
+		command => 'link_files',
+		system_user => $username,
+		filenames => [
+			{ link => $link_path->to_string, target => $target_path->to_string }
+		],
+	});
+	return $c->reply->exception($res->{error}) if $res->{error};
+	$c->log->debug($res->{info});
+
+	return $c->redirect_to('list_files', catchall => $dir);
 }
 
 sub rename_files {
