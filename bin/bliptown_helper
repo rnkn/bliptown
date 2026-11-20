@@ -78,6 +78,23 @@ sub rename_files {
 	return join ', ', @messages;
 }
 
+sub link_files {
+	my $payload = shift;
+	my @messages;
+	my @filenames = @{$payload->{filenames} // []};
+	my $user = $payload->{system_user};
+	foreach my $file (@filenames) {
+		my $link_path = path($file->{link});
+		my $target_path = path($file->{target})->to_rel($link_path->dirname);
+		if (-l $link_path) {
+			unlink $link_path or die "cannot delete file: $link_path";
+		}
+		symlink $target_path, $link_path or die "cannot link file: $link_path ($!)";
+		push @messages, "linked file: $link_path -> $target_path";
+	}
+	return 'link_files: ' . join '; ', @messages;
+}
+
 sub delete_files {
 	my $payload = shift;
 	my $home = chdir_site($payload);
@@ -126,6 +143,7 @@ my %allowed_commands = (
 	delete_files	=> { func => \&delete_files,	fields => [qw(system_user filenames)] },
 	backup_file		=> { func => \&backup_file,		fields => [qw(system_user filenames)] },
 	make_directory	=> { func => \&make_directory,	fields => [qw(system_user filenames)] },
+	link_files		=> { func => \&link_files,		fields => [qw(system_user filenames)] },
 	download_site	=> { func => \&download_site,	fields => [qw(system_user)] },
 );
 
