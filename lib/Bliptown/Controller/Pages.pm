@@ -63,9 +63,10 @@ sub render_page {
 	}
 
 	my $defaults_path = path($c->app->static->paths->[0], 'defaults')->to_abs;
-	my $fallback_path = path($defaults_path, $slug)->to_abs;
+	my $fallback_path = path($defaults_path, $slug);
 	if (-f $fallback_path && -r $fallback_path) {
-		return unless index($fallback_path->realpath, $defaults_path) == 0;
+		my $fallback_realpath = eval { $fallback_path->realpath } || '';
+		return $c->reply->not_found unless index($fallback_realpath, $defaults_path) == 0;
 		return $c->reply->file($fallback_path);
 	}
 
