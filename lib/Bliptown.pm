@@ -576,7 +576,6 @@ EOF
 			return 1;
 		}
 		else {
-			$c->flash(info => 'Login required');
 			$c->render(
 				status => 403,
 				format => 'txt',
