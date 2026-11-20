@@ -63,7 +63,13 @@ sub generate_login {
 	my $c = shift;
 	my $username = $c->param('username');
 	my $redirect = $c->param('back_to') // '/';
-	return unless $username;
+	unless ($username) {
+		return $c->render(
+			status => 403,
+			format => 'txt',
+			text => '403 Forbidden: sorry, this page requires a username.'
+		);
+	}
 
 	if ($username eq $ENV{BLIPTOWN_DEMO_USER}) {
 		$c->session(username => $ENV{BLIPTOWN_DEMO_USER});
